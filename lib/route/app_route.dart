@@ -1,7 +1,6 @@
-class AppRoutes {
-
-  static const splash = '/';
-  static const login = '/login';
-  static const home = '/home';
-
+abstract class AppRoutes {
+  static const String splash = '/';
+  static const String login = '/login';
+  static const String home = '/home';
+  static const String editProfile = '/edit-profile';
 }

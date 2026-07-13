@@ -17,6 +17,12 @@ class SettingsController extends GetxController {
   final RxString userPhone = '+1 555 000 1234'.obs;
   final RxString userEmail = 'john@example.com'.obs;
 
+
+  // Profile information
+  final RxString userUsername = '@johndoe'.obs;
+  final RxString userBio = 'Available'.obs;
+
+
   Locale get currentLocale {
     switch (language.value) {
       case AppLanguage.english:
@@ -67,6 +73,22 @@ class SettingsController extends GetxController {
     if (newValue.isNotEmpty && GetUtils.isEmail(newValue)) {
       userEmail.value = newValue;
     }
+  }
+
+  void updateUsername(String value) {
+    final String newValue = value.trim();
+
+    if (newValue.isEmpty) {
+      return;
+    }
+
+    userUsername.value = newValue.startsWith('@')
+        ? newValue
+        : '@$newValue';
+  }
+
+  void updateBio(String value) {
+    userBio.value = value.trim();
   }
 
   Future<void> logout() async {

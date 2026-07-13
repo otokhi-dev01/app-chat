@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:appchat/screen/profile/profile_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -90,6 +91,9 @@ class HomeAppBar extends StatelessWidget
           IconButton(
             tooltip: 'Edit profile',
             onPressed: () {
+              Get.to(
+                  () => ProfileEditScreen(),
+              );
               // Edit profile
             },
             icon: const Icon(

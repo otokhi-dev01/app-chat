@@ -1,57 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../controllers/settings_controller.dart';
+import '../../route/app_route.dart';
+import '../widgets/profile/profile_header.dart';
+import '../widgets/profile/profile_imformation_card.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final SettingsController controller =
+    Get.find<SettingsController>();
+
     return ListView(
-      padding: const EdgeInsets.all(16),
-      children: const [
-        SizedBox(height: 20),
-        CircleAvatar(
-          radius: 55,
-          child: Icon(
-            Icons.person,
-            size: 60,
+      keyboardDismissBehavior:
+      ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        18,
+        16,
+        110,
+      ),
+      children: [
+        Obx(
+              () => ProfileHeader(
+            name: controller.userName.value,
+            email: controller.userEmail.value,
+            onEditProfile: () {
+              Get.toNamed(AppRoutes.editProfile);
+            },
           ),
         ),
-        SizedBox(height: 16),
-        Center(
+
+        const SizedBox(height: 24),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 6,
+          ),
           child: Text(
-            'User Name',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+            'profile_information'.tr,
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall
+                ?.copyWith(
+              color:
+              Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        SizedBox(height: 5),
-        Center(
-          child: Text(
-            'user@gmail.com',
-            style: TextStyle(
-              color: Colors.grey,
-            ),
+
+        const SizedBox(height: 8),
+
+        Obx(
+              () => ProfileInformationCard(
+            username: controller.userUsername.value,
+            bio: controller.userBio.value,
           ),
-        ),
-        SizedBox(height: 30),
-        ListTile(
-          leading: Icon(Icons.phone_outlined),
-          title: Text('Phone'),
-          subtitle: Text('+855 12 345 678'),
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.alternate_email),
-          title: Text('Username'),
-          subtitle: Text('@username'),
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.info_outline),
-          title: Text('Bio'),
-          subtitle: Text('Available'),
         ),
       ],
     );

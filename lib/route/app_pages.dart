@@ -1,4 +1,6 @@
+import 'package:appchat/screen/profile/profile_edit_screen.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import '../screen/splash/splash_screen.dart';
 import '../screen/auth/login_screen.dart';
 import '../screen/home/home_screen.dart';
@@ -27,6 +29,14 @@ class AppPages {
       page: () => HomeScreen(),
     ),
 
+  GetPage(
+  name: AppRoutes.editProfile,
+  page: () => ProfileEditScreen(),
+  transition: Transition.rightToLeft,
+  transitionDuration: const Duration(
+  milliseconds: 250,
+  ),
+  ),
   ];
 
 }
