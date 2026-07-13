@@ -91,4 +91,27 @@ const Map<String, String> enUS = {
 
   'user': 'User',
   'profile_information': 'Profile Information',
+
+  'welcome_back': 'Welcome Back',
+  'login_to_continue': 'Login to continue',
+  // 'email': 'Email',
+  'password': 'Password',
+  'login': 'Login',
+  'logging_in': 'Logging in...',
+  'forgot_password': 'Forgot password?',
+  'dont_have_account': "Don't have an account?",
+  'create_account': 'Create Account',
+  'show_password': 'Show password',
+  'hide_password': 'Hide password',
+
+  'enter_email': 'Please enter your email',
+  // 'invalid_email': 'Please enter a valid email address',
+  'enter_password': 'Please enter your password',
+  'password_min_length':
+  'Password must contain at least 6 characters',
+
+  'success': 'Success',
+  'error': 'Error',
+  'login_successful': 'Login successful',
+  'login_failed': 'Login failed. Please try again',
 };

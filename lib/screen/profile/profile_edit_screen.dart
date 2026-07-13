@@ -6,7 +6,6 @@ import '../widgets/profile/profile_avatar_section.dart';
 import '../widgets/profile/profile_field.dart';
 import '../widgets/profile/profile_photo_sheet.dart';
 
-
 class ProfileEditScreen extends StatelessWidget {
   ProfileEditScreen({super.key});
 

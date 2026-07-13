@@ -92,4 +92,27 @@ const Map<String, String> kmKH = {
 
   'user': 'អ្នកប្រើ',
   'profile_information': 'ព័ត៌មានប្រវត្តិរូប',
+
+  'welcome_back': 'សូមស្វាគមន៍មកវិញ',
+  'login_to_continue': 'ចូលគណនីដើម្បីបន្ត',
+  // 'email': 'អ៊ីមែល',
+  'password': 'ពាក្យសម្ងាត់',
+  'login': 'ចូលគណនី',
+  'logging_in': 'កំពុងចូលគណនី...',
+  'forgot_password': 'ភ្លេចពាក្យសម្ងាត់?',
+  'dont_have_account': 'មិនទាន់មានគណនីមែនទេ?',
+  'create_account': 'បង្កើតគណនី',
+  'show_password': 'បង្ហាញពាក្យសម្ងាត់',
+  'hide_password': 'លាក់ពាក្យសម្ងាត់',
+
+  'enter_email': 'សូមបញ្ចូលអ៊ីមែលរបស់អ្នក',
+  // 'invalid_email': 'សូមបញ្ចូលអ៊ីមែលឱ្យបានត្រឹមត្រូវ',
+  'enter_password': 'សូមបញ្ចូលពាក្យសម្ងាត់',
+  'password_min_length':
+  'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួអក្សរ',
+
+  'success': 'ជោគជ័យ',
+  'error': 'មានបញ្ហា',
+  'login_successful': 'ចូលគណនីបានជោគជ័យ',
+  'login_failed': 'ចូលគណនីមិនបាន សូមព្យាយាមម្ដងទៀត',
 };
