@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/main_navigation_controller.dart';
+
 class MainBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -18,13 +20,11 @@ class MainBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
     final bool isDark = theme.brightness == Brightness.dark;
 
-    final Color backgroundColor = isDark
-        ? const Color(0xFF1B1D22)
-        : Colors.white;
+    final Color backgroundColor =
+    isDark ? const Color(0xFF1B1D22) : Colors.white;
 
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
@@ -50,7 +50,7 @@ class MainBottomNavigation extends StatelessWidget {
             children: [
               Expanded(
                 child: _NavigationItem(
-                  index: 0,
+                  index: MainTab.chats.index,
                   currentIndex: currentIndex,
                   icon: Icons.chat_bubble_outline_rounded,
                   activeIcon: Icons.chat_bubble_rounded,
@@ -62,7 +62,7 @@ class MainBottomNavigation extends StatelessWidget {
               ),
               Expanded(
                 child: _NavigationItem(
-                  index: 1,
+                  index: MainTab.contacts.index,
                   currentIndex: currentIndex,
                   icon: Icons.people_outline_rounded,
                   activeIcon: Icons.people_rounded,
@@ -73,7 +73,7 @@ class MainBottomNavigation extends StatelessWidget {
               ),
               Expanded(
                 child: _NavigationItem(
-                  index: 2,
+                  index: MainTab.settings.index,
                   currentIndex: currentIndex,
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings_rounded,
@@ -84,7 +84,7 @@ class MainBottomNavigation extends StatelessWidget {
               ),
               Expanded(
                 child: _NavigationItem(
-                  index: 3,
+                  index: MainTab.profile.index,
                   currentIndex: currentIndex,
                   icon: Icons.person_outline_rounded,
                   activeIcon: Icons.person_rounded,
@@ -129,76 +129,79 @@ class _NavigationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
     final Color primary = colorScheme.primary;
-    final Color inactiveColor =
-        colorScheme.onSurfaceVariant;
+    final Color inactiveColor = colorScheme.onSurfaceVariant;
 
     final Color selectedBackground =
     primary.withValues(alpha: 0.11);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        highlightColor: Colors.transparent,
-        splashColor: primary.withValues(alpha: 0.10),
-        onTap: () {
-          if (isSelected) {
-            return;
-          }
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          splashFactory: NoSplash.splashFactory,
+          onTap: () {
+            if (isSelected) {
+              return;
+            }
 
-          HapticFeedback.selectionClick();
-          onTap(index);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 240),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.symmetric(horizontal: 1),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? selectedBackground
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _NavigationIcon(
-                selected: isSelected,
-                icon: icon,
-                activeIcon: activeIcon,
-                primary: primary,
-                inactiveColor: inactiveColor,
-                badgeCount: badgeCount,
-                profileImage: profileImage,
-                navigationBackground:
-                navigationBackground,
-              ),
-              const SizedBox(height: 3),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                style: TextStyle(
-                  color: isSelected
-                      ? primary
-                      : inactiveColor,
-                  fontSize: 10.5,
-                  height: 1,
-                  fontWeight: isSelected
-                      ? FontWeight.w700
-                      : FontWeight.w500,
+            onTap(index);
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            margin: EdgeInsets.symmetric(horizontal: 1),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? selectedBackground
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _NavigationIcon(
+                  selected: isSelected,
+                  icon: icon,
+                  activeIcon: activeIcon,
+                  primary: primary,
+                  inactiveColor: inactiveColor,
+                  badgeCount: badgeCount,
+                  profileImage: profileImage,
+                  navigationBackground: navigationBackground,
                 ),
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+                 SizedBox(height: 3),
+                AnimatedDefaultTextStyle(
+                  duration: Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  style: TextStyle(
+                    color: isSelected
+                        ? primary
+                        : inactiveColor,
+                    fontSize: 10.5,
+                    height: 1,
+                    fontWeight: isSelected
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -229,15 +232,16 @@ class _NavigationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
 
     if (profileImage != null) {
       return AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
+        duration: Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
         width: 29,
         height: 29,
-        padding: const EdgeInsets.all(1.5),
+        padding: EdgeInsets.all(1.5),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
@@ -262,38 +266,41 @@ class _NavigationIcon extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
-            switchInCurve: Curves.easeOutBack,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (child, animation) {
-              return ScaleTransition(
-                scale: animation,
-                child: FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
-              );
-            },
-            child: Icon(
-              selected ? activeIcon : icon,
-              key: ValueKey<bool>(selected),
-              size: 26,
-              color: selected
-                  ? primary
-                  : inactiveColor,
-            ),
+      AnimatedSwitcher(
+      duration: Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (
+          Widget child,
+          Animation<double> animation,
+          ) {
+        return ScaleTransition(
+          scale: animation,
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
           ),
+        );
+      },
+      child: Icon(
+        selected ? activeIcon : icon,
+        key: ValueKey<bool>(selected),
+        size: 26,
+        color: selected
+            ? primary
+            : inactiveColor,
+      ),
+    ),
           if (badgeCount > 0)
             Positioned(
               top: -5,
               right: -3,
               child: Container(
-                constraints: const BoxConstraints(
+                constraints: BoxConstraints(
                   minWidth: 18,
                   minHeight: 18,
                 ),
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 4,
                 ),
                 alignment: Alignment.center,

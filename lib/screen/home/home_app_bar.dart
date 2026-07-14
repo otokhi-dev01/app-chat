@@ -1,257 +1,273 @@
 import 'dart:ui';
 
-import 'package:appchat/screen/profile/profile_edit_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/home_controller.dart';
+import '../../controllers/chat_controller.dart';
+import 'home_app_bar_actions.dart';
 import 'home_category_filter.dart';
+import 'home_search_bar_preview.dart';
 
 class HomeAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final int selectedIndex;
   final List<String> titles;
-  final HomeController controller;
+  final ChatController controller;
 
-  const HomeAppBar({
+  HomeAppBar({
     super.key,
     required this.selectedIndex,
     required this.titles,
     required this.controller,
   });
 
+  double get bottomHeight {
+    return selectedIndex == 0 ? 74 : 0;
+  }
+
+  String get currentTitle {
+    if (selectedIndex < 0 ||
+        selectedIndex >= titles.length) {
+      return '';
+    }
+
+    return titles[selectedIndex];
+  }
+
   @override
   Size get preferredSize {
-    // Height stays fixed for tab 0 whether it's showing the category
-    // filter or the search field — only the content inside animates.
-    final double bottomHeight = selectedIndex == 0 ? 74 : 0;
-
     return Size.fromHeight(
       kToolbarHeight + bottomHeight,
     );
   }
 
-  List<Widget> _buildActions() {
-    switch (selectedIndex) {
-      case 0:
-        return [
-          IconButton(
-            tooltip: 'Search chats',
-            onPressed: controller.openSearchScreen,
-            icon: const Icon(Icons.search_rounded),
-          ),
-          IconButton(
-            tooltip: 'More',
-            onPressed: () {
-              // More chat options
-            },
-            icon: const Icon(
-              Icons.more_vert_rounded,
-            ),
-          ),
-        ];
+  void _handleChatMenu(
+      BuildContext context,
+      String value,
+      ) {
+    switch (value) {
+      case 'mark_all_read':
+        _showMessage(
+          context,
+          'All chats marked as read',
+        );
+        break;
 
-      case 1:
-        return [
-          IconButton(
-            tooltip: 'Search contacts',
-            onPressed: () {
-              // Search contacts
-            },
-            icon: const Icon(
-              Icons.search_rounded,
-            ),
-          ),
-          IconButton(
-            tooltip: 'Add contact',
-            onPressed: () {
-              // Add contact
-            },
-            icon: const Icon(
-              Icons.person_add_alt_1_rounded,
-            ),
-          ),
-        ];
+      case 'archived_chats':
+        _showMessage(
+          context,
+          'Open archived chats',
+        );
+        break;
 
-      case 2:
-        return [
-          IconButton(
-            tooltip: 'Search settings',
-            onPressed: () {
-              // Search settings
-            },
-            icon: const Icon(
-              Icons.search_rounded,
-            ),
-          ),
-        ];
-
-      case 3:
-        return [
-          IconButton(
-            tooltip: 'Edit profile',
-            onPressed: () {
-              Get.to(
-                  () => ProfileEditScreen(),
-              );
-              // Edit profile
-            },
-            icon: const Icon(
-              Icons.edit_rounded,
-            ),
-          ),
-        ];
-
-      default:
-        return [];
+      case 'chat_settings':
+        _showMessage(
+          context,
+          'Open chat settings',
+        );
+        break;
     }
+  }
+
+  void _showMessage(
+      BuildContext context,
+      String message,
+      ) {
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: colorScheme.primary,
+          margin: EdgeInsets.all(14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      );
+  }
+
+  SystemUiOverlayStyle _overlayStyle(
+      ThemeData theme,
+      bool isDark,
+      ) {
+    if (isDark) {
+      return SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor:
+        theme.scaffoldBackgroundColor,
+      );
+    }
+
+    return SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor:
+      theme.scaffoldBackgroundColor,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark =
-        Theme.of(context).brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
-    // ClipRect + BackdropFilter gives the app bar the same frosted-glass
-    // look as the bottom nav, so the chat list is faintly visible/blurred
-    // underneath it rather than hidden behind a solid bar.
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: AppBar(
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          titleSpacing: 16,
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: isDark
-              ? const Color(0xFF171A1F).withValues(alpha: 0.72)
-              : Colors.white.withValues(alpha: 0.72),
+    bool isDark =
+        theme.brightness == Brightness.dark;
 
-          title: AnimatedSwitcher(
-            duration: const Duration(
-              milliseconds: 220,
+    Color appBarColor = isDark
+        ? Color(0xFF1B1D22).withValues(alpha: 0.92)
+        : Colors.white.withValues(alpha: 0.96);
+
+    Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Color(0xFFE7E9ED);
+
+    Color actionBackground = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Color(0xFFF2F4F7);
+
+    return AppBar(
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: Colors.transparent,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      forceMaterialTransparency: true,
+      titleSpacing: 16,
+      systemOverlayStyle: _overlayStyle(
+        theme,
+        isDark,
+      ),
+      iconTheme: IconThemeData(
+        color: colorScheme.onSurface,
+      ),
+      actionsIconTheme: IconThemeData(
+        color: colorScheme.onSurface,
+      ),
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 18,
+            sigmaY: 18,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: appBarColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: borderColor,
+                ),
+              ),
             ),
-            transitionBuilder: (child, animation) {
+          ),
+        ),
+      ),
+      title: AnimatedSwitcher(
+        duration: Duration(milliseconds: 220),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (
+            Widget child,
+            Animation<double> animation,
+            ) {
+          Animation<Offset> position =
+          Tween<Offset>(
+            begin: Offset(0.08, 0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+          );
+
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: position,
+              child: child,
+            ),
+          );
+        },
+        child: Text(
+          currentTitle,
+          key: ValueKey<int>(selectedIndex),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      actions: [
+        HomeAppBarActions(
+          selectedIndex: selectedIndex,
+          controller: controller,
+          backgroundColor: actionBackground,
+          iconColor: colorScheme.onSurface,
+          onChatMenuSelected: (String value) {
+            _handleChatMenu(
+              context,
+              value,
+            );
+          },
+        ),
+        SizedBox(width: 10),
+      ],
+      bottom: selectedIndex == 0
+          ? PreferredSize(
+        preferredSize: Size.fromHeight(74),
+        child: Obx(
+              () => AnimatedSwitcher(
+            duration: Duration(
+              milliseconds: 260,
+            ),
+            switchInCurve:
+            Curves.easeOutCubic,
+            switchOutCurve:
+            Curves.easeInCubic,
+            transitionBuilder: (
+                Widget child,
+                Animation<double> animation,
+                ) {
               return FadeTransition(
                 opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.08, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
+                child: SizeTransition(
+                  sizeFactor: animation,
+                  axisAlignment: -1,
                   child: child,
                 ),
               );
             },
-            child: Text(
-              titles[selectedIndex],
-              key: ValueKey<int>(selectedIndex),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+            child: controller.isSearching.value
+                ? HomeSearchBarPreview(
+              key: ValueKey(
+                'search-preview',
               ),
-            ),
-          ),
-
-          actions: _buildActions(),
-
-          bottom: selectedIndex == 0
-              ? PreferredSize(
-            preferredSize: const Size.fromHeight(74),
-            child: Obx(
-                  () => AnimatedSwitcher(
-                duration: const Duration(milliseconds: 260),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axisAlignment: -1,
-                      child: child,
-                    ),
-                  );
-                },
-                child: controller.isSearching.value
-                    ? _SearchBarPreview(
-                  key: const ValueKey('search'),
-                  controller: controller,
-                )
-                    : HomeCategoryFilter(
-                  key: const ValueKey('filter'),
-                  controller: controller,
-                ),
+              controller: controller,
+            )
+                : HomeCategoryFilter(
+              key: ValueKey(
+                'category-filter',
               ),
-            ),
-          )
-              : null,
-        ),
-      ),
-    );
-  }
-}
-
-/// Non-editable pinned search bar shown while the chat list is scrolled
-/// down. Tapping it opens the dedicated SearchScreen — it never accepts
-/// typing itself.
-class _SearchBarPreview extends StatelessWidget {
-  final HomeController controller;
-
-  const _SearchBarPreview({
-    super.key,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark =
-        Theme.of(context).brightness == Brightness.dark;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 2, 12, 10),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: controller.openSearchScreen,
-          child: Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.10)
-                    : Colors.black.withValues(alpha: 0.06),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.search_rounded,
-                  size: 20,
-                  color: isDark
-                      ? Colors.grey.shade400
-                      : Colors.grey.shade600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Search chats',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
-                  ),
-                ),
-              ],
+              controller: controller,
             ),
           ),
         ),
-      ),
+      )
+          : null,
     );
   }
 }

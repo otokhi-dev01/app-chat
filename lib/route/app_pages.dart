@@ -14,13 +14,13 @@ class AppPages {
 
     GetPage(
       name: AppRoutes.splash,
-      page: () => const SplashScreen(),
+      page: () =>  SplashScreen(),
     ),
 
 
     GetPage(
       name: AppRoutes.login,
-      page: () => const LoginScreen(),
+      page: () =>  LoginScreen(),
     ),
 
 
@@ -33,7 +33,7 @@ class AppPages {
   name: AppRoutes.editProfile,
   page: () => ProfileEditScreen(),
   transition: Transition.rightToLeft,
-  transitionDuration: const Duration(
+  transitionDuration:  Duration(
   milliseconds: 250,
   ),
   ),

@@ -2,19 +2,19 @@ import 'package:appchat/screen/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
 import '../../route/app_route.dart';
 import '../widgets/app_logo.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final GlobalKey<FormState> _formKey =
-  GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController =
   TextEditingController();
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       // Replace this delay with your login API.
       await Future<void>.delayed(
-        const Duration(seconds: 2),
+        Duration(seconds: 2),
       );
 
       if (!mounted) {
@@ -96,19 +96,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: const Text('Login Successful'),
+            content: Text('Login Successful'),
             backgroundColor:
             Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
+            margin: EdgeInsets.all(16),
           ),
         );
 
-      // Unfocus before removing the login screen.
       FocusManager.instance.primaryFocus?.unfocus();
 
       await Future<void>.delayed(
-        const Duration(milliseconds: 250),
+        Duration(milliseconds: 250),
       );
 
       if (!mounted) {
@@ -129,13 +128,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: const Text(
+            content: Text(
               'Login failed. Please try again.',
             ),
             backgroundColor:
             Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
+            margin: EdgeInsets.all(16),
           ),
         );
     }
@@ -163,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
         theme.brightness == Brightness.dark;
 
     final Color fieldBackground = isDark
-        ? const Color(0xFF1B1D22)
+        ? Color(0xFF1B1D22)
         : Colors.white;
 
     final Color fieldBorderColor = isDark
@@ -177,13 +176,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             keyboardDismissBehavior:
             ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(
                 begin: 0,
                 end: 1,
               ),
-              duration: const Duration(
+              duration: Duration(
                 milliseconds: 550,
               ),
               curve: Curves.easeOutCubic,
@@ -206,13 +205,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment:
                     MainAxisAlignment.center,
                     children: [
-                      const AppLogo(
+                      AppLogo(
                         size: 120,
                         padding: 0,
                         fit: BoxFit.contain,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       Text(
                         'Welcome Back',
@@ -225,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
 
                       Text(
                         'Login to continue',
@@ -236,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40),
 
                       _LoginTextField(
                         controller: _emailController,
@@ -249,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextInputType.emailAddress,
                         textInputAction:
                         TextInputAction.next,
-                        autofillHints: const [
+                        autofillHints: [
                           AutofillHints.email,
                           AutofillHints.username,
                         ],
@@ -259,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       _LoginTextField(
                         controller: _passwordController,
@@ -271,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: _obscurePassword,
                         textInputAction:
                         TextInputAction.done,
-                        autofillHints: const [
+                        autofillHints: [
                           AutofillHints.password,
                         ],
                         validator: _validatePassword,
@@ -285,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed:
                           _togglePasswordVisibility,
                           icon: AnimatedSwitcher(
-                            duration: const Duration(
+                            duration: Duration(
                               milliseconds: 180,
                             ),
                             transitionBuilder:
@@ -313,7 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       SizedBox(
                         width: double.infinity,
@@ -339,12 +338,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           child: AnimatedSwitcher(
-                            duration: const Duration(
+                            duration: Duration(
                               milliseconds: 220,
                             ),
                             child: _isLoading
                                 ? Row(
-                              key: const ValueKey(
+                              key: ValueKey(
                                 'loading',
                               ),
                               mainAxisAlignment:
@@ -361,8 +360,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .onPrimary,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
-                                const Text(
+                                SizedBox(width: 10),
+                                Text(
                                   'Logging in...',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -372,7 +371,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             )
-                                : const Text(
+                                : Text(
                               'Login',
                               key: ValueKey('login'),
                               style: TextStyle(
@@ -385,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -408,10 +407,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ?.unfocus();
 
                               Get.to(
-                                    () => const RegisterScreen(),
+                                    () => RegisterScreen(),
                                 transition:
                                 Transition.rightToLeft,
-                                duration: const Duration(
+                                duration: Duration(
                                   milliseconds: 280,
                                 ),
                               );
@@ -420,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               foregroundColor:
                               colorScheme.primary,
                             ),
-                            child: const Text(
+                            child: Text(
                               'Create Account',
                               style: TextStyle(
                                 fontWeight:
@@ -457,7 +456,7 @@ class _LoginTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool obscureText;
 
-  const _LoginTextField({
+  _LoginTextField({
     required this.controller,
     required this.focusNode,
     required this.label,

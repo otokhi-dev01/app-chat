@@ -1,53 +1,26 @@
+import 'package:appchat/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import '../../controllers/home_controller.dart';
-import '../../models/home_model.dart';
+import 'package:get/get.dart';
+
+import '../../models/chat_model.dart';
 import '../widgets/chat_title.dart';
 
 class HomeChatList extends StatelessWidget {
-  final HomeController controller;
+  final ChatController controller;
 
-  const HomeChatList({
+  HomeChatList({
     super.key,
     required this.controller,
   });
-
-  List<ChatModel> _filterChats(
-      List<ChatModel> chats,
-      int categoryIndex,
-      ) {
-    switch (categoryIndex) {
-      case 1:
-        return chats
-            .where((chat) => chat.unread > 0)
-            .toList();
-
-      case 2:
-        return chats
-            .where((chat) => chat.type == 'personal')
-            .toList();
-
-      case 3:
-        return chats
-            .where((chat) => chat.type == 'group')
-            .toList();
-
-      default:
-        return chats;
-    }
-  }
 
   String _emptyMessage(int categoryIndex) {
     switch (categoryIndex) {
       case 1:
         return 'No unread conversations';
-
       case 2:
         return 'No personal conversations';
-
       case 3:
         return 'No group conversations';
-
       default:
         return 'No conversations found';
     }
@@ -57,42 +30,56 @@ class HomeChatList extends StatelessWidget {
     switch (categoryIndex) {
       case 1:
         return Icons.mark_chat_read_outlined;
-
       case 2:
         return Icons.person_outline_rounded;
-
       case 3:
         return Icons.groups_outlined;
-
       default:
         return Icons.chat_bubble_outline_rounded;
     }
   }
 
+  Widget _scrollListener({
+    required Widget child,
+  }) {
+    return NotificationListener<UserScrollNotification>(
+      onNotification: (
+          UserScrollNotification notification,
+          ) {
+        controller.handleChatScroll(notification);
+        return false;
+      },
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
     return Obx(() {
-      final int categoryIndex =
+      int categoryIndex =
           controller.selectedCategoryIndex.value;
 
-      final bool isLoading =
+      bool isLoading =
           controller.isLoading.value;
 
-      final String errorMessage =
+      String errorMessage =
           controller.errorMessage.value;
 
-      final List<ChatModel> allChats =
+      List<ChatModel> allChats =
       controller.chats.toList();
 
-      final List<ChatModel> filteredChats =
-      _filterChats(
-        allChats,
-        categoryIndex,
-      );
+      // Important fix:
+      List<ChatModel> visibleChats =
+          controller.filteredChats;
 
       if (isLoading && allChats.isEmpty) {
-        return const Center(
-          child: CircularProgressIndicator(),
+        return Center(
+          child: CircularProgressIndicator(
+            color: colorScheme.primary,
+          ),
         );
       }
 
@@ -104,51 +91,104 @@ class HomeChatList extends StatelessWidget {
         );
       }
 
-      if (filteredChats.isEmpty) {
-        return RefreshIndicator(
-          onRefresh: controller.refreshChats,
-          child: ListView(
-            physics:
-            const AlwaysScrollableScrollPhysics(),
-            children: [
-              const SizedBox(height: 160),
-              Icon(
-                _emptyIcon(categoryIndex),
-                size: 68,
-                color: Colors.grey,
+      if (visibleChats.isEmpty) {
+        return _scrollListener(
+          child: RefreshIndicator(
+            color: colorScheme.primary,
+            onRefresh: controller.refreshChats,
+            child: ListView(
+              physics: BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
               ),
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  _emptyMessage(categoryIndex),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
+              padding: EdgeInsets.fromLTRB(
+                24,
+                130,
+                24,
+                110,
+              ),
+              children: [
+                Center(
+                  child: Container(
+                    width: 88,
+                    height: 88,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withValues(
+                        alpha: 0.10,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _emptyIcon(categoryIndex),
+                      size: 42,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 18),
+                Text(
+                  _emptyMessage(categoryIndex),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 7),
+                Text(
+                  'Pull down to refresh your conversations.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
 
-      return RefreshIndicator(
-        onRefresh: controller.refreshChats,
-        child: ListView.separated(
-          physics:
-          const AlwaysScrollableScrollPhysics(),
-          itemCount: filteredChats.length,
-          separatorBuilder: (_, __) {
-            return const Divider(
-              height: 1,
-              indent: 80,
-            );
-          },
-          itemBuilder: (context, index) {
-            return ChatTile(
-              chat: filteredChats[index],
-            );
-          },
+      return _scrollListener(
+        child: RefreshIndicator(
+          color: colorScheme.primary,
+          onRefresh: controller.refreshChats,
+          child: ListView.separated(
+            physics: BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            keyboardDismissBehavior:
+            ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.only(
+              top: 6,
+              bottom: 105,
+            ),
+            itemCount: visibleChats.length,
+            separatorBuilder: (
+                BuildContext context,
+                int index,
+                ) {
+              return Divider(
+                height: 1,
+                thickness: 1,
+                indent: 80,
+                endIndent: 16,
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: 0.45,
+                ),
+              );
+            },
+            itemBuilder: (
+                BuildContext context,
+                int index,
+                ) {
+              ChatModel chat = visibleChats[index];
+
+              return ChatTile(
+                key: ValueKey(chat.id),
+                chat: chat,
+              );
+            },
+          ),
         ),
       );
     });
@@ -159,36 +199,49 @@ class _ChatErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const _ChatErrorWidget({
+  _ChatErrorWidget({
     required this.message,
     required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_rounded,
               size: 64,
-              color: Colors.grey,
+              color: colorScheme.error,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
+            Text(
+              'Unable to load chats',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
-              icon: const Icon(
+              icon: Icon(
                 Icons.refresh_rounded,
               ),
-              label: const Text('Try Again'),
+              label: Text('Try Again'),
             ),
           ],
         ),

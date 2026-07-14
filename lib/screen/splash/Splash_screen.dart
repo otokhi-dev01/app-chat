@@ -8,15 +8,15 @@ import '../../route/app_route.dart';
 import '../widgets/app_logo.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+  SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Timer(
-        const Duration(seconds: 3),
+        Duration(seconds: 3),
             () {
-          Get.offAllNamed(AppRoutes.login);
+          Get.offAllNamed(AppRoutes.home);
         },
       );
     });
@@ -28,15 +28,13 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AppLogo(
+              AppLogo(
                 size: 120,
                 padding: 0,
                 fit: BoxFit.contain,
               ),
-
-              const SizedBox(height: 30),
-
-              const Text(
+              SizedBox(height: 30),
+              Text(
                 'ChatApp',
                 style: TextStyle(
                   fontSize: 32,
@@ -45,20 +43,16 @@ class SplashScreen extends StatelessWidget {
                   letterSpacing: 1,
                 ),
               ),
-
-              const SizedBox(height: 10),
-
-              const Text(
+              SizedBox(height: 10),
+              Text(
                 'Fast. Secure. Simple.',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
                 ),
               ),
-
-              const SizedBox(height: 60),
-
-              const CircularProgressIndicator(
+              SizedBox(height: 60),
+              CircularProgressIndicator(
                 color: Colors.white,
               ),
             ],

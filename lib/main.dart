@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
 
         translations: AppTranslations(),
         locale: settingsController.currentLocale,
-        fallbackLocale: const Locale('en', 'US'),
+        fallbackLocale: Locale('en', 'US'),
 
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
