@@ -1,23 +1,29 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../models/chat_model.dart';
-import '../screen/search/search_screen.dart';
-
+import '../screen/home/search/search_screen.dart';
 class ChatController extends GetxController {
   final RxList<ChatModel> chats = <ChatModel>[].obs;
 
   final RxBool isLoading = false.obs;
   final RxBool isSearching = false.obs;
-
-  // Controls the search preview inside HomeAppBar.
   final RxBool showHomeSearchBar = true.obs;
 
   final RxString searchQuery = ''.obs;
   final RxString errorMessage = ''.obs;
 
   final RxInt selectedCategoryIndex = 0.obs;
+
+  TextEditingController? _searchTextController;
+
+  TextEditingController get searchTextController {
+    return _searchTextController ??=
+        TextEditingController(
+          text: searchQuery.value,
+        );
+  }
 
   final List<String> categories = [
     'All',
@@ -29,6 +35,7 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     loadChats();
   }
 
@@ -38,7 +45,21 @@ class ChatController extends GetxController {
     }
 
     isSearching.value = true;
+
     FocusManager.instance.primaryFocus?.unfocus();
+
+    // Always create a fresh controller when opening search.
+    _disposeSearchTextController();
+
+    _searchTextController =
+        TextEditingController(
+          text: searchQuery.value,
+        );
+
+    _searchTextController!.selection =
+        TextSelection.collapsed(
+          offset: _searchTextController!.text.length,
+        );
 
     try {
       await Get.to(
@@ -46,11 +67,17 @@ class ChatController extends GetxController {
           controller: this,
         ),
         transition: Transition.fadeIn,
-        duration: Duration(milliseconds: 220),
+        duration: Duration(
+          milliseconds: 220,
+        ),
       );
     } finally {
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      searchQuery.value = '';
+      _disposeSearchTextController();
+
       isSearching.value = false;
-      clearSearch();
     }
   }
 
@@ -63,7 +90,6 @@ class ChatController extends GetxController {
 
     double offset = notification.metrics.pixels;
 
-    // At the top, close the search field.
     if (offset <= 5) {
       showHomeSearchBar.value = false;
       return;
@@ -71,13 +97,11 @@ class ChatController extends GetxController {
 
     if (notification.direction ==
         ScrollDirection.reverse) {
-      // Scroll down: open search field.
       if (!showHomeSearchBar.value) {
         showHomeSearchBar.value = true;
       }
     } else if (notification.direction ==
         ScrollDirection.forward) {
-      // Scroll up: close search field.
       if (showHomeSearchBar.value) {
         showHomeSearchBar.value = false;
       }
@@ -101,7 +125,6 @@ class ChatController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // Replace this delay with your API or local database call.
       await Future.delayed(
         Duration(milliseconds: 300),
       );
@@ -122,7 +145,8 @@ class ChatController extends GetxController {
         ChatModel(
           id: '2',
           name: 'Design Team',
-          message: 'Chloe: Uploaded the new mockups',
+          message:
+          'Chloe: Uploaded the new mockups',
           dateTime: DateTime.now().subtract(
             Duration(hours: 2),
           ),
@@ -153,7 +177,8 @@ class ChatController extends GetxController {
         ChatModel(
           id: '5',
           name: 'Project Alpha',
-          message: 'George: Let\'s catch up this weekend',
+          message:
+          'George: Let\'s catch up this weekend',
           dateTime: DateTime.now().subtract(
             Duration(days: 3),
           ),
@@ -196,6 +221,37 @@ class ChatController extends GetxController {
 
   void clearSearch() {
     searchQuery.value = '';
+
+    TextEditingController? textController =
+        _searchTextController;
+
+    if (textController != null &&
+        textController.text.isNotEmpty) {
+      textController.clear();
+    }
+  }
+
+  List<ChatModel> get searchResults {
+    String query =
+    searchQuery.value.trim().toLowerCase();
+
+    if (query.isEmpty) {
+      return [];
+    }
+
+    return chats.where(
+          (ChatModel chat) {
+        bool matchesName = chat.name
+            .toLowerCase()
+            .contains(query);
+
+        bool matchesMessage = chat.message
+            .toLowerCase()
+            .contains(query);
+
+        return matchesName || matchesMessage;
+      },
+    ).toList();
   }
 
   List<ChatModel> get filteredChats {
@@ -394,9 +450,11 @@ class ChatController extends GetxController {
   }
 
   void markAllAsRead() {
-    for (int index = 0;
+    for (
+    int index = 0;
     index < chats.length;
-    index++) {
+    index++
+    ) {
       ChatModel chat = chats[index];
 
       if (chat.unread > 0) {
@@ -437,15 +495,29 @@ class ChatController extends GetxController {
     );
   }
 
+  void _disposeSearchTextController() {
+    TextEditingController? textController =
+        _searchTextController;
+
+    if (textController == null) {
+      return;
+    }
+
+    textController.dispose();
+    _searchTextController = null;
+  }
+
   @override
   void onClose() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    _disposeSearchTextController();
+
     searchQuery.value = '';
     errorMessage.value = '';
-
     selectedCategoryIndex.value = 0;
-
     isSearching.value = false;
-    showHomeSearchBar.value = true;
+    showHomeSearchBar.value = false;
 
     super.onClose();
   }

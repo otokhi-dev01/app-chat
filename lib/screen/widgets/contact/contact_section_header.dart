@@ -1,24 +1,43 @@
 import 'package:flutter/material.dart';
 
-class ContactSectionHeader extends StatelessWidget {
+class ContactSectionHeader
+    extends StatelessWidget {
   final String letter;
 
-  const ContactSectionHeader({super.key, required this.letter});
+  ContactSectionHeader({
+    super.key,
+    required this.letter,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final bool isDark = theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Container(
       width: double.infinity,
-      color: isDark ? const Color(0xFF1B1D22) : const Color(0xFFF7F7F8),
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+      margin: EdgeInsets.fromLTRB(
+        14,
+        8,
+        14,
+        5,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 7,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary
+            .withValues(alpha: 0.08),
+        borderRadius:
+        BorderRadius.circular(10),
+      ),
       child: Text(
         letter,
-        style: TextStyle(
-          color: theme.colorScheme.primary,
-          fontSize: 14,
+        style: theme.textTheme.labelLarge
+            ?.copyWith(
+          color: colorScheme.primary,
+          fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
       ),

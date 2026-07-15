@@ -16,6 +16,9 @@ class ChatModel {
   final bool isTyping;
   final bool isMe; // true if last message was sent by current user
   final MessageStatus status;
+  final String? mediaPath;
+  final double? latitude;
+  final double? longitude;
 
   const ChatModel({
     required this.id,
@@ -31,6 +34,9 @@ class ChatModel {
     this.isTyping = false,
     this.isMe = false,
     this.status = MessageStatus.sent,
+    this.mediaPath,
+    this.latitude,
+    this.longitude,
   });
 
   bool get hasUnread => unread > 0;

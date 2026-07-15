@@ -4,12 +4,15 @@ import 'package:flutter/services.dart';
 import '../../models/chat_message_model.dart';
 import '../../models/chat_model.dart';
 import '../../services/chat_camera_services.dart';
-import '../widgets/chat_detail/chat_attachment_item.dart';
-import '../widgets/chat_detail/chat_date_divider.dart';
-import '../widgets/chat_detail/chat_detail_app_bar.dart';
-import '../widgets/chat_detail/chat_empty_conversation.dart';
-import '../widgets/chat_detail/chat_input_bar.dart';
-import '../widgets/chat_detail/chat_message_bubble.dart';
+import '../../services/chat_voice_recorder_service.dart';
+import '../widgets/chat_detail/chat_attachment_sheet.dart';
+import '../widgets/chat_detail/chat_voice_message.dart';
+import 'chat_detail_app_bar.dart';
+import '../widgets/chat_detail/chat_detail_content.dart';
+import '../widgets/chat_detail/chat_message_action_sheet.dart';
+import '../widgets/chat_detail/chat_sample_messages.dart';
+import 'package:get/get.dart';
+import 'chat_message_search_screen.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final ChatModel chat;
@@ -25,15 +28,21 @@ class ChatDetailScreen extends StatefulWidget {
   }
 }
 
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
+class _ChatDetailScreenState extends State<ChatDetailScreen>
+    with WidgetsBindingObserver {
   late final TextEditingController messageController;
+
   late final ScrollController scrollController;
   late final FocusNode messageFocusNode;
 
   final List<ChatMessageModel> messages = [];
 
-  final ChatCameraService cameraService =
-  ChatCameraService();
+  final ChatCameraService cameraService = ChatCameraService();
+
+  final ChatVoiceRecorderService voiceRecorderService =
+  ChatVoiceRecorderService();
+
+  DateTime? voiceRecordingStartedAt;
 
   bool isRecordingVoice = false;
   bool isTapRecordingMode = false;
@@ -42,11 +51,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   static final double cancelDragThreshold = -80;
 
+  double _lastBottomInset = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     messageController = TextEditingController();
+
     scrollController = ScrollController();
     messageFocusNode = FocusNode();
 
@@ -54,7 +67,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       _handleMessageFocusChange,
     );
 
-    _loadSampleMessages();
+    messages.addAll(
+      buildChatSampleMessages(widget.chat),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom(
@@ -63,59 +78,57 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     });
   }
 
-  void _handleMessageFocusChange() {
-    if (messageFocusNode.hasFocus) {
-      Future.delayed(
-        Duration(milliseconds: 250),
-            () {
-          if (!mounted) {
-            return;
-          }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
 
-          _scrollToBottom();
-        },
-      );
+    messageFocusNode.removeListener(
+      _handleMessageFocusChange,
+    );
+
+    messageFocusNode.unfocus();
+
+    messageController.dispose();
+    scrollController.dispose();
+    messageFocusNode.dispose();
+
+    if (isRecordingVoice) {
+      voiceRecorderService.cancelRecording();
     }
+
+    voiceRecorderService.dispose();
+
+    super.dispose();
   }
 
-  void _loadSampleMessages() {
-    DateTime now = DateTime.now();
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    if (!mounted) return;
 
-    messages.addAll([
-      ChatMessageModel(
-        id: 'message-1',
-        text: 'Hello! How are you?',
-        sentAt: now.subtract(
-          Duration(minutes: 24),
-        ),
-        isMe: false,
-      ),
-      ChatMessageModel(
-        id: 'message-2',
-        text:
-        'I am doing well. I am currently working on the chat application.',
-        sentAt: now.subtract(
-          Duration(minutes: 21),
-        ),
-        isMe: true,
-        isRead: true,
-      ),
-      ChatMessageModel(
-        id: 'message-3',
-        text: 'That sounds great. How is it going?',
-        sentAt: now.subtract(
-          Duration(minutes: 18),
-        ),
-        isMe: false,
-      ),
-      ChatMessageModel(
-        id: 'message-4',
-        text: widget.chat.message,
-        sentAt: widget.chat.dateTime,
-        isMe: widget.chat.isMe,
-        isRead: true,
-      ),
-    ]);
+    final double currentBottomInset =
+        MediaQuery.maybeOf(context)?.viewInsets.bottom ?? 0;
+
+    if (currentBottomInset > _lastBottomInset && currentBottomInset > 0) {
+      _scrollToBottom(animated: true, durationMs: 180);
+    }
+    _lastBottomInset = currentBottomInset;
+  }
+
+  void _handleMessageFocusChange() {
+    if (!messageFocusNode.hasFocus) {
+      return;
+    }
+
+    Future<void>.delayed(
+      const Duration(milliseconds: 100),
+          () {
+        if (!mounted) {
+          return;
+        }
+        _scrollToBottom(animated: true, durationMs: 200);
+      },
+    );
   }
 
   void _sendMessage() {
@@ -127,11 +140,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
     HapticFeedback.lightImpact();
 
-    ChatMessageModel newMessage =
-    ChatMessageModel(
-      id: DateTime.now()
-          .microsecondsSinceEpoch
-          .toString(),
+    ChatMessageModel newMessage = ChatMessageModel(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
       text: text,
       sentAt: DateTime.now(),
       isMe: true,
@@ -144,7 +154,132 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
     messageController.clear();
 
+    // Synchronously maintain focus on the text field
+    messageFocusNode.requestFocus();
+
     _scrollToBottom();
+  }
+
+  Future<void> _openMessageSearch() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    String? selectedMessageId = await Get.to<String>(
+          () {
+        return ChatMessageSearchScreen(
+          chatName: widget.chat.name,
+          messages: List<ChatMessageModel>.from(
+            messages,
+          ),
+        );
+      },
+      transition: Transition.cupertino,
+      duration: Duration(milliseconds: 280),
+    );
+
+    if (!mounted || selectedMessageId == null) {
+      return;
+    }
+
+    int messageIndex = messages.indexWhere(
+          (ChatMessageModel message) {
+        return message.id == selectedMessageId;
+      },
+    );
+
+    if (messageIndex < 0) {
+      return;
+    }
+
+    _scrollToSearchResult(messageIndex);
+  }
+
+  void _scrollToSearchResult(
+      int messageIndex,
+      ) {
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+        if (!mounted ||
+            !scrollController.hasClients ||
+            messages.isEmpty) {
+          return;
+        }
+
+        double maxScrollExtent =
+            scrollController.position.maxScrollExtent;
+
+        double scrollPercent;
+
+        if (messages.length <= 1) {
+          scrollPercent = 0;
+        } else {
+          scrollPercent =
+              messageIndex / (messages.length - 1);
+        }
+
+        double targetOffset =
+            maxScrollExtent * scrollPercent;
+
+        targetOffset = targetOffset.clamp(
+          0,
+          maxScrollExtent,
+        );
+
+        scrollController.animateTo(
+          targetOffset,
+          duration: Duration(milliseconds: 450),
+          curve: Curves.easeOutCubic,
+        );
+      },
+    );
+  }
+
+  Future<void> _confirmClearConversation() async {
+    bool? shouldClear = await Get.dialog<bool>(
+      AlertDialog(
+        title: Text(
+          'Clear conversation?',
+        ),
+        content: Text(
+          'All messages in this conversation will be removed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(result: false);
+            },
+            child: Text(
+              'Cancel',
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(result: true);
+            },
+            child: Text(
+              'Clear',
+              style: TextStyle(
+                color: Theme.of(context)
+                    .colorScheme
+                    .error,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || shouldClear != true) {
+      return;
+    }
+
+    setState(() {
+      messages.clear();
+    });
+
+    _showSnackBar(
+      message: 'Conversation cleared',
+    );
   }
 
   Future<void> _openCamera() async {
@@ -155,8 +290,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     FocusManager.instance.primaryFocus?.unfocus();
 
     try {
-      ChatMessageModel? photoMessage =
-      await cameraService.takePhoto();
+      ChatMessageModel? photoMessage = await cameraService.takePhoto();
 
       if (!mounted || photoMessage == null) {
         return;
@@ -168,20 +302,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
       _scrollToBottom();
     } on PlatformException catch (error) {
-      if (!mounted) {
-        return;
-      }
-
       _showSnackBar(
-        message:
-        'Camera error: ${error.message ?? error.code}',
+        message: 'Camera error: ${error.message ?? error.code}',
         isError: true,
       );
     } catch (error) {
-      if (!mounted) {
-        return;
-      }
-
       _showSnackBar(
         message: 'Could not open camera: $error',
         isError: true,
@@ -189,26 +314,265 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     }
   }
 
-  void _onVoiceTap() {
-    if (isRecordingVoice) {
+  Future<void> _openGallery() async {
+    if (cameraService.isOpeningCamera) {
       return;
     }
 
-    HapticFeedback.lightImpact();
+    try {
+      ChatMessageModel? photoMessage = await cameraService.pickFromGallery();
 
-    FocusManager.instance.primaryFocus?.unfocus();
+      if (photoMessage == null || !mounted) {
+        return;
+      }
 
-    setState(() {
-      isRecordingVoice = true;
-      isTapRecordingMode = true;
-      voiceDragDx = 0;
-    });
+      setState(() {
+        messages.add(photoMessage);
+      });
 
-    // TODO:
-    // Start actual audio recording here.
+      _scrollToBottom();
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gallery error: ${e.message ?? e.code}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open gallery: $e'),
+        ),
+      );
+    }
   }
 
-  void _onVoiceStart() {
+  Future<void> _openFilePicker() async {
+    if (cameraService.isOpeningCamera) {
+      return;
+    }
+
+    try {
+      ChatMessageModel? fileMessage = await cameraService.pickFile();
+
+      if (fileMessage == null || !mounted) {
+        return;
+      }
+
+      setState(() {
+        messages.add(fileMessage);
+      });
+
+      _scrollToBottom();
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'File picker error: ${e.message ?? e.code}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open file picker: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openLocationPicker() async {
+    if (cameraService.isPickingLocation) {
+      return;
+    }
+
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    try {
+      ChatMessageModel? locationMessage = await cameraService.pickLocation();
+
+      if (!mounted || locationMessage == null) {
+        return;
+      }
+
+      setState(() {
+        messages.add(locationMessage);
+      });
+
+      _scrollToBottom();
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      _showSnackBar(
+        message: '$error',
+        isError: true,
+      );
+    }
+  }
+
+  void _showAttachmentOptions() {
+    showChatAttachmentSheet(
+      context: context,
+      onCamera: _openCamera,
+      onGallery: _openGallery,
+      onFile: _openFilePicker,
+      onLocation: _openLocationPicker,
+    );
+  }
+
+  void _showMessageActions(
+      ChatMessageModel message,
+      ) {
+    showChatMessageActionsSheet(
+      context: context,
+      message: message,
+      onCopied: () {
+        _showSnackBar(
+          message: 'Message copied',
+        );
+      },
+      onReply: () {
+        if (!mounted) {
+          return;
+        }
+
+        messageFocusNode.requestFocus();
+      },
+      onDelete: () {
+        if (!mounted) {
+          return;
+        }
+
+        setState(() {
+          messages.removeWhere(
+                (ChatMessageModel item) {
+              return item.id == message.id;
+            },
+          );
+        });
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Voice recording
+  // ---------------------------------------------------------------------
+
+  Future<void> _onVoiceTap() async {
+    if (isRecordingVoice) {
+      await _sendVoiceRecording(
+        voiceRecorderService.recordedDuration,
+      );
+
+      return;
+    }
+
+    HapticFeedback.lightImpact();
+
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    try {
+      await voiceRecorderService.startRecording();
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        isRecordingVoice = true;
+        isTapRecordingMode = true;
+        voiceDragDx = 0;
+        voiceRecordingStartedAt = DateTime.now();
+      });
+    } on ChatMicPermissionException catch (error) {
+      if (!mounted) return;
+      await _handleMicPermissionError(error);
+    } catch (error) {
+      _showSnackBar(
+        message: 'Could not start recording: $error',
+        isError: true,
+      );
+    }
+  }
+
+  Future<void> _handleMicPermissionError(
+      ChatMicPermissionException error,
+      ) async {
+    if (error.type == ChatMicPermissionError.denied) {
+      bool shouldRetry = await _showPermissionDialog(
+        title: 'Microphone access needed',
+        message:
+        'Allow microphone access so you can record and send voice messages.',
+        confirmLabel: 'Allow',
+      );
+
+      if (shouldRetry && mounted) {
+        await _onVoiceTap();
+      }
+
+      return;
+    }
+
+    bool shouldOpenSettings = await _showPermissionDialog(
+      title: 'Microphone access disabled',
+      message: error.type == ChatMicPermissionError.restricted
+          ? 'Microphone access is restricted on this device and can\'t be changed here.'
+          : 'Voice messages need microphone access. '
+          'Enable it for this app in Settings.',
+      confirmLabel: error.type == ChatMicPermissionError.restricted
+          ? 'OK'
+          : 'Open Settings',
+      showSettingsAction: error.type != ChatMicPermissionError.restricted,
+    );
+
+    if (shouldOpenSettings) {
+      await ChatVoiceRecorderService.openSettings();
+    }
+  }
+
+  Future<bool> _showPermissionDialog({
+    required String title,
+    required String message,
+    required String confirmLabel,
+    bool showSettingsAction = true,
+  }) async {
+    if (!mounted) return false;
+
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              child: Text(confirmLabel),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
+  Future<void> _onVoiceStart() async {
     if (isRecordingVoice) {
       return;
     }
@@ -217,19 +581,32 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    setState(() {
-      isRecordingVoice = true;
-      isTapRecordingMode = false;
-      voiceDragDx = 0;
-    });
+    try {
+      await voiceRecorderService.startRecording();
 
-    // TODO:
-    // Start actual audio recording here.
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        isRecordingVoice = true;
+        isTapRecordingMode = false;
+        voiceDragDx = 0;
+        voiceRecordingStartedAt = DateTime.now();
+      });
+    } on ChatMicPermissionException catch (error) {
+      if (!mounted) return;
+      await _handleMicPermissionError(error);
+    } catch (error) {
+      _showSnackBar(
+        message: 'Could not start recording: $error',
+        isError: true,
+      );
+    }
   }
 
   void _onVoiceDrag(double dx) {
-    if (!isRecordingVoice ||
-        isTapRecordingMode) {
+    if (!isRecordingVoice || isTapRecordingMode) {
       return;
     }
 
@@ -238,431 +615,105 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     });
   }
 
-  void _onVoiceEnd() {
-    if (!isRecordingVoice ||
-        isTapRecordingMode) {
+  Future<void> _onVoiceEnd() async {
+    if (!isRecordingVoice || isTapRecordingMode) {
       return;
     }
 
-    bool shouldCancel =
-        voiceDragDx <= cancelDragThreshold;
+    bool shouldCancel = voiceDragDx <= cancelDragThreshold;
 
     if (shouldCancel) {
-      _cancelVoiceRecording();
-    } else {
-      _sendVoiceRecording(
-        Duration.zero,
-      );
+      await _cancelVoiceRecording();
+      return;
     }
+
+    await _sendVoiceRecording(
+      voiceRecorderService.recordedDuration,
+    );
   }
 
-  void _cancelVoiceRecording() {
+  Future<void> _cancelVoiceRecording() async {
     if (!isRecordingVoice) {
       return;
     }
 
     HapticFeedback.lightImpact();
 
-    // TODO:
-    // Stop recorder and delete temporary audio file.
+    await voiceRecorderService.cancelRecording();
+
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       isRecordingVoice = false;
       isTapRecordingMode = false;
       voiceDragDx = 0;
+      voiceRecordingStartedAt = null;
     });
   }
 
-  void _sendVoiceRecording(
+  Future<void> _sendVoiceRecording(
       Duration duration,
-      ) {
+      ) async {
     if (!isRecordingVoice) {
       return;
     }
 
-    // TODO:
-    // Stop the recorder and get the saved audio path.
-    //
-    // String? audioPath = await recorder.stop();
+    String? audioPath = await voiceRecorderService.stopRecording();
 
-    ChatMessageModel voiceMessage =
-    ChatMessageModel(
-      id: DateTime.now()
-          .microsecondsSinceEpoch
-          .toString(),
-      text: '',
-      sentAt: DateTime.now(),
-      isMe: true,
-      isRead: false,
-    );
-
-    HapticFeedback.mediumImpact();
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       isRecordingVoice = false;
       isTapRecordingMode = false;
       voiceDragDx = 0;
+      voiceRecordingStartedAt = null;
+    });
 
+    if (audioPath == null || audioPath.trim().isEmpty) {
+      _showSnackBar(
+        message: 'Recording was too short.',
+        isError: true,
+      );
+
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+
+    ChatMessageModel voiceMessage = ChatMessageModel(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      text: '',
+      sentAt: DateTime.now(),
+      isMe: true,
+      isRead: false,
+      type: ChatMessageType.voice,
+      mediaPath: audioPath,
+    );
+
+    setState(() {
       messages.add(voiceMessage);
     });
 
     _scrollToBottom();
   }
 
-  void _scrollToBottom({
-    bool animated = true,
-  }) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted ||
-          !scrollController.hasClients) {
-        return;
-      }
-
-      double target =
-          scrollController.position.maxScrollExtent;
-
-      if (animated) {
-        scrollController.animateTo(
-          target,
-          duration: Duration(
-            milliseconds: 280,
-          ),
-          curve: Curves.easeOutCubic,
-        );
-      } else {
-        scrollController.jumpTo(target);
-      }
-    });
-  }
-
-  void _showAttachmentOptions() {
-    FocusManager.instance.primaryFocus?.unfocus();
-
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color sheetColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
-    Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
-
-    showModalBottomSheet<void>(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor:
-      Colors.black.withValues(alpha: 0.35),
-      builder: (BuildContext sheetContext) {
-        return Container(
-          decoration: BoxDecoration(
-            color: sheetColor,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(26),
-            ),
-            border: Border(
-              top: BorderSide(
-                color: borderColor,
-              ),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                12,
-                20,
-                24,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.25),
-                      borderRadius:
-                      BorderRadius.circular(20),
-                    ),
-                  ),
-
-                  SizedBox(height: 18),
-
-                  Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary
-                              .withValues(alpha: 0.11),
-                          borderRadius:
-                          BorderRadius.circular(13),
-                        ),
-                        child: Icon(
-                          Icons.attach_file_rounded,
-                          color: colorScheme.primary,
-                          size: 22,
-                        ),
-                      ),
-
-                      SizedBox(width: 12),
-
-                      Expanded(
-                        child: Text(
-                          'Share content',
-                          style: theme
-                              .textTheme.titleMedium
-                              ?.copyWith(
-                            color:
-                            colorScheme.onSurface,
-                            fontWeight:
-                            FontWeight.w700,
-                          ),
-                        ),
-                      ),
-
-                      IconButton(
-                        tooltip: 'Close',
-                        onPressed: () {
-                          Navigator.pop(
-                            sheetContext,
-                          );
-                        },
-                        icon: Icon(
-                          Icons.close_rounded,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 18),
-
-                  Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceAround,
-                    children: [
-                      ChatAttachmentItem(
-                        icon: Icons.image_outlined,
-                        label: 'Gallery',
-                        onTap: () {
-                          Navigator.pop(
-                            sheetContext,
-                          );
-
-                          // TODO:
-                          // Open image gallery.
-                        },
-                      ),
-                      ChatAttachmentItem(
-                        icon:
-                        Icons.camera_alt_outlined,
-                        label: 'Camera',
-                        onTap: () {
-                          Navigator.pop(
-                            sheetContext,
-                          );
-
-                          _openCamera();
-                        },
-                      ),
-                      ChatAttachmentItem(
-                        icon: Icons
-                            .insert_drive_file_outlined,
-                        label: 'File',
-                        onTap: () {
-                          Navigator.pop(
-                            sheetContext,
-                          );
-
-                          // TODO:
-                          // Open file picker.
-                        },
-                      ),
-                      ChatAttachmentItem(
-                        icon:
-                        Icons.location_on_outlined,
-                        label: 'Location',
-                        onTap: () {
-                          Navigator.pop(
-                            sheetContext,
-                          );
-
-                          // TODO:
-                          // Open location picker.
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showMessageActions(
-      ChatMessageModel message,
-      ) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color sheetColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
-    Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
-
-    showModalBottomSheet<void>(
-      context: context,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      barrierColor:
-      Colors.black.withValues(alpha: 0.35),
-      builder: (BuildContext sheetContext) {
-        return Container(
-          decoration: BoxDecoration(
-            color: sheetColor,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(26),
-            ),
-            border: Border(
-              top: BorderSide(
-                color: borderColor,
-              ),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                12,
-                12,
-                12,
-                16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.25),
-                      borderRadius:
-                      BorderRadius.circular(20),
-                    ),
-                  ),
-
-                  SizedBox(height: 12),
-
-                  _MessageActionTile(
-                    icon: Icons.copy_rounded,
-                    title: 'Copy',
-                    onTap: () {
-                      Clipboard.setData(
-                        ClipboardData(
-                          text: message.text,
-                        ),
-                      );
-
-                      Navigator.pop(
-                        sheetContext,
-                      );
-
-                      _showSnackBar(
-                        message: 'Message copied',
-                      );
-                    },
-                  ),
-
-                  _MessageActionTile(
-                    icon: Icons.reply_rounded,
-                    title: 'Reply',
-                    onTap: () {
-                      Navigator.pop(
-                        sheetContext,
-                      );
-
-                      Future.delayed(
-                        Duration(
-                          milliseconds: 150,
-                        ),
-                            () {
-                          if (!mounted) {
-                            return;
-                          }
-
-                          messageFocusNode
-                              .requestFocus();
-                        },
-                      );
-                    },
-                  ),
-
-                  if (message.isMe)
-                    _MessageActionTile(
-                      icon: Icons
-                          .delete_outline_rounded,
-                      title: 'Delete',
-                      isDanger: true,
-                      onTap: () {
-                        Navigator.pop(
-                          sheetContext,
-                        );
-
-                        setState(() {
-                          messages.removeWhere(
-                                (
-                                ChatMessageModel item,
-                                ) {
-                              return item.id ==
-                                  message.id;
-                            },
-                          );
-                        });
-                      },
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // ---------------------------------------------------------------------
 
   void _handleMenu(String value) {
     switch (value) {
-      case 'clear':
-        setState(() {
-          messages.clear();
-        });
+      case 'view_profile':
+        _showSnackBar(
+          message:
+          'Open ${widget.chat.name} profile',
+        );
         break;
 
       case 'search':
-        _showSnackBar(
-          message: 'Search messages selected',
-        );
+        _openMessageSearch();
         break;
 
       case 'mute':
@@ -673,13 +724,36 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         );
         break;
 
-      case 'view_profile':
-        _showSnackBar(
-          message:
-          'Open ${widget.chat.name} profile',
-        );
+      case 'clear':
+        _confirmClearConversation();
         break;
     }
+  }
+
+  void _scrollToBottom({
+    bool animated = true,
+    int durationMs = 280,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !scrollController.hasClients) {
+        return;
+      }
+
+      double target = scrollController.position.maxScrollExtent;
+
+      if (!animated) {
+        scrollController.jumpTo(target);
+        return;
+      }
+
+      scrollController.animateTo(
+        target,
+        duration: Duration(
+          milliseconds: durationMs,
+        ),
+        curve: Curves.easeOutCubic,
+      );
+    });
   }
 
   void _showSnackBar({
@@ -690,8 +764,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       return;
     }
 
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -700,238 +773,67 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           content: Text(message),
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(14),
-          backgroundColor: isError
-              ? colorScheme.error
-              : colorScheme.primary,
+          backgroundColor: isError ? colorScheme.error : colorScheme.primary,
           shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       );
   }
 
   @override
-  void dispose() {
-    messageFocusNode.removeListener(
-      _handleMessageFocusChange,
-    );
-
-    messageFocusNode.unfocus();
-
-    messageController.dispose();
-    scrollController.dispose();
-    messageFocusNode.dispose();
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    double appBarSpace =
-        MediaQuery.paddingOf(context).top + 68;
+    double appBarSpace = MediaQuery.paddingOf(context).top + 68;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: true,
-      backgroundColor: theme.scaffoldBackgroundColor,
+    return GestureDetector(
+      onTapUp: (TapUpDetails details) {
+        final double screenHeight = MediaQuery.of(context).size.height;
+        final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-      appBar: ChatDetailAppBar(
-        chat: widget.chat,
-        onAudioCall: () {
-          _showSnackBar(
-            message: 'Calling ${widget.chat.name}...',
-          );
-        },
-        onMenuSelected: _handleMenu,
-      ),
+        // Excludes the entire bottom input bar area (with a 90dp safety margin) from dismissing the keyboard.
+        // This stops focus loss when tapping send, camera, voice, or surrounding margins.
+        final double dismissBoundary = screenHeight - keyboardHeight - 90;
 
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: Duration(
-                milliseconds: 250,
-              ),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              child: messages.isEmpty
-                  ? KeyedSubtree(
-                key: ValueKey(
-                  'empty-conversation',
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: appBarSpace,
-                    bottom: 100,
-                  ),
-                  child: ChatEmptyConversation(
-                    name: widget.chat.name,
-                  ),
-                ),
-              )
-                  : ListView.builder(
-                key: ValueKey(
-                  'message-list',
-                ),
-                controller: scrollController,
-                keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior
-                    .onDrag,
-                padding: EdgeInsets.fromLTRB(
-                  0,
-                  appBarSpace + 8,
-                  0,
-                  108,
-                ),
-                itemCount: messages.length + 1,
-                itemBuilder: (
-                    BuildContext context,
-                    int index,
-                    ) {
-                  if (index == 0) {
-                    return ChatDateDivider(
-                      label: 'Today',
-                    );
-                  }
-
-                  ChatMessageModel message =
-                  messages[index - 1];
-
-                  return KeyedSubtree(
-                    key: ValueKey(
-                      message.id,
-                    ),
-                    child: ChatMessageBubble(
-                      message: message,
-                      onLongPress: () {
-                        _showMessageActions(
-                          message,
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: ChatInputBar(
-              key: ValueKey(
-                'chat-input-bar',
-              ),
-              controller: messageController,
-              focusNode: messageFocusNode,
-              onSend: _sendMessage,
-              onAttachment:
-              _showAttachmentOptions,
-              onCamera: _openCamera,
-
-              isRecording:
-              isRecordingVoice,
-              isHoldRecording:
-              isRecordingVoice &&
-                  !isTapRecordingMode,
-              voiceDragDx:
-              voiceDragDx,
-              cancelThreshold:
-              cancelDragThreshold,
-
-              onVoiceTap:
-              _onVoiceTap,
-              onVoiceStart:
-              _onVoiceStart,
-              onVoiceDrag:
-              _onVoiceDrag,
-              onVoiceEnd:
-              _onVoiceEnd,
-              onVoiceCancel:
-              _cancelVoiceRecording,
-              onVoiceSend:
-              _sendVoiceRecording,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MessageActionTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-  final bool isDanger;
-
-  _MessageActionTile({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.isDanger = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    Color itemColor = isDanger
-        ? colorScheme.error
-        : colorScheme.primary;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(14),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 9,
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: itemColor.withValues(
-                    alpha: 0.11,
-                  ),
-                  borderRadius:
-                  BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  color: itemColor,
-                  size: 21,
-                ),
-              ),
-
-              SizedBox(width: 13),
-
-              Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.bodyLarge
-                      ?.copyWith(
-                    color: isDanger
-                        ? colorScheme.error
-                        : colorScheme.onSurface,
-                    fontWeight:
-                    FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        if (details.globalPosition.dy < dismissBoundary) {
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: true,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: ChatDetailAppBar(
+          chat: widget.chat,
+          onAudioCall: () {
+            _showSnackBar(
+              message: 'Calling ${widget.chat.name}...',
+            );
+          },
+          onMenuSelected: _handleMenu,
+        ),
+        body: ChatDetailContent(
+          chatName: widget.chat.name,
+          messages: messages,
+          appBarSpace: appBarSpace,
+          scrollController: scrollController,
+          messageController: messageController,
+          messageFocusNode: messageFocusNode,
+          onSend: _sendMessage,
+          onAttachment: _showAttachmentOptions,
+          onCamera: _openCamera,
+          onMessageLongPress: _showMessageActions,
+          isRecording: isRecordingVoice,
+          isHoldRecording: isRecordingVoice && !isTapRecordingMode,
+          voiceDragDx: voiceDragDx,
+          cancelThreshold: cancelDragThreshold,
+          onVoiceTap: _onVoiceTap,
+          onVoiceStart: _onVoiceStart,
+          onVoiceDrag: _onVoiceDrag,
+          onVoiceEnd: _onVoiceEnd,
+          onVoiceCancel: _cancelVoiceRecording,
+          onVoiceSend: _sendVoiceRecording,
         ),
       ),
     );

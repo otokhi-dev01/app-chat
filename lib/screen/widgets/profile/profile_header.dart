@@ -10,7 +10,7 @@ class ProfileHeader extends StatelessWidget {
     super.key,
     required this.name,
     required this.email,
-    required this.onEditProfile,
+    required this.onEditProfile, required String status, required bool isOnline, required String imageUrl,
   });
 
   @override

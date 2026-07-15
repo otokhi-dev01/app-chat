@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../../controllers/chat_controller.dart';
 import 'home_app_bar_actions.dart';
 import 'home_category_filter.dart';
-import 'home_search_bar_preview.dart';
 
 class HomeAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -26,13 +25,23 @@ class HomeAppBar extends StatelessWidget
     return selectedIndex == 0 ? 74 : 0;
   }
 
-  String get currentTitle {
-    if (selectedIndex < 0 ||
-        selectedIndex >= titles.length) {
-      return '';
-    }
+  String _getTranslatedTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'chats'.tr;
 
-    return titles[selectedIndex];
+      case 1:
+        return 'contacts'.tr;
+
+      case 2:
+        return 'settings'.tr;
+
+      case 3:
+        return 'profile'.tr;
+
+      default:
+        return '';
+    }
   }
 
   @override
@@ -48,23 +57,25 @@ class HomeAppBar extends StatelessWidget
       ) {
     switch (value) {
       case 'mark_all_read':
+        controller.markAllAsRead();
+
         _showMessage(
           context,
-          'All chats marked as read',
+          'all_chats_marked_as_read'.tr,
         );
         break;
 
       case 'archived_chats':
         _showMessage(
           context,
-          'Open archived chats',
+          'open_archived_chats'.tr,
         );
         break;
 
       case 'chat_settings':
         _showMessage(
           context,
-          'Open chat settings',
+          'open_chat_settings'.tr,
         );
         break;
     }
@@ -96,20 +107,14 @@ class HomeAppBar extends StatelessWidget
       ThemeData theme,
       bool isDark,
       ) {
-    if (isDark) {
-      return SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-      );
-    }
-
-    return SystemUiOverlayStyle.dark.copyWith(
+    return isDark
+        ? SystemUiOverlayStyle.light.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor:
+      theme.scaffoldBackgroundColor,
+    )
+        : SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
       systemNavigationBarColor:
       theme.scaffoldBackgroundColor,
     );
@@ -124,15 +129,23 @@ class HomeAppBar extends StatelessWidget
         theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(alpha: 0.92)
-        : Colors.white.withValues(alpha: 0.96);
+        ? Color(0xFF1B1D22).withValues(
+      alpha: 0.94,
+    )
+        : Colors.white.withValues(
+      alpha: 0.98,
+    );
 
     Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
         : Color(0xFFE7E9ED);
 
     Color actionBackground = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
         : Color(0xFFF2F4F7);
 
     return AppBar(
@@ -143,17 +156,25 @@ class HomeAppBar extends StatelessWidget
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
-      titleSpacing: 16,
+
+      // Chats stays on the left.
+      // Contacts, Settings, and Profile are centered.
+      centerTitle: selectedIndex != 0,
+      titleSpacing: 20,
+
       systemOverlayStyle: _overlayStyle(
         theme,
         isDark,
       ),
+
       iconTheme: IconThemeData(
         color: colorScheme.onSurface,
       ),
+
       actionsIconTheme: IconThemeData(
         color: colorScheme.onSurface,
       ),
+
       flexibleSpace: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
@@ -166,51 +187,54 @@ class HomeAppBar extends StatelessWidget
               border: Border(
                 bottom: BorderSide(
                   color: borderColor,
+                  width: 1,
                 ),
               ),
             ),
           ),
         ),
       ),
+
       title: AnimatedSwitcher(
-        duration: Duration(milliseconds: 220),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
+        duration: Duration(
+          milliseconds: 300,
+        ),
+        switchInCurve: Curves.easeOutQuart,
+        switchOutCurve: Curves.easeInQuart,
         transitionBuilder: (
             Widget child,
             Animation<double> animation,
             ) {
-          Animation<Offset> position =
+          Animation<Offset> slideTransition =
           Tween<Offset>(
-            begin: Offset(0.08, 0),
+            begin: Offset(0.15, 0),
             end: Offset.zero,
-          ).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ),
-          );
+          ).animate(animation);
 
           return FadeTransition(
             opacity: animation,
             child: SlideTransition(
-              position: position,
+              position: slideTransition,
               child: child,
             ),
           );
         },
         child: Text(
-          currentTitle,
-          key: ValueKey<int>(selectedIndex),
+          _getTranslatedTitle(selectedIndex),
+          key: ValueKey<int>(
+            selectedIndex,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
           ),
         ),
       ),
+
       actions: [
         HomeAppBarActions(
           selectedIndex: selectedIndex,
@@ -226,45 +250,12 @@ class HomeAppBar extends StatelessWidget
         ),
         SizedBox(width: 10),
       ],
+
       bottom: selectedIndex == 0
           ? PreferredSize(
         preferredSize: Size.fromHeight(74),
-        child: Obx(
-              () => AnimatedSwitcher(
-            duration: Duration(
-              milliseconds: 260,
-            ),
-            switchInCurve:
-            Curves.easeOutCubic,
-            switchOutCurve:
-            Curves.easeInCubic,
-            transitionBuilder: (
-                Widget child,
-                Animation<double> animation,
-                ) {
-              return FadeTransition(
-                opacity: animation,
-                child: SizeTransition(
-                  sizeFactor: animation,
-                  axisAlignment: -1,
-                  child: child,
-                ),
-              );
-            },
-            child: controller.isSearching.value
-                ? HomeSearchBarPreview(
-              key: ValueKey(
-                'search-preview',
-              ),
-              controller: controller,
-            )
-                : HomeCategoryFilter(
-              key: ValueKey(
-                'category-filter',
-              ),
-              controller: controller,
-            ),
-          ),
+        child: HomeCategoryFilter(
+          controller: controller,
         ),
       )
           : null,

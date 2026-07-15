@@ -30,17 +30,13 @@ class HomeAppBarActions extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             HomeAppBarActionButton(
-              tooltip: 'Search chats',
+              tooltip: 'search_chats'.tr,
               icon: Icons.search_rounded,
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
-
-              // Click search icon -> open SearchScreen
               onPressed: controller.openSearchScreen,
             ),
-
             SizedBox(width: 5),
-
             HomeChatMenu(
               onSelected: onChatMenuSelected,
             ),
@@ -52,17 +48,15 @@ class HomeAppBarActions extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             HomeAppBarActionButton(
-              tooltip: 'Search contacts',
+              tooltip: 'search_contacts'.tr,
               icon: Icons.search_rounded,
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
               onPressed: () {},
             ),
-
             SizedBox(width: 5),
-
             HomeAppBarActionButton(
-              tooltip: 'Add contact',
+              tooltip: 'add_contact'.tr,
               icon: Icons.person_add_alt_1_rounded,
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
@@ -73,7 +67,7 @@ class HomeAppBarActions extends StatelessWidget {
 
       case 2:
         return HomeAppBarActionButton(
-          tooltip: 'Search settings',
+          tooltip: 'search_settings'.tr,
           icon: Icons.search_rounded,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
@@ -82,7 +76,7 @@ class HomeAppBarActions extends StatelessWidget {
 
       case 3:
         return HomeAppBarActionButton(
-          tooltip: 'Edit profile',
+          tooltip: 'edit_profile'.tr,
           icon: Icons.edit_rounded,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,

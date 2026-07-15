@@ -35,6 +35,12 @@
     <key>NSPhotoLibraryUsageDescription</key>
     <string>This app needs photo library access so you can attach photos to your messages.</string>
 
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs your location so you can share it in chat.</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>AppChat needs microphone access to record voice messages.</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

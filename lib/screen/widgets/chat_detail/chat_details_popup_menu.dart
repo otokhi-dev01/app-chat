@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
-class HomeChatMenu extends StatelessWidget {
-  final ValueChanged<String> onSelected;
+import '../../../models/chat_model.dart';
 
-  HomeChatMenu({
+class ChatDetailPopupMenu extends StatelessWidget {
+  final ChatModel chat;
+  final ValueChanged<String>? onSelected;
+  final Color buttonBackground;
+
+  ChatDetailPopupMenu({
     super.key,
+    required this.chat,
     required this.onSelected,
+    required this.buttonBackground,
   });
 
   @override
@@ -20,10 +26,6 @@ class HomeChatMenu extends StatelessWidget {
         ? Color(0xFF1B1D22)
         : Colors.white;
 
-    Color buttonColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFF2F4F7);
-
     Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Color(0xFFE7E9ED);
@@ -31,14 +33,18 @@ class HomeChatMenu extends StatelessWidget {
     return PopupMenuButton<String>(
       tooltip: 'More',
       padding: EdgeInsets.zero,
+      position: PopupMenuPosition.under,
+
+      // Positive X moves the popup toward the right.
+      offset: Offset(36, 5),
+
+      constraints: BoxConstraints(
+        minWidth: 220,
+        maxWidth: 245,
+      ),
       color: menuColor,
       surfaceTintColor: Colors.transparent,
       elevation: 10,
-      position: PopupMenuPosition.under,
-
-      // Positive X moves the dropdown to the right.
-      offset: Offset(14, 6),
-
       shadowColor: Colors.black.withValues(
         alpha: isDark ? 0.30 : 0.12,
       ),
@@ -54,7 +60,7 @@ class HomeChatMenu extends StatelessWidget {
         height: 40,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: buttonColor,
+          color: buttonBackground,
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -63,29 +69,42 @@ class HomeChatMenu extends StatelessWidget {
           size: 22,
         ),
       ),
-      itemBuilder: (
-          BuildContext context,
-          ) {
+      itemBuilder: (BuildContext context) {
         return [
           PopupMenuItem<String>(
-            value: 'mark_all_read',
-            child: _HomeChatMenuItem(
-              icon: Icons.mark_chat_read_outlined,
-              title: 'Mark all as read',
+            value: 'view_profile',
+            child: _ChatPopupMenuItem(
+              icon: Icons.person_outline_rounded,
+              title: 'View profile',
             ),
           ),
           PopupMenuItem<String>(
-            value: 'archived_chats',
-            child: _HomeChatMenuItem(
-              icon: Icons.archive_outlined,
-              title: 'Archived chats',
+            value: 'search',
+            child: _ChatPopupMenuItem(
+              icon: Icons.search_rounded,
+              title: 'Search messages',
             ),
           ),
           PopupMenuItem<String>(
-            value: 'chat_settings',
-            child: _HomeChatMenuItem(
-              icon: Icons.settings_outlined,
-              title: 'Chat settings',
+            value: 'mute',
+            child: _ChatPopupMenuItem(
+              icon: chat.isMuted
+                  ? Icons.notifications_outlined
+                  : Icons.notifications_off_outlined,
+              title: chat.isMuted
+                  ? 'Unmute notifications'
+                  : 'Mute notifications',
+            ),
+          ),
+          PopupMenuDivider(
+            height: 10,
+          ),
+          PopupMenuItem<String>(
+            value: 'clear',
+            child: _ChatPopupMenuItem(
+              icon: Icons.delete_sweep_outlined,
+              title: 'Clear conversation',
+              isDanger: true,
             ),
           ),
         ];
@@ -94,19 +113,25 @@ class HomeChatMenu extends StatelessWidget {
   }
 }
 
-class _HomeChatMenuItem extends StatelessWidget {
+class _ChatPopupMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final bool isDanger;
 
-  _HomeChatMenuItem({
+  _ChatPopupMenuItem({
     required this.icon,
     required this.title,
+    this.isDanger = false,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
+    Color itemColor = isDanger
+        ? colorScheme.error
+        : colorScheme.primary;
 
     return Row(
       children: [
@@ -115,14 +140,12 @@ class _HomeChatMenuItem extends StatelessWidget {
           height: 36,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(
-              alpha: 0.11,
-            ),
+            color: itemColor.withValues(alpha: 0.11),
             borderRadius: BorderRadius.circular(11),
           ),
           child: Icon(
             icon,
-            color: colorScheme.primary,
+            color: itemColor,
             size: 20,
           ),
         ),
@@ -131,7 +154,9 @@ class _HomeChatMenuItem extends StatelessWidget {
           child: Text(
             title,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
+              color: isDanger
+                  ? colorScheme.error
+                  : colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
