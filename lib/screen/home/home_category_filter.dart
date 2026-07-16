@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:appchat/controllers/chat_controller.dart';
+import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

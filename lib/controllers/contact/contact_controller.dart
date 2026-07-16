@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
-import '../models/contact_model.dart';
+import '../../models/contact_model.dart';
 
 class ContactController extends GetxController {
   final TextEditingController searchController =
@@ -79,6 +79,62 @@ class ContactController extends GetxController {
     if (searchController.text.isNotEmpty) {
       searchController.clear();
     }
+  }
+
+  void addContact({
+    required String name,
+    required String phoneNumber,
+  }) {
+    String cleanName = name.trim();
+    String cleanPhoneNumber = phoneNumber.trim();
+
+    if (cleanName.isEmpty || cleanPhoneNumber.isEmpty) {
+      return;
+    }
+
+    ContactModel newContact = ContactModel(
+      name: cleanName,
+      status: ContactStatus.offline,
+    );
+
+    contacts.add(newContact);
+
+    contacts.sort(
+          (
+          ContactModel first,
+          ContactModel second,
+          ) {
+        return first.name.toLowerCase().compareTo(
+          second.name.toLowerCase(),
+        );
+      },
+    );
+
+    searchQuery.refresh();
+
+    debugPrint('Contact name: $cleanName');
+    debugPrint(
+      'Phone number: $cleanPhoneNumber',
+    );
+  }
+
+  void addContactModel(
+      ContactModel contact,
+      ) {
+    contacts.add(contact);
+
+    contacts.sort(
+          (
+          ContactModel first,
+          ContactModel second,
+          ) {
+        return first.name.toLowerCase().compareTo(
+          second.name.toLowerCase(),
+        );
+      },
+    );
+
+    searchQuery.refresh();
   }
 
   List<ContactModel> get filteredContacts {
@@ -176,22 +232,11 @@ class ContactController extends GetxController {
     }
   }
 
-  void openAddContact() {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
-    // TODO: Navigate to AddContactScreen.
-  }
-
   void openContact(ContactModel contact) {
     FocusManager.instance.primaryFocus
         ?.unfocus();
 
     // TODO: Navigate to ContactDetailScreen.
-  }
-
-  void addContact(ContactModel contact) {
-    contacts.add(contact);
   }
 
   void removeContact(ContactModel contact) {

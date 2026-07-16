@@ -15,6 +15,7 @@ class ChatModel {
   final bool isOnline;
   final bool isTyping;
   final bool isMe; // true if last message was sent by current user
+  final bool isArchived;
   final MessageStatus status;
   final String? mediaPath;
   final double? latitude;
@@ -35,6 +36,7 @@ class ChatModel {
     this.isMe = false,
     this.status = MessageStatus.sent,
     this.mediaPath,
+    this.isArchived = false,
     this.latitude,
     this.longitude,
   });
@@ -78,6 +80,7 @@ class ChatModel {
     bool? isOnline,
     bool? isTyping,
     bool? isMe,
+    bool? isArchived,
     MessageStatus? status,
   }) {
     return ChatModel(
@@ -93,7 +96,11 @@ class ChatModel {
       isOnline: isOnline ?? this.isOnline,
       isTyping: isTyping ?? this.isTyping,
       isMe: isMe ?? this.isMe,
+      isArchived: isArchived ?? this.isArchived,
       status: status ?? this.status,
+      mediaPath: mediaPath,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
 }

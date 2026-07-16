@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../controllers/chat_controller.dart';
+import '../../../controllers/chat/chat_controller.dart';
 import '../home_chat_list.dart';
 
 class SearchScreen extends StatelessWidget {

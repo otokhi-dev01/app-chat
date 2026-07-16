@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/chat_controller.dart';
+import '../../controllers/chat/chat_controller.dart';
 import '../../models/chat_model.dart';
 import '../widgets/chat_title.dart';
 

@@ -1,6 +1,11 @@
+
+import 'package:appchat/screen/settings/setting_screen.dart';
 import 'package:get/get.dart';
 
+import '../controllers/contact/qr_contact_scanner_controller.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/contact/qr_scan/qr_contact_scanner_binding.dart';
+import '../screen/contact/qr_scan/qr_contact_scanner_screen.dart';
 import '../screen/home/home_screen.dart';
 import '../screen/profile/profile_detail_screen.dart';
 import '../screen/profile/profile_edit_screen.dart';
@@ -32,14 +37,33 @@ class AppPages {
       ),
     ),
 
-    // GetPage(
-    //   name: AppRoutes.profileDetail,
-    //   page: () => ProfileDetailScreen(userId: null,),
-    //   transition: Transition.cupertino,
-    //   transitionDuration: Duration(
-    //     milliseconds: 280,
-    //   ),
-    // ),
+    GetPage(
+      name: AppRoutes.settings,
+      page: () => SettingScreen(),
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 280,
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.qrScanner,
+      page: () => QrContactScannerScreen(),
+      binding: QrContactScannerBinding(),
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 280,
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.profileDetail,
+      page: () => ProfileDetailScreen(),
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 280,
+      ),
+    ),
 
     GetPage(
       name: AppRoutes.editProfile,

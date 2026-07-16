@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/chat_controller.dart';
+import '../../controllers/chat/chat_controller.dart';
 import 'home_app_bar_actions.dart';
 import 'home_category_filter.dart';
 
@@ -13,12 +13,14 @@ class HomeAppBar extends StatelessWidget
   final int selectedIndex;
   final List<String> titles;
   final ChatController controller;
+  final VoidCallback onOpenSettings;
 
   HomeAppBar({
     super.key,
     required this.selectedIndex,
     required this.titles,
     required this.controller,
+    required this.onOpenSettings,
   });
 
   double get bottomHeight {
@@ -40,6 +42,10 @@ class HomeAppBar extends StatelessWidget
         return 'profile'.tr;
 
       default:
+        if (index >= 0 && index < titles.length) {
+          return titles[index];
+        }
+
         return '';
     }
   }
@@ -51,10 +57,12 @@ class HomeAppBar extends StatelessWidget
     );
   }
 
-  void _handleChatMenu(
+  Future<void> _handleChatMenu(
       BuildContext context,
       String value,
-      ) {
+      ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     switch (value) {
       case 'mark_all_read':
         controller.markAllAsRead();
@@ -66,17 +74,7 @@ class HomeAppBar extends StatelessWidget
         break;
 
       case 'archived_chats':
-        _showMessage(
-          context,
-          'open_archived_chats'.tr,
-        );
-        break;
-
-      case 'chat_settings':
-        _showMessage(
-          context,
-          'open_chat_settings'.tr,
-        );
+        await controller.openArchivedChatsScreen();
         break;
     }
   }
@@ -92,10 +90,19 @@ class HomeAppBar extends StatelessWidget
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: colorScheme.primary,
           margin: EdgeInsets.all(14),
+          duration: Duration(
+            milliseconds: 1800,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -107,16 +114,26 @@ class HomeAppBar extends StatelessWidget
       ThemeData theme,
       bool isDark,
       ) {
-    return isDark
-        ? SystemUiOverlayStyle.light.copyWith(
+    if (isDark) {
+      return SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor:
+        theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness:
+        Brightness.light,
+      );
+    }
+
+    return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
       systemNavigationBarColor:
       theme.scaffoldBackgroundColor,
-    )
-        : SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness:
+      Brightness.dark,
     );
   }
 
@@ -156,25 +173,18 @@ class HomeAppBar extends StatelessWidget
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
-
-      // Chats stays on the left.
-      // Contacts, Settings, and Profile are centered.
       centerTitle: selectedIndex != 0,
       titleSpacing: 20,
-
       systemOverlayStyle: _overlayStyle(
         theme,
         isDark,
       ),
-
       iconTheme: IconThemeData(
         color: colorScheme.onSurface,
       ),
-
       actionsIconTheme: IconThemeData(
         color: colorScheme.onSurface,
       ),
-
       flexibleSpace: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
@@ -194,7 +204,6 @@ class HomeAppBar extends StatelessWidget
           ),
         ),
       ),
-
       title: AnimatedSwitcher(
         duration: Duration(
           milliseconds: 300,
@@ -234,7 +243,6 @@ class HomeAppBar extends StatelessWidget
           ),
         ),
       ),
-
       actions: [
         HomeAppBarActions(
           selectedIndex: selectedIndex,
@@ -250,7 +258,6 @@ class HomeAppBar extends StatelessWidget
         ),
         SizedBox(width: 10),
       ],
-
       bottom: selectedIndex == 0
           ? PreferredSize(
         preferredSize: Size.fromHeight(74),

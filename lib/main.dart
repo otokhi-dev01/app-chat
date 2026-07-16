@@ -3,7 +3,7 @@ import 'package:appchat/route/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'controllers/settings_controller.dart';
+import 'controllers/settings/settings_controller.dart';
 import 'core/localization/app_translation.dart';
 import 'core/theme/app_theme.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/settings_controller.dart';
+import '../../../controllers/settings/settings_controller.dart';
 
 class DisplaySettingsSection extends StatelessWidget {
   final SettingsController controller;

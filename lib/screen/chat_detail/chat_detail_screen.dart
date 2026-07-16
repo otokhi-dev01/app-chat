@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../controllers/call/call_controller.dart';
 import '../../models/chat_message_model.dart';
 import '../../models/chat_model.dart';
+import '../../route/app_route.dart';
 import '../../services/chat_camera_services.dart';
 import '../../services/chat_voice_recorder_service.dart';
 import '../widgets/chat_detail/chat_attachment_sheet.dart';
 import '../widgets/chat_detail/chat_voice_message.dart';
+import 'call/call_screen.dart';
 import 'chat_detail_app_bar.dart';
 import '../widgets/chat_detail/chat_detail_content.dart';
 import '../widgets/chat_detail/chat_message_action_sheet.dart';
@@ -230,6 +233,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
           curve: Curves.easeOutCubic,
         );
       },
+    );
+  }
+
+  Future<void> _openProfileDetail() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    await Get.toNamed(
+      AppRoutes.profileDetail,
     );
   }
 
@@ -756,6 +767,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
     });
   }
 
+
   void _showSnackBar({
     required String message,
     bool isError = false,
@@ -806,10 +818,26 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: ChatDetailAppBar(
           chat: widget.chat,
+          onProfileTap: _openProfileDetail,
           onAudioCall: () {
-            _showSnackBar(
-              message: 'Calling ${widget.chat.name}...',
+            Get.put(
+              CallController(
+                name: widget.chat.name,
+                avatarUrl: widget.chat.image,
+                callType: CallType.audio,
+              ),
             );
+            Get.to(() => CallScreen());
+          },
+          onVideoCall: () {
+            Get.put(
+              CallController(
+                name: widget.chat.name,
+                avatarUrl: widget.chat.image,
+                callType: CallType.video,
+              ),
+            );
+            Get.to(() => CallScreen());
           },
           onMenuSelected: _handleMenu,
         ),

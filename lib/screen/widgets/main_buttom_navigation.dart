@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/main_navigation_controller.dart';
+import '../../controllers/navigation/main_navigation_controller.dart';
 
 class MainBottomNavigation extends StatelessWidget {
   final int currentIndex;

@@ -1,4 +1,4 @@
-import 'package:appchat/controllers/chat_controller.dart';
+import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: HomeAppBar(
         selectedIndex: selectedIndex,
         titles: titles,
-        controller: controller,
+        controller: controller, onOpenSettings: () {  },
       ),
       body: IndexedStack(
         index: selectedIndex,

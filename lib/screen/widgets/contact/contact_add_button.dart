@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/contact_controller.dart';
+import '../../../controllers/contact/contact_controller.dart';
+import '../../contact/qr_scan/qr_contact_scanner_screen.dart';
+import 'show_add_contact_sheet.dart';
 
-class ContactAddButton
-    extends StatelessWidget {
+class ContactAddButton extends StatelessWidget {
   final ContactController controller;
 
   ContactAddButton({
@@ -12,10 +13,142 @@ class ContactAddButton
     required this.controller,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  void _openAddContactSheet(
+      BuildContext context, {
+        String initialPhoneNumber = '',
+      }) {
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
+
+    showAddContactSheet(
+      context: context,
+      initialPhoneNumber:
+      initialPhoneNumber,
+      onAdd: (AddContactData contact) {
+        controller.addContact(
+          name: contact.fullName,
+          phoneNumber:
+          contact.phoneNumber,
+        );
+      },
+      onAddViaQrCode: () {
+        _openQrScanner(context);
+      },
+    );
+  }
+
+  Future<void> _openQrScanner(
+      BuildContext context,
+      ) async {
+    String? scannedValue =
+    await Get.to<String>(
+          () => QrContactScannerScreen(),
+      transition: Transition.cupertino,
+      duration: Duration(
+        milliseconds: 280,
+      ),
+    );
+
+    if (scannedValue == null ||
+        scannedValue.trim().isEmpty ||
+        !context.mounted) {
+      return;
+    }
+
+    String phoneNumber =
+    _extractPhoneNumber(
+      scannedValue,
+    );
+
+    if (phoneNumber.isEmpty) {
+      _showInvalidQrMessage(
+        context,
+      );
+
+      return;
+    }
+
+    _openAddContactSheet(
+      context,
+      initialPhoneNumber: phoneNumber,
+    );
+  }
+
+  String _extractPhoneNumber(
+      String scannedValue,
+      ) {
+    String value =
+    scannedValue.trim();
+
+    Uri? uri = Uri.tryParse(value);
+
+    if (uri != null &&
+        uri.scheme.toLowerCase() ==
+            'tel') {
+      return uri.path.trim();
+    }
+
+    RegExpMatch? phoneMatch =
+    RegExp(
+      r'\+?[0-9][0-9\s\-()]{6,}',
+    ).firstMatch(value);
+
+    if (phoneMatch == null) {
+      return '';
+    }
+
+    return phoneMatch
+        .group(0)
+        ?.trim() ??
+        '';
+  }
+
+  void _showInvalidQrMessage(
+      BuildContext context,
+      ) {
     ColorScheme colorScheme =
         Theme.of(context).colorScheme;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            'This QR code does not contain a phone number',
+          ),
+          behavior:
+          SnackBarBehavior.floating,
+          backgroundColor:
+          colorScheme.error,
+          margin: EdgeInsets.all(14),
+          shape: RoundedRectangleBorder(
+            borderRadius:
+            BorderRadius.circular(14),
+          ),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme =
+    Theme.of(context);
+
+    ColorScheme colorScheme =
+        theme.colorScheme;
+
+    bool isDark =
+        theme.brightness ==
+            Brightness.dark;
+
+    Color shadowColor = isDark
+        ? Colors.black.withValues(
+      alpha: 0.32,
+    )
+        : colorScheme.primary
+        .withValues(
+      alpha: 0.24,
+    );
 
     return Positioned(
       right: 16,
@@ -23,7 +156,8 @@ class ContactAddButton
       child: Obx(
             () {
           bool isVisible =
-              controller.showAddButton.value;
+              controller
+                  .showAddButton.value;
 
           return IgnorePointer(
             ignoring: !isVisible,
@@ -31,7 +165,8 @@ class ContactAddButton
               duration: Duration(
                 milliseconds: 220,
               ),
-              curve: Curves.easeOutCubic,
+              curve:
+              Curves.easeOutCubic,
               offset: isVisible
                   ? Offset.zero
                   : Offset(0, 2),
@@ -39,23 +174,54 @@ class ContactAddButton
                 duration: Duration(
                   milliseconds: 180,
                 ),
-                curve: Curves.easeOutCubic,
-                opacity: isVisible ? 1 : 0,
-                child: FloatingActionButton(
-                  heroTag: 'add_contact_fab',
-                  elevation: 5,
-                  highlightElevation: 2,
-                  backgroundColor:
-                  colorScheme.primary,
-                  foregroundColor:
-                  colorScheme.onPrimary,
-                  onPressed:
-                  controller.openAddContact,
-                  shape: CircleBorder(),
-                  child: Icon(
-                    Icons
-                        .person_add_alt_1_rounded,
-                    size: 23,
+                curve:
+                Curves.easeOutCubic,
+                opacity:
+                isVisible ? 1 : 0,
+                child: Container(
+                  decoration:
+                  BoxDecoration(
+                    shape:
+                    BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                        shadowColor,
+                        blurRadius: 18,
+                        offset:
+                        Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Tooltip(
+                    message:
+                    'Add contact',
+                    child:
+                    FloatingActionButton(
+                      heroTag:
+                      'add_contact_fab',
+                      elevation: 0,
+                      highlightElevation:
+                      0,
+                      backgroundColor:
+                      colorScheme
+                          .primary,
+                      foregroundColor:
+                      colorScheme
+                          .onPrimary,
+                      onPressed: () {
+                        _openAddContactSheet(
+                          context,
+                        );
+                      },
+                      shape:
+                      CircleBorder(),
+                      child: Icon(
+                        Icons
+                            .person_add_alt_1_rounded,
+                        size: 23,
+                      ),
+                    ),
                   ),
                 ),
               ),

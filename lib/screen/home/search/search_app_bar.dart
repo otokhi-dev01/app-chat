@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/chat_controller.dart';
+import '../../../controllers/chat/chat_controller.dart';
 
 class SearchAppBar extends StatelessWidget
     implements PreferredSizeWidget {

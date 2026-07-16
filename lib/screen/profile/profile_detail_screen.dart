@@ -1,53 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/user_controller.dart';
+import '../../controllers/user/user_controller.dart';
 import '../widgets/profile_detail/profile_detail_action.dart';
 import '../widgets/profile_detail/profile_detail_app_bar.dart';
 import '../widgets/profile_detail/profile_detail_header.dart';
 import '../widgets/profile_detail/profile_detail_info_section.dart';
 
 class ProfileDetailScreen extends StatelessWidget {
-  final int userId;
-
-  late final String controllerTag;
-  late final UserController controller;
+  final UserController controller;
 
   ProfileDetailScreen({
     super.key,
-    required this.userId,
-  }) {
-    controllerTag = 'profile-user-$userId';
-
-    controller = Get.isRegistered<UserController>(
-      tag: controllerTag,
-    )
-        ? Get.find<UserController>(
-      tag: controllerTag,
-    )
-        : Get.put(
-      UserController(
-        userId: userId,
-      ),
-      tag: controllerTag,
-    );
-  }
+    UserController? controller,
+  }) : controller = controller ??
+      (Get.isRegistered<UserController>()
+          ? Get.find<UserController>()
+          : Get.put(UserController()));
 
   void _showMessage(
       BuildContext context,
       String message,
       ) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: colorScheme.primary,
           margin: EdgeInsets.all(14),
+          duration: Duration(
+            milliseconds: 1800,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -76,6 +70,24 @@ class ProfileDetailScreen extends StatelessWidget {
     }
   }
 
+  void _openMessage(
+      BuildContext context,
+      ) {
+    _showMessage(
+      context,
+      'Open conversation with ${controller.name.value}',
+    );
+  }
+
+  void _startCall(
+      BuildContext context,
+      ) {
+    _showMessage(
+      context,
+      'Calling ${controller.name.value}...',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -98,24 +110,17 @@ class ProfileDetailScreen extends StatelessWidget {
           Get.back();
         },
         onMenuSelected: (String value) {
-          _handleMenu(context, value);
+          _handleMenu(
+            context,
+            value,
+          );
         },
       ),
       body: Obx(
             () {
-          if (controller.isLoading.value) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: theme.colorScheme.primary,
-              ),
-            );
-          }
-
-          if (controller.errorMessage.value.isNotEmpty) {
-            return _buildErrorState(context);
-          }
-
-          return _buildProfileContent(context);
+          return _buildProfileContent(
+            context,
+          );
         },
       ),
     );
@@ -124,14 +129,13 @@ class ProfileDetailScreen extends StatelessWidget {
   Widget _buildProfileContent(
       BuildContext context,
       ) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
 
-    bool isOnline =
-        controller.status.value
-            .trim()
-            .toLowerCase() ==
-            'online';
+    bool isOnline = controller.status.value
+        .trim()
+        .toLowerCase() ==
+        'online';
 
     return SafeArea(
       top: false,
@@ -162,20 +166,13 @@ class ProfileDetailScreen extends StatelessWidget {
                     isFollowing:
                     controller.isFollowing.value,
                     onMessage: () {
-                      _showMessage(
-                        context,
-                        'Open conversation with '
-                            '${controller.name.value}',
-                      );
+                      _openMessage(context);
                     },
                     onCall: () {
-                      _showMessage(
-                        context,
-                        'Calling '
-                            '${controller.name.value}...',
-                      );
+                      _startCall(context);
                     },
-                    onFollow: controller.toggleFollow,
+                    onFollow:
+                    controller.toggleFollow,
                   ),
 
                   SizedBox(height: 14),
@@ -203,61 +200,6 @@ class ProfileDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorState(
-      BuildContext context,
-      ) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(30),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colorScheme.error.withValues(
-                  alpha: 0.10,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.person_off_outlined,
-                color: colorScheme.error,
-                size: 34,
-              ),
-            ),
-            SizedBox(height: 18),
-            Text(
-              'Could not load profile',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            SizedBox(height: 7),
-            Text(
-              controller.errorMessage.value,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            SizedBox(height: 18),
-            FilledButton(
-              onPressed: controller.loadUserById,
-              child: Text('Try again'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildNotificationCard(
       BuildContext context,
       ColorScheme colorScheme,
@@ -272,8 +214,12 @@ class ProfileDetailScreen extends StatelessWidget {
         : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
     return Material(
       color: cardColor,
@@ -313,7 +259,9 @@ class ProfileDetailScreen extends StatelessWidget {
                   size: 24,
                 ),
               ),
+
               SizedBox(width: 12),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment:
@@ -327,7 +275,9 @@ class ProfileDetailScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+
                     SizedBox(height: 4),
+
                     Text(
                       'Manage notifications from this user',
                       style: theme.textTheme.bodySmall
@@ -340,6 +290,7 @@ class ProfileDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
               Icon(
                 Icons.chevron_right_rounded,
                 color:

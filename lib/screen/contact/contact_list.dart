@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/contact_controller.dart';
+import '../../controllers/contact/contact_controller.dart';
 import '../../../models/contact_model.dart';
 import '../widgets/contact/contact_empty_state.dart';
 import '../widgets/contact/contact_section_header.dart';

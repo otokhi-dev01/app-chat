@@ -41,6 +41,9 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>AppChat needs microphone access to record voice messages.</string>
 
+    <key>NSCameraUsageDescription</key>
+    <string>AppChat needs camera access to scan contact QR codes.</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

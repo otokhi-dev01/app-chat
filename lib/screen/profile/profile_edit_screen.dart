@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import '../../controllers/edit_profile_controller.dart';
+import '../../controllers/profile/edit_profile_controller.dart';
 import '../widgets/profile/profile_avatar_section.dart';
 import '../widgets/profile/profile_field.dart';
 import '../widgets/profile/profile_photo_sheet.dart';

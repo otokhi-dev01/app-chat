@@ -2,7 +2,7 @@ import 'package:appchat/screen/profile/profile_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/chat_controller.dart';
+import '../../controllers/chat/chat_controller.dart';
 import 'home_app_bar_button.dart';
 import 'home_chat_menu.dart';
 

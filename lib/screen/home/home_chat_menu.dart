@@ -35,10 +35,11 @@ class HomeChatMenu extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       elevation: 10,
       position: PopupMenuPosition.under,
-
-      // Positive X moves the dropdown to the right.
       offset: Offset(14, 6),
-
+      constraints: BoxConstraints(
+        minWidth: 220,
+        maxWidth: 245,
+      ),
       shadowColor: Colors.black.withValues(
         alpha: isDark ? 0.30 : 0.12,
       ),
@@ -74,18 +75,12 @@ class HomeChatMenu extends StatelessWidget {
               title: 'Mark all as read',
             ),
           ),
+
           PopupMenuItem<String>(
             value: 'archived_chats',
             child: _HomeChatMenuItem(
               icon: Icons.archive_outlined,
               title: 'Archived chats',
-            ),
-          ),
-          PopupMenuItem<String>(
-            value: 'chat_settings',
-            child: _HomeChatMenuItem(
-              icon: Icons.settings_outlined,
-              title: 'Chat settings',
             ),
           ),
         ];
@@ -126,7 +121,9 @@ class _HomeChatMenuItem extends StatelessWidget {
             size: 20,
           ),
         ),
+
         SizedBox(width: 12),
+
         Expanded(
           child: Text(
             title,

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
-import '../models/chat_model.dart';
-import '../screen/home/search/search_screen.dart';
+import '../../models/chat_model.dart';
+import '../../route/app_route.dart';
+import '../../screen/chat_detail/chat_detail_screen.dart';
+import '../../screen/home/archived_chat/archived_chat_screen.dart';
+import '../../screen/home/search/search_screen.dart';
+
 class ChatController extends GetxController {
   final RxList<ChatModel> chats = <ChatModel>[].obs;
 
@@ -79,6 +83,43 @@ class ChatController extends GetxController {
 
       isSearching.value = false;
     }
+  }
+
+  /// Opens the Telegram-style Archived Chats screen and keeps the main
+  /// chats list in sync with whatever the user does there (unarchive,
+  /// mute toggle, delete).
+  Future<void> openArchivedChatsScreen() async {
+    await Get.to(
+          () => ArchivedChatsScreen(
+        archivedChats: archivedChats,
+        onUnarchive: (ChatModel chat) {
+          unarchiveChat(chat.id);
+        },
+        onDelete: (ChatModel chat) {
+          deleteChat(chat.id);
+        },
+        onToggleMute: (ChatModel chat) {
+          updateChat(chat);
+        },
+        onOpenChat: (ChatModel chat) {
+          Get.to(
+                () => ChatDetailScreen(chat: chat),
+          );
+        },
+      ),
+      transition: Transition.fadeIn,
+      duration: Duration(
+        milliseconds: 220,
+      ),
+    );
+  }
+
+  Future<void> openSettingsScreen() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    await Get.toNamed(
+      AppRoutes.settings,
+    );
   }
 
   void handleChatScroll(
@@ -241,6 +282,10 @@ class ChatController extends GetxController {
 
     return chats.where(
           (ChatModel chat) {
+        if (chat.isArchived) {
+          return false;
+        }
+
         bool matchesName = chat.name
             .toLowerCase()
             .contains(query);
@@ -254,8 +299,15 @@ class ChatController extends GetxController {
     ).toList();
   }
 
+  /// Chats shown on the main list. Archived chats are deliberately
+  /// excluded here — they only appear inside the Archived Chats screen,
+  /// reached via the collapsed summary row.
   List<ChatModel> get filteredChats {
-    Iterable<ChatModel> result = chats;
+    Iterable<ChatModel> result = chats.where(
+          (ChatModel chat) {
+        return !chat.isArchived;
+      },
+    );
 
     int categoryIndex =
         selectedCategoryIndex.value;
@@ -311,6 +363,28 @@ class ChatController extends GetxController {
     return result.toList();
   }
 
+  /// All chats the user has archived, newest first. Feeds both the
+  /// collapsed summary row and the Archived Chats screen.
+  List<ChatModel> get archivedChats {
+    List<ChatModel> result = chats.where(
+          (ChatModel chat) {
+        return chat.isArchived;
+      },
+    ).toList();
+
+    result.sort(
+          (ChatModel a, ChatModel b) {
+        return b.dateTime.compareTo(a.dateTime);
+      },
+    );
+
+    return result;
+  }
+
+  int get archivedChatCount {
+    return archivedChats.length;
+  }
+
   int get totalUnreadCount {
     return chats.fold(
       0,
@@ -318,7 +392,7 @@ class ChatController extends GetxController {
           int total,
           ChatModel chat,
           ) {
-        if (chat.isMuted) {
+        if (chat.isMuted || chat.isArchived) {
           return total;
         }
 
@@ -328,11 +402,11 @@ class ChatController extends GetxController {
   }
 
   int get allChatCount {
-    return chats.length;
+    return filteredChats.length;
   }
 
   int get unreadChatCount {
-    return chats.where(
+    return filteredChats.where(
           (ChatModel chat) {
         return chat.unread > 0;
       },
@@ -340,7 +414,7 @@ class ChatController extends GetxController {
   }
 
   int get personalChatCount {
-    return chats.where(
+    return filteredChats.where(
           (ChatModel chat) {
         return chat.type == 'personal';
       },
@@ -348,7 +422,7 @@ class ChatController extends GetxController {
   }
 
   int get groupChatCount {
-    return chats.where(
+    return filteredChats.where(
           (ChatModel chat) {
         return chat.type == 'group';
       },
@@ -405,6 +479,79 @@ class ChatController extends GetxController {
     chats[index] = currentChat.copyWith(
       isMuted: !currentChat.isMuted,
     );
+  }
+
+  /// Archives a chat (Telegram-style swipe action on the main list).
+  /// The chat disappears from [filteredChats] and [searchResults] and
+  /// starts showing up in [archivedChats] instead.
+  void archiveChat(String chatId) {
+    int index = chats.indexWhere(
+          (ChatModel chat) {
+        return chat.id == chatId;
+      },
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    chats[index] = chats[index].copyWith(
+      isArchived: true,
+    );
+  }
+
+  /// Moves a chat back out of the archive onto the main list.
+  void unarchiveChat(String chatId) {
+    int index = chats.indexWhere(
+          (ChatModel chat) {
+        return chat.id == chatId;
+      },
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    chats[index] = chats[index].copyWith(
+      isArchived: false,
+    );
+  }
+
+  /// Toggles archive state, handy for a single swipe/menu action that
+  /// should work whether the chat currently is or isn't archived.
+  void toggleArchive(String chatId) {
+    int index = chats.indexWhere(
+          (ChatModel chat) {
+        return chat.id == chatId;
+      },
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    ChatModel currentChat = chats[index];
+
+    chats[index] = currentChat.copyWith(
+      isArchived: !currentChat.isArchived,
+    );
+  }
+
+  /// Replaces a chat in the source list with an already-updated
+  /// instance. Used by screens (like ArchivedChatsScreen) that build
+  /// their own copyWith() result and just need it written back.
+  void updateChat(ChatModel updatedChat) {
+    int index = chats.indexWhere(
+          (ChatModel chat) {
+        return chat.id == updatedChat.id;
+      },
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    chats[index] = updatedChat;
   }
 
   void markAsRead(String chatId) {

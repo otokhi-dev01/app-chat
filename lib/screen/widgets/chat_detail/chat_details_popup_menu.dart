@@ -72,13 +72,6 @@ class ChatDetailPopupMenu extends StatelessWidget {
       itemBuilder: (BuildContext context) {
         return [
           PopupMenuItem<String>(
-            value: 'view_profile',
-            child: _ChatPopupMenuItem(
-              icon: Icons.person_outline_rounded,
-              title: 'View profile',
-            ),
-          ),
-          PopupMenuItem<String>(
             value: 'search',
             child: _ChatPopupMenuItem(
               icon: Icons.search_rounded,

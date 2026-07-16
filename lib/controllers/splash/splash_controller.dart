@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 
-import '../route/app_route.dart';
+import '../../route/app_route.dart';
 
 class SplashController extends GetxController {
   Timer? _timer;
