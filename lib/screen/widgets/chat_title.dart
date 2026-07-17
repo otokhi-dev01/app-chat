@@ -1,15 +1,15 @@
+import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Required for Haptics
 import 'package:get/get.dart';
 
-import '../../controllers/chat/chat_controller.dart';
-import '../../core/theme/app_theme.dart';
 import '../../models/chat_model.dart';
 import '../chat_detail/chat_detail_screen.dart';
 
 class ChatTile extends StatelessWidget {
   final ChatModel chat;
 
-  ChatTile({
+  const ChatTile({
     super.key,
     required this.chat,
   });
@@ -17,10 +17,7 @@ class ChatTile extends StatelessWidget {
   String _formatDateTime(DateTime dateTime) {
     DateTime now = DateTime.now();
 
-    bool isToday =
-        now.year == dateTime.year &&
-            now.month == dateTime.month &&
-            now.day == dateTime.day;
+    bool isToday = now.year == dateTime.year && now.month == dateTime.month && now.day == dateTime.day;
 
     if (isToday) {
       int hour = dateTime.hour;
@@ -32,20 +29,16 @@ class ChatTile extends StatelessWidget {
         formattedHour = 12;
       }
 
-      String minute =
-      dateTime.minute.toString().padLeft(2, '0');
+      String minute = dateTime.minute.toString().padLeft(2, '0');
 
       return '$formattedHour:$minute $period';
     }
 
     DateTime yesterday = now.subtract(
-      Duration(days: 1),
+      const Duration(days: 1),
     );
 
-    bool isYesterday =
-        yesterday.year == dateTime.year &&
-            yesterday.month == dateTime.month &&
-            yesterday.day == dateTime.day;
+    bool isYesterday = yesterday.year == dateTime.year && yesterday.month == dateTime.month && yesterday.day == dateTime.day;
 
     if (isYesterday) {
       return 'Yesterday';
@@ -69,9 +62,11 @@ class ChatTile extends StatelessWidget {
   }
 
   void _openChatDetail() {
+    // Play subtle iOS-style tap feedback on opening chats
+    HapticFeedback.lightImpact();
+
     if (Get.isRegistered<ChatController>()) {
-      ChatController controller =
-      Get.find<ChatController>();
+      ChatController controller = Get.find<ChatController>();
 
       controller.markAsRead(chat.id);
     }
@@ -86,33 +81,31 @@ class ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark =
-        Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: _BouncyChatTile(
         onTap: _openChatDetail,
         onLongPress: () {
           _showChatActions(context);
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 9,
           ),
           child: Row(
             children: [
-              _buildAvatar(
-                context,
-                isDark,
-              ),
-              SizedBox(width: 12),
+              _buildAvatar(context, isDark, primaryColor),
+              const SizedBox(width: 12),
               Expanded(
-                child: _buildChatContent(),
+                child: _buildChatContent(primaryColor),
               ),
-              SizedBox(width: 8),
-              _buildTrailing(),
+              const SizedBox(width: 8),
+              _buildTrailing(primaryColor),
             ],
           ),
         ),
@@ -123,20 +116,20 @@ class ChatTile extends StatelessWidget {
   Widget _buildAvatar(
       BuildContext context,
       bool isDark,
+      Color primaryColor,
       ) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
         CircleAvatar(
           radius: 28,
-          backgroundColor:
-          AppTheme.primaryColor.withValues(
+          backgroundColor: primaryColor.withValues(
             alpha: 0.15,
           ),
           child: Text(
             _getFirstLetter(),
             style: TextStyle(
-              color: AppTheme.primaryColor,
+              color: primaryColor,
               fontSize: 19,
               fontWeight: FontWeight.w700,
             ),
@@ -151,24 +144,22 @@ class ChatTile extends StatelessWidget {
               height: 19,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
+                color: primaryColor,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark
-                      ? Color(0xFF121212)
-                      : Colors.white,
+                  // Set to match Telegram dark mode background color (0xFF0E1621)
+                  color: isDark ? const Color(0xFF0E1621) : Colors.white,
                   width: 2,
                 ),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.group_rounded,
                 color: Colors.white,
                 size: 11,
               ),
             ),
           ),
-        if (chat.isOnline &&
-            chat.type == 'personal')
+        if (chat.isOnline && chat.type == 'personal')
           Positioned(
             right: 0,
             bottom: 1,
@@ -179,9 +170,8 @@ class ChatTile extends StatelessWidget {
                 color: Colors.green,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark
-                      ? Color(0xFF121212)
-                      : Colors.white,
+                  // Set to match Telegram dark mode background color (0xFF0E1621)
+                  color: isDark ? const Color(0xFF0E1621) : Colors.white,
                   width: 2,
                 ),
               ),
@@ -191,7 +181,7 @@ class ChatTile extends StatelessWidget {
     );
   }
 
-  Widget _buildChatContent() {
+  Widget _buildChatContent(Color primaryColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -204,14 +194,12 @@ class ChatTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: chat.unread > 0
-                      ? FontWeight.w700
-                      : FontWeight.w600,
+                  fontWeight: chat.unread > 0 ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
             ),
             if (chat.isPinned)
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(left: 5),
                 child: Icon(
                   Icons.push_pin_rounded,
@@ -220,7 +208,7 @@ class ChatTile extends StatelessWidget {
                 ),
               ),
             if (chat.isMuted)
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(left: 5),
                 child: Icon(
                   Icons.volume_off_rounded,
@@ -230,37 +218,26 @@ class ChatTile extends StatelessWidget {
               ),
           ],
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Row(
           children: [
             if (chat.isMe) ...[
               Icon(
-                chat.status == MessageStatus.read
-                    ? Icons.done_all_rounded
-                    : Icons.done_rounded,
+                chat.status == MessageStatus.read ? Icons.done_all_rounded : Icons.done_rounded,
                 size: 17,
-                color:
-                chat.status == MessageStatus.read
-                    ? AppTheme.primaryColor
-                    : Colors.grey,
+                color: chat.status == MessageStatus.read ? primaryColor : Colors.grey,
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
             ],
             Expanded(
               child: Text(
-                chat.isTyping
-                    ? 'Typing...'
-                    : chat.message,
+                chat.isTyping ? 'Typing...' : chat.message,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: chat.isTyping
-                      ? AppTheme.primaryColor
-                      : Colors.grey.shade600,
+                  color: chat.isTyping ? primaryColor : Colors.grey.shade600,
                   fontSize: 14,
-                  fontWeight: chat.isTyping
-                      ? FontWeight.w600
-                      : FontWeight.w400,
+                  fontWeight: chat.isTyping ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
@@ -270,7 +247,7 @@ class ChatTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTrailing() {
+  Widget _buildTrailing(Color primaryColor) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -278,37 +255,29 @@ class ChatTile extends StatelessWidget {
         Text(
           _formatDateTime(chat.dateTime),
           style: TextStyle(
-            color: chat.unread > 0
-                ? AppTheme.primaryColor
-                : Colors.grey.shade600,
+            color: chat.unread > 0 ? primaryColor : Colors.grey.shade600,
             fontSize: 11,
-            fontWeight: chat.unread > 0
-                ? FontWeight.w600
-                : FontWeight.w400,
+            fontWeight: chat.unread > 0 ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         if (chat.unread > 0)
           Container(
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               minWidth: 21,
               minHeight: 21,
             ),
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 6,
             ),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: chat.isMuted
-                  ? Colors.grey
-                  : AppTheme.primaryColor,
+              color: chat.isMuted ? Colors.grey : primaryColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              chat.unread > 99
-                  ? '99+'
-                  : chat.unread.toString(),
-              style: TextStyle(
+              chat.unread > 99 ? '99+' : chat.unread.toString(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
@@ -316,7 +285,7 @@ class ChatTile extends StatelessWidget {
             ),
           )
         else
-          SizedBox(height: 21),
+          const SizedBox(height: 21),
       ],
     );
   }
@@ -326,8 +295,7 @@ class ChatTile extends StatelessWidget {
       return;
     }
 
-    ChatController controller =
-    Get.find<ChatController>();
+    ChatController controller = Get.find<ChatController>();
 
     showModalBottomSheet<void>(
       context: context,
@@ -339,14 +307,10 @@ class ChatTile extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(
-                  chat.isPinned
-                      ? Icons.push_pin_outlined
-                      : Icons.push_pin_rounded,
+                  chat.isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
                 ),
                 title: Text(
-                  chat.isPinned
-                      ? 'Unpin conversation'
-                      : 'Pin conversation',
+                  chat.isPinned ? 'Unpin conversation' : 'Pin conversation',
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -355,14 +319,10 @@ class ChatTile extends StatelessWidget {
               ),
               ListTile(
                 leading: Icon(
-                  chat.isMuted
-                      ? Icons.notifications_outlined
-                      : Icons.notifications_off_outlined,
+                  chat.isMuted ? Icons.notifications_outlined : Icons.notifications_off_outlined,
                 ),
                 title: Text(
-                  chat.isMuted
-                      ? 'Unmute notifications'
-                      : 'Mute notifications',
+                  chat.isMuted ? 'Unmute notifications' : 'Mute notifications',
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -371,21 +331,21 @@ class ChatTile extends StatelessWidget {
               ),
               if (chat.unread > 0)
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.mark_chat_read_outlined,
                   ),
-                  title: Text('Mark as read'),
+                  title: const Text('Mark as read'),
                   onTap: () {
                     Navigator.pop(context);
                     controller.markAsRead(chat.id);
                   },
                 ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.delete_outline_rounded,
                   color: Colors.red,
                 ),
-                title: Text(
+                title: const Text(
                   'Delete conversation',
                   style: TextStyle(
                     color: Colors.red,
@@ -400,6 +360,62 @@ class ChatTile extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------
+// 3. Private elastic press handler to keep the tile stateless
+// ---------------------------------------------------------------------
+class _BouncyChatTile extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+
+  const _BouncyChatTile({
+    required this.child,
+    required this.onTap,
+    this.onLongPress,
+  });
+
+  @override
+  State<_BouncyChatTile> createState() => _BouncyChatTileState();
+}
+
+class _BouncyChatTileState extends State<_BouncyChatTile> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() {
+          _isPressed = true;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          _isPressed = false;
+        });
+        widget.onTap();
+      },
+      onTapCancel: () {
+        setState(() {
+          _isPressed = false;
+        });
+      },
+      onLongPress: () {
+        setState(() {
+          _isPressed = false;
+        });
+        widget.onLongPress?.call();
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
     );
   }
 }

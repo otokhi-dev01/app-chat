@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/contact/contact_controller.dart';
+import '../../services/contact_service.dart';
+import '../../services/mock_contact_service.dart';
 import '../widgets/contact/contact_add_button.dart';
 
 import '../widgets/contact/contact_search_field.dart';
@@ -13,12 +15,23 @@ class ContactScreen extends StatelessWidget {
   });
 
   ContactController get controller {
+    if (!Get.isRegistered<ContactService>()) {
+      Get.put<ContactService>(
+        MockContactService(),
+        permanent: true,
+      );
+    }
+
     if (Get.isRegistered<ContactController>()) {
       return Get.find<ContactController>();
     }
 
-    return Get.put(
-      ContactController(),
+    return Get.put<ContactController>(
+      ContactController(
+        contactService:
+        Get.find<ContactService>(),
+      ),
+      permanent: true,
     );
   }
 

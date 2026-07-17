@@ -2,6 +2,8 @@ import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../services/chat_list_service.dart';
+import '../../services/mock_chat_list_service.dart';
 import '../contact/contact_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/setting_screen.dart';
@@ -36,11 +38,24 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    if (Get.isRegistered<ChatController>()) {
-      controller = Get.find<ChatController>();
-    } else {
-      controller = Get.put(ChatController());
+    if (!Get.isRegistered<ChatListService>()) {
+      Get.put<ChatListService>(
+        MockChatListService(),
+        permanent: true,
+      );
     }
+
+    if (!Get.isRegistered<ChatController>()) {
+      Get.put<ChatController>(
+        ChatController(
+          chatService:
+          Get.find<ChatListService>(),
+        ),
+        permanent: true,
+      );
+    }
+
+    controller = Get.find<ChatController>();
   }
 
   void changePage(int index) {

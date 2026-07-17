@@ -6,8 +6,12 @@ import 'package:get/get.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../../route/app_route.dart';
 
+// Import your custom settings widgets
+import '../widgets/settings/account_screen.dart';
+import '../widgets/settings/general_settings_section.dart'; // Adjust path as needed
+
 class ProfileScreen extends StatelessWidget {
-  ProfileScreen({
+  const ProfileScreen({
     super.key,
   });
 
@@ -39,34 +43,35 @@ class ProfileScreen extends StatelessWidget {
       ClipboardData(text: value),
     );
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('Username copied'),
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    Get.rawSnackbar(
+      messageText: const Text(
+        'Username copied to clipboard',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
         ),
-      );
+      ),
+      backgroundColor: colorScheme.primary,
+      borderRadius: 14,
+      margin: const EdgeInsets.all(14),
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(milliseconds: 1500),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    SettingsController controller =
-    Get.find<SettingsController>();
+    SettingsController controller = Get.find<SettingsController>();
 
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
@@ -76,25 +81,23 @@ class ProfileScreen extends StatelessWidget {
           () {
         String name = controller.userName.value.trim();
         String email = controller.userEmail.value.trim();
-        String username =
-        controller.userUsername.value.trim();
-        String bio = controller.userBio.value.trim();
+        String username = controller.userUsername.value.trim();
 
         return ListView(
-          keyboardDismissBehavior:
-          ScrollViewKeyboardDismissBehavior.onDrag,
-          physics: BouncingScrollPhysics(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
           ),
-          padding: EdgeInsets.fromLTRB(
+          padding: const EdgeInsets.fromLTRB(
             14,
             16,
             14,
             110,
           ),
           children: [
+            // 1. Profile Header Card
             Container(
-              padding: EdgeInsets.fromLTRB(
+              padding: const EdgeInsets.fromLTRB(
                 18,
                 24,
                 18,
@@ -112,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
                       alpha: isDark ? 0.18 : 0.05,
                     ),
                     blurRadius: 20,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -126,12 +129,10 @@ class ProfileScreen extends StatelessWidget {
                         height: 104,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: colorScheme.primary
-                              .withValues(alpha: 0.14),
+                          color: colorScheme.primary.withValues(alpha: 0.14),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: colorScheme.primary
-                                .withValues(alpha: 0.24),
+                            color: colorScheme.primary.withValues(alpha: 0.24),
                             width: 2,
                           ),
                         ),
@@ -147,29 +148,26 @@ class ProfileScreen extends StatelessWidget {
                       Positioned(
                         right: -2,
                         bottom: 2,
-                        child: Material(
-                          color: colorScheme.primary,
-                          shape: CircleBorder(),
-                          child: InkWell(
-                            onTap: _openEditProfile,
-                            customBorder: CircleBorder(),
-                            child: SizedBox(
-                              width: 34,
-                              height: 34,
-                              child: Icon(
-                                Icons.camera_alt_rounded,
-                                color: colorScheme.onPrimary,
-                                size: 18,
-                              ),
+                        child: _BouncyProfileButton(
+                          onTap: _openEditProfile,
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.camera_alt_rounded,
+                              color: colorScheme.onPrimary,
+                              size: 18,
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 16),
-
+                  const SizedBox(height: 16),
                   Text(
                     name.isEmpty ? 'Your Name' : name,
                     maxLines: 1,
@@ -181,13 +179,9 @@ class ProfileScreen extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-
-                  SizedBox(height: 5),
-
+                  const SizedBox(height: 5),
                   Text(
-                    email.isEmpty
-                        ? 'No email address'
-                        : email,
+                    email.isEmpty ? 'No email address' : email,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -195,9 +189,7 @@ class ProfileScreen extends StatelessWidget {
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-
-                  SizedBox(height: 22),
-
+                  const SizedBox(height: 22),
                   Row(
                     children: [
                       Expanded(
@@ -207,7 +199,7 @@ class ProfileScreen extends StatelessWidget {
                           onTap: _openEditProfile,
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: _ProfileActionButton(
                           icon: Icons.alternate_email_rounded,
@@ -220,7 +212,7 @@ class ProfileScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: _ProfileActionButton(
                           icon: Icons.qr_code_rounded,
@@ -234,7 +226,7 @@ class ProfileScreen extends StatelessWidget {
                                 username: username,
                               ),
                               transition: Transition.rightToLeft,
-                              duration: Duration(
+                              duration: const Duration(
                                 milliseconds: 280,
                               ),
                             );
@@ -247,115 +239,15 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 22),
+            const SizedBox(height: 22),
 
-            _SectionTitle(
-              title: 'profile_information'.tr,
-            ),
+            // 2. Dynamic Account Settings Section (Imported & Standardized)
+            AccountSettingsSection(controller: controller),
 
-            SizedBox(height: 8),
+            const SizedBox(height: 22),
 
-            Container(
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: borderColor,
-                ),
-              ),
-              child: Column(
-                children: [
-                  _ProfileInfoTile(
-                    icon: Icons.alternate_email_rounded,
-                    title: username.isEmpty
-                        ? 'No username'
-                        : username.startsWith('@')
-                        ? username
-                        : '@$username',
-                    subtitle: 'Username',
-                    onTap: username.isEmpty
-                        ? null
-                        : () {
-                      _copyUsername(
-                        context,
-                        username,
-                      );
-                    },
-                  ),
-
-                  _ProfileDivider(),
-
-                  _ProfileInfoTile(
-                    icon: Icons.email_outlined,
-                    title: email.isEmpty
-                        ? 'No email address'
-                        : email,
-                    subtitle: 'Email',
-                  ),
-
-                  _ProfileDivider(),
-
-                  _ProfileInfoTile(
-                    icon: Icons.info_outline_rounded,
-                    title: bio.isEmpty
-                        ? 'Add a short bio about yourself'
-                        : bio,
-                    subtitle: 'Bio',
-                    maxLines: 3,
-                    onTap: _openEditProfile,
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 22),
-
-            _SectionTitle(
-              title: 'Account',
-            ),
-
-            SizedBox(height: 8),
-
-            Container(
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: borderColor,
-                ),
-              ),
-              child: Column(
-                children: [
-                  _ProfileMenuTile(
-                    icon: Icons.notifications_none_rounded,
-                    title: 'Notifications',
-                    subtitle:
-                    'Messages, groups and calls',
-                    onTap: () {},
-                  ),
-
-                  _ProfileDivider(),
-
-                  _ProfileMenuTile(
-                    icon: Icons.lock_outline_rounded,
-                    title: 'Privacy and Security',
-                    subtitle:
-                    'Blocked users and permissions',
-                    onTap: () {},
-                  ),
-
-                  _ProfileDivider(),
-
-                  _ProfileMenuTile(
-                    icon: Icons.storage_rounded,
-                    title: 'Data and Storage',
-                    subtitle:
-                    'Storage usage and downloads',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
+            // 3. Dynamic General Settings Section (Imported & Standardized)
+            GeneralSettingsSection(controller: controller),
           ],
         );
       },
@@ -368,7 +260,7 @@ class _ProfileActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  _ProfileActionButton({
+  const _ProfileActionButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -379,277 +271,87 @@ class _ProfileActionButton extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    return Material(
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.07)
-          : colorScheme.primary.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 13,
-          ),
-          child: Column(
-            children: [
-              Icon(
-                icon,
+    return _BouncyProfileButton(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 13,
+        ),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : colorScheme.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: colorScheme.primary,
+              size: 22,
+            ),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.primary,
-                size: 22,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(height: 7),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  _SectionTitle({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 7,
-      ),
-      child: Text(
-        title,
-        style: Theme.of(context)
-            .textTheme
-            .titleSmall
-            ?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileInfoTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final int maxLines;
-  final VoidCallback? onTap;
-
-  _ProfileInfoTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.maxLines = 1,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            13,
-            14,
-            13,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(alpha: 0.11),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(
-                  icon,
-                  color: colorScheme.primary,
-                  size: 21,
-                ),
-              ),
-
-              SizedBox(width: 14),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: maxLines,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              if (onTap != null)
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: 11,
-                  ),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: colorScheme.onSurfaceVariant
-                        .withValues(alpha: 0.55),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileMenuTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
+// Custom stateful press animation to keep the main widget stateless
+class _BouncyProfileButton extends StatefulWidget {
+  final Widget child;
   final VoidCallback onTap;
 
-  _ProfileMenuTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
+  const _BouncyProfileButton({
+    required this.child,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            13,
-            12,
-            13,
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(alpha: 0.11),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(
-                  icon,
-                  color: colorScheme.primary,
-                  size: 21,
-                ),
-              ),
-
-              SizedBox(width: 14),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant
-                    .withValues(alpha: 0.55),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  State<_BouncyProfileButton> createState() => _BouncyProfileButtonState();
 }
 
-class _ProfileDivider extends StatelessWidget {
+class _BouncyProfileButtonState extends State<_BouncyProfileButton> {
+  bool _isPressed = false;
+
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    return Divider(
-      height: 1,
-      thickness: 1,
-      indent: 70,
-      endIndent: 14,
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.07)
-          : Colors.black.withValues(alpha: 0.055),
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() {
+          _isPressed = true;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          _isPressed = false;
+        });
+        widget.onTap();
+      },
+      onTapCancel: () {
+        setState(() {
+          _isPressed = false;
+        });
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
     );
   }
 }

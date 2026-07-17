@@ -8,14 +8,13 @@ import '../../controllers/chat/chat_controller.dart';
 import 'home_app_bar_actions.dart';
 import 'home_category_filter.dart';
 
-class HomeAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int selectedIndex;
   final List<String> titles;
   final ChatController controller;
   final VoidCallback onOpenSettings;
 
-  HomeAppBar({
+  const HomeAppBar({
     super.key,
     required this.selectedIndex,
     required this.titles,
@@ -31,21 +30,16 @@ class HomeAppBar extends StatelessWidget
     switch (index) {
       case 0:
         return 'chats'.tr;
-
       case 1:
         return 'contacts'.tr;
-
       case 2:
         return 'settings'.tr;
-
       case 3:
         return 'profile'.tr;
-
       default:
         if (index >= 0 && index < titles.length) {
           return titles[index];
         }
-
         return '';
     }
   }
@@ -66,7 +60,6 @@ class HomeAppBar extends StatelessWidget
     switch (value) {
       case 'mark_all_read':
         controller.markAllAsRead();
-
         _showMessage(
           context,
           'all_chats_marked_as_read'.tr,
@@ -83,8 +76,7 @@ class HomeAppBar extends StatelessWidget
       BuildContext context,
       String message,
       ) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -99,8 +91,8 @@ class HomeAppBar extends StatelessWidget
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: colorScheme.primary,
-          margin: EdgeInsets.all(14),
-          duration: Duration(
+          margin: const EdgeInsets.all(14),
+          duration: const Duration(
             milliseconds: 1800,
           ),
           shape: RoundedRectangleBorder(
@@ -119,10 +111,8 @@ class HomeAppBar extends StatelessWidget
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
@@ -130,10 +120,8 @@ class HomeAppBar extends StatelessWidget
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
@@ -142,28 +130,20 @@ class HomeAppBar extends StatelessWidget
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
+    // Adjusted alpha levels to make it transparent enough to see scroll progress
     Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.70);
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFE7E9ED);
+        ? Colors.white.withValues(alpha: 0.08)
+        : const Color(0xFFE7E9ED);
 
     Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+        ? Colors.white.withValues(alpha: 0.08)
+        : const Color(0xFFF2F4F7);
 
     return AppBar(
       elevation: 0,
@@ -205,7 +185,7 @@ class HomeAppBar extends StatelessWidget
         ),
       ),
       title: AnimatedSwitcher(
-        duration: Duration(
+        duration: const Duration(
           milliseconds: 300,
         ),
         switchInCurve: Curves.easeOutQuart,
@@ -214,9 +194,8 @@ class HomeAppBar extends StatelessWidget
             Widget child,
             Animation<double> animation,
             ) {
-          Animation<Offset> slideTransition =
-          Tween<Offset>(
-            begin: Offset(0.15, 0),
+          Animation<Offset> slideTransition = Tween<Offset>(
+            begin: const Offset(0.15, 0),
             end: Offset.zero,
           ).animate(animation);
 
@@ -256,11 +235,11 @@ class HomeAppBar extends StatelessWidget
             );
           },
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
       ],
       bottom: selectedIndex == 0
           ? PreferredSize(
-        preferredSize: Size.fromHeight(74),
+        preferredSize: const Size.fromHeight(74),
         child: HomeCategoryFilter(
           controller: controller,
         ),

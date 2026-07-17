@@ -15,6 +15,11 @@ const Map<String, String> enUS = {
   'manage_privacy':
   'Manage your privacy and keep your account secure',
 
+  "chat_folders": "Chat Folders",
+  "manage_folders": "Manage your chat folders",
+  "devices": "Devices",
+  "manage_devices": "Manage active devices",
+
   'data_storage': 'Data and Storage',
   'manage_storage':
   'Manage your cache and data stored on this device',

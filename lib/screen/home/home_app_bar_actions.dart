@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
+import '../../controllers/contact/contact_controller.dart';
+import '../../controllers/settings/settings_search_controller.dart';
+import '../../route/app_route.dart';
+import '../settings/settings_search_screen.dart';
 import 'home_app_bar_button.dart';
 import 'home_chat_menu.dart';
 
@@ -13,7 +17,7 @@ class HomeAppBarActions extends StatelessWidget {
   final Color iconColor;
   final ValueChanged<String> onChatMenuSelected;
 
-  HomeAppBarActions({
+  const HomeAppBarActions({
     super.key,
     required this.selectedIndex,
     required this.controller,
@@ -44,26 +48,7 @@ class HomeAppBarActions extends StatelessWidget {
         );
 
       case 1:
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            HomeAppBarActionButton(
-              tooltip: 'search_contacts'.tr,
-              icon: Icons.search_rounded,
-              backgroundColor: backgroundColor,
-              foregroundColor: iconColor,
-              onPressed: () {},
-            ),
-            SizedBox(width: 5),
-            HomeAppBarActionButton(
-              tooltip: 'add_contact'.tr,
-              icon: Icons.person_add_alt_1_rounded,
-              backgroundColor: backgroundColor,
-              foregroundColor: iconColor,
-              onPressed: () {},
-            ),
-          ],
-        );
+        return const SizedBox.shrink();
 
       case 2:
         return HomeAppBarActionButton(
@@ -71,7 +56,23 @@ class HomeAppBarActions extends StatelessWidget {
           icon: Icons.search_rounded,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
-          onPressed: () {},
+          onPressed: () async {
+            FocusManager.instance.primaryFocus?.unfocus();
+
+            dynamic result = await Get.toNamed(
+              AppRoutes.settingsSearch,
+            );
+
+            String? selectedSetting = result is String ? result : null;
+
+            if (selectedSetting == null) {
+              return;
+            }
+
+            debugPrint(
+              'Selected setting: $selectedSetting',
+            );
+          },
         );
 
       case 3:
@@ -84,13 +85,14 @@ class HomeAppBarActions extends StatelessWidget {
             Get.to(
                   () => ProfileEditScreen(),
               transition: Transition.rightToLeft,
-              duration: Duration(milliseconds: 280),
+              duration: const Duration(milliseconds: 280),
+              opaque: false, // <-- CRITICAL: Allows you to see the previous screen in the background
             );
           },
         );
 
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 }

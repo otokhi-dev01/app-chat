@@ -107,6 +107,24 @@ class _ChatMessageSearchScreenState
 
       case ChatMessageType.location:
         return 'location map';
+      case ChatMessageType.video:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.contact:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.sticker:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.gif:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.call:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.system:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 
@@ -154,6 +172,24 @@ class _ChatMessageSearchScreenState
         }
 
         return 'Shared location';
+      case ChatMessageType.video:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.contact:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.sticker:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.gif:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.call:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.system:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 
@@ -191,6 +227,24 @@ class _ChatMessageSearchScreenState
 
       case ChatMessageType.location:
         return Icons.location_on_outlined;
+      case ChatMessageType.video:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.contact:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.sticker:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.gif:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.call:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case ChatMessageType.system:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 

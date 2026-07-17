@@ -1,17 +1,16 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
 import '../../../controllers/contact/qr_contact_scanner_controller.dart';
 
-class QrContactScannerScreen extends StatelessWidget {
-  QrContactScannerScreen({
+class QrContactScannerScreen extends GetView<QrContactScannerController> {
+  const QrContactScannerScreen({
     super.key,
   });
-
-  // Inject the controller here so that it initializes automatically on load
-  final QrContactScannerController controller = Get.put(QrContactScannerController());
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,6 @@ class QrContactScannerScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         extendBodyBehindAppBar: true,
         appBar: _buildAppBar(
-          context: context,
           theme: theme,
           colorScheme: colorScheme,
         ),
@@ -42,17 +40,20 @@ class QrContactScannerScreen extends StatelessWidget {
               fit: BoxFit.cover,
               tapToFocus: true,
               onDetect: controller.handleDetect,
-              placeholderBuilder: (BuildContext context) {
-                return _CameraLoadingView();
+              placeholderBuilder: (
+                  BuildContext context,
+                  ) {
+                return const _CameraLoadingView();
               },
-              // Fixed: Removed the third parameter to match the mobile_scanner 7.x signature
-              errorBuilder: (BuildContext context, MobileScannerException error) {
+              errorBuilder: (
+                  BuildContext context,
+                  MobileScannerException error,
+                  ) {
                 return _CameraErrorView(
                   onRetry: controller.restartScanner,
                 );
               },
             ),
-
             IgnorePointer(
               child: CustomPaint(
                 painter: _QrScannerOverlayPainter(
@@ -63,7 +64,6 @@ class QrContactScannerScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             Positioned(
               top: 84,
               left: 16,
@@ -75,7 +75,7 @@ class QrContactScannerScreen extends StatelessWidget {
                     String message = controller.errorMessage.value;
 
                     if (message.isEmpty) {
-                      return SizedBox.shrink();
+                      return const SizedBox.shrink();
                     }
 
                     return _ScannerMessage(
@@ -86,7 +86,6 @@ class QrContactScannerScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             Positioned(
               left: 16,
               right: 16,
@@ -98,11 +97,10 @@ class QrContactScannerScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             Obx(
                   () {
                 if (!controller.isProcessing.value) {
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 }
 
                 return Container(
@@ -118,7 +116,9 @@ class QrContactScannerScreen extends StatelessWidget {
                       color: Colors.black.withValues(
                         alpha: 0.72,
                       ),
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(
+                        22,
+                      ),
                       border: Border.all(
                         color: Colors.white.withValues(
                           alpha: 0.12,
@@ -140,7 +140,6 @@ class QrContactScannerScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildAppBar({
-    required BuildContext context,
     required ThemeData theme,
     required ColorScheme colorScheme,
   }) {
@@ -180,7 +179,7 @@ class QrContactScannerScreen extends StatelessWidget {
         ),
       ),
       leading: Padding(
-        padding: EdgeInsets.only(
+        padding: const EdgeInsets.only(
           left: 10,
           top: 12,
           bottom: 12,
@@ -205,7 +204,7 @@ class QrContactScannerScreen extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 3),
+          const SizedBox(height: 3),
           Text(
             'Scan a contact QR code',
             maxLines: 1,
@@ -222,7 +221,7 @@ class QrContactScannerScreen extends StatelessWidget {
       ),
       actions: [
         Padding(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
             top: 12,
             bottom: 12,
             right: 10,
@@ -275,9 +274,9 @@ class _ScannerBottomPanel extends StatelessWidget {
         ),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Color(0xFF1B1D22).withValues(
+            color: const Color(0xFF1B1D22).withValues(
               alpha: 0.90,
             ),
             borderRadius: BorderRadius.circular(24),
@@ -292,7 +291,7 @@ class _ScannerBottomPanel extends StatelessWidget {
                   alpha: 0.28,
                 ),
                 blurRadius: 26,
-                offset: Offset(0, 12),
+                offset: const Offset(0, 12),
               ),
             ],
           ),
@@ -309,7 +308,9 @@ class _ScannerBottomPanel extends StatelessWidget {
                       color: colorScheme.primary.withValues(
                         alpha: 0.14,
                       ),
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(
+                        15,
+                      ),
                     ),
                     child: Icon(
                       Icons.center_focus_strong_rounded,
@@ -317,7 +318,7 @@ class _ScannerBottomPanel extends StatelessWidget {
                       size: 24,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +331,7 @@ class _ScannerBottomPanel extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'The camera scans automatically',
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -345,7 +346,7 @@ class _ScannerBottomPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
@@ -362,7 +363,7 @@ class _ScannerBottomPanel extends StatelessWidget {
                       },
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Obx(
                           () {
@@ -407,68 +408,60 @@ class _ScannerControlButton extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    Color backgroundColor = isActive
-        ? colorScheme.primary
-        : Colors.white.withValues(
-      alpha: 0.08,
-    );
+    Color backgroundColor = isActive ? colorScheme.primary : Colors.white.withValues(alpha: 0.08);
 
     Color foregroundColor = isActive ? colorScheme.onPrimary : Colors.white;
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: isLoading ? null : onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          height: 50,
-          padding: EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isActive
-                  ? colorScheme.primary
-                  : Colors.white.withValues(
-                alpha: 0.08,
-              ),
+    return _BouncyScannerButton(
+      onTap: isLoading ? () {} : onTap,
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive
+                ? colorScheme.primary
+                : Colors.white.withValues(
+              alpha: 0.08,
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isLoading)
-                SizedBox(
-                  width: 19,
-                  height: 19,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: foregroundColor,
-                  ),
-                )
-              else
-                Icon(
-                  icon,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLoading)
+              SizedBox(
+                width: 19,
+                height: 19,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
                   color: foregroundColor,
-                  size: 20,
                 ),
-              SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+              )
+            else
+              Icon(
+                icon,
+                color: foregroundColor,
+                size: 20,
+              ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: foregroundColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -490,22 +483,21 @@ class _ScannerCircleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: Colors.black.withValues(
-          alpha: 0.34,
-        ),
-        shape: CircleBorder(),
-        child: InkWell(
-          onTap: onTap,
-          customBorder: CircleBorder(),
-          child: SizedBox(
-            width: 42,
-            height: 42,
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 18,
+      child: _BouncyScannerButton(
+        onTap: onTap,
+        child: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(
+              alpha: 0.34,
             ),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 18,
           ),
         ),
       ),
@@ -530,7 +522,12 @@ class _ScannerMessage extends StatelessWidget {
       color: colorScheme.error,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(14, 10, 8, 10),
+        padding: const EdgeInsets.fromLTRB(
+          14,
+          10,
+          8,
+          10,
+        ),
         child: Row(
           children: [
             Icon(
@@ -538,7 +535,7 @@ class _ScannerMessage extends StatelessWidget {
               color: colorScheme.onError,
               size: 21,
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
@@ -565,6 +562,8 @@ class _ScannerMessage extends StatelessWidget {
 }
 
 class _CameraLoadingView extends StatelessWidget {
+  const _CameraLoadingView();
+
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -593,9 +592,9 @@ class _CameraErrorView extends StatelessWidget {
     ColorScheme colorScheme = theme.colorScheme;
 
     return Container(
-      color: Color(0xFF111216),
+      color: const Color(0xFF111216),
       alignment: Alignment.center,
-      padding: EdgeInsets.all(24),
+      padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -615,7 +614,7 @@ class _CameraErrorView extends StatelessWidget {
               size: 34,
             ),
           ),
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
           Text(
             'Camera unavailable',
             textAlign: TextAlign.center,
@@ -625,7 +624,7 @@ class _CameraErrorView extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 7),
+          const SizedBox(height: 7),
           Text(
             'Check camera permission and try again.',
             textAlign: TextAlign.center,
@@ -636,25 +635,24 @@ class _CameraErrorView extends StatelessWidget {
               fontSize: 13,
             ),
           ),
-          SizedBox(height: 20),
-          Material(
-            color: colorScheme.primary,
-            borderRadius: BorderRadius.circular(16),
-            child: InkWell(
-              onTap: onRetry,
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 13,
-                ),
-                child: Text(
-                  'Try again',
-                  style: TextStyle(
-                    color: colorScheme.onPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
+          const SizedBox(height: 20),
+          _BouncyScannerButton(
+            onTap: onRetry,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 13,
+              ),
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                'Try again',
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -675,7 +673,10 @@ class _QrScannerOverlayPainter extends CustomPainter {
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(
+      Canvas canvas,
+      Size size,
+      ) {
     double availableWidth = size.width - 48;
 
     double scannerSize = availableWidth > 290 ? 290 : availableWidth;
@@ -691,7 +692,7 @@ class _QrScannerOverlayPainter extends CustomPainter {
 
     RRect scannerRRect = RRect.fromRectAndRadius(
       scannerRect,
-      Radius.circular(28),
+      const Radius.circular(28),
     );
 
     Path fullPath = Path()
@@ -736,55 +737,106 @@ class _QrScannerOverlayPainter extends CustomPainter {
     double inset = 3;
 
     double left = scannerRect.left + inset;
+
     double right = scannerRect.right - inset;
+
     double top = scannerRect.top + inset;
+
     double bottom = scannerRect.bottom - inset;
 
     canvas.drawLine(
-      Offset(left, top + cornerLength),
-      Offset(left, top + 8),
+      Offset(
+        left,
+        top + cornerLength,
+      ),
+      Offset(
+        left,
+        top + 8,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(left + 8, top),
-      Offset(left + cornerLength, top),
+      Offset(
+        left + 8,
+        top,
+      ),
+      Offset(
+        left + cornerLength,
+        top,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(right - cornerLength, top),
-      Offset(right - 8, top),
+      Offset(
+        right - cornerLength,
+        top,
+      ),
+      Offset(
+        right - 8,
+        top,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(right, top + 8),
-      Offset(right, top + cornerLength),
+      Offset(
+        right,
+        top + 8,
+      ),
+      Offset(
+        right,
+        top + cornerLength,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(left, bottom - cornerLength),
-      Offset(left, bottom - 8),
+      Offset(
+        left,
+        bottom - cornerLength,
+      ),
+      Offset(
+        left,
+        bottom - 8,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(left + 8, bottom),
-      Offset(left + cornerLength, bottom),
+      Offset(
+        left + 8,
+        bottom,
+      ),
+      Offset(
+        left + cornerLength,
+        bottom,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(right - cornerLength, bottom),
-      Offset(right - 8, bottom),
+      Offset(
+        right - cornerLength,
+        bottom,
+      ),
+      Offset(
+        right - 8,
+        bottom,
+      ),
       cornerPaint,
     );
 
     canvas.drawLine(
-      Offset(right, bottom - cornerLength),
-      Offset(right, bottom - 8),
+      Offset(
+        right,
+        bottom - cornerLength,
+      ),
+      Offset(
+        right,
+        bottom - 8,
+      ),
       cornerPaint,
     );
 
@@ -809,7 +861,55 @@ class _QrScannerOverlayPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_QrScannerOverlayPainter oldDelegate) {
+  bool shouldRepaint(
+      _QrScannerOverlayPainter oldDelegate,
+      ) {
     return oldDelegate.overlayColor != overlayColor || oldDelegate.frameColor != frameColor;
+  }
+}
+
+// Stateful elastic press animation wrapper to maintain stateless designs across other files
+class _BouncyScannerButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _BouncyScannerButton({
+    required this.child,
+    required this.onTap,
+  });
+
+  @override
+  State<_BouncyScannerButton> createState() => _BouncyScannerButtonState();
+}
+
+class _BouncyScannerButtonState extends State<_BouncyScannerButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() {
+          _isPressed = true;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          _isPressed = false;
+        });
+        widget.onTap();
+      },
+      onTapCancel: () {
+        setState(() {
+          _isPressed = false;
+        });
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
+    );
   }
 }

@@ -135,8 +135,7 @@ class _NavigationItem extends StatelessWidget {
     final Color primary = colorScheme.primary;
     final Color inactiveColor = colorScheme.onSurfaceVariant;
 
-    final Color selectedBackground =
-    primary.withValues(alpha: 0.11);
+    final Color selectedBackground = primary.withValues(alpha: 0.11);
 
     return Semantics(
       button: true,
@@ -153,17 +152,14 @@ class _NavigationItem extends StatelessWidget {
             if (isSelected) {
               return;
             }
-
             onTap(index);
           },
           child: AnimatedContainer(
-            duration: Duration(milliseconds: 240),
+            duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
-            margin: EdgeInsets.symmetric(horizontal: 1),
+            margin: const EdgeInsets.symmetric(horizontal: 1),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? selectedBackground
-                  : Colors.transparent,
+              color: isSelected ? selectedBackground : Colors.transparent,
               borderRadius: BorderRadius.circular(22),
             ),
             child: Column(
@@ -179,19 +175,15 @@ class _NavigationItem extends StatelessWidget {
                   profileImage: profileImage,
                   navigationBackground: navigationBackground,
                 ),
-                 SizedBox(height: 3),
+                const SizedBox(height: 3),
                 AnimatedDefaultTextStyle(
-                  duration: Duration(milliseconds: 220),
+                  duration: const Duration(milliseconds: 180),
                   curve: Curves.easeOutCubic,
                   style: TextStyle(
-                    color: isSelected
-                        ? primary
-                        : inactiveColor,
+                    color: isSelected ? primary : inactiveColor,
                     fontSize: 10.5,
                     height: 1,
-                    fontWeight: isSelected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   child: Text(
                     label,
@@ -232,101 +224,102 @@ class _NavigationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    Widget iconWidget;
 
     if (profileImage != null) {
-      return AnimatedContainer(
-        duration: Duration(milliseconds: 220),
+      iconWidget = AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         width: 29,
         height: 29,
-        padding: EdgeInsets.all(1.5),
+        padding: const EdgeInsets.all(1.5),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: selected
-                ? primary
-                : Colors.transparent,
+            color: selected ? primary : Colors.transparent,
             width: 1.5,
           ),
         ),
         child: CircleAvatar(
           backgroundImage: profileImage,
-          backgroundColor:
-          colorScheme.surfaceContainerHighest,
+          backgroundColor: colorScheme.surfaceContainerHighest,
+        ),
+      );
+    } else {
+      iconWidget = SizedBox(
+        width: 38,
+        height: 29,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              switchInCurve: Curves.easeOutBack, // Fixed curve name
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (
+                  Widget child,
+                  Animation<double> animation,
+                  ) {
+                return ScaleTransition(
+                  scale: animation,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                );
+              },
+              child: Icon(
+                selected ? activeIcon : icon,
+                key: ValueKey<bool>(selected),
+                size: 26,
+                color: selected ? primary : inactiveColor,
+              ),
+            ),
+            if (badgeCount > 0)
+              Positioned(
+                top: -5,
+                right: -3,
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: primary,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: navigationBackground,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Text(
+                    badgeCount > 99 ? '99+' : badgeCount.toString(),
+                    style: TextStyle(
+                      color: colorScheme.onPrimary,
+                      fontSize: 9,
+                      height: 1,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       );
     }
 
-    return SizedBox(
-      width: 38,
-      height: 29,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-      AnimatedSwitcher(
-      duration: Duration(milliseconds: 220),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (
-          Widget child,
-          Animation<double> animation,
-          ) {
-        return ScaleTransition(
-          scale: animation,
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
-        );
-      },
-      child: Icon(
-        selected ? activeIcon : icon,
-        key: ValueKey<bool>(selected),
-        size: 26,
-        color: selected
-            ? primary
-            : inactiveColor,
-      ),
-    ),
-          if (badgeCount > 0)
-            Positioned(
-              top: -5,
-              right: -3,
-              child: Container(
-                constraints: BoxConstraints(
-                  minWidth: 18,
-                  minHeight: 18,
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 4,
-                ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: primary,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: navigationBackground,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  badgeCount > 99
-                      ? '99+'
-                      : badgeCount.toString(),
-                  style: TextStyle(
-                    color: colorScheme.onPrimary,
-                    fontSize: 9,
-                    height: 1,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+    return AnimatedScale(
+      scale: selected ? 1.08 : 1.0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutBack, // Fixed curve name
+      child: iconWidget,
     );
   }
 }

@@ -1,7 +1,7 @@
+import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/chat/chat_controller.dart';
 import '../../models/chat_model.dart';
 import '../widgets/chat_title.dart';
 
@@ -17,7 +17,7 @@ class HomeChatList extends StatelessWidget {
   final double emptyTopPadding;
   final double emptyBottomPadding;
 
-  HomeChatList({
+  const HomeChatList({
     super.key,
     required this.controller,
     this.isSearchMode = false,
@@ -110,19 +110,18 @@ class HomeChatList extends StatelessWidget {
     }
 
     if (enableHomeScrollBehavior) {
-      result =
-          NotificationListener<UserScrollNotification>(
-            onNotification: (
-                UserScrollNotification notification,
-                ) {
-              controller.handleChatScroll(
-                notification,
-              );
-
-              return false;
-            },
-            child: result,
+      result = NotificationListener<UserScrollNotification>(
+        onNotification: (
+            UserScrollNotification notification,
+            ) {
+          controller.handleChatScroll(
+            notification,
           );
+
+          return false;
+        },
+        child: result,
+      );
     }
 
     return result;
@@ -135,25 +134,17 @@ class HomeChatList extends StatelessWidget {
 
     return Obx(
           () {
-        int categoryIndex =
-            controller.selectedCategoryIndex.value;
+        int categoryIndex = controller.selectedCategoryIndex.value;
 
-        bool isLoading =
-            controller.isLoading.value;
+        bool isLoading = controller.isLoading.value;
 
-        String errorMessage =
-            controller.errorMessage.value;
+        String errorMessage = controller.errorMessage.value;
 
-        String query =
-        controller.searchQuery.value.trim();
+        String query = controller.searchQuery.value.trim();
 
-        List<ChatModel> allChats =
-        controller.chats.toList();
+        List<ChatModel> allChats = controller.chats.toList();
 
-        List<ChatModel> visibleChats =
-        isSearchMode
-            ? controller.searchResults
-            : controller.filteredChats;
+        List<ChatModel> visibleChats = isSearchMode ? controller.searchResults : controller.filteredChats;
 
         if (isLoading && allChats.isEmpty) {
           return Center(
@@ -163,8 +154,7 @@ class HomeChatList extends StatelessWidget {
           );
         }
 
-        if (errorMessage.isNotEmpty &&
-            allChats.isEmpty) {
+        if (errorMessage.isNotEmpty && allChats.isEmpty) {
           return _ChatErrorWidget(
             message: errorMessage,
             onRetry: controller.retry,
@@ -174,12 +164,9 @@ class HomeChatList extends StatelessWidget {
         if (visibleChats.isEmpty) {
           return _wrapScrollable(
             child: ListView(
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior
-                  .onDrag,
-              physics: BouncingScrollPhysics(
-                parent:
-                AlwaysScrollableScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
               ),
               padding: EdgeInsets.fromLTRB(
                 24,
@@ -194,14 +181,12 @@ class HomeChatList extends StatelessWidget {
                     height: 88,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: colorScheme.primary
-                          .withValues(alpha: 0.10),
+                      color: colorScheme.primary.withValues(alpha: 0.10),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _emptyIcon(
-                        categoryIndex:
-                        categoryIndex,
+                        categoryIndex: categoryIndex,
                         query: query,
                       ),
                       size: 42,
@@ -209,36 +194,26 @@ class HomeChatList extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                SizedBox(height: 18),
-
+                const SizedBox(height: 18),
                 Text(
                   _emptyMessage(
-                    categoryIndex:
-                    categoryIndex,
+                    categoryIndex: categoryIndex,
                     query: query,
                   ),
                   textAlign: TextAlign.center,
-                  style: theme
-                      .textTheme.titleMedium
-                      ?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-
-                SizedBox(height: 7),
-
+                const SizedBox(height: 7),
                 Text(
                   _emptyDescription(
                     query: query,
                   ),
                   textAlign: TextAlign.center,
-                  style: theme
-                      .textTheme.bodyMedium
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -248,12 +223,9 @@ class HomeChatList extends StatelessWidget {
 
         return _wrapScrollable(
           child: ListView.separated(
-            keyboardDismissBehavior:
-            ScrollViewKeyboardDismissBehavior
-                .onDrag,
-            physics: BouncingScrollPhysics(
-              parent:
-              AlwaysScrollableScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
             ),
             padding: EdgeInsets.only(
               top: topPadding,
@@ -269,16 +241,14 @@ class HomeChatList extends StatelessWidget {
                 thickness: 1,
                 indent: 80,
                 endIndent: 16,
-                color: colorScheme.outlineVariant
-                    .withValues(alpha: 0.45),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.45),
               );
             },
             itemBuilder: (
                 BuildContext context,
                 int index,
                 ) {
-              ChatModel chat =
-              visibleChats[index];
+              ChatModel chat = visibleChats[index];
 
               return ChatTile(
                 key: ValueKey(chat.id),
@@ -296,7 +266,7 @@ class _ChatErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  _ChatErrorWidget({
+  const _ChatErrorWidget({
     required this.message,
     required this.onRetry,
   });
@@ -308,7 +278,7 @@ class _ChatErrorWidget extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -317,8 +287,7 @@ class _ChatErrorWidget extends StatelessWidget {
               height: 88,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.error
-                    .withValues(alpha: 0.10),
+                color: colorScheme.error.withValues(alpha: 0.10),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -327,40 +296,29 @@ class _ChatErrorWidget extends StatelessWidget {
                 color: colorScheme.error,
               ),
             ),
-
-            SizedBox(height: 18),
-
+            const SizedBox(height: 18),
             Text(
               'Unable to load chats',
-              style: theme
-                  .textTheme.titleMedium
-                  ?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
             ),
-
-            SizedBox(height: 8),
-
+            const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color:
-                colorScheme.onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
-
-            SizedBox(height: 20),
-
+            const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
-              icon: Icon(
+              icon: const Icon(
                 Icons.refresh_rounded,
               ),
-              label: Text('Try Again'),
+              label: const Text('Try Again'),
             ),
           ],
         ),

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'app_theme_dark.dart'; // Imports the Telegram dark theme
 
 class AppTheme {
   AppTheme._();
 
   static const Color primaryColor = Color(0xFFC4AA29);
 
+  // Pure White Light Mode Configuration
   static ThemeData get light {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF5F6F8),
+      scaffoldBackgroundColor: Colors.white, // Updated to pure white as requested
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.light,
+        surface: Colors.white, // Sets standard container surfaces to match
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -24,22 +27,6 @@ class AppTheme {
     );
   }
 
-  static ThemeData get dark {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF101114),
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryColor,
-        brightness: Brightness.dark,
-      ),
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        backgroundColor: Color(0xFF17191D),
-        foregroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-      ),
-      dividerColor: Colors.white12,
-    );
-  }
+  // Links to the separate dark theme file
+  static ThemeData get dark => TelegramDarkTheme.theme;
 }
