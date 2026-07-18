@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
+import '../../models/chat_folder_model.dart';
 import '../../models/chat_model.dart';
 import '../../route/app_route.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
 import '../../screen/home/archived_chat/archived_chat_screen.dart';
 import '../../screen/home/search/search_screen.dart';
 import '../../services/chat_list_service.dart';
-
 
 class ChatController extends GetxController {
   final ChatListService chatService;
@@ -27,28 +27,27 @@ class ChatController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxString errorMessage = ''.obs;
 
-  final RxInt selectedCategoryIndex = 0.obs;
+  // ============================================================
+  // CHAT FOLDER FILTER
+  // ============================================================
 
-  TextEditingController?
-  _searchTextController;
+  final RxString selectedFolderId =
+      'folder_all'.obs;
 
-  TextEditingController
-  get searchTextController {
+  final Rx<ChatFolderType> selectedFolderType =
+      ChatFolderType.all.obs;
+
+  final RxList<String> selectedFolderChatIds =
+      <String>[].obs;
+
+  TextEditingController? _searchTextController;
+
+  TextEditingController get searchTextController {
     return _searchTextController ??=
         TextEditingController(
           text: searchQuery.value,
         );
   }
-
-  final RxList<String> categories = <String>[
-    'All',
-    'Unread',
-    'Personal',
-    'Groups',
-    'Work',
-    'Online',
-    'Offline',
-  ].obs;
 
   @override
   void onInit() {
@@ -163,12 +162,6 @@ class ChatController extends GetxController {
           () => ArchivedChatsScreen(
         archivedChats: archivedChats,
         onUnarchive: (ChatModel chat) {
-          /*
-           * The Archived screen returns:
-           *
-           * isArchived = false when unarchiving.
-           * isArchived = true when Undo is pressed.
-           */
           if (chat.isArchived) {
             archiveChat(chat.id);
           } else {
@@ -200,11 +193,6 @@ class ChatController extends GetxController {
       ),
     );
 
-    /*
-     * Reload after closing Archived Chats
-     * to ensure controller and service
-     * contain the same values.
-     */
     await loadChats();
   }
 
@@ -214,6 +202,7 @@ class ChatController extends GetxController {
 
     await Get.toNamed(
       AppRoutes.settings,
+      preventDuplicates: true,
     );
   }
 
@@ -221,7 +210,9 @@ class ChatController extends GetxController {
   // SEARCH
   // ============================================================
 
-  void updateSearch(String value) {
+  void updateSearch(
+      String value,
+      ) {
     searchQuery.value = value;
   }
 
@@ -274,16 +265,73 @@ class ChatController extends GetxController {
   }
 
   // ============================================================
-  // CATEGORY FILTER
+  // CHAT FOLDER FILTER
   // ============================================================
 
-  void selectCategory(int index) {
-    if (index < 0 ||
-        index >= categories.length) {
+  void selectFolder(
+      ChatFolderModel folder,
+      ) {
+    if (selectedFolderId.value ==
+        folder.id) {
       return;
     }
 
-    selectedCategoryIndex.value = index;
+    selectedFolderId.value = folder.id;
+    selectedFolderType.value =
+        folder.type;
+
+    selectedFolderChatIds.assignAll(
+      folder.chatIds,
+    );
+  }
+
+  void resetFolderSelection() {
+    selectedFolderId.value =
+    'folder_all';
+
+    selectedFolderType.value =
+        ChatFolderType.all;
+
+    selectedFolderChatIds.clear();
+  }
+
+  void synchronizeSelectedFolder(
+      List<ChatFolderModel> folders,
+      ) {
+    if (folders.isEmpty) {
+      resetFolderSelection();
+      return;
+    }
+
+    int selectedIndex =
+    folders.indexWhere(
+          (ChatFolderModel folder) {
+        return folder.id ==
+            selectedFolderId.value;
+      },
+    );
+
+    if (selectedIndex < 0) {
+      resetFolderSelection();
+      return;
+    }
+
+    ChatFolderModel selectedFolder =
+    folders[selectedIndex];
+
+    selectedFolderType.value =
+        selectedFolder.type;
+
+    selectedFolderChatIds.assignAll(
+      selectedFolder.chatIds,
+    );
+  }
+
+  bool isFolderSelected(
+      ChatFolderModel folder,
+      ) {
+    return selectedFolderId.value ==
+        folder.id;
   }
 
   List<ChatModel> get activeChats {
@@ -294,88 +342,142 @@ class ChatController extends GetxController {
     ).toList();
   }
 
-  List<ChatModel> get filteredChats {
+  List<ChatModel> getChatsForFolder(
+      ChatFolderModel folder,
+      ) {
     List<ChatModel> result =
         activeChats;
 
-    int selectedIndex =
-        selectedCategoryIndex.value;
+    switch (folder.type) {
+      case ChatFolderType.all:
+        return result;
 
-    switch (selectedIndex) {
-      case 1:
-        result = result.where(
+      case ChatFolderType.unread:
+        return result.where(
               (ChatModel chat) {
             return chat.unread > 0;
           },
         ).toList();
-        break;
 
-      case 2:
-        result = result.where(
+      case ChatFolderType.personal:
+        return result.where(
               (ChatModel chat) {
             return chat.type ==
                 'personal';
           },
         ).toList();
-        break;
 
-      case 3:
-        result = result.where(
+      case ChatFolderType.groups:
+        return result.where(
               (ChatModel chat) {
             return chat.type == 'group';
           },
         ).toList();
-        break;
 
-      case 4:
-        result = result.where(
+      case ChatFolderType.custom:
+        if (folder.chatIds.isEmpty) {
+          return <ChatModel>[];
+        }
+
+        Set<String> folderChatIds =
+        folder.chatIds.toSet();
+
+        return result.where(
               (ChatModel chat) {
-            return chat.type == 'work';
+            return folderChatIds.contains(
+              chat.id,
+            );
           },
         ).toList();
-        break;
-
-      case 5:
-        result = result.where(
-              (ChatModel chat) {
-            return chat.isOnline;
-          },
-        ).toList();
-        break;
-
-      case 6:
-        result = result.where(
-              (ChatModel chat) {
-            return !chat.isOnline;
-          },
-        ).toList();
-        break;
     }
+  }
 
-    String query =
-    searchQuery.value
+  int getFolderCount(
+      ChatFolderModel folder,
+      ) {
+    return getChatsForFolder(
+      folder,
+    ).length;
+  }
+
+  List<ChatModel> get folderFilteredChats {
+    List<ChatModel> result =
+        activeChats;
+
+    ChatFolderType folderType =
+        selectedFolderType.value;
+
+    switch (folderType) {
+      case ChatFolderType.all:
+        return result;
+
+      case ChatFolderType.unread:
+        return result.where(
+              (ChatModel chat) {
+            return chat.unread > 0;
+          },
+        ).toList();
+
+      case ChatFolderType.personal:
+        return result.where(
+              (ChatModel chat) {
+            return chat.type ==
+                'personal';
+          },
+        ).toList();
+
+      case ChatFolderType.groups:
+        return result.where(
+              (ChatModel chat) {
+            return chat.type == 'group';
+          },
+        ).toList();
+
+      case ChatFolderType.custom:
+        if (selectedFolderChatIds
+            .isEmpty) {
+          return <ChatModel>[];
+        }
+
+        Set<String> folderChatIds =
+        selectedFolderChatIds.toSet();
+
+        return result.where(
+              (ChatModel chat) {
+            return folderChatIds.contains(
+              chat.id,
+            );
+          },
+        ).toList();
+    }
+  }
+
+  List<ChatModel> get filteredChats {
+    List<ChatModel> result =
+        folderFilteredChats;
+
+    String query = searchQuery.value
         .trim()
         .toLowerCase();
 
-    if (query.isNotEmpty) {
-      result = result.where(
-            (ChatModel chat) {
-          bool matchesName = chat.name
-              .toLowerCase()
-              .contains(query);
-
-          bool matchesMessage =
-          chat.message
-              .toLowerCase()
-              .contains(query);
-
-          return matchesName ||
-              matchesMessage;
-        },
-      ).toList();
+    if (query.isEmpty) {
+      return result;
     }
 
-    return result;
+    return result.where(
+          (ChatModel chat) {
+        bool matchesName = chat.name
+            .toLowerCase()
+            .contains(query);
+
+        bool matchesMessage = chat.message
+            .toLowerCase()
+            .contains(query);
+
+        return matchesName ||
+            matchesMessage;
+      },
+    ).toList();
   }
 
   // ============================================================
@@ -443,7 +545,8 @@ class ChatController extends GetxController {
   int get personalChatCount {
     return activeChats.where(
           (ChatModel chat) {
-        return chat.type == 'personal';
+        return chat.type ==
+            'personal';
       },
     ).length;
   }
@@ -724,6 +827,10 @@ class ChatController extends GetxController {
           return chat.id == chatId;
         },
       );
+
+      selectedFolderChatIds.remove(
+        chatId,
+      );
     } catch (error) {
       errorMessage.value =
       'Failed to delete chat: $error';
@@ -737,6 +844,8 @@ class ChatController extends GetxController {
       await chatService.clearChats();
 
       chats.clear();
+
+      selectedFolderChatIds.clear();
     } catch (error) {
       errorMessage.value =
       'Failed to clear chats: $error';
@@ -758,12 +867,14 @@ class ChatController extends GetxController {
       ) {
     int index = chats.indexWhere(
           (ChatModel chat) {
-        return chat.id == updatedChat.id;
+        return chat.id ==
+            updatedChat.id;
       },
     );
 
     if (index < 0) {
       chats.add(updatedChat);
+      _sortChats();
       return;
     }
 
@@ -848,11 +959,11 @@ class ChatController extends GetxController {
           ChatModel first,
           ChatModel second,
           ) {
-        /*
-         * Archived chats remain inside
-         * the source list but are hidden
-         * from filteredChats.
-         */
+        if (first.isArchived !=
+            second.isArchived) {
+          return first.isArchived ? 1 : -1;
+        }
+
         if (first.isPinned !=
             second.isPinned) {
           return first.isPinned ? -1 : 1;
@@ -892,7 +1003,9 @@ class ChatController extends GetxController {
 
     searchQuery.value = '';
     errorMessage.value = '';
-    selectedCategoryIndex.value = 0;
+
+    resetFolderSelection();
+
     isSearching.value = false;
     showHomeSearchBar.value = false;
 

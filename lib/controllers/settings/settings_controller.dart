@@ -9,91 +9,193 @@ enum AppLanguage {
 class SettingsController extends GetxController {
   final RxBool notificationsEnabled = true.obs;
 
-  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
+  final Rx<ThemeMode> themeMode =
+      ThemeMode.system.obs;
 
-  final Rx<AppLanguage> language = AppLanguage.english.obs;
+  final RxString userName =
+      'John Doe'.obs;
 
-  final RxString userName = 'John Doe'.obs;
-  final RxString userPhone = '+1 555 000 1234'.obs;
-  final RxString userEmail = 'john@example.com'.obs;
+  final RxString userPhone =
+      '+1 555 000 1234'.obs;
 
+  final RxString userEmail =
+      'john@example.com'.obs;
 
-  // Profile information
-  final RxString userUsername = '@johndoe'.obs;
-  final RxString userBio = 'Available'.obs;
+  final RxString userUsername =
+      '@johndoe'.obs;
 
+  final RxString userBio =
+      'Available'.obs;
+
+  bool _isChangingLanguage = false;
+
+  AppLanguage get currentLanguage {
+    Locale? locale =
+        Get.locale ?? Get.deviceLocale;
+
+    String languageCode =
+        locale?.languageCode ?? 'en';
+
+    if (languageCode == 'km') {
+      return AppLanguage.khmer;
+    }
+
+    return AppLanguage.english;
+  }
 
   Locale get currentLocale {
-    switch (language.value) {
+    return _localeFromLanguage(
+      currentLanguage,
+    );
+  }
+
+  Locale _localeFromLanguage(
+      AppLanguage selectedLanguage,
+      ) {
+    switch (selectedLanguage) {
       case AppLanguage.english:
-        return const Locale('en', 'US');
+        return Locale(
+          'en',
+          'US',
+        );
 
       case AppLanguage.khmer:
-        return const Locale('km', 'KH');
+        return Locale(
+          'km',
+          'KH',
+        );
     }
   }
 
-  void toggleNotifications(bool value) {
+  void toggleNotifications(
+      bool value,
+      ) {
+    if (notificationsEnabled.value ==
+        value) {
+      return;
+    }
+
     notificationsEnabled.value = value;
   }
 
-  void changeTheme(ThemeMode mode) {
+  void changeTheme(
+      ThemeMode mode,
+      ) {
+    if (themeMode.value == mode) {
+      return;
+    }
+
     themeMode.value = mode;
 
-    // Immediately update the application theme.
-    Get.changeThemeMode(mode);
+    Get.changeThemeMode(
+      mode,
+    );
   }
 
-  void changeLanguage(AppLanguage selectedLanguage) {
-    language.value = selectedLanguage;
+  Future<void> changeLanguage(
+      AppLanguage selectedLanguage,
+      ) async {
+    if (_isChangingLanguage ||
+        selectedLanguage ==
+            currentLanguage) {
+      return;
+    }
 
-    // Immediately rebuild all widgets using `.tr`.
-    Get.updateLocale(currentLocale);
-  }
+    _isChangingLanguage = true;
 
-  void updateName(String value) {
-    final newValue = value.trim();
+    try {
+      Locale locale =
+      _localeFromLanguage(
+        selectedLanguage,
+      );
 
-    if (newValue.isNotEmpty) {
-      userName.value = newValue;
+      await Get.updateLocale(
+        locale,
+      );
+    } finally {
+      _isChangingLanguage = false;
     }
   }
 
-  void updatePhone(String value) {
-    final newValue = value.trim();
+  void updateName(
+      String value,
+      ) {
+    String newValue = value.trim();
 
-    if (newValue.isNotEmpty) {
-      userPhone.value = newValue;
+    if (newValue.isEmpty ||
+        newValue == userName.value) {
+      return;
     }
+
+    userName.value = newValue;
   }
 
-  void updateEmail(String value) {
-    final newValue = value.trim();
+  void updatePhone(
+      String value,
+      ) {
+    String newValue = value.trim();
 
-    if (newValue.isNotEmpty && GetUtils.isEmail(newValue)) {
-      userEmail.value = newValue;
+    if (newValue.isEmpty ||
+        newValue == userPhone.value) {
+      return;
     }
+
+    userPhone.value = newValue;
   }
 
-  void updateUsername(String value) {
-    final String newValue = value.trim();
+  void updateEmail(
+      String value,
+      ) {
+    String newValue = value.trim();
+
+    if (newValue.isEmpty ||
+        newValue == userEmail.value ||
+        !GetUtils.isEmail(newValue)) {
+      return;
+    }
+
+    userEmail.value = newValue;
+  }
+
+  void updateUsername(
+      String value,
+      ) {
+    String newValue = value.trim();
 
     if (newValue.isEmpty) {
       return;
     }
 
-    userUsername.value = newValue.startsWith('@')
+    String normalizedUsername =
+    newValue.startsWith('@')
         ? newValue
         : '@$newValue';
+
+    if (normalizedUsername ==
+        userUsername.value) {
+      return;
+    }
+
+    userUsername.value =
+        normalizedUsername;
   }
 
-  void updateBio(String value) {
-    userBio.value = value.trim();
+  void updateBio(
+      String value,
+      ) {
+    String newValue = value.trim();
+
+    if (newValue ==
+        userBio.value) {
+      return;
+    }
+
+    userBio.value = newValue;
   }
 
   Future<void> logout() async {
-    // Clear access token, refresh token, and session data here.
-
-    await Get.offAllNamed('/login');
+    await Get.offAllNamed(
+      '/login',
+    );
   }
 }

@@ -1,7 +1,7 @@
-import '../../models/contact_model.dart';
-import '../../models/user_model.dart';
-import '../data/mock_chat_database.dart';
-import 'contact_service.dart';
+import '../../../models/contact_model.dart';
+import '../../../models/user_model.dart';
+import '../../data/mock_chat_database.dart';
+import '../contact_service.dart';
 import 'mock_service_delay.dart';
 
 class MockContactService

@@ -3,38 +3,55 @@ import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
 
-class LanguageSettingsSection extends StatelessWidget {
+class LanguageSettingsSection
+    extends StatelessWidget {
   final SettingsController controller;
 
-  const LanguageSettingsSection({
+  LanguageSettingsSection({
     super.key,
     required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final bool isDark = theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    bool isDark =
+        theme.brightness == Brightness.dark;
 
-    final Color dividerColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+    Color cardColor = isDark
+        ? Color(0xFF1B1D22)
+        : Colors.white;
+
+    Color dividerColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
+
+    AppLanguage selectedLanguage =
+        controller.currentLanguage;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+      CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(
+          padding: EdgeInsets.only(
             left: 6,
             right: 6,
             bottom: 8,
           ),
           child: Text(
             'language'.tr,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w700,
+            style: theme
+                .textTheme.titleSmall
+                ?.copyWith(
+              color:
+              theme.colorScheme.primary,
+              fontWeight:
+              FontWeight.w700,
             ),
           ),
         ),
@@ -42,57 +59,61 @@ class LanguageSettingsSection extends StatelessWidget {
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1B1D22) : Colors.white,
-            borderRadius: BorderRadius.circular(18),
+            color: cardColor,
+            borderRadius:
+            BorderRadius.circular(18),
             border: Border.all(
               color: dividerColor,
             ),
           ),
-          child: Obx(() {
-            final selectedLanguage = controller.language.value;
-
-            return Column(
-              children: [
-                _LanguageSectionItem(
-                  title: 'english'.tr,
-                  subtitle: 'English',
-                  iconText: 'EN',
-                  selected: selectedLanguage == AppLanguage.english,
-                  onTap: () {
-                    controller.changeLanguage(
-                      AppLanguage.english,
-                    );
-                  },
-                ),
-                _LanguageDivider(color: dividerColor),
-                _LanguageSectionItem(
-                  title: 'khmer'.tr,
-                  subtitle: 'ភាសាខ្មែរ',
-                  iconText: 'ខ',
-                  selected: selectedLanguage == AppLanguage.khmer,
-                  onTap: () {
-                    controller.changeLanguage(
-                      AppLanguage.khmer,
-                    );
-                  },
-                ),
-              ],
-            );
-          }),
+          child: Column(
+            children: [
+              _LanguageSectionItem(
+                title: 'english'.tr,
+                subtitle: 'English',
+                iconText: 'EN',
+                selected:
+                selectedLanguage ==
+                    AppLanguage.english,
+                onTap: () {
+                  controller.changeLanguage(
+                    AppLanguage.english,
+                  );
+                },
+              ),
+              _LanguageDivider(
+                color: dividerColor,
+              ),
+              _LanguageSectionItem(
+                title: 'khmer'.tr,
+                subtitle: 'ភាសាខ្មែរ',
+                iconText: 'ខ',
+                selected:
+                selectedLanguage ==
+                    AppLanguage.khmer,
+                onTap: () {
+                  controller.changeLanguage(
+                    AppLanguage.khmer,
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-class _LanguageSectionItem extends StatelessWidget {
+class _LanguageSectionItem
+    extends StatelessWidget {
   final String title;
   final String subtitle;
   final String iconText;
   final bool selected;
   final VoidCallback onTap;
 
-  const _LanguageSectionItem({
+  _LanguageSectionItem({
     required this.title,
     required this.subtitle,
     required this.iconText,
@@ -102,189 +123,235 @@ class _LanguageSectionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final primary = colorScheme.primary;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
 
-    return _BouncyLanguageTile(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 13,
-        ),
-        color: selected ? primary.withValues(alpha: 0.08) : Colors.transparent,
-        child: Row(
-          children: [
-            // Avatar Code-Box Spring Animation
-            AnimatedScale(
-              scale: selected ? 1.06 : 1.0,
-              duration: const Duration(milliseconds: 240),
-              curve: const Cubic(0.2, 1.4, 0.3, 1.0),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: selected ? primary : colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(13),
-                  boxShadow: selected
-                      ? [
-                    BoxShadow(
-                      color: primary.withValues(alpha: 0.20),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                      : null,
-                ),
-                child: Text(
-                  iconText,
-                  style: TextStyle(
-                    color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color pressedColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.05,
+    )
+        : Colors.black.withValues(
+      alpha: 0.035,
+    );
+
+    Color backgroundColor = selected
+        ? colorScheme.primary.withValues(
+      alpha: 0.07,
+    )
+        : Colors.transparent;
+
+    return Material(
+      color: backgroundColor,
+      child: InkWell(
+        onTap: selected
+            ? null
+            : onTap,
+        splashColor: Colors.transparent,
+        highlightColor: pressedColor,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        child: SizedBox(
+          height: 70,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 14,
             ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: selected ? primary : colorScheme.onSurface,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                    ),
+            child: Row(
+              children: [
+                _LanguageIcon(
+                  text: iconText,
+                  selected: selected,
+                ),
+                SizedBox(width: 13),
+                Expanded(
+                  child: _LanguageInformation(
+                    title: title,
+                    subtitle: subtitle,
+                    selected: selected,
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 12),
+                _LanguageIndicator(
+                  selected: selected,
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            // Liquid-switch checkmark pop
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              switchInCurve: const Cubic(0.2, 1.4, 0.3, 1.0),
-              switchOutCurve: Curves.easeIn,
-              transitionBuilder: (child, animation) {
-                return ScaleTransition(
-                  scale: animation,
-                  child: child,
-                );
-              },
-              child: selected
-                  ? Container(
-                key: const ValueKey('selected'),
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_rounded,
-                  size: 16,
-                  color: colorScheme.onPrimary,
-                ),
-              )
-                  : Container(
-                key: const ValueKey('unselected'),
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    width: 1.5,
-                    color: colorScheme.outline,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _LanguageDivider extends StatelessWidget {
+class _LanguageIcon
+    extends StatelessWidget {
+  final String text;
+  final bool selected;
+
+  _LanguageIcon({
+    required this.text,
+    required this.selected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
+
+    return Container(
+      width: 44,
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: selected
+            ? colorScheme.primary
+            : colorScheme
+            .surfaceContainerHighest,
+        borderRadius:
+        BorderRadius.circular(13),
+        border: Border.all(
+          color: selected
+              ? colorScheme.primary
+              : colorScheme.outlineVariant
+              .withValues(
+            alpha: 0.20,
+          ),
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: selected
+              ? colorScheme.onPrimary
+              : colorScheme
+              .onSurfaceVariant,
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageInformation
+    extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final bool selected;
+
+  _LanguageInformation({
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
+
+    return Column(
+      mainAxisAlignment:
+      MainAxisAlignment.center,
+      crossAxisAlignment:
+      CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          maxLines: 1,
+          overflow:
+          TextOverflow.ellipsis,
+          style: theme.textTheme.bodyLarge
+              ?.copyWith(
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.onSurface,
+            fontWeight: selected
+                ? FontWeight.w700
+                : FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 3),
+        Text(
+          subtitle,
+          maxLines: 1,
+          overflow:
+          TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall
+              ?.copyWith(
+            color: colorScheme
+                .onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LanguageIndicator
+    extends StatelessWidget {
+  final bool selected;
+
+  _LanguageIndicator({
+    required this.selected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
+
+    return Container(
+      width: 24,
+      height: 24,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: selected
+            ? colorScheme.primary
+            : Colors.transparent,
+        shape: BoxShape.circle,
+        border: Border.all(
+          width: 1.5,
+          color: selected
+              ? colorScheme.primary
+              : colorScheme.outline,
+        ),
+      ),
+      child: selected
+          ? Icon(
+        Icons.check_rounded,
+        size: 16,
+        color:
+        colorScheme.onPrimary,
+      )
+          : SizedBox.shrink(),
+    );
+  }
+}
+
+class _LanguageDivider
+    extends StatelessWidget {
   final Color color;
 
-  const _LanguageDivider({
+  _LanguageDivider({
     required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 71),
+      padding: EdgeInsets.only(
+        left: 71,
+      ),
       child: Divider(
         height: 1,
         thickness: 1,
         color: color,
-      ),
-    );
-  }
-}
-
-// 4. Custom stateful language press animation to keep the screen's main page stateless
-class _BouncyLanguageTile extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onTap;
-
-  const _BouncyLanguageTile({
-    required this.child,
-    required this.onTap,
-  });
-
-  @override
-  State<_BouncyLanguageTile> createState() => _BouncyLanguageTileState();
-}
-
-class _BouncyLanguageTileState extends State<_BouncyLanguageTile> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) {
-        setState(() {
-          _isPressed = true;
-        });
-      },
-      onTapUp: (_) {
-        setState(() {
-          _isPressed = false;
-        });
-        widget.onTap();
-      },
-      onTapCancel: () {
-        setState(() {
-          _isPressed = false;
-        });
-      },
-      child: AnimatedScale(
-        scale: _isPressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOutCubic,
-        child: widget.child,
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for Haptics
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
@@ -7,81 +6,121 @@ import '../../../controllers/settings/settings_controller.dart';
 class DisplaySettingsSection extends StatelessWidget {
   final SettingsController controller;
 
-  const DisplaySettingsSection({
+  DisplaySettingsSection({
     super.key,
     required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color cardColor = isDark
+        ? Color(0xFF1B1D22)
+        : Colors.white;
+
+    Color borderColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+      CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 5),
+          padding: EdgeInsets.only(
+            left: 5,
+          ),
           child: Text(
             'display'.tr,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
+            style: theme
+                .textTheme.titleSmall
+                ?.copyWith(
+              color: colorScheme.primary,
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.all(12),
+          width: double.infinity,
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1B1D22) : Colors.white,
-            borderRadius: BorderRadius.circular(18),
+            color: cardColor,
+            borderRadius:
+            BorderRadius.circular(18),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.06),
+              color: borderColor,
             ),
           ),
-          child: Obx(() {
-            final ThemeMode selectedMode = controller.themeMode.value;
+          child: Obx(
+                () {
+              ThemeMode selectedMode =
+                  controller.themeMode.value;
 
-            return Row(
-              children: [
-                Expanded(
-                  child: _ThemeOption(
-                    title: 'system_default'.tr,
-                    icon: Icons.brightness_auto_rounded,
-                    selected: selectedMode == ThemeMode.system,
-                    onTap: () {
-                      controller.changeTheme(ThemeMode.system);
-                    },
+              return Row(
+                children: [
+                  Expanded(
+                    child: _ThemeOption(
+                      title:
+                      'system_default'.tr,
+                      icon: Icons
+                          .brightness_auto_rounded,
+                      selected:
+                      selectedMode ==
+                          ThemeMode.system,
+                      onTap: () {
+                        controller.changeTheme(
+                          ThemeMode.system,
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _ThemeOption(
-                    title: 'light'.tr,
-                    icon: Icons.light_mode_outlined,
-                    selected: selectedMode == ThemeMode.light,
-                    onTap: () {
-                      controller.changeTheme(ThemeMode.light);
-                    },
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _ThemeOption(
+                      title: 'light'.tr,
+                      icon:
+                      Icons.light_mode_outlined,
+                      selected:
+                      selectedMode ==
+                          ThemeMode.light,
+                      onTap: () {
+                        controller.changeTheme(
+                          ThemeMode.light,
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _ThemeOption(
-                    title: 'dark'.tr,
-                    icon: Icons.dark_mode_outlined,
-                    selected: selectedMode == ThemeMode.dark,
-                    onTap: () {
-                      controller.changeTheme(ThemeMode.dark);
-                    },
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _ThemeOption(
+                      title: 'dark'.tr,
+                      icon:
+                      Icons.dark_mode_outlined,
+                      selected:
+                      selectedMode ==
+                          ThemeMode.dark,
+                      onTap: () {
+                        controller.changeTheme(
+                          ThemeMode.dark,
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );
@@ -94,7 +133,7 @@ class _ThemeOption extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _ThemeOption({
+  _ThemeOption({
     required this.title,
     required this.icon,
     required this.selected,
@@ -103,104 +142,130 @@ class _ThemeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final Color primary = theme.colorScheme.primary;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
 
-    final Widget optionContent = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          size: 26,
-          color: selected ? primary : theme.colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(height: 7),
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: selected ? primary : theme.colorScheme.onSurfaceVariant,
-            fontSize: 12,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ],
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color backgroundColor = selected
+        ? colorScheme.primary.withValues(
+      alpha: 0.12,
+    )
+        : colorScheme
+        .surfaceContainerHighest
+        .withValues(
+      alpha: isDark ? 0.55 : 0.45,
     );
 
-    return _BouncyThemeOption(
-      onTap: () {
-        // Trigger a soft haptic click on selection
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        height: 82,
-        decoration: BoxDecoration(
-          color: selected
-              ? primary.withValues(alpha: 0.12)
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: selected ? primary : Colors.transparent,
-            width: 1.2,
+    Color optionBorderColor = selected
+        ? colorScheme.primary.withValues(
+      alpha: 0.75,
+    )
+        : colorScheme.outlineVariant
+        .withValues(
+      alpha: isDark ? 0.18 : 0.25,
+    );
+
+    Color foregroundColor = selected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
+
+    Color pressedColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.05,
+    )
+        : Colors.black.withValues(
+      alpha: 0.035,
+    );
+
+    return Material(
+      color: backgroundColor,
+      borderRadius:
+      BorderRadius.circular(15),
+      child: InkWell(
+        onTap: selected ? null : onTap,
+        borderRadius:
+        BorderRadius.circular(15),
+        splashFactory:
+        InkRipple.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor:
+        Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        overlayColor:
+        WidgetStateProperty.resolveWith(
+              (Set<WidgetState> states) {
+            if (states.contains(
+              WidgetState.pressed,
+            )) {
+              return pressedColor;
+            }
+
+            return Colors.transparent;
+          },
+        ),
+        child: Container(
+          height: 82,
+          padding: EdgeInsets.symmetric(
+            horizontal: 6,
+            vertical: 10,
+          ),
+          decoration: BoxDecoration(
+            borderRadius:
+            BorderRadius.circular(15),
+            border: Border.all(
+              color: optionBorderColor,
+              width: 1.2,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment:
+            MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: 26,
+                    color: foregroundColor,
+                  ),
+                ),
+              ),
+              SizedBox(height: 7),
+              SizedBox(
+                height: 18,
+                child: Center(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow:
+                    TextOverflow.ellipsis,
+                    textAlign:
+                    TextAlign.center,
+                    strutStyle: StrutStyle(
+                      fontSize: 12,
+                      height: 1.2,
+                      forceStrutHeight: true,
+                    ),
+                    style: TextStyle(
+                      color: foregroundColor,
+                      fontSize: 12,
+                      height: 1.2,
+                      fontWeight: selected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        child: AnimatedScale(
-          // Springs the content outward when selected
-          scale: selected ? 1.06 : 1.0,
-          duration: const Duration(milliseconds: 240),
-          curve: const Cubic(0.2, 1.4, 0.3, 1.0),
-          child: optionContent,
-        ),
-      ),
-    );
-  }
-}
-
-// 4. Custom stateful option press animation to keep the screen's main page stateless
-class _BouncyThemeOption extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onTap;
-
-  const _BouncyThemeOption({
-    required this.child,
-    required this.onTap,
-  });
-
-  @override
-  State<_BouncyThemeOption> createState() => _BouncyThemeOptionState();
-}
-
-class _BouncyThemeOptionState extends State<_BouncyThemeOption> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) {
-        setState(() {
-          _isPressed = true;
-        });
-      },
-      onTapUp: (_) {
-        setState(() {
-          _isPressed = false;
-        });
-        widget.onTap();
-      },
-      onTapCancel: () {
-        setState(() {
-          _isPressed = false;
-        });
-      },
-      child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0, // Standard cards compress slightly more for feedback
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOutCubic,
-        child: widget.child,
       ),
     );
   }

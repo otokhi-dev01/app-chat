@@ -1,7 +1,7 @@
-import '../data/mock_chat_database.dart';
-import '../models/chat_model.dart';
-import '../models/user_model.dart';
-import 'chat_list_service.dart';
+import '../../data/mock_chat_database.dart';
+import '../../models/chat_model.dart';
+import '../../models/user_model.dart';
+import '../chat_list_service.dart';
 
 class MockChatListService
     implements ChatListService {

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../controllers/contact/contact_controller.dart';
 import '../../services/contact_service.dart';
-import '../../services/mock_contact_service.dart';
+import '../../services/mock/mock_contact_service.dart';
 import '../widgets/contact/contact_add_button.dart';
 
 import '../widgets/contact/contact_search_field.dart';

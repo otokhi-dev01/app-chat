@@ -1,7 +1,7 @@
-import '../../models/chat_message_model.dart';
-import '../../models/user_model.dart';
-import '../data/mock_chat_database.dart';
-import 'message_service.dart';
+import '../../../models/chat_message_model.dart';
+import '../../../models/user_model.dart';
+import '../../data/mock_chat_database.dart';
+import '../message_service.dart';
 import 'mock_service_delay.dart';
 
 class MockMessageService

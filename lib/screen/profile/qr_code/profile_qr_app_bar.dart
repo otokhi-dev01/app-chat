@@ -1,0 +1,225 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class ProfileQrAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final VoidCallback onBack;
+  final VoidCallback onScan;
+
+  ProfileQrAppBar({
+    super.key,
+    required this.onBack,
+    required this.onScan,
+  });
+
+  @override
+  Size get preferredSize {
+    return Size.fromHeight(64);
+  }
+
+  SystemUiOverlayStyle _overlayStyle({
+    required ThemeData theme,
+    required bool isDark,
+  }) {
+    if (isDark) {
+      return SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor:
+        theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness:
+        Brightness.light,
+      );
+    }
+
+    return SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor:
+      theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness:
+      Brightness.dark,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color appBarColor = isDark
+        ? Color(0xFF1B1D22).withValues(
+      alpha: 0.94,
+    )
+        : Colors.white.withValues(
+      alpha: 0.98,
+    );
+
+    Color actionBackground = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Color(0xFFF2F4F7);
+
+    Color borderColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
+
+    return AppBar(
+      toolbarHeight: 64,
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: Colors.transparent,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      forceMaterialTransparency: true,
+      titleSpacing: 0,
+      leadingWidth: 58,
+      systemOverlayStyle: _overlayStyle(
+        theme: theme,
+        isDark: isDark,
+      ),
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 18,
+            sigmaY: 18,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: appBarColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: borderColor,
+                  width: 1,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      leading: Padding(
+        padding: EdgeInsets.fromLTRB(
+          9,
+          13,
+          7,
+          13,
+        ),
+        child: _ProfileQrAppBarButton(
+          tooltip: 'Back',
+          backgroundColor: actionBackground,
+          icon:
+          Icons.arrow_back_ios_new_rounded,
+          iconColor: colorScheme.onSurface,
+          onTap: onBack,
+        ),
+      ),
+      title: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
+          Text(
+            'My QR Code',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(
+              color: colorScheme.onSurface,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 2),
+          Text(
+            'Share or scan a profile',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(
+              color:
+              colorScheme.onSurfaceVariant,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            7,
+            13,
+            9,
+            13,
+          ),
+          child: _ProfileQrAppBarButton(
+            tooltip: 'Scan contact QR code',
+            backgroundColor:
+            colorScheme.primary.withValues(
+              alpha: 0.12,
+            ),
+            icon:
+            Icons.qr_code_scanner_rounded,
+            iconColor: colorScheme.primary,
+            onTap: onScan,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileQrAppBarButton
+    extends StatelessWidget {
+  final String tooltip;
+  final Color backgroundColor;
+  final IconData icon;
+  final Color iconColor;
+  final VoidCallback onTap;
+
+  _ProfileQrAppBarButton({
+    required this.tooltip,
+    required this.backgroundColor,
+    required this.icon,
+    required this.iconColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: backgroundColor,
+      shape: CircleBorder(),
+      child: Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: CircleBorder(),
+          child: SizedBox(
+            width: 38,
+            height: 38,
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 19,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -44,6 +44,12 @@
     <key>NSCameraUsageDescription</key>
     <string>AppChat needs camera access to scan contact QR codes.</string>
 
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>AppChat needs permission to save your QR code to Photos.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>AppChat needs access to your photo library.</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

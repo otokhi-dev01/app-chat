@@ -1,8 +1,8 @@
 import 'package:appchat/services/save_message_service.dart';
-import '../../models/chat_message_model.dart';
-import '../../models/save_message_model.dart';
-import '../data/mock_chat_database.dart';
-import 'message_service.dart';
+import '../../../models/chat_message_model.dart';
+import '../../../models/save_message_model.dart';
+import '../../data/mock_chat_database.dart';
+import '../message_service.dart';
 import 'mock_service_delay.dart';
 
 class MockSavedMessageService

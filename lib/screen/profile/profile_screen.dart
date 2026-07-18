@@ -1,4 +1,4 @@
-import 'package:appchat/screen/profile/profile_qr_code_screen.dart';
+import 'package:appchat/screen/profile/qr_code/profile_qr_code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

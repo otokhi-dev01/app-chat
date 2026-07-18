@@ -16,12 +16,17 @@ abstract class AppRoutes {
   // settings
   static const String settings = '/settings';
   static const String settingsSearch = '/settings-search';
+  static const String devices = '/devices';
+  static const String about = '/about';
+  static const String privacySecurity = '/privacy-security';
+  static const String dataStorage = '/data-storage';
+  static const String chatFolders = '/chat-folder';
   // contact
   static const String qrScanner = '/qr-scanner';
 
 
   // testing
-static const String testing = '/testing';
+  static const String testing = '/testing';
 
 
 }

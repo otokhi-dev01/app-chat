@@ -2,9 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 import '../../../controllers/chat/chat_controller.dart';
-import '../home_chat_list.dart';
+import '../../../models/chat_model.dart';
+import '../../chat_detail/chat_detail_screen.dart';
 
 class SearchScreen extends StatelessWidget {
   final ChatController controller;
@@ -14,7 +16,9 @@ class SearchScreen extends StatelessWidget {
     required this.controller,
   });
 
-  void _closeSearch(BuildContext context) {
+  void _closeSearch(
+      BuildContext context,
+      ) {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (Navigator.of(context).canPop()) {
@@ -26,6 +30,28 @@ class SearchScreen extends StatelessWidget {
     controller.clearSearch();
   }
 
+  Future<void> _openChat(
+      ChatModel chat,
+      ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (chat.unread > 0) {
+      await controller.markAsRead(
+        chat.id,
+      );
+    }
+
+    await Get.to(
+          () => ChatDetailScreen(
+        chat: chat,
+      ),
+      transition: Transition.cupertino,
+      duration: Duration(
+        milliseconds: 280,
+      ),
+    );
+  }
+
   SystemUiOverlayStyle _overlayStyle(
       ThemeData theme,
       bool isDark,
@@ -33,8 +59,10 @@ class SearchScreen extends StatelessWidget {
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness:
+        Brightness.light,
+        statusBarBrightness:
+        Brightness.dark,
         systemNavigationBarColor:
         theme.scaffoldBackgroundColor,
         systemNavigationBarIconBrightness:
@@ -44,8 +72,10 @@ class SearchScreen extends StatelessWidget {
 
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness:
+      Brightness.dark,
+      statusBarBrightness:
+      Brightness.light,
       systemNavigationBarColor:
       theme.scaffoldBackgroundColor,
       systemNavigationBarIconBrightness:
@@ -56,7 +86,8 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    ColorScheme colorScheme =
+        theme.colorScheme;
 
     bool isDark =
         theme.brightness == Brightness.dark;
@@ -92,11 +123,10 @@ class SearchScreen extends StatelessWidget {
           bool didPop,
           Object? result,
           ) {
-        if (!didPop) {
-          return;
+        if (didPop) {
+          FocusManager.instance.primaryFocus
+              ?.unfocus();
         }
-
-        FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
@@ -107,14 +137,19 @@ class SearchScreen extends StatelessWidget {
           automaticallyImplyLeading: false,
           elevation: 0,
           scrolledUnderElevation: 0,
-          backgroundColor: Colors.transparent,
-          foregroundColor: colorScheme.onSurface,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
+          backgroundColor:
+          Colors.transparent,
+          foregroundColor:
+          colorScheme.onSurface,
+          surfaceTintColor:
+          Colors.transparent,
+          shadowColor:
+          Colors.transparent,
           forceMaterialTransparency: true,
           titleSpacing: 0,
           leadingWidth: 58,
-          systemOverlayStyle: _overlayStyle(
+          systemOverlayStyle:
+          _overlayStyle(
             theme,
             isDark,
           ),
@@ -151,9 +186,16 @@ class SearchScreen extends StatelessWidget {
                 message: 'Back',
                 child: InkWell(
                   onTap: () {
-                    _closeSearch(context);
+                    _closeSearch(
+                      context,
+                    );
                   },
-                  customBorder: CircleBorder(),
+                  customBorder:
+                  CircleBorder(),
+                  splashColor:
+                  Colors.transparent,
+                  highlightColor:
+                  Colors.transparent,
                   child: SizedBox(
                     width: 40,
                     height: 40,
@@ -161,7 +203,8 @@ class SearchScreen extends StatelessWidget {
                       Icons
                           .arrow_back_ios_new_rounded,
                       size: 18,
-                      color: colorScheme.onSurface,
+                      color: colorScheme
+                          .onSurface,
                     ),
                   ),
                 ),
@@ -177,7 +220,9 @@ class SearchScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: searchBackground,
                 borderRadius:
-                BorderRadius.circular(16),
+                BorderRadius.circular(
+                  16,
+                ),
                 border: Border.all(
                   color: borderColor,
                 ),
@@ -185,19 +230,17 @@ class SearchScreen extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(width: 13),
-
                   Icon(
                     Icons.search_rounded,
                     size: 21,
-                    color: colorScheme.primary,
+                    color:
+                    colorScheme.primary,
                   ),
-
                   SizedBox(width: 9),
-
                   Expanded(
                     child: TextField(
-                      controller:
-                      controller.searchTextController,
+                      controller: controller
+                          .searchTextController,
                       autofocus: true,
                       onChanged:
                       controller.updateSearch,
@@ -212,12 +255,14 @@ class SearchScreen extends StatelessWidget {
                       style: theme
                           .textTheme.bodyLarge
                           ?.copyWith(
-                        color:
-                        colorScheme.onSurface,
+                        color: colorScheme
+                            .onSurface,
                         fontSize: 15,
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Search chats',
+                      decoration:
+                      InputDecoration(
+                        hintText:
+                        'Search chats',
                         hintStyle: theme
                             .textTheme.bodyLarge
                             ?.copyWith(
@@ -225,7 +270,8 @@ class SearchScreen extends StatelessWidget {
                               .onSurfaceVariant,
                           fontSize: 15,
                         ),
-                        border: InputBorder.none,
+                        border:
+                        InputBorder.none,
                         enabledBorder:
                         InputBorder.none,
                         focusedBorder:
@@ -239,17 +285,16 @@ class SearchScreen extends StatelessWidget {
                       onTapOutside: (
                           PointerDownEvent event,
                           ) {
-                        FocusManager
-                            .instance.primaryFocus
+                        FocusManager.instance
+                            .primaryFocus
                             ?.unfocus();
                       },
                     ),
                   ),
-
                   ValueListenableBuilder<
                       TextEditingValue>(
-                    valueListenable:
-                    controller.searchTextController,
+                    valueListenable: controller
+                        .searchTextController,
                     builder: (
                         BuildContext context,
                         TextEditingValue value,
@@ -262,7 +307,8 @@ class SearchScreen extends StatelessWidget {
                       }
 
                       return Padding(
-                        padding: EdgeInsets.only(
+                        padding:
+                        EdgeInsets.only(
                           right: 4,
                         ),
                         child: Material(
@@ -271,18 +317,28 @@ class SearchScreen extends StatelessWidget {
                               .withValues(
                             alpha: 0.10,
                           ),
-                          shape: CircleBorder(),
+                          shape:
+                          CircleBorder(),
                           child: Tooltip(
-                            message: 'Clear search',
+                            message:
+                            'Clear search',
                             child: InkWell(
-                              onTap: _clearSearch,
+                              onTap:
+                              _clearSearch,
                               customBorder:
                               CircleBorder(),
+                              splashColor:
+                              Colors
+                                  .transparent,
+                              highlightColor:
+                              Colors
+                                  .transparent,
                               child: SizedBox(
                                 width: 32,
                                 height: 32,
                                 child: Icon(
-                                  Icons.close_rounded,
+                                  Icons
+                                      .close_rounded,
                                   size: 18,
                                   color: colorScheme
                                       .onSurfaceVariant,
@@ -299,17 +355,547 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
         ),
+        body: Obx(
+              () {
+            String query = controller
+                .searchQuery.value
+                .trim();
 
-        // Uses your existing HomeChatList and ChatTile.
-        body: HomeChatList(
-          controller: controller,
-          isSearchMode: true,
-          enableHomeScrollBehavior: false,
-          enableRefresh: false,
-          topPadding: 6,
-          bottomPadding: 30,
-          emptyTopPadding: 120,
-          emptyBottomPadding: 40,
+            List<ChatModel> results =
+                controller.searchResults;
+
+            if (query.isEmpty) {
+              return _SearchInitialView();
+            }
+
+            if (results.isEmpty) {
+              return _SearchEmptyView(
+                query: query,
+              );
+            }
+
+            return ListView.separated(
+              keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior
+                  .onDrag,
+              physics:
+              BouncingScrollPhysics(
+                parent:
+                AlwaysScrollableScrollPhysics(),
+              ),
+              padding: EdgeInsets.fromLTRB(
+                0,
+                6,
+                0,
+                30,
+              ),
+              itemCount: results.length,
+              separatorBuilder: (
+                  BuildContext context,
+                  int index,
+                  ) {
+                return Divider(
+                  height: 1,
+                  thickness: 1,
+                  indent: 82,
+                  endIndent: 14,
+                  color: colorScheme
+                      .outlineVariant
+                      .withValues(
+                    alpha: 0.35,
+                  ),
+                );
+              },
+              itemBuilder: (
+                  BuildContext context,
+                  int index,
+                  ) {
+                ChatModel chat =
+                results[index];
+
+                return _SearchChatTile(
+                  chat: chat,
+                  onTap: () {
+                    _openChat(chat);
+                  },
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchChatTile extends StatelessWidget {
+  final ChatModel chat;
+  final VoidCallback onTap;
+
+  _SearchChatTile({
+    required this.chat,
+    required this.onTap,
+  });
+
+  String _formatTime(
+      DateTime dateTime,
+      ) {
+    DateTime now = DateTime.now();
+
+    bool isToday =
+        now.year == dateTime.year &&
+            now.month == dateTime.month &&
+            now.day == dateTime.day;
+
+    if (isToday) {
+      String hour =
+      dateTime.hour.toString().padLeft(
+        2,
+        '0',
+      );
+
+      String minute =
+      dateTime.minute.toString().padLeft(
+        2,
+        '0',
+      );
+
+      return '$hour:$minute';
+    }
+
+    DateTime today = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    DateTime messageDay = DateTime(
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+    );
+
+    int difference =
+        today.difference(messageDay).inDays;
+
+    if (difference == 1) {
+      return 'Yesterday';
+    }
+
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  IconData get fallbackIcon {
+    if (chat.type == 'group') {
+      return Icons.groups_rounded;
+    }
+
+    return Icons.person_rounded;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
+
+    bool hasImage =
+        chat.image.trim().isNotEmpty;
+
+    Color pressedColor =
+    theme.brightness == Brightness.dark
+        ? Colors.white.withValues(
+      alpha: 0.04,
+    )
+        : Colors.black.withValues(
+      alpha: 0.025,
+    );
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: Colors.transparent,
+        highlightColor:
+        Colors.transparent,
+        overlayColor:
+        WidgetStateProperty.resolveWith(
+              (Set<WidgetState> states) {
+            if (states.contains(
+              WidgetState.pressed,
+            )) {
+              return pressedColor;
+            }
+
+            return Colors.transparent;
+          },
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            14,
+            10,
+            14,
+            10,
+          ),
+          child: Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: colorScheme
+                        .surfaceContainerHighest,
+                    backgroundImage: hasImage
+                        ? NetworkImage(
+                      chat.image,
+                    )
+                        : null,
+                    child: hasImage
+                        ? null
+                        : Icon(
+                      fallbackIcon,
+                      color: colorScheme
+                          .onSurfaceVariant,
+                      size: 26,
+                    ),
+                  ),
+                  if (chat.isOnline &&
+                      chat.type == 'personal')
+                    Positioned(
+                      right: 0,
+                      bottom: 1,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration:
+                        BoxDecoration(
+                          color: Colors.green,
+                          shape:
+                          BoxShape.circle,
+                          border: Border.all(
+                            color: theme
+                                .scaffoldBackgroundColor,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            chat.name,
+                            maxLines: 1,
+                            overflow:
+                            TextOverflow
+                                .ellipsis,
+                            style: theme
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                              color: colorScheme
+                                  .onSurface,
+                              fontSize: 15,
+                              fontWeight:
+                              chat.unread >
+                                  0
+                                  ? FontWeight
+                                  .w700
+                                  : FontWeight
+                                  .w600,
+                            ),
+                          ),
+                        ),
+                        if (chat.isPinned)
+                          Padding(
+                            padding:
+                            EdgeInsets.only(
+                              left: 5,
+                            ),
+                            child: Icon(
+                              Icons
+                                  .push_pin_rounded,
+                              color: colorScheme
+                                  .onSurfaceVariant,
+                              size: 15,
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        if (chat.isMuted)
+                          Padding(
+                            padding:
+                            EdgeInsets.only(
+                              right: 5,
+                            ),
+                            child: Icon(
+                              Icons
+                                  .volume_off_rounded,
+                              color: colorScheme
+                                  .onSurfaceVariant,
+                              size: 15,
+                            ),
+                          ),
+                        Expanded(
+                          child: Text(
+                            chat.message,
+                            maxLines: 1,
+                            overflow:
+                            TextOverflow
+                                .ellipsis,
+                            style: theme
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                              color: chat.unread >
+                                  0
+                                  ? colorScheme
+                                  .onSurface
+                                  : colorScheme
+                                  .onSurfaceVariant,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
+              Column(
+                mainAxisSize:
+                MainAxisSize.min,
+                crossAxisAlignment:
+                CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    _formatTime(
+                      chat.dateTime,
+                    ),
+                    style: theme
+                        .textTheme.bodySmall
+                        ?.copyWith(
+                      color: chat.unread > 0
+                          ? colorScheme.primary
+                          : colorScheme
+                          .onSurfaceVariant,
+                      fontSize: 11,
+                      fontWeight:
+                      chat.unread > 0
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 7),
+                  if (chat.unread > 0)
+                    Container(
+                      constraints:
+                      BoxConstraints(
+                        minWidth: 21,
+                        minHeight: 21,
+                      ),
+                      padding:
+                      EdgeInsets.symmetric(
+                        horizontal: 6,
+                      ),
+                      alignment:
+                      Alignment.center,
+                      decoration:
+                      BoxDecoration(
+                        color: chat.isMuted
+                            ? colorScheme
+                            .onSurfaceVariant
+                            : colorScheme
+                            .primary,
+                        borderRadius:
+                        BorderRadius.circular(
+                          12,
+                        ),
+                      ),
+                      child: Text(
+                        chat.unread > 99
+                            ? '99+'
+                            : chat.unread
+                            .toString(),
+                        style: TextStyle(
+                          color: colorScheme
+                              .onPrimary,
+                          fontSize: 9,
+                          height: 1,
+                          fontWeight:
+                          FontWeight.w700,
+                        ),
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      width: 21,
+                      height: 21,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchInitialView
+    extends StatelessWidget {
+  _SearchInitialView();
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          28,
+          80,
+          28,
+          40,
+        ),
+        child: Column(
+          mainAxisSize:
+          MainAxisSize.min,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: colorScheme.primary
+                    .withValues(
+                  alpha: 0.10,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_rounded,
+                color:
+                colorScheme.primary,
+                size: 34,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Search chats',
+              textAlign: TextAlign.center,
+              style: theme
+                  .textTheme.titleMedium
+                  ?.copyWith(
+                color:
+                colorScheme.onSurface,
+                fontWeight:
+                FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              'Search by contact name or message.',
+              textAlign: TextAlign.center,
+              style: theme
+                  .textTheme.bodyMedium
+                  ?.copyWith(
+                color: colorScheme
+                    .onSurfaceVariant,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchEmptyView
+    extends StatelessWidget {
+  final String query;
+
+  _SearchEmptyView({
+    required this.query,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme =
+        theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          28,
+          80,
+          28,
+          40,
+        ),
+        child: Column(
+          mainAxisSize:
+          MainAxisSize.min,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: colorScheme
+                    .surfaceContainerHighest,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons
+                    .search_off_rounded,
+                color: colorScheme
+                    .onSurfaceVariant,
+                size: 34,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No results found',
+              textAlign: TextAlign.center,
+              style: theme
+                  .textTheme.titleMedium
+                  ?.copyWith(
+                color:
+                colorScheme.onSurface,
+                fontWeight:
+                FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              'No chats match “$query”.',
+              textAlign: TextAlign.center,
+              style: theme
+                  .textTheme.bodyMedium
+                  ?.copyWith(
+                color: colorScheme
+                    .onSurfaceVariant,
+                height: 1.4,
+              ),
+            ),
+          ],
         ),
       ),
     );
