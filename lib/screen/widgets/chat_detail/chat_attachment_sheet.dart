@@ -9,10 +9,12 @@ Future<void> showChatAttachmentSheet({
   VoidCallback? onFile,
   VoidCallback? onLocation,
 }) {
-  FocusManager.instance.primaryFocus?.unfocus();
+  FocusManager.instance.primaryFocus
+      ?.unfocus();
 
   ThemeData theme = Theme.of(context);
-  ColorScheme colorScheme = theme.colorScheme;
+  ColorScheme colorScheme =
+      theme.colorScheme;
 
   bool isDark =
       theme.brightness == Brightness.dark;
@@ -22,22 +24,39 @@ Future<void> showChatAttachmentSheet({
       : Colors.white;
 
   Color borderColor = isDark
-      ? Colors.white.withValues(alpha: 0.08)
-      : Colors.black.withValues(alpha: 0.06);
+      ? Colors.white.withValues(
+    alpha: 0.08,
+  )
+      : Colors.black.withValues(
+    alpha: 0.06,
+  );
+
+  Color closeButtonColor = isDark
+      ? Colors.white.withValues(
+    alpha: 0.08,
+  )
+      : Colors.black.withValues(
+    alpha: 0.04,
+  );
 
   return showModalBottomSheet<void>(
     context: context,
     useSafeArea: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor:
-    Colors.black.withValues(alpha: 0.35),
-    builder: (BuildContext sheetContext) {
+    barrierColor: Colors.black.withValues(
+      alpha: 0.35,
+    ),
+    builder: (
+        BuildContext sheetContext,
+        ) {
       return Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           color: sheetColor,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(26),
+          borderRadius:
+          BorderRadius.vertical(
+            top: Radius.circular(22),
           ),
           border: Border(
             top: BorderSide(
@@ -49,111 +68,160 @@ Future<void> showChatAttachmentSheet({
           top: false,
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-              20,
-              12,
-              20,
-              24,
+              14,
+              9,
+              14,
+              16,
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize:
+              MainAxisSize.min,
               children: [
                 _SheetHandle(),
-
-                SizedBox(height: 18),
-
+                SizedBox(height: 12),
                 Row(
                   children: [
                     Container(
-                      width: 42,
-                      height: 42,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary
-                            .withValues(alpha: 0.11),
+                      width: 36,
+                      height: 36,
+                      alignment:
+                      Alignment.center,
+                      decoration:
+                      BoxDecoration(
+                        color: colorScheme
+                            .primary
+                            .withValues(
+                          alpha: 0.11,
+                        ),
                         borderRadius:
-                        BorderRadius.circular(13),
+                        BorderRadius
+                            .circular(
+                          11,
+                        ),
                       ),
                       child: Icon(
-                        Icons.attach_file_rounded,
-                        color: colorScheme.primary,
-                        size: 22,
+                        Icons
+                            .attach_file_rounded,
+                        color:
+                        colorScheme.primary,
+                        size: 19,
                       ),
                     ),
-
-                    SizedBox(width: 12),
-
+                    SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Share content',
+                        maxLines: 1,
+                        overflow:
+                        TextOverflow.ellipsis,
                         style: theme
-                            .textTheme.titleMedium
+                            .textTheme.titleSmall
                             ?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w700,
+                          color: colorScheme
+                              .onSurface,
+                          fontSize: 14,
+                          fontWeight:
+                          FontWeight.w700,
                         ),
                       ),
                     ),
-
-                    IconButton(
-                      tooltip: 'Close',
-                      onPressed: () {
-                        Navigator.pop(sheetContext);
-                      },
-                      icon: Icon(
-                        Icons.close_rounded,
+                    Material(
+                      color: closeButtonColor,
+                      shape: CircleBorder(),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(
+                            sheetContext,
+                          );
+                        },
+                        customBorder:
+                        CircleBorder(),
+                        splashColor:
+                        Colors.transparent,
+                        highlightColor:
+                        Colors.transparent,
+                        hoverColor:
+                        Colors.transparent,
+                        focusColor:
+                        Colors.transparent,
+                        child: SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: colorScheme
+                                .onSurfaceVariant,
+                            size: 18,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-
-                SizedBox(height: 18),
-
+                SizedBox(height: 14),
                 Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceAround,
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
                   children: [
-                    ChatAttachmentItem(
-                      icon: Icons.image_outlined,
-                      label: 'Gallery',
-                      onTap: () {
-                        _closeAndRun(
-                          sheetContext,
-                          onGallery,
-                        );
-                      },
+                    Expanded(
+                      child:
+                      ChatAttachmentItem(
+                        imagePath:
+                        'assets/images/chat_attachment/gallery.png',
+                        label: 'Gallery',
+                        imageSize: 34,
+                        onTap: () {
+                          _closeAndRun(
+                            sheetContext,
+                            onGallery,
+                          );
+                        },
+                      ),
                     ),
-                    ChatAttachmentItem(
-                      icon:
-                      Icons.camera_alt_outlined,
-                      label: 'Camera',
-                      onTap: () {
-                        _closeAndRun(
-                          sheetContext,
-                          onCamera,
-                        );
-                      },
+                    Expanded(
+                      child:
+                      ChatAttachmentItem(
+                        imagePath:
+                        'assets/images/chat_attachment/camera.png',
+                        label: 'Camera',
+                        imageSize: 34,
+                        onTap: () {
+                          _closeAndRun(
+                            sheetContext,
+                            onCamera,
+                          );
+                        },
+                      ),
                     ),
-                    ChatAttachmentItem(
-                      icon: Icons
-                          .insert_drive_file_outlined,
-                      label: 'File',
-                      onTap: () {
-                        _closeAndRun(
-                          sheetContext,
-                          onFile,
-                        );
-                      },
+                    Expanded(
+                      child:
+                      ChatAttachmentItem(
+                        imagePath:
+                        'assets/images/chat_attachment/file.png',
+                        label: 'File',
+                        imageSize: 34,
+                        onTap: () {
+                          _closeAndRun(
+                            sheetContext,
+                            onFile,
+                          );
+                        },
+                      ),
                     ),
-                    ChatAttachmentItem(
-                      icon:
-                      Icons.location_on_outlined,
-                      label: 'Location',
-                      onTap: () {
-                        _closeAndRun(
-                          sheetContext,
-                          onLocation,
-                        );
-                      },
+                    Expanded(
+                      child:
+                      ChatAttachmentItem(
+                        imagePath:
+                        'assets/images/chat_attachment/location.png',
+                        label: 'Location',
+                        imageSize: 34,
+                        onTap: () {
+                          _closeAndRun(
+                            sheetContext,
+                            onLocation,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -177,24 +245,34 @@ void _closeAndRun(
   }
 
   Future<void>.delayed(
-    Duration(milliseconds: 130),
-    action,
+    Duration(
+      milliseconds: 100,
+    ),
+        () {
+      action();
+    },
   );
 }
 
 class _SheetHandle extends StatelessWidget {
+  _SheetHandle();
+
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme =
         Theme.of(context).colorScheme;
 
     return Container(
-      width: 42,
+      width: 36,
       height: 4,
       decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant
-            .withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(20),
+        color: colorScheme
+            .onSurfaceVariant
+            .withValues(
+          alpha: 0.25,
+        ),
+        borderRadius:
+        BorderRadius.circular(20),
       ),
     );
   }

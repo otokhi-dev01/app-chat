@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
 
-class LanguageSettingsSection
-    extends StatelessWidget {
+class LanguageSettingsSection extends StatelessWidget {
   final SettingsController controller;
 
   LanguageSettingsSection({
@@ -15,6 +14,7 @@ class LanguageSettingsSection
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -45,13 +45,10 @@ class LanguageSettingsSection
           ),
           child: Text(
             'language'.tr,
-            style: theme
-                .textTheme.titleSmall
+            style: theme.textTheme.titleSmall
                 ?.copyWith(
-              color:
-              theme.colorScheme.primary,
-              fontWeight:
-              FontWeight.w700,
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -71,7 +68,9 @@ class LanguageSettingsSection
               _LanguageSectionItem(
                 title: 'english'.tr,
                 subtitle: 'English',
-                iconText: 'EN',
+                imagePath:
+                'assets/images/languages/english.png',
+                fallbackText: 'EN',
                 selected:
                 selectedLanguage ==
                     AppLanguage.english,
@@ -87,7 +86,9 @@ class LanguageSettingsSection
               _LanguageSectionItem(
                 title: 'khmer'.tr,
                 subtitle: 'ភាសាខ្មែរ',
-                iconText: 'ខ',
+                imagePath:
+                'assets/images/languages/khmer.png',
+                fallbackText: 'ខ',
                 selected:
                 selectedLanguage ==
                     AppLanguage.khmer,
@@ -109,14 +110,16 @@ class _LanguageSectionItem
     extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String iconText;
+  final String imagePath;
+  final String fallbackText;
   final bool selected;
   final VoidCallback onTap;
 
   _LanguageSectionItem({
     required this.title,
     required this.subtitle,
-    required this.iconText,
+    required this.imagePath,
+    required this.fallbackText,
     required this.selected,
     required this.onTap,
   });
@@ -147,9 +150,7 @@ class _LanguageSectionItem
     return Material(
       color: backgroundColor,
       child: InkWell(
-        onTap: selected
-            ? null
-            : onTap,
+        onTap: selected ? null : onTap,
         splashColor: Colors.transparent,
         highlightColor: pressedColor,
         hoverColor: Colors.transparent,
@@ -163,7 +164,8 @@ class _LanguageSectionItem
             child: Row(
               children: [
                 _LanguageIcon(
-                  text: iconText,
+                  imagePath: imagePath,
+                  fallbackText: fallbackText,
                   selected: selected,
                 ),
                 SizedBox(width: 13),
@@ -189,11 +191,13 @@ class _LanguageSectionItem
 
 class _LanguageIcon
     extends StatelessWidget {
-  final String text;
+  final String imagePath;
+  final String fallbackText;
   final bool selected;
 
   _LanguageIcon({
-    required this.text,
+    required this.imagePath,
+    required this.fallbackText,
     required this.selected,
   });
 
@@ -202,35 +206,74 @@ class _LanguageIcon
     ColorScheme colorScheme =
         Theme.of(context).colorScheme;
 
+    Color backgroundColor = selected
+        ? colorScheme.primary.withValues(
+      alpha: 0.13,
+    )
+        : colorScheme
+        .surfaceContainerHighest;
+
+    Color borderColor = selected
+        ? colorScheme.primary
+        : colorScheme.outlineVariant
+        .withValues(
+      alpha: 0.20,
+    );
+
     return Container(
       width: 44,
       height: 44,
       alignment: Alignment.center,
+      padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: selected
-            ? colorScheme.primary
-            : colorScheme
-            .surfaceContainerHighest,
+        color: backgroundColor,
         borderRadius:
         BorderRadius.circular(13),
         border: Border.all(
-          color: selected
-              ? colorScheme.primary
-              : colorScheme.outlineVariant
-              .withValues(
-            alpha: 0.20,
-          ),
+          color: borderColor,
         ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: selected
-              ? colorScheme.onPrimary
-              : colorScheme
-              .onSurfaceVariant,
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
+      child: ClipRRect(
+        borderRadius:
+        BorderRadius.circular(9),
+        child: Image.asset(
+          imagePath,
+          width: 34,
+          height: 34,
+          fit: BoxFit.cover,
+          filterQuality:
+          FilterQuality.high,
+          errorBuilder: (
+              BuildContext context,
+              Object error,
+              StackTrace? stackTrace,
+              ) {
+            return Container(
+              width: 34,
+              height: 34,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme
+                    .surfaceContainerHighest,
+                borderRadius:
+                BorderRadius.circular(9),
+              ),
+              child: Text(
+                fallbackText,
+                style: TextStyle(
+                  color: selected
+                      ? colorScheme.onPrimary
+                      : colorScheme
+                      .onSurfaceVariant,
+                  fontSize: 14,
+                  fontWeight:
+                  FontWeight.w700,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -284,8 +327,8 @@ class _LanguageInformation
           TextOverflow.ellipsis,
           style: theme.textTheme.bodySmall
               ?.copyWith(
-            color: colorScheme
-                .onSurfaceVariant,
+            color:
+            colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -326,8 +369,7 @@ class _LanguageIndicator
           ? Icon(
         Icons.check_rounded,
         size: 16,
-        color:
-        colorScheme.onPrimary,
+        color: colorScheme.onPrimary,
       )
           : SizedBox.shrink(),
     );

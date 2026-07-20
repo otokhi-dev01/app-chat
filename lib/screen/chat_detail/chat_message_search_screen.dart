@@ -97,7 +97,7 @@ class _ChatMessageSearchScreenState
         return 'text message';
 
       case ChatMessageType.image:
-        return 'photo image';
+        return 'photo images';
 
       case ChatMessageType.voice:
         return 'voice audio message';

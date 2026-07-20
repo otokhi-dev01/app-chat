@@ -5,8 +5,9 @@ import '../../controllers/contact/contact_controller.dart';
 import '../../services/contact_service.dart';
 import '../../services/mock/mock_contact_service.dart';
 import '../widgets/contact/contact_add_button.dart';
-
+import '../widgets/contact/contact_add_group_button.dart';
 import '../widgets/contact/contact_search_field.dart';
+import 'add_group/add_group_screen.dart';
 import 'contact_list.dart';
 
 class ContactScreen extends StatelessWidget {
@@ -35,9 +36,26 @@ class ContactScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _openAddGroupScreen() async {
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
+
+    await Get.to(
+          () => AddGroupScreen(),
+      transition: Transition.cupertino,
+      duration: Duration(
+        milliseconds: 250,
+      ),
+      preventDuplicates: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
+    ContactController contactController =
+        controller;
 
     return ColoredBox(
       color: theme.scaffoldBackgroundColor,
@@ -47,21 +65,32 @@ class ContactScreen extends StatelessWidget {
             children: [
               ContactSearchField(
                 controller:
-                controller.searchController,
+                contactController
+                    .searchController,
                 onChanged:
-                controller.updateSearch,
+                contactController
+                    .updateSearch,
                 onClear:
-                controller.clearSearch,
+                contactController
+                    .clearSearch,
               ),
+
+              ContactAddGroupButton(
+                onTap: _openAddGroupScreen,
+              ),
+
               Expanded(
                 child: ContactList(
-                  controller: controller,
+                  controller:
+                  contactController,
                 ),
               ),
             ],
           ),
+
           ContactAddButton(
-            controller: controller,
+            controller:
+            contactController,
           ),
         ],
       ),

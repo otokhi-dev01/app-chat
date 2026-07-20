@@ -232,7 +232,7 @@ class ChatModel {
       dateTime: _parseDateTime(
         json['dateTime'],
       ),
-      image: json['image']?.toString() ??
+      image: json['images']?.toString() ??
           'https://i.pravatar.cc/150',
       unread: _parseInt(json['unread']),
       type:
@@ -278,7 +278,7 @@ class ChatModel {
       'name': name,
       'message': message,
       'dateTime': dateTime.toIso8601String(),
-      'image': image,
+      'images': image,
       'unread': unread,
       'type': type,
       'isPinned': isPinned,

@@ -50,7 +50,7 @@ class ChatMessageModel {
   /// Image, video, voice, GIF, sticker, or file path.
   final String? mediaPath;
 
-  /// Smaller image used before loading the full media.
+  /// Smaller images used before loading the full media.
   final String? thumbnailPath;
 
   /// File information.

@@ -35,7 +35,7 @@ class SplashScreen extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Text(
-                'ChatApp',
+                'Piisiit Chat',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

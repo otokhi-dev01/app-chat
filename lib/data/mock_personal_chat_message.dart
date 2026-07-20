@@ -107,7 +107,7 @@ class MockPersonalChatMessages {
         'https://picsum.photos/id/48/900/700',
         thumbnailPath:
         'https://picsum.photos/id/48/300/220',
-        mimeType: 'image/jpeg',
+        mimeType: 'images/jpeg',
         fileSizeBytes: 248000,
         mediaWidth: 900,
         mediaHeight: 700,

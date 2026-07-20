@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../controllers/navigation/main_navigation_controller.dart';
 
-class MainBottomNavigation extends StatelessWidget {
+class MainBottomNavigation extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final int unreadCount;
@@ -19,9 +19,86 @@ class MainBottomNavigation extends StatelessWidget {
   });
 
   @override
+  State<MainBottomNavigation> createState() {
+    return _MainBottomNavigationState();
+  }
+}
+
+class _MainBottomNavigationState
+    extends State<MainBottomNavigation> {
+  final GlobalKey _stackKey = GlobalKey();
+
+  final List<GlobalKey> _itemKeys = List.generate(
+    4,
+        (_) => GlobalKey(),
+  );
+
+  Rect? _indicatorRect;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measure();
+    });
+  }
+
+  @override
+  void didUpdateWidget(
+      MainBottomNavigation oldWidget,
+      ) {
+    super.didUpdateWidget(oldWidget);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measure();
+    });
+  }
+
+  void _measure() {
+    if (!mounted) {
+      return;
+    }
+
+    GlobalKey activeKey =
+    _itemKeys[widget.currentIndex];
+
+    BuildContext? stackContext =
+        _stackKey.currentContext;
+
+    BuildContext? activeContext =
+        activeKey.currentContext;
+
+    if (stackContext == null ||
+        activeContext == null) {
+      return;
+    }
+
+    RenderBox stackBox =
+    stackContext.findRenderObject() as RenderBox;
+
+    RenderBox activeBox =
+    activeContext.findRenderObject() as RenderBox;
+
+    Offset offset = activeBox.localToGlobal(
+      Offset.zero,
+      ancestor: stackBox,
+    );
+
+    Rect rect = offset & activeBox.size;
+
+    if (rect != _indicatorRect) {
+      setState(() {
+        _indicatorRect = rect;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final bool isDark = theme.brightness == Brightness.dark;
+    final ColorScheme colorScheme = theme.colorScheme;
 
     final Color backgroundColor =
     isDark ? const Color(0xFF1B1D22) : Colors.white;
@@ -29,6 +106,9 @@ class MainBottomNavigation extends StatelessWidget {
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
+
+    final Color activeBackground =
+    colorScheme.primary.withValues(alpha: 0.11);
 
     return SafeArea(
       top: false,
@@ -46,53 +126,80 @@ class MainBottomNavigation extends StatelessWidget {
               color: borderColor,
             ),
           ),
-          child: Row(
+          child: Stack(
+            key: _stackKey,
             children: [
-              Expanded(
-                child: _NavigationItem(
-                  index: MainTab.chats.index,
-                  currentIndex: currentIndex,
-                  icon: Icons.chat_bubble_outline_rounded,
-                  activeIcon: Icons.chat_bubble_rounded,
-                  label: 'chats'.tr,
-                  badgeCount: unreadCount,
-                  navigationBackground: backgroundColor,
-                  onTap: onTap,
+              if (_indicatorRect != null)
+                AnimatedPositioned(
+                  duration: const Duration(
+                    milliseconds: 260,
+                  ),
+                  curve: Curves.easeOutCubic,
+                  left: _indicatorRect!.left,
+                  top: _indicatorRect!.top,
+                  width: _indicatorRect!.width,
+                  height: _indicatorRect!.height,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: activeBackground,
+                      borderRadius:
+                      BorderRadius.circular(22),
+                    ),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _NavigationItem(
-                  index: MainTab.contacts.index,
-                  currentIndex: currentIndex,
-                  icon: Icons.people_outline_rounded,
-                  activeIcon: Icons.people_rounded,
-                  label: 'contacts'.tr,
-                  navigationBackground: backgroundColor,
-                  onTap: onTap,
-                ),
-              ),
-              Expanded(
-                child: _NavigationItem(
-                  index: MainTab.settings.index,
-                  currentIndex: currentIndex,
-                  icon: Icons.settings_outlined,
-                  activeIcon: Icons.settings_rounded,
-                  label: 'settings'.tr,
-                  navigationBackground: backgroundColor,
-                  onTap: onTap,
-                ),
-              ),
-              Expanded(
-                child: _NavigationItem(
-                  index: MainTab.profile.index,
-                  currentIndex: currentIndex,
-                  icon: Icons.person_outline_rounded,
-                  activeIcon: Icons.person_rounded,
-                  label: 'profile'.tr,
-                  profileImage: profileImage,
-                  navigationBackground: backgroundColor,
-                  onTap: onTap,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _NavigationItem(
+                      key: _itemKeys[MainTab.chats.index],
+                      index: MainTab.chats.index,
+                      currentIndex: widget.currentIndex,
+                      icon: Icons.chat_bubble_outline_rounded,
+                      activeIcon: Icons.chat_bubble_rounded,
+                      label: 'chats'.tr,
+                      badgeCount: widget.unreadCount,
+                      navigationBackground: backgroundColor,
+                      onTap: widget.onTap,
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavigationItem(
+                      key: _itemKeys[MainTab.contacts.index],
+                      index: MainTab.contacts.index,
+                      currentIndex: widget.currentIndex,
+                      icon: Icons.people_outline_rounded,
+                      activeIcon: Icons.people_rounded,
+                      label: 'contacts'.tr,
+                      navigationBackground: backgroundColor,
+                      onTap: widget.onTap,
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavigationItem(
+                      key: _itemKeys[MainTab.settings.index],
+                      index: MainTab.settings.index,
+                      currentIndex: widget.currentIndex,
+                      icon: Icons.settings_outlined,
+                      activeIcon: Icons.settings_rounded,
+                      label: 'settings'.tr,
+                      navigationBackground: backgroundColor,
+                      onTap: widget.onTap,
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavigationItem(
+                      key: _itemKeys[MainTab.profile.index],
+                      index: MainTab.profile.index,
+                      currentIndex: widget.currentIndex,
+                      icon: Icons.person_outline_rounded,
+                      activeIcon: Icons.person_rounded,
+                      label: 'profile'.tr,
+                      profileImage: widget.profileImage,
+                      navigationBackground: backgroundColor,
+                      onTap: widget.onTap,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -114,6 +221,7 @@ class _NavigationItem extends StatelessWidget {
   final Color navigationBackground;
 
   const _NavigationItem({
+    super.key,
     required this.index,
     required this.currentIndex,
     required this.icon,
@@ -135,8 +243,9 @@ class _NavigationItem extends StatelessWidget {
     final Color primary = colorScheme.primary;
     final Color inactiveColor = colorScheme.onSurfaceVariant;
 
-    final Color selectedBackground = primary.withValues(alpha: 0.11);
-
+    // Background highlight is now handled by the shared sliding
+    // indicator in MainBottomNavigation, so this item only renders
+    // its own content (icon + label), no background of its own.
     return Semantics(
       button: true,
       selected: isSelected,
@@ -154,14 +263,8 @@ class _NavigationItem extends StatelessWidget {
             }
             onTap(index);
           },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
+          child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 1),
-            decoration: BoxDecoration(
-              color: isSelected ? selectedBackground : Colors.transparent,
-              borderRadius: BorderRadius.circular(22),
-            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -257,7 +360,7 @@ class _NavigationIcon extends StatelessWidget {
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
-              switchInCurve: Curves.easeOutBack, // Fixed curve name
+              switchInCurve: Curves.easeOutBack,
               switchOutCurve: Curves.easeIn,
               transitionBuilder: (
                   Widget child,
@@ -318,7 +421,7 @@ class _NavigationIcon extends StatelessWidget {
     return AnimatedScale(
       scale: selected ? 1.08 : 1.0,
       duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOutBack, // Fixed curve name
+      curve: Curves.easeOutBack,
       child: iconWidget,
     );
   }

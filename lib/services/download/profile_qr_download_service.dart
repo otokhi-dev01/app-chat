@@ -132,7 +132,7 @@ class ProfileQrDownloadService {
 
       if (byteData == null) {
         throw StateError(
-          'Unable to create QR code image.',
+          'Unable to create QR code images.',
         );
       }
 

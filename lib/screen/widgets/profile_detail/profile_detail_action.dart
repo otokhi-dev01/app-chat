@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ProfileActions
-    extends StatelessWidget {
-  final bool isFollowing;
+class ProfileActions extends StatelessWidget {
   final VoidCallback? onMessage;
   final VoidCallback? onCall;
-  final VoidCallback? onFollow;
+  final VoidCallback? onMore;
 
   ProfileActions({
     super.key,
-    required this.isFollowing,
     this.onMessage,
     this.onCall,
-    this.onFollow,
+    this.onMore,
   });
 
   @override
@@ -27,10 +24,12 @@ class ProfileActions
         : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white
-        .withValues(alpha: 0.08)
-        : Colors.black
-        .withValues(alpha: 0.06);
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -39,8 +38,9 @@ class ProfileActions
       ),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(
+          20,
+        ),
         border: Border.all(
           color: borderColor,
         ),
@@ -49,13 +49,12 @@ class ProfileActions
         children: [
           Expanded(
             child: ProfileActionButton(
-              icon:
-              Icons.chat_bubble_outline_rounded,
+              icon: Icons
+                  .chat_bubble_outline_rounded,
               label: 'Message',
               onTap: onMessage,
             ),
           ),
-
           Expanded(
             child: ProfileActionButton(
               icon: Icons.call_outlined,
@@ -63,17 +62,11 @@ class ProfileActions
               onTap: onCall,
             ),
           ),
-
           Expanded(
             child: ProfileActionButton(
-              icon: isFollowing
-                  ? Icons.person_remove_outlined
-                  : Icons.person_add_alt_1_rounded,
-              label: isFollowing
-                  ? 'Unfollow'
-                  : 'Follow',
-              isActive: !isFollowing,
-              onTap: onFollow,
+              icon: Icons.more_horiz_rounded,
+              label: 'More',
+              onTap: onMore,
             ),
           ),
         ],
@@ -86,14 +79,12 @@ class ProfileActionButton
     extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool isActive;
   final VoidCallback? onTap;
 
   ProfileActionButton({
     super.key,
     required this.icon,
     required this.label,
-    this.isActive = true,
     this.onTap,
   });
 
@@ -103,41 +94,52 @@ class ProfileActionButton
     ColorScheme colorScheme =
         theme.colorScheme;
 
-    Color foregroundColor = isActive
-        ? colorScheme.primary
-        : colorScheme.onSurfaceVariant;
+    bool isEnabled = onTap != null;
 
-    Color backgroundColor = isActive
+    Color foregroundColor = isEnabled
         ? colorScheme.primary
-        .withValues(alpha: 0.11)
-        : colorScheme.onSurface
-        .withValues(alpha: 0.07);
+        : colorScheme.onSurfaceVariant
+        .withValues(
+      alpha: 0.55,
+    );
+
+    Color backgroundColor = isEnabled
+        ? colorScheme.primary.withValues(
+      alpha: 0.11,
+    )
+        : colorScheme.onSurface.withValues(
+      alpha: 0.05,
+    );
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          16,
+        ),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 4,
             vertical: 5,
           ),
           child: Column(
-            mainAxisSize:
-            MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              AnimatedContainer(
-                duration:
-                Duration(milliseconds: 180),
+              Container(
                 width: 48,
                 height: 48,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   borderRadius:
-                  BorderRadius.circular(16),
+                  BorderRadius.circular(
+                    16,
+                  ),
                 ),
                 child: Icon(
                   icon,
@@ -156,8 +158,7 @@ class ProfileActionButton
                     ?.copyWith(
                   color: foregroundColor,
                   fontSize: 11.5,
-                  fontWeight:
-                  FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

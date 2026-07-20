@@ -23,6 +23,7 @@ abstract class AppRoutes {
   static const String chatFolders = '/chat-folder';
   // contact
   static const String qrScanner = '/qr-scanner';
+  static const String addGroup = '/add-group';
 
 
   // testing

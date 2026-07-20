@@ -7,6 +7,8 @@ import '../controllers/contact/qr_contact_scanner_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
 import '../models/chat_model.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/contact/add_group/add_group_binding.dart';
+import '../screen/contact/add_group/add_group_screen.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_binding.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_screen.dart';
 import '../screen/home/home_screen.dart';
@@ -84,6 +86,16 @@ class AppPages {
       transition: Transition.cupertino,
       transitionDuration: const Duration(
         milliseconds: 220, // Reduced to 220ms
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.addGroup,
+      page: () => AddGroupScreen(),
+      binding: AddGroupBinding(),
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 250,
       ),
     ),
 

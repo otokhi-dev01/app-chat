@@ -25,7 +25,16 @@ class ContactList extends StatelessWidget {
         List<String> letters =
         grouped.keys.toList();
 
-        letters.sort();
+        letters.sort(
+              (
+              String first,
+              String second,
+              ) {
+            return first.toLowerCase().compareTo(
+              second.toLowerCase(),
+            );
+          },
+        );
 
         if (letters.isEmpty) {
           return ContactEmptyState(
@@ -71,8 +80,8 @@ class ContactList extends StatelessWidget {
                 ...contacts.map(
                       (ContactModel contact) {
                     return ContactTile(
-                      key: ValueKey(
-                        contact.name,
+                      key: ValueKey<String>(
+                        contact.id,
                       ),
                       contact: contact,
                       onTap: () {

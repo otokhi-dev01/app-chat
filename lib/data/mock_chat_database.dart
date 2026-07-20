@@ -213,7 +213,7 @@
 //       dateTime: DateTime.now().subtract(
 //         Duration(minutes: 12),
 //       ),
-//       image: '',
+//       images: '',
 //       unread: 0,
 //       type: 'saved',
 //       isPinned: true,
@@ -231,7 +231,7 @@
 //       dateTime: DateTime.now().subtract(
 //         Duration(minutes: 3),
 //       ),
-//       image:
+//       images:
 //       'https://i.pravatar.cc/300?u=user_002',
 //       unread: 0,
 //       type: 'personal',
@@ -252,7 +252,7 @@
 //       dateTime: DateTime.now().subtract(
 //         Duration(minutes: 8),
 //       ),
-//       image:
+//       images:
 //       'https://picsum.photos/id/20/300',
 //       unread: 5,
 //       type: 'group',
@@ -271,7 +271,7 @@
 //       dateTime: DateTime.now().subtract(
 //         Duration(hours: 1),
 //       ),
-//       image:
+//       images:
 //       'https://picsum.photos/id/48/300',
 //       unread: 1,
 //       type: 'work',
@@ -481,13 +481,13 @@
 //         ),
 //         isMe: true,
 //         isRead: true,
-//         type: ChatMessageType.image,
+//         type: ChatMessageType.images,
 //         status: ChatMessageStatus.read,
 //         mediaPath:
 //         'https://picsum.photos/id/48/900/700',
 //         thumbnailPath:
 //         'https://picsum.photos/id/48/300/220',
-//         mimeType: 'image/jpeg',
+//         mimeType: 'images/jpeg',
 //         fileSizeBytes: 248000,
 //         mediaWidth: 900,
 //         mediaHeight: 700,
@@ -1290,7 +1290,7 @@
 //       name: oldChat.name,
 //       message: '',
 //       dateTime: oldChat.dateTime,
-//       image: oldChat.image,
+//       images: oldChat.images,
 //       unread: 0,
 //       type: oldChat.type,
 //       isPinned: oldChat.isPinned,
@@ -1332,7 +1332,7 @@
 //       name: oldChat.name,
 //       message: message.displayText,
 //       dateTime: message.sentAt,
-//       image: oldChat.image,
+//       images: oldChat.images,
 //       unread: unreadCount,
 //       type: oldChat.type,
 //       isPinned: oldChat.isPinned,
