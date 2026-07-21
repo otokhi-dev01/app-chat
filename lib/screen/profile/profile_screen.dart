@@ -1,12 +1,17 @@
+import 'package:appchat/screen/profile/post/add_post_camera_screen.dart';
+import 'package:appchat/screen/profile/post/add_post_screen.dart';
 import 'package:appchat/screen/profile/qr_code/profile_qr_code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/profile/add_post_camera_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../../data/mock_profile_story_post_data.dart';
+import '../../models/add_post_capture_result.dart';
 import '../../models/profile_story_post_model.dart';
 import '../../route/app_route.dart';
+import '../widgets/story/profile_add_post_button.dart';
 import '../widgets/story/profile_post_viewer_screen.dart';
 import '../widgets/story/profile_story_post_section.dart';
 import '../widgets/settings/account_screen.dart';
@@ -151,6 +156,46 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _addNewPost() async {
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
+
+    AddPostCaptureResult? result =
+    await Get.to<AddPostCaptureResult>(
+          () => AddPostCameraScreen(),
+      binding: BindingsBuilder(
+            () {
+          Get.lazyPut<AddPostCameraController>(
+                () => AddPostCameraController(),
+          );
+        },
+      ),
+      transition: Transition.fadeIn,
+      duration: Duration(
+        milliseconds: 220,
+      ),
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    debugPrint(
+      'Post path: ${result.path}',
+    );
+
+    debugPrint(
+      'Post type: ${result.type.name}',
+    );
+
+    debugPrint(
+      'From gallery: ${result.fromGallery}',
+    );
+
+    // Open your caption/publish screen here.
+  }
+
+
   @override
   Widget build(BuildContext context) {
     SettingsController controller =
@@ -179,77 +224,91 @@ class ProfileScreen extends StatelessWidget {
 
     return ColoredBox(
       color: pageColor,
-      child: Obx(
-            () {
-          String name =
-          controller.userName.value.trim();
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Obx(
+                  () {
+                String name =
+                controller.userName.value.trim();
 
-          String email =
-          controller.userEmail.value.trim();
+                String email =
+                controller.userEmail.value.trim();
 
-          String username =
-          controller.userUsername.value.trim();
+                String username =
+                controller.userUsername.value.trim();
 
-          return ListView(
-            keyboardDismissBehavior:
-            ScrollViewKeyboardDismissBehavior
-                .onDrag,
-            physics: BouncingScrollPhysics(
-              parent:
-              AlwaysScrollableScrollPhysics(),
+                return ListView(
+                  keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior
+                      .onDrag,
+                  physics: BouncingScrollPhysics(
+                    parent:
+                    AlwaysScrollableScrollPhysics(),
+                  ),
+                  padding: EdgeInsets.fromLTRB(
+                    14,
+                    16,
+                    14,
+                    180,
+                  ),
+                  children: [
+                    _ProfileHeaderCard(
+                      name: name,
+                      email: email,
+                      firstLetter:
+                      _firstLetter(name),
+                      cardColor: cardColor,
+                      borderColor: borderColor,
+                      onEdit: _openEditProfile,
+                      onCopyUsername: () {
+                        _copyUsername(
+                          context,
+                          username,
+                        );
+                      },
+                      onQrCode: () {
+                        _openQrCode(
+                          name: name,
+                          username: username,
+                        );
+                      },
+                    ),
+                    SizedBox(height: 22),
+                    AccountSettingsSection(
+                      controller: controller,
+                    ),
+                    SizedBox(height: 22),
+                    ProfileStoryPostSection(
+                      posts:
+                      MockProfileStoryPostData
+                          .posts,
+                      onPostTap: (
+                          ProfilePostItem post,
+                          ) {
+                        _openPost(post);
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
-            padding: EdgeInsets.fromLTRB(
-              14,
-              16,
-              14,
-              110,
+          ),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 5,
+            child: SafeArea(
+              top: false,
+              child: Center(
+                child: ProfileAddPostButton(
+                  onTap: _addNewPost,
+                ),
+              ),
             ),
-            children: [
-              _ProfileHeaderCard(
-                name: name,
-                email: email,
-                firstLetter:
-                _firstLetter(name),
-                cardColor: cardColor,
-                borderColor: borderColor,
-                onEdit: _openEditProfile,
-                onCopyUsername: () {
-                  _copyUsername(
-                    context,
-                    username,
-                  );
-                },
-                onQrCode: () {
-                  _openQrCode(
-                    name: name,
-                    username: username,
-                  );
-                },
-              ),
-
-              SizedBox(height: 22),
-
-              AccountSettingsSection(
-                controller: controller,
-              ),
-
-              SizedBox(height: 22),
-
-              ProfileStoryPostSection(
-                posts:
-                MockProfileStoryPostData
-                    .posts,
-                onPostTap: (
-                    ProfilePostItem post,
-                    ) {
-                  _openPost(
-                    post,
-                  );
-                },
-              ),
-            ],
-          );
-        },
+          ),
+        ],
       ),
     );
   }

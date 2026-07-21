@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../models/chat_model.dart';
 import '../../widgets/archived/archived_chats_actions_sheet.dart';
@@ -158,36 +157,12 @@ class _ArchivedChatsScreenState
   Future<void> _showChatActions(
       ChatModel chat,
       ) async {
-    HapticFeedback.lightImpact();
-
-    await showModalBottomSheet<void>(
+    await ArchivedChatActionsSheet.show(
       context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(
-        alpha: 0.42,
-      ),
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (BuildContext sheetContext) {
-        return ArchivedChatActionsSheet(
-          chat: chat,
-          onUnarchive: () {
-            Navigator.of(sheetContext).pop();
-
-            _unarchiveChat(chat);
-          },
-          onMuteToggle: () {
-            Navigator.of(sheetContext).pop();
-
-            _toggleMute(chat);
-          },
-          onDelete: () {
-            Navigator.of(sheetContext).pop();
-
-            _deleteChat(chat);
-          },
-        );
-      },
+      chat: chat,
+      onUnarchive: () => _unarchiveChat(chat),
+      onMuteToggle: () => _toggleMute(chat),
+      onDelete: () => _deleteChat(chat),
     );
   }
 

@@ -89,6 +89,7 @@ class MockChatFolderService
   @override
   Future<ChatFolderModel?> createFolder({
     required String name,
+    List<String>? chatIds,
   }) async {
     String cleanName = name.trim();
 
@@ -108,14 +109,16 @@ class MockChatFolderService
       ),
     );
 
+    final List<String> ids = chatIds ?? <String>[];
+
     ChatFolderModel folder =
     ChatFolderModel(
       id: 'folder_${DateTime.now().microsecondsSinceEpoch}',
       name: cleanName,
       type: ChatFolderType.custom,
-      chatCount: 0,
+      chatCount: ids.length,
       isSystem: false,
-      chatIds: <String>[],
+      chatIds: ids,
     );
 
     _customFolders.add(folder);

@@ -91,6 +91,8 @@ class _AddGroupContentState
       hasPhoto: controller
           .groupImagePath.value
           .isNotEmpty,
+      groupImagePath: controller
+          .groupImagePath.value,
       onGallery:
       _pickGroupImageFromGallery,
       onCamera: _takeGroupPhoto,

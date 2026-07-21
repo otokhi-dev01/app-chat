@@ -68,220 +68,210 @@ class ArchivedChatTile extends StatelessWidget {
         'archived-${chat.id}',
       ),
       direction: DismissDirection.endToStart,
-      dismissThresholds: {
+      dismissThresholds: const {
         DismissDirection.endToStart: 0.35,
       },
       background: Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 5,
-        ),
-        padding: EdgeInsets.only(
-          right: 24,
-        ),
+        padding: const EdgeInsets.only(right: 24),
         alignment: Alignment.centerRight,
-        decoration: BoxDecoration(
-          color: colorScheme.primary,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        color: colorScheme.primary,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Icon(
-              Icons.unarchive_rounded,
-              color: colorScheme.onPrimary,
-              size: 24,
-            ),
-            SizedBox(height: 3),
             Text(
               'Unarchive',
               style: TextStyle(
                 color: colorScheme.onPrimary,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.unarchive_rounded,
+              color: colorScheme.onPrimary,
+              size: 22,
             ),
           ],
         ),
       ),
-      onDismissed: (
-          DismissDirection direction,
-          ) {
+      onDismissed: (DismissDirection direction) {
         onSwipeUnarchive();
       },
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 5,
-        ),
-        child: Material(
-          color: cardColor,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: borderColor,
-            ),
-          ),
-          child: InkWell(
-            onTap: onTap,
-            onLongPress: onLongPress,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                13,
-                12,
-                13,
-                12,
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              onLongPress: onLongPress,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              overlayColor: WidgetStateProperty.resolveWith(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return isDark
+                        ? Colors.white.withValues(alpha: 0.04)
+                        : Colors.black.withValues(alpha: 0.025);
+                  }
+                  return Colors.transparent;
+                },
               ),
-              child: Row(
-                children: [
-                  _ArchivedChatAvatar(
-                    imageUrl: chat.image,
-                    initials: _getInitials(
-                      chat.name,
-                    ),
-                  ),
-
-                  SizedBox(width: 12),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                chat.name,
-                                maxLines: 1,
-                                overflow:
-                                TextOverflow.ellipsis,
-                                style: theme
-                                    .textTheme.titleSmall
-                                    ?.copyWith(
-                                  color:
-                                  colorScheme.onSurface,
-                                  fontSize: 15,
-                                  fontWeight:
-                                  FontWeight.w700,
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(width: 8),
-
-                            Text(
-                              chat.time,
-                              style: theme
-                                  .textTheme.bodySmall
-                                  ?.copyWith(
-                                color: colorScheme
-                                    .onSurfaceVariant,
-                                fontSize: 11,
-                                fontWeight:
-                                FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 5),
-
-                        Row(
-                          children: [
-                            if (chat.isMuted) ...[
-                              Icon(
-                                Icons
-                                    .volume_off_rounded,
-                                size: 15,
-                                color: colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                              SizedBox(width: 5),
-                            ],
-
-                            Expanded(
-                              child: Text(
-                                chat.isTyping
-                                    ? 'Typing...'
-                                    : chat.message,
-                                maxLines: 1,
-                                overflow:
-                                TextOverflow.ellipsis,
-                                style: theme
-                                    .textTheme.bodyMedium
-                                    ?.copyWith(
-                                  color: chat.isTyping
-                                      ? colorScheme.primary
-                                      : colorScheme
-                                      .onSurfaceVariant,
-                                  fontSize: 13,
-                                  fontWeight:
-                                  chat.isTyping
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontStyle:
-                                  chat.isTyping
-                                      ? FontStyle.italic
-                                      : FontStyle.normal,
-                                ),
-                              ),
-                            ),
-
-                            if (chat.hasUnread) ...[
-                              SizedBox(width: 8),
-
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 22,
-                                  minHeight: 22,
-                                ),
-                                alignment: Alignment.center,
-                                padding:
-                                EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: chat.isMuted
-                                      ? colorScheme
-                                      .onSurfaceVariant
-                                      .withValues(
-                                    alpha: 0.65,
-                                  )
-                                      : colorScheme.primary,
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                    20,
-                                  ),
-                                ),
-                                child: Text(
-                                  chat.unread > 99
-                                      ? '99+'
-                                      : '${chat.unread}',
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: colorScheme.surfaceContainerHighest,
+                          backgroundImage: chat.image.trim().isNotEmpty
+                              ? NetworkImage(chat.image)
+                              : null,
+                          child: chat.image.trim().isEmpty
+                              ? Text(
+                                  _getInitials(chat.name),
                                   style: TextStyle(
-                                    color: chat.isMuted
-                                        ? colorScheme.surface
-                                        : colorScheme
-                                        .onPrimary,
-                                    fontSize: 10,
-                                    fontWeight:
-                                    FontWeight.w700,
+                                    color: colorScheme.primary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
                                   ),
+                                )
+                              : null,
+                        ),
+                        if (chat.isOnline)
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4CAF50),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: theme.scaffoldBackgroundColor,
+                                  width: 2,
                                 ),
                               ),
-                            ],
-                          ],
-                        ),
+                            ),
+                          ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  chat.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: colorScheme.onSurface,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                chat.time,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: chat.unread > 0
+                                      ? colorScheme.primary
+                                      : colorScheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                  fontWeight: chat.unread > 0
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              if (chat.isMuted) ...[
+                                Icon(
+                                  Icons.volume_off_rounded,
+                                  size: 15,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  chat.isTyping ? 'Typing...' : chat.message,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: chat.isTyping
+                                        ? colorScheme.primary
+                                        : colorScheme.onSurfaceVariant,
+                                    fontSize: 14,
+                                    height: 1.25,
+                                    fontWeight: chat.isTyping
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    fontStyle: chat.isTyping
+                                        ? FontStyle.italic
+                                        : FontStyle.normal,
+                                  ),
+                                ),
+                              ),
+                              if (chat.hasUnread) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  constraints: const BoxConstraints(
+                                    minWidth: 20,
+                                    minHeight: 20,
+                                  ),
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: chat.isMuted
+                                        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.65)
+                                        : colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    chat.unread > 99 ? '99+' : '${chat.unread}',
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            indent: 82,
+            endIndent: 14,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+          ),
+        ],
       ),
     );
   }

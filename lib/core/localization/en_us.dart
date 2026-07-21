@@ -90,6 +90,7 @@ const Map<String, String> enUS = {
 
   'profile_photo': 'Profile Photo',
   'change_profile_photo': 'Change Profile Photo',
+  'view_photo': 'View Photo',
   'take_photo': 'Take Photo',
   'choose_from_gallery': 'Choose from Gallery',
   'remove_photo': 'Remove Photo',

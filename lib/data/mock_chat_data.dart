@@ -83,7 +83,7 @@ class MockChatData {
         isOnline: false,
         isTyping: false,
         isMe: false,
-        isArchived: false,
+        isArchived: true,
         status: MessageStatus.delivered,
       ),
     ];

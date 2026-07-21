@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import '../../controllers/profile/edit_profile_controller.dart';
+import '../../services/chat_camera_services.dart';
 import '../widgets/profile/profile_avatar_section.dart';
 import '../widgets/profile/profile_field.dart';
 import '../widgets/profile/profile_photo_sheet.dart';
+import '../widgets/profile/full_profile_image_viewer.dart';
 
 class ProfileEditScreen extends StatelessWidget {
   ProfileEditScreen({super.key});
@@ -13,6 +15,8 @@ class ProfileEditScreen extends StatelessWidget {
   final ProfileEditController controller = Get.put(
     ProfileEditController(),
   );
+
+  final ChatCameraService _cameraService = ChatCameraService();
 
   @override
   Widget build(BuildContext context) {
@@ -265,21 +269,42 @@ class ProfileEditScreen extends StatelessWidget {
             32,
           ),
           children: [
-            ProfileAvatarSection(
-              onChangePhoto: () {
-                showProfilePhotoSheet(
-                  context: context,
-                  onTakePhoto: () {
-                    // Add camera picker.
-                  },
-                  onChooseGallery: () {
-                    // Add gallery picker.
-                  },
-                  onRemovePhoto: () {
-                    // Remove profile photo.
-                  },
-                );
-              },
+            Obx(
+              () => ProfileAvatarSection(
+                profileImagePath: controller.profileImagePath.value,
+                onChangePhoto: () {
+                  showProfilePhotoSheet(
+                    context: context,
+                    profileImagePath: controller.profileImagePath.value,
+                    onViewPhoto: () {
+                      Get.to(
+                        () => FullProfileImageViewer(
+                          imagePath: controller.profileImagePath.value,
+                        ),
+                      );
+                    },
+                    onTakePhoto: () async {
+                      try {
+                        final result = await _cameraService.takePhoto();
+                        if (result != null && result.mediaPath != null) {
+                          controller.setProfileImage(result.mediaPath!);
+                        }
+                      } catch (_) {}
+                    },
+                    onChooseGallery: () async {
+                      try {
+                        final result = await _cameraService.pickFromGallery();
+                        if (result != null && result.mediaPath != null) {
+                          controller.setProfileImage(result.mediaPath!);
+                        }
+                      } catch (_) {}
+                    },
+                    onRemovePhoto: () {
+                      controller.removeProfileImage();
+                    },
+                  );
+                },
+              ),
             ),
 
             const SizedBox(height: 28),

@@ -25,6 +25,15 @@ class ProfileEditController extends GetxController {
   );
 
   final isSaving = false.obs;
+  final RxString profileImagePath = ''.obs;
+
+  void setProfileImage(String value) {
+    profileImagePath.value = value.trim();
+  }
+
+  void removeProfileImage() {
+    profileImagePath.value = '';
+  }
 
   String? validateRequired(String? value) {
     if (value == null || value.trim().isEmpty) {

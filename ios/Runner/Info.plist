@@ -30,25 +30,19 @@
 	<string>Main</string>
 
 	<key>NSCameraUsageDescription</key>
-    <string>This app needs camera access so you can take and send photos in chat.</string>
-
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs photo library access so you can attach photos to your messages.</string>
-
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs your location so you can share it in chat.</string>
+    <string>PiitsiitChat needs camera access to take photos and videos, scan contact QR codes, and create posts.</string>
 
     <key>NSMicrophoneUsageDescription</key>
-    <string>AppChat needs microphone access to record voice messages.</string>
-
-    <key>NSCameraUsageDescription</key>
-    <string>AppChat needs camera access to scan contact QR codes.</string>
-
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>AppChat needs permission to save your QR code to Photos.</string>
+    <string>PiitsiitChat needs microphone access to record voice messages and audio for videos.</string>
 
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>AppChat needs access to your photo library.</string>
+    <string>PiitsiitChat needs photo library access to select photos and videos for chats and posts.</string>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>PiitsiitChat needs permission to save photos and QR codes to your photo library.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>PiitsiitChat needs your location so you can share it in chat.</string>
 
 	<key>UISupportedInterfaceOrientations</key>
 	<array>

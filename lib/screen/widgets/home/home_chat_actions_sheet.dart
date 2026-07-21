@@ -3,17 +3,21 @@ import 'package:flutter/services.dart';
 
 import '../../../models/chat_model.dart';
 
-class ArchivedChatActionsSheet extends StatelessWidget {
+class HomeChatActionsSheet extends StatelessWidget {
   final ChatModel chat;
-  final VoidCallback onUnarchive;
+  final VoidCallback onPin;
   final VoidCallback onMuteToggle;
+  final VoidCallback onArchive;
+  final VoidCallback onMarkRead;
   final VoidCallback onDelete;
 
-  ArchivedChatActionsSheet({
+  HomeChatActionsSheet({
     super.key,
     required this.chat,
-    required this.onUnarchive,
+    required this.onPin,
     required this.onMuteToggle,
+    required this.onArchive,
+    required this.onMarkRead,
     required this.onDelete,
   });
 
@@ -21,8 +25,10 @@ class ArchivedChatActionsSheet extends StatelessWidget {
   static Future<void> show({
     required BuildContext context,
     required ChatModel chat,
-    required VoidCallback onUnarchive,
+    required VoidCallback onPin,
     required VoidCallback onMuteToggle,
+    required VoidCallback onArchive,
+    required VoidCallback onMarkRead,
     required VoidCallback onDelete,
   }) async {
     HapticFeedback.lightImpact();
@@ -34,15 +40,23 @@ class ArchivedChatActionsSheet extends StatelessWidget {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (BuildContext sheetContext) {
-        return ArchivedChatActionsSheet(
+        return HomeChatActionsSheet(
           chat: chat,
-          onUnarchive: () {
+          onPin: () {
             Navigator.of(sheetContext).pop();
-            onUnarchive();
+            onPin();
           },
           onMuteToggle: () {
             Navigator.of(sheetContext).pop();
             onMuteToggle();
+          },
+          onArchive: () {
+            Navigator.of(sheetContext).pop();
+            onArchive();
+          },
+          onMarkRead: () {
+            Navigator.of(sheetContext).pop();
+            onMarkRead();
           },
           onDelete: () {
             Navigator.of(sheetContext).pop();
@@ -60,26 +74,30 @@ class ArchivedChatActionsSheet extends StatelessWidget {
 
     bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
+    bool hasImage = chat.image.trim().isNotEmpty;
+
+    IconData fallbackIcon =
+        chat.type == 'group' ? Icons.groups_rounded : Icons.person_rounded;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(26),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         border: Border.all(color: borderColor),
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 12),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle
             Container(
               width: 40,
               height: 4,
@@ -89,27 +107,25 @@ class ArchivedChatActionsSheet extends StatelessWidget {
               ),
             ),
 
+            // Header — avatar + name
             Padding(
-              padding: EdgeInsets.fromLTRB(10, 15, 10, 13),
+              padding: const EdgeInsets.fromLTRB(10, 15, 10, 13),
               child: Row(
                 children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.archive_rounded,
-                      color: colorScheme.primary,
-                      size: 23,
-                    ),
+                  CircleAvatar(
+                    radius: 23,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    backgroundImage:
+                        hasImage ? NetworkImage(chat.image) : null,
+                    child: hasImage
+                        ? null
+                        : Icon(
+                            fallbackIcon,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 22,
+                          ),
                   ),
-
-                  SizedBox(width: 12),
-
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +140,9 @@ class ArchivedChatActionsSheet extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(height: 3),
+                        const SizedBox(height: 3),
                         Text(
-                          'Archived conversation',
+                          chat.type == 'group' ? 'Group chat' : 'Personal chat',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 12,
@@ -141,22 +157,28 @@ class ArchivedChatActionsSheet extends StatelessWidget {
 
             Divider(height: 1, color: borderColor),
 
-            SizedBox(height: 7),
+            const SizedBox(height: 7),
 
-            _ArchivedActionTile(
-              icon: Icons.unarchive_rounded,
-              title: 'Unarchive',
-              subtitle: 'Return this conversation to chats',
+            // Pin / Unpin
+            _ActionTile(
+              icon: chat.isPinned
+                  ? Icons.push_pin_outlined
+                  : Icons.push_pin_rounded,
+              title: chat.isPinned ? 'Unpin' : 'Pin',
+              subtitle: chat.isPinned
+                  ? 'Remove from pinned chats'
+                  : 'Keep this chat at the top',
               iconColor: colorScheme.primary,
               iconBackground: colorScheme.primary.withValues(alpha: 0.11),
-              onTap: onUnarchive,
+              onTap: onPin,
             ),
 
-            _ArchivedActionTile(
+            // Mute / Unmute
+            _ActionTile(
               icon: chat.isMuted
                   ? Icons.notifications_active_rounded
                   : Icons.notifications_off_rounded,
-              title: chat.isMuted ? 'Unmute notifications' : 'Mute notifications',
+              title: chat.isMuted ? 'Unmute' : 'Mute',
               subtitle: chat.isMuted
                   ? 'Receive new message alerts'
                   : 'Stop new message alerts',
@@ -165,7 +187,32 @@ class ArchivedChatActionsSheet extends StatelessWidget {
               onTap: onMuteToggle,
             ),
 
-            _ArchivedActionTile(
+            // Archive
+            _ActionTile(
+              icon: Icons.archive_rounded,
+              title: 'Archive',
+              subtitle: 'Move this chat to archive',
+              iconColor: colorScheme.primary,
+              iconBackground: colorScheme.primary.withValues(alpha: 0.11),
+              onTap: onArchive,
+            ),
+
+            // Mark read / unread
+            _ActionTile(
+              icon: chat.unread > 0
+                  ? Icons.mark_chat_read_rounded
+                  : Icons.mark_chat_unread_rounded,
+              title: chat.unread > 0 ? 'Mark as read' : 'Mark as unread',
+              subtitle: chat.unread > 0
+                  ? 'Clear unread message count'
+                  : 'Show as having unread messages',
+              iconColor: colorScheme.primary,
+              iconBackground: colorScheme.primary.withValues(alpha: 0.11),
+              onTap: onMarkRead,
+            ),
+
+            // Delete
+            _ActionTile(
               icon: Icons.delete_outline_rounded,
               title: 'Delete chat',
               subtitle: 'Remove this conversation',
@@ -181,7 +228,9 @@ class ArchivedChatActionsSheet extends StatelessWidget {
   }
 }
 
-class _ArchivedActionTile extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ActionTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -190,7 +239,7 @@ class _ArchivedActionTile extends StatelessWidget {
   final Color? titleColor;
   final VoidCallback onTap;
 
-  _ArchivedActionTile({
+  _ActionTile({
     required this.icon,
     required this.title,
     required this.subtitle,
@@ -211,7 +260,7 @@ class _ArchivedActionTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(17),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
           child: Row(
             children: [
               Container(
@@ -224,9 +273,7 @@ class _ArchivedActionTile extends StatelessWidget {
                 ),
                 child: Icon(icon, color: iconColor, size: 22),
               ),
-
-              SizedBox(width: 12),
-
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +286,7 @@ class _ArchivedActionTile extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -250,7 +297,6 @@ class _ArchivedActionTile extends StatelessWidget {
                   ],
                 ),
               ),
-
               Icon(
                 Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.65),

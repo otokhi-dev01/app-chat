@@ -11,24 +11,10 @@ class MockChatFolderData {
         isSystem: true,
       ),
       ChatFolderModel(
-        id: 'folder_unread',
-        name: 'Unread',
-        type: ChatFolderType.unread,
-        chatCount: 8,
-        isSystem: true,
-      ),
-      ChatFolderModel(
         id: 'folder_personal',
         name: 'Personal',
         type: ChatFolderType.personal,
         chatCount: 18,
-        isSystem: true,
-      ),
-      ChatFolderModel(
-        id: 'folder_groups',
-        name: 'Groups',
-        type: ChatFolderType.groups,
-        chatCount: 7,
         isSystem: true,
       ),
     ];

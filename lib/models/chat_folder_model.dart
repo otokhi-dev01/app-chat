@@ -1,8 +1,6 @@
 enum ChatFolderType {
   all,
-  unread,
   personal,
-  groups,
   custom,
 }
 

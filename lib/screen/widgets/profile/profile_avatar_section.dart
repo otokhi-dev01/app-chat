@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileAvatarSection extends StatelessWidget {
+  final String profileImagePath;
   final VoidCallback onChangePhoto;
 
   const ProfileAvatarSection({
     super.key,
+    required this.profileImagePath,
     required this.onChangePhoto,
   });
 
@@ -18,6 +22,18 @@ class ProfileAvatarSection extends StatelessWidget {
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
+
+    ImageProvider? imageProvider;
+    if (profileImagePath.trim().isNotEmpty) {
+      final trimmed = profileImagePath.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        imageProvider = NetworkImage(trimmed);
+      } else if (trimmed.startsWith('assets/')) {
+        imageProvider = AssetImage(trimmed);
+      } else {
+        imageProvider = FileImage(File(trimmed));
+      }
+    }
 
     return Column(
       children: [
@@ -41,11 +57,14 @@ class ProfileAvatarSection extends StatelessWidget {
                 backgroundColor: colorScheme.primary.withValues(
                   alpha: 0.12,
                 ),
-                child: Icon(
-                  Icons.person_rounded,
-                  color: colorScheme.primary,
-                  size: 68,
-                ),
+                backgroundImage: imageProvider,
+                child: imageProvider == null
+                    ? Icon(
+                        Icons.person_rounded,
+                        color: colorScheme.primary,
+                        size: 68,
+                      )
+                    : null,
               ),
             ),
 

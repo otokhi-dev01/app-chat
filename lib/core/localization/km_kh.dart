@@ -91,6 +91,7 @@ const Map<String, String> kmKH = {
 
   'profile_photo': 'រូបថតប្រវត្តិរូប',
   'change_profile_photo': 'ប្តូររូបថតប្រវត្តិរូប',
+  'view_photo': 'មើលរូបថត',
   'take_photo': 'ថតរូប',
   'choose_from_gallery': 'ជ្រើសរើសពីវិចិត្រសាល',
   'remove_photo': 'លុបរូបថត',

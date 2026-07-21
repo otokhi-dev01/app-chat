@@ -5,6 +5,7 @@ abstract class ChatFolderService {
 
   Future<ChatFolderModel?> createFolder({
     required String name,
+    List<String>? chatIds,
   });
 
   Future<ChatFolderModel?> updateFolder({

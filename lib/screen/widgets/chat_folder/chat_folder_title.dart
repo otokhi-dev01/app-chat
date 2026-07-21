@@ -19,14 +19,8 @@ class ChatFolderTile extends StatelessWidget {
       case ChatFolderType.all:
         return Icons.chat_bubble_outline_rounded;
 
-      case ChatFolderType.unread:
-        return Icons.mark_chat_unread_outlined;
-
       case ChatFolderType.personal:
         return Icons.person_outline_rounded;
-
-      case ChatFolderType.groups:
-        return Icons.groups_outlined;
 
       case ChatFolderType.custom:
         return Icons.folder_outlined;

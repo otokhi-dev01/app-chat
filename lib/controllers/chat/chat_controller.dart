@@ -352,25 +352,11 @@ class ChatController extends GetxController {
       case ChatFolderType.all:
         return result;
 
-      case ChatFolderType.unread:
-        return result.where(
-              (ChatModel chat) {
-            return chat.unread > 0;
-          },
-        ).toList();
-
       case ChatFolderType.personal:
         return result.where(
               (ChatModel chat) {
             return chat.type ==
                 'personal';
-          },
-        ).toList();
-
-      case ChatFolderType.groups:
-        return result.where(
-              (ChatModel chat) {
-            return chat.type == 'group';
           },
         ).toList();
 
@@ -411,25 +397,11 @@ class ChatController extends GetxController {
       case ChatFolderType.all:
         return result;
 
-      case ChatFolderType.unread:
-        return result.where(
-              (ChatModel chat) {
-            return chat.unread > 0;
-          },
-        ).toList();
-
       case ChatFolderType.personal:
         return result.where(
               (ChatModel chat) {
             return chat.type ==
                 'personal';
-          },
-        ).toList();
-
-      case ChatFolderType.groups:
-        return result.where(
-              (ChatModel chat) {
-            return chat.type == 'group';
           },
         ).toList();
 

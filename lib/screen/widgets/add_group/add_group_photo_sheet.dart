@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 Future<void> showAddGroupPhotoSheet({
   required BuildContext context,
   required bool hasPhoto,
+  String? groupImagePath,
   required VoidCallback onGallery,
   required VoidCallback onCamera,
   required VoidCallback onRemove,
@@ -67,6 +70,7 @@ Future<void> showAddGroupPhotoSheet({
                 Container(
                   width: 38,
                   height: 38,
+                  clipBehavior: Clip.antiAlias,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: colorScheme.primary
@@ -76,11 +80,53 @@ Future<void> showAddGroupPhotoSheet({
                     borderRadius:
                     BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    Icons.add_a_photo_outlined,
-                    color: colorScheme.primary,
-                    size: 20,
-                  ),
+                  child: hasPhoto &&
+                          groupImagePath != null &&
+                          groupImagePath.trim().isNotEmpty
+                      ? (groupImagePath.startsWith('http://') ||
+                              groupImagePath.startsWith('https://')
+                          ? Image.network(
+                              groupImagePath.trim(),
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(
+                                Icons.image_not_supported_outlined,
+                                color: colorScheme.primary,
+                                size: 18,
+                              ),
+                            )
+                          : groupImagePath.startsWith('assets/')
+                              ? Image.asset(
+                                  groupImagePath.trim(),
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                    Icons.image_not_supported_outlined,
+                                    color: colorScheme.primary,
+                                    size: 18,
+                                  ),
+                                )
+                              : Image.file(
+                                  File(groupImagePath.trim()),
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                    Icons.image_not_supported_outlined,
+                                    color: colorScheme.primary,
+                                    size: 18,
+                                  ),
+                                ))
+                      : Icon(
+                          Icons.add_a_photo_outlined,
+                          color: colorScheme.primary,
+                          size: 20,
+                        ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
@@ -151,50 +197,41 @@ Future<void> showAddGroupPhotoSheet({
               ],
             ),
             SizedBox(height: 15),
-            Row(
+            Column(
               children: [
-                Expanded(
-                  child: _PhotoOption(
-                    icon:
-                    Icons.photo_library_outlined,
-                    label: 'Gallery',
-                    onTap: () {
-                      _closeAndRun(
-                        context: sheetContext,
-                        action: onGallery,
-                      );
-                    },
-                  ),
+                _PhotoOption(
+                  icon: Icons.photo_library_outlined,
+                  label: 'Gallery',
+                  onTap: () {
+                    _closeAndRun(
+                      context: sheetContext,
+                      action: onGallery,
+                    );
+                  },
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: _PhotoOption(
-                    icon:
-                    Icons.camera_alt_outlined,
-                    label: 'Camera',
-                    onTap: () {
-                      _closeAndRun(
-                        context: sheetContext,
-                        action: onCamera,
-                      );
-                    },
-                  ),
+                SizedBox(height: 10),
+                _PhotoOption(
+                  icon: Icons.camera_alt_outlined,
+                  label: 'Camera',
+                  onTap: () {
+                    _closeAndRun(
+                      context: sheetContext,
+                      action: onCamera,
+                    );
+                  },
                 ),
                 if (hasPhoto) ...[
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: _PhotoOption(
-                      icon:
-                      Icons.delete_outline_rounded,
-                      label: 'Remove',
-                      isDanger: true,
-                      onTap: () {
-                        _closeAndRun(
-                          context: sheetContext,
-                          action: onRemove,
-                        );
-                      },
-                    ),
+                  SizedBox(height: 10),
+                  _PhotoOption(
+                    icon: Icons.delete_outline_rounded,
+                    label: 'Remove',
+                    isDanger: true,
+                    onTap: () {
+                      _closeAndRun(
+                        context: sheetContext,
+                        action: onRemove,
+                      );
+                    },
                   ),
                 ],
               ],
@@ -268,6 +305,10 @@ class _PhotoOption extends StatelessWidget {
 
     Color foregroundColor = isDanger
         ? colorScheme.error
+        : colorScheme.onSurface;
+
+    Color iconColor = isDanger
+        ? colorScheme.error
         : colorScheme.primary;
 
     Color backgroundColor = isDanger
@@ -302,43 +343,50 @@ class _PhotoOption extends StatelessWidget {
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: Container(
-          height: 70,
           padding: EdgeInsets.symmetric(
-            horizontal: 5,
-            vertical: 8,
+            horizontal: 16,
+            vertical: 12,
           ),
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: isDark ? Color(0xFF22242B) : Color(0xFFF5F7FA),
             borderRadius:
             BorderRadius.circular(15),
             border: Border.all(
               color: borderColor,
             ),
           ),
-          child: Column(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+          child: Row(
             children: [
-              Icon(
-                icon,
-                color: foregroundColor,
-                size: 23,
-              ),
-              SizedBox(height: 6),
-              Text(
-                label,
-                maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color: foregroundColor,
-                  fontSize: 10.5,
-                  fontWeight:
-                  FontWeight.w600,
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: foregroundColor,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
+                size: 20,
               ),
             ],
           ),

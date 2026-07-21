@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:appchat/screen/widgets/profile/photo_option_title.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 Future<void> showProfilePhotoSheet({
   required BuildContext context,
+  String? profileImagePath,
+  required VoidCallback onViewPhoto,
   required VoidCallback onTakePhoto,
   required VoidCallback onChooseGallery,
   required VoidCallback onRemovePhoto,
@@ -59,16 +63,55 @@ Future<void> showProfilePhotoSheet({
                     Container(
                       width: 44,
                       height: 44,
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withValues(
                           alpha: 0.12,
                         ),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(
-                        Icons.photo_camera_outlined,
-                        color: colorScheme.primary,
-                      ),
+                      child: profileImagePath != null &&
+                              profileImagePath.trim().isNotEmpty
+                          ? (profileImagePath.startsWith('http://') ||
+                                  profileImagePath.startsWith('https://')
+                              ? Image.network(
+                                  profileImagePath.trim(),
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                    Icons.image_not_supported_outlined,
+                                    color: colorScheme.primary,
+                                  ),
+                                )
+                              : profileImagePath.startsWith('assets/')
+                                  ? Image.asset(
+                                      profileImagePath.trim(),
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Icon(
+                                        Icons.image_not_supported_outlined,
+                                        color: colorScheme.primary,
+                                      ),
+                                    )
+                                  : Image.file(
+                                      File(profileImagePath.trim()),
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Icon(
+                                        Icons.image_not_supported_outlined,
+                                        color: colorScheme.primary,
+                                      ),
+                                    ))
+                          : Icon(
+                              Icons.photo_camera_outlined,
+                              color: colorScheme.primary,
+                            ),
                     ),
 
                     const SizedBox(width: 12),
@@ -96,6 +139,19 @@ Future<void> showProfilePhotoSheet({
 
                 const SizedBox(height: 14),
 
+                if (profileImagePath != null &&
+                    profileImagePath.trim().isNotEmpty) ...[
+                  PhotoOptionTile(
+                    icon: Icons.visibility_outlined,
+                    title: 'view_photo'.tr,
+                    onTap: () {
+                      Navigator.pop(sheetContext);
+                      onViewPhoto();
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+
                 PhotoOptionTile(
                   icon: Icons.camera_alt_outlined,
                   title: 'take_photo'.tr,
@@ -116,17 +172,20 @@ Future<void> showProfilePhotoSheet({
                   },
                 ),
 
-                const SizedBox(height: 8),
+                if (profileImagePath != null &&
+                    profileImagePath.trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
 
-                PhotoOptionTile(
-                  icon: Icons.delete_outline_rounded,
-                  title: 'remove_photo'.tr,
-                  isDanger: true,
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-                    onRemovePhoto();
-                  },
-                ),
+                  PhotoOptionTile(
+                    icon: Icons.delete_outline_rounded,
+                    title: 'remove_photo'.tr,
+                    isDanger: true,
+                    onTap: () {
+                      Navigator.pop(sheetContext);
+                      onRemovePhoto();
+                    },
+                  ),
+                ],
               ],
             ),
           ),

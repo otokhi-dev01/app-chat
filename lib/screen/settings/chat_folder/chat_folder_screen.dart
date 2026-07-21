@@ -22,7 +22,7 @@ class ChatFolderScreen extends StatelessWidget {
       ) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    String? result =
+    ChatFolderFormResult? result =
     await ChatFolderFormSheet.open(
       context: context,
       title: 'Create Folder',
@@ -30,13 +30,14 @@ class ChatFolderScreen extends StatelessWidget {
     );
 
     if (result == null ||
-        result.trim().isEmpty) {
+        result.name.trim().isEmpty) {
       return;
     }
 
     bool created =
     await controller.addFolder(
-      result,
+      result.name,
+      chatIds: result.selectedMemberIds,
     );
 
     if (!context.mounted) {
@@ -80,20 +81,21 @@ class ChatFolderScreen extends StatelessWidget {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    String? result =
+    ChatFolderFormResult? result =
     await ChatFolderFormSheet.open(
       context: context,
       title: 'Edit Folder',
       confirmText: 'Save',
       initialValue: folder.name,
+      initialSelectedMemberIds: folder.chatIds,
     );
 
     if (result == null ||
-        result.trim().isEmpty) {
+        result.name.trim().isEmpty) {
       return;
     }
 
-    String newName = result.trim();
+    String newName = result.name.trim();
 
     if (newName == folder.name.trim()) {
       return;

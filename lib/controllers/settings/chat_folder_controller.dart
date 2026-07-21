@@ -70,8 +70,9 @@ class ChatFolderController
   }
 
   Future<bool> addFolder(
-      String name,
-      ) async {
+    String name, {
+    List<String>? chatIds,
+  }) async {
     String cleanName = name.trim();
 
     if (cleanName.isEmpty ||
@@ -86,6 +87,7 @@ class ChatFolderController
       ChatFolderModel? folder =
       await folderService.createFolder(
         name: cleanName,
+        chatIds: chatIds,
       );
 
       if (folder == null) {
