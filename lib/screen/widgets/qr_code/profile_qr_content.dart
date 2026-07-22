@@ -1,10 +1,10 @@
+import 'package:appchat/screen/widgets/qr_code/profile_qr_action_button.dart';
 import 'package:flutter/material.dart';
 
 import 'profile_qr_card.dart';
 import 'profile_qr_info_card.dart';
 
-class ProfileQrContent
-    extends StatelessWidget {
+class ProfileQrContent extends StatelessWidget {
   final String name;
   final String username;
   final String qrData;
@@ -12,6 +12,7 @@ class ProfileQrContent
   final bool hasUsername;
   final VoidCallback onCopy;
   final Future<void> Function() onDownload;
+  final ScrollController? scrollController;
 
   ProfileQrContent({
     super.key,
@@ -22,270 +23,100 @@ class ProfileQrContent
     required this.hasUsername,
     required this.onCopy,
     required this.onDownload,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
 
-    return SafeArea(
-      top: false,
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color pageColor = isDark
+        ? Color(0xFF131519)
+        : Color(0xFFF6F7F9);
+
+    return ColoredBox(
+      color: pageColor,
       child: ListView(
+        controller: scrollController,
+        primary: scrollController == null,
+        shrinkWrap: scrollController == null,
         keyboardDismissBehavior:
-        ScrollViewKeyboardDismissBehavior
-            .onDrag,
+        ScrollViewKeyboardDismissBehavior.onDrag,
         physics: BouncingScrollPhysics(
-          parent:
-          AlwaysScrollableScrollPhysics(),
+          parent: AlwaysScrollableScrollPhysics(),
         ),
         padding: EdgeInsets.fromLTRB(
+          16,
           18,
-          24,
-          18,
-          30,
+          16,
+          32,
         ),
         children: [
-          Text(
-            'Share your profile',
-            textAlign: TextAlign.center,
-            style: theme
-                .textTheme.headlineSmall
-                ?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 7),
-          Text(
-            'Let someone scan this QR code to find your AppChat profile.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(
-              color:
-              colorScheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-          SizedBox(height: 24),
           ProfileQrCard(
             name: name,
             username: username,
             qrData: qrData,
             firstLetter: firstLetter,
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 24),
+          _QrSectionTitle(
+            title: 'Quick Actions',
+          ),
+          SizedBox(height: 10),
           Row(
             children: [
               Expanded(
-                child: _CopyProfileButton(
+                child: CopyProfileButton(
                   hasUsername: hasUsername,
                   onPressed: onCopy,
                 ),
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 9),
               Expanded(
-                child: _SaveQrButton(
+                child: SaveQrButton(
                   onDownload: onDownload,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 24),
+          _QrSectionTitle(
+            title: 'Security',
+          ),
+          SizedBox(height: 10),
           ProfileQrInfoCard(),
+          SizedBox(height: 24),
         ],
       ),
     );
   }
 }
 
-class _CopyProfileButton
-    extends StatelessWidget {
-  final bool hasUsername;
-  final VoidCallback onPressed;
+class _QrSectionTitle extends StatelessWidget {
+  final String title;
 
-  _CopyProfileButton({
-    required this.hasUsername,
-    required this.onPressed,
+  _QrSectionTitle({
+    required this.title,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        minimumSize: Size(
-          double.infinity,
-          52,
-        ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 12,
-        ),
-        backgroundColor:
-        colorScheme.primary,
-        foregroundColor:
-        colorScheme.onPrimary,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius:
-          BorderRadius.circular(16),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment:
-        MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.copy_rounded,
-            size: 19,
-          ),
-          SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              hasUsername
-                  ? 'Copy Username'
-                  : 'Copy Link',
-              maxLines: 1,
-              overflow:
-              TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SaveQrButton extends StatefulWidget {
-  final Future<void> Function() onDownload;
-
-  _SaveQrButton({
-    required this.onDownload,
-  });
-
-  @override
-  State<_SaveQrButton> createState() {
-    return _SaveQrButtonState();
-  }
-}
-
-class _SaveQrButtonState
-    extends State<_SaveQrButton> {
-  bool _isSaving = false;
-
-  Future<void> _handleSave() async {
-    if (_isSaving) {
-      return;
-    }
-
-    setState(() {
-      _isSaving = true;
-    });
-
-    try {
-      await widget.onDownload();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color buttonColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : colorScheme.primary.withValues(
-      alpha: 0.08,
-    );
-
-    Color borderColor =
-    colorScheme.primary.withValues(
-      alpha: isDark ? 0.22 : 0.18,
-    );
-
-    return Material(
-      color: buttonColor,
-      borderRadius:
-      BorderRadius.circular(16),
-      child: InkWell(
-        onTap:
-        _isSaving ? null : _handleSave,
-        borderRadius:
-        BorderRadius.circular(16),
-        child: Container(
-          width: double.infinity,
-          height: 52,
-          padding: EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
-          decoration: BoxDecoration(
-            borderRadius:
-            BorderRadius.circular(16),
-            border: Border.all(
-              color: borderColor,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-            children: [
-              if (_isSaving)
-                SizedBox(
-                  width: 18,
-                  height: 18,
-                  child:
-                  CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color:
-                    colorScheme.primary,
-                  ),
-                )
-              else
-                Icon(
-                  Icons.download_rounded,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
-              SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  _isSaving
-                      ? 'Saving...'
-                      : 'Save QR',
-                  maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                    colorScheme.primary,
-                    fontSize: 12,
-                    fontWeight:
-                    FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 3,
+      ),
+      child: Text(
+        title,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: colorScheme.onSurface,
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

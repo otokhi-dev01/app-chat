@@ -82,7 +82,7 @@ class AboutHeader extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            'AppChat',
+            'PiisiitChat',
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               color: colorScheme.onSurface,
@@ -172,7 +172,7 @@ class AboutFooter extends StatelessWidget {
         ),
         SizedBox(height: 4),
         Text(
-          '© 2026 AppChat',
+          '© 2026 PiisiitChat',
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant.withValues(
               alpha: 0.70,

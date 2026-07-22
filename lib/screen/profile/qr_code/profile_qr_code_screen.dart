@@ -37,9 +37,7 @@ class ProfileQrCodeScreen
   }
 
   String get cleanUsername {
-    return username
-        .trim()
-        .replaceFirst(
+    return username.trim().replaceFirst(
       '@',
       '',
     );
@@ -197,31 +195,42 @@ class ProfileQrCodeScreen
     required IconData icon,
     bool isError = false,
   }) {
+    ThemeData theme =
+    Theme.of(context);
+
     ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+        theme.colorScheme;
+
+    Color backgroundColor = isError
+        ? colorScheme.error
+        : colorScheme.primary;
+
+    Color foregroundColor = isError
+        ? colorScheme.onError
+        : colorScheme.onPrimary;
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          backgroundColor: isError
-              ? colorScheme.error
-              : null,
+          backgroundColor:
+          backgroundColor,
           content: Row(
             children: [
               Icon(
                 icon,
-                color: isError
-                    ? colorScheme.onError
-                    : Colors.white,
+                color: foregroundColor,
                 size: 21,
               ),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
                   message,
-                  style: TextStyle(
-                    color: Colors.white,
+                  style: theme
+                      .textTheme.bodyMedium
+                      ?.copyWith(
+                    color: foregroundColor,
+                    fontSize: 13,
                     fontWeight:
                     FontWeight.w600,
                   ),
@@ -253,7 +262,9 @@ class ProfileQrCodeScreen
       appBar: ProfileQrAppBar(
         onBack: _closeScreen,
         onScan: () {
-          _openScanner(context);
+          _openScanner(
+            context,
+          );
         },
       ),
       body: ProfileQrContent(
@@ -264,7 +275,9 @@ class ProfileQrCodeScreen
         hasUsername:
         cleanUsername.isNotEmpty,
         onCopy: () {
-          _copyProfileValue(context);
+          _copyProfileValue(
+            context,
+          );
         },
         onDownload: () {
           return _downloadQrCode(

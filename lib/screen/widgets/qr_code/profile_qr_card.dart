@@ -1,5 +1,9 @@
+import 'package:appchat/screen/widgets/qr_code/qr_design_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
+import '../../../controllers/qr_code/qr_design_controller.dart';
 
 class ProfileQrCard
     extends StatelessWidget {
@@ -15,6 +19,14 @@ class ProfileQrCard
     required this.qrData,
     required this.firstLetter,
   });
+
+  QrDesignController get _designController {
+    if (!Get.isRegistered<QrDesignController>()) {
+      Get.put(QrDesignController(), permanent: true);
+    }
+
+    return Get.find<QrDesignController>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +48,9 @@ class ProfileQrCard
         : Colors.black.withValues(
       alpha: 0.06,
     );
+
+    QrDesignController designController =
+        _designController;
 
     return Container(
       width: double.infinity,
@@ -68,8 +83,24 @@ class ProfileQrCard
       ),
       child: Column(
         children: [
-          _ProfileQrAvatar(
-            firstLetter: firstLetter,
+          Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: _ProfileQrAvatar(
+                  firstLetter: firstLetter,
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: _CustomizeButton(
+                  onTap: () {
+                    showQrDesignSheet(context);
+                  },
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 12),
           Text(
@@ -115,9 +146,19 @@ class ProfileQrCard
               )
                   .toDouble();
 
-              return _ProfileQrImage(
-                qrData: qrData,
-                size: qrSize,
+              return Obx(
+                    () => _ProfileQrImage(
+                  qrData: qrData,
+                  size: qrSize,
+                  moduleShape: designController
+                      .moduleShape.value,
+                  eyeShape:
+                  designController.eyeShape.value,
+                  foregroundColor: designController
+                      .qrColor.value,
+                  backgroundColor: designController
+                      .qrBackground.value,
+                ),
               );
             },
           ),
@@ -150,6 +191,40 @@ class ProfileQrCard
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CustomizeButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  _CustomizeButton({
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.primary.withValues(
+        alpha: 0.10,
+      ),
+      shape: CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: CircleBorder(),
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(
+            Icons.palette_outlined,
+            size: 18,
+            color: colorScheme.primary,
+          ),
+        ),
       ),
     );
   }
@@ -202,10 +277,18 @@ class _ProfileQrImage
     extends StatelessWidget {
   final String qrData;
   final double size;
+  final QrDataModuleShape moduleShape;
+  final QrEyeShape eyeShape;
+  final Color foregroundColor;
+  final Color backgroundColor;
 
   _ProfileQrImage({
     required this.qrData,
     required this.size,
+    required this.moduleShape,
+    required this.eyeShape,
+    required this.foregroundColor,
+    required this.backgroundColor,
   });
 
   @override
@@ -213,10 +296,11 @@ class _ProfileQrImage
     ColorScheme colorScheme =
         Theme.of(context).colorScheme;
 
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 220),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
         borderRadius:
         BorderRadius.circular(24),
         border: Border.all(
@@ -242,16 +326,15 @@ class _ProfileQrImage
         version: QrVersions.auto,
         size: size,
         padding: EdgeInsets.all(8),
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
         eyeStyle: QrEyeStyle(
-          eyeShape: QrEyeShape.square,
-          color: Colors.black,
+          eyeShape: eyeShape,
+          color: foregroundColor,
         ),
         dataModuleStyle:
         QrDataModuleStyle(
-          dataModuleShape:
-          QrDataModuleShape.square,
-          color: Colors.black,
+          dataModuleShape: moduleShape,
+          color: foregroundColor,
         ),
         errorStateBuilder: (
             BuildContext context,

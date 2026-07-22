@@ -49,7 +49,8 @@ class ProfileQrAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    ColorScheme colorScheme =
+        theme.colorScheme;
 
     bool isDark =
         theme.brightness == Brightness.dark;
@@ -82,7 +83,8 @@ class ProfileQrAppBar extends StatelessWidget
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: Colors.transparent,
-      foregroundColor: colorScheme.onSurface,
+      foregroundColor:
+      colorScheme.onSurface,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
@@ -120,10 +122,12 @@ class ProfileQrAppBar extends StatelessWidget
         ),
         child: _ProfileQrAppBarButton(
           tooltip: 'Back',
-          backgroundColor: actionBackground,
-          icon:
-          Icons.arrow_back_ios_new_rounded,
-          iconColor: colorScheme.onSurface,
+          backgroundColor:
+          actionBackground,
+          icon: Icons
+              .arrow_back_ios_new_rounded,
+          iconColor:
+          colorScheme.onSurface,
           onTap: onBack,
         ),
       ),
@@ -135,25 +139,32 @@ class ProfileQrAppBar extends StatelessWidget
           Text(
             'My QR Code',
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleMedium
+            overflow:
+            TextOverflow.ellipsis,
+            style: theme
+                .textTheme.titleMedium
                 ?.copyWith(
-              color: colorScheme.onSurface,
+              color:
+              colorScheme.onSurface,
               fontSize: 17,
-              fontWeight: FontWeight.w700,
+              fontWeight:
+              FontWeight.w700,
             ),
           ),
           SizedBox(height: 2),
           Text(
             'Share or scan a profile',
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall
+            overflow:
+            TextOverflow.ellipsis,
+            style: theme
+                .textTheme.bodySmall
                 ?.copyWith(
-              color:
-              colorScheme.onSurfaceVariant,
+              color: colorScheme
+                  .onSurfaceVariant,
               fontSize: 11,
-              fontWeight: FontWeight.w500,
+              fontWeight:
+              FontWeight.w500,
             ),
           ),
         ],
@@ -167,14 +178,17 @@ class ProfileQrAppBar extends StatelessWidget
             13,
           ),
           child: _ProfileQrAppBarButton(
-            tooltip: 'Scan contact QR code',
+            tooltip:
+            'Scan contact QR code',
             backgroundColor:
-            colorScheme.primary.withValues(
+            colorScheme.primary
+                .withValues(
               alpha: 0.12,
             ),
-            icon:
-            Icons.qr_code_scanner_rounded,
-            iconColor: colorScheme.primary,
+            icon: Icons
+                .qr_code_scanner_rounded,
+            iconColor:
+            colorScheme.primary,
             onTap: onScan,
           ),
         ),
@@ -209,6 +223,14 @@ class _ProfileQrAppBarButton
         child: InkWell(
           onTap: onTap,
           customBorder: CircleBorder(),
+          splashColor:
+          Colors.transparent,
+          highlightColor:
+          Colors.transparent,
+          hoverColor:
+          Colors.transparent,
+          focusColor:
+          Colors.transparent,
           child: SizedBox(
             width: 38,
             height: 38,
