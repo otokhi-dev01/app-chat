@@ -40,8 +40,7 @@ class DeviceController extends GetxController {
     return sessions[index];
   }
 
-  List<DeviceSessionModel>
-  get otherSessions {
+  List<DeviceSessionModel> get otherSessions {
     return sessions.where(
           (DeviceSessionModel session) {
         return !session.isCurrent;
@@ -89,32 +88,21 @@ class DeviceController extends GetxController {
       return;
     }
 
-    bool confirmed =
-    await _showConfirmationDialog(
-      title: 'Terminate session?',
-      message:
-      '${session.deviceName} will be logged out from your account.',
-      confirmText: 'Terminate',
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     try {
       errorMessage.value = '';
 
       List<DeviceSessionModel> result =
-      await deviceService
-          .terminateSession(
+      await deviceService.terminateSession(
         session.id,
       );
 
       sessions.assignAll(result);
 
       Get.snackbar(
-        'Session terminated',
-        '${session.deviceName} was logged out.',
+        'session_terminated'.tr,
+        'device_logged_out'.trParams({
+          'device': session.deviceName,
+        }),
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.all(16),
         borderRadius: 16,
@@ -127,31 +115,21 @@ class DeviceController extends GetxController {
           _cleanErrorMessage(error);
 
       Get.snackbar(
-        'Unable to terminate session',
+        'unable_to_terminate_session'.tr,
         errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.all(16),
         borderRadius: 16,
+        icon: Icon(
+          Icons.error_outline_rounded,
+        ),
       );
     }
   }
 
-  Future<void>
-  terminateAllOtherSessions() async {
+  Future<void> terminateAllOtherSessions() async {
     if (otherSessions.isEmpty ||
         isTerminatingAll.value) {
-      return;
-    }
-
-    bool confirmed =
-    await _showConfirmationDialog(
-      title: 'Terminate all sessions?',
-      message:
-      'All devices except this device will be logged out.',
-      confirmText: 'Terminate all',
-    );
-
-    if (!confirmed) {
       return;
     }
 
@@ -166,8 +144,8 @@ class DeviceController extends GetxController {
       sessions.assignAll(result);
 
       Get.snackbar(
-        'Sessions terminated',
-        'All other devices were logged out.',
+        'sessions_terminated'.tr,
+        'all_other_devices_logged_out'.tr,
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.all(16),
         borderRadius: 16,
@@ -180,11 +158,14 @@ class DeviceController extends GetxController {
           _cleanErrorMessage(error);
 
       Get.snackbar(
-        'Unable to terminate sessions',
+        'unable_to_terminate_sessions'.tr,
         errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.all(16),
         borderRadius: 16,
+        icon: Icon(
+          Icons.error_outline_rounded,
+        ),
       );
     } finally {
       isTerminatingAll.value = false;
@@ -201,8 +182,7 @@ class DeviceController extends GetxController {
       errorMessage.value = '';
 
       List<DeviceSessionModel> result =
-      await deviceService
-          .resetSessions();
+      await deviceService.resetSessions();
 
       sessions.assignAll(result);
     } catch (error) {
@@ -211,140 +191,6 @@ class DeviceController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  Future<bool> _showConfirmationDialog({
-    required String title,
-    required String message,
-    required String confirmText,
-  }) async {
-    BuildContext? context = Get.context;
-
-    if (context == null) {
-      return false;
-    }
-
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
-    bool? result = await Get.dialog<bool>(
-      AlertDialog(
-        backgroundColor: cardColor,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius:
-          BorderRadius.circular(22),
-        ),
-        titlePadding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          8,
-        ),
-        contentPadding: EdgeInsets.fromLTRB(
-          20,
-          0,
-          20,
-          16,
-        ),
-        actionsPadding: EdgeInsets.fromLTRB(
-          16,
-          0,
-          16,
-          16,
-        ),
-        title: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colorScheme.error
-                    .withValues(
-                  alpha: 0.10,
-                ),
-                borderRadius:
-                BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Icons.logout_rounded,
-                color: colorScheme.error,
-                size: 21,
-              ),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: theme
-                    .textTheme.titleMedium
-                    ?.copyWith(
-                  color:
-                  colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight:
-                  FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          message,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(
-            color:
-            colorScheme.onSurfaceVariant,
-            fontSize: 13,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back(
-                result: false,
-              );
-            },
-            child: Text(
-              'Cancel',
-            ),
-          ),
-          FilledButton(
-            onPressed: () {
-              Get.back(
-                result: true,
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor:
-              colorScheme.error,
-              foregroundColor:
-              colorScheme.onError,
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(13),
-              ),
-            ),
-            child: Text(
-              confirmText,
-            ),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
-
-    return result == true;
   }
 
   String _cleanErrorMessage(

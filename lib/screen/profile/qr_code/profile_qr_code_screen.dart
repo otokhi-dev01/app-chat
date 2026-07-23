@@ -30,7 +30,7 @@ class ProfileQrCodeScreen
     String value = name.trim();
 
     if (value.isEmpty) {
-      return 'AppChat User';
+      return 'appchat_user'.tr;
     }
 
     return value;
@@ -45,7 +45,7 @@ class ProfileQrCodeScreen
 
   String get displayUsername {
     if (cleanUsername.isEmpty) {
-      return 'No username';
+      return 'no_username'.tr;
     }
 
     return '@$cleanUsername';
@@ -107,9 +107,11 @@ class ProfileQrCodeScreen
 
     if (result is ContactModel) {
       _showMessage(
-        context: context,
-        message:
-        '${result.name} was added to your contacts.',
+        title: 'contact_added'.tr,
+        message: 'contact_added_message'
+            .trParams({
+          'name': result.name,
+        }),
         icon:
         Icons.person_add_alt_1_rounded,
       );
@@ -133,9 +135,9 @@ class ProfileQrCodeScreen
       }
 
       _showMessage(
-        context: context,
+        title: 'qr_code_saved'.tr,
         message:
-        'QR code saved to Photos.',
+        'qr_code_saved_to_photos'.tr,
         icon:
         Icons.download_done_rounded,
       );
@@ -144,30 +146,19 @@ class ProfileQrCodeScreen
         return;
       }
 
-      String message = error
-          .toString()
-          .replaceFirst(
-        'Bad state: ',
-        '',
-      )
-          .replaceFirst(
-        'Exception: ',
-        '',
-      );
-
       _showMessage(
-        context: context,
-        message: message,
+        title:
+        'unable_to_save_qr_code'.tr,
+        message: _cleanErrorMessage(
+          error,
+        ),
         icon:
         Icons.error_outline_rounded,
-        isError: true,
       );
     }
   }
 
-  void _copyProfileValue(
-      BuildContext context,
-      ) {
+  void _copyProfileValue() {
     String value =
     cleanUsername.isNotEmpty
         ? '@$cleanUsername'
@@ -179,82 +170,72 @@ class ProfileQrCodeScreen
       ),
     );
 
+    if (cleanUsername.isNotEmpty) {
+      _showMessage(
+        title: 'username_copied'.tr,
+        message:
+        'username_copied_to_clipboard'
+            .tr,
+        icon: Icons.copy_rounded,
+      );
+
+      return;
+    }
+
     _showMessage(
-      context: context,
+      title: 'profile_link_copied'.tr,
       message:
-      cleanUsername.isNotEmpty
-          ? 'Username copied.'
-          : 'Profile link copied.',
+      'profile_link_copied_to_clipboard'
+          .tr,
       icon: Icons.copy_rounded,
     );
   }
 
   void _showMessage({
-    required BuildContext context,
+    required String title,
     required String message,
     required IconData icon,
-    bool isError = false,
   }) {
-    ThemeData theme =
-    Theme.of(context);
+    Get.closeAllSnackbars();
 
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    Get.snackbar(
+      title,
+      message,
+      snackPosition:
+      SnackPosition.BOTTOM,
+      margin: EdgeInsets.all(16),
+      borderRadius: 16,
+      icon: Icon(
+        icon,
+      ),
+      duration: Duration(
+        seconds: 3,
+      ),
+      isDismissible: true,
+      dismissDirection:
+      DismissDirection.horizontal,
+    );
+  }
 
-    Color backgroundColor = isError
-        ? colorScheme.error
-        : colorScheme.primary;
-
-    Color foregroundColor = isError
-        ? colorScheme.onError
-        : colorScheme.onPrimary;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          backgroundColor:
-          backgroundColor,
-          content: Row(
-            children: [
-              Icon(
-                icon,
-                color: foregroundColor,
-                size: 21,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: theme
-                      .textTheme.bodyMedium
-                      ?.copyWith(
-                    color: foregroundColor,
-                    fontSize: 13,
-                    fontWeight:
-                    FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          behavior:
-          SnackBarBehavior.floating,
-          margin: EdgeInsets.all(14),
-          shape:
-          RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(
-              14,
-            ),
-          ),
-        ),
-      );
+  String _cleanErrorMessage(
+      Object error,
+      ) {
+    return error
+        .toString()
+        .replaceFirst(
+      'Bad state: ',
+      '',
+    )
+        .replaceFirst(
+      'Exception: ',
+      '',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    ThemeData theme =
+    Theme.of(context);
 
     return Scaffold(
       backgroundColor:
@@ -274,11 +255,7 @@ class ProfileQrCodeScreen
         firstLetter: firstLetter,
         hasUsername:
         cleanUsername.isNotEmpty,
-        onCopy: () {
-          _copyProfileValue(
-            context,
-          );
-        },
+        onCopy: _copyProfileValue,
         onDownload: () {
           return _downloadQrCode(
             context,

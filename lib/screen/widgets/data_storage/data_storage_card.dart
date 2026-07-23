@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class DataStorageCard extends StatelessWidget {
   final List<Widget> children;
@@ -160,25 +161,30 @@ class DataStorageSummaryCard extends StatelessWidget {
               size: 28,
             ),
           ),
+
           SizedBox(width: 14),
+
           Expanded(
             child: Row(
               children: [
                 Expanded(
                   child: _SummaryValue(
-                    label: 'Cache',
+                    label: 'cache'.tr,
                     value: cacheSize,
                   ),
                 ),
+
                 Container(
                   width: 1,
                   height: 38,
                   color: borderColor,
                 ),
+
                 SizedBox(width: 14),
+
                 Expanded(
                   child: _SummaryValue(
-                    label: 'Network',
+                    label: 'network'.tr,
                     value: networkUsage,
                   ),
                 ),
@@ -217,7 +223,9 @@ class _SummaryValue extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
+
         SizedBox(height: 3),
+
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -260,10 +268,12 @@ class DataStorageInformationCard extends StatelessWidget {
             color: colorScheme.primary,
             size: 20,
           ),
+
           SizedBox(width: 10),
+
           Expanded(
             child: Text(
-              'Clearing the cache removes temporary files but does not delete your chats or saved messages.',
+              'clear_cache_information'.tr,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 11,

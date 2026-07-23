@@ -13,10 +13,8 @@ class AddGroupScreen extends StatelessWidget {
     super.key,
     AddGroupController? controller,
   }) : controller = controller ??
-      (Get.isRegistered<
-          AddGroupController>()
-          ? Get.find<
-          AddGroupController>()
+      (Get.isRegistered<AddGroupController>()
+          ? Get.find<AddGroupController>()
           : Get.put(
         AddGroupController(),
       ));
@@ -24,8 +22,7 @@ class AddGroupScreen extends StatelessWidget {
   Future<void> _createGroup(
       BuildContext context,
       ) async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     bool created =
     await controller.createGroup();
@@ -36,10 +33,8 @@ class AddGroupScreen extends StatelessWidget {
 
     if (!created) {
       _showMessage(
-        context: context,
-        message:
-        controller.errorMessage.value,
-        isError: true,
+        message: controller.errorMessage.value,
+        icon: Icons.error_outline_rounded,
       );
 
       return;
@@ -72,63 +67,27 @@ class AddGroupScreen extends StatelessWidget {
   }
 
   void _showMessage({
-    required BuildContext context,
     required String message,
-    bool isError = false,
+    required IconData icon,
   }) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    Get.closeAllSnackbars();
 
-    Color backgroundColor = isError
-        ? colorScheme.error
-        : colorScheme.primary;
-
-    Color foregroundColor = isError
-        ? colorScheme.onError
-        : colorScheme.onPrimary;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          behavior:
-          SnackBarBehavior.floating,
-          backgroundColor:
-          backgroundColor,
-          margin: EdgeInsets.all(14),
-          duration: Duration(
-            milliseconds: 1800,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(14),
-          ),
-          content: Row(
-            children: [
-              Icon(
-                isError
-                    ? Icons
-                    .error_outline_rounded
-                    : Icons
-                    .check_circle_outline_rounded,
-                color: foregroundColor,
-                size: 20,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight:
-                    FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+    Get.snackbar(
+      'unable_to_create_group'.tr,
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: EdgeInsets.all(16),
+      borderRadius: 16,
+      icon: Icon(
+        icon,
+      ),
+      duration: Duration(
+        seconds: 3,
+      ),
+      isDismissible: true,
+      dismissDirection:
+      DismissDirection.horizontal,
+    );
   }
 
   @override
@@ -137,7 +96,6 @@ class AddGroupScreen extends StatelessWidget {
     Theme.of(context);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor:
       theme.scaffoldBackgroundColor,
       appBar: PreferredSize(

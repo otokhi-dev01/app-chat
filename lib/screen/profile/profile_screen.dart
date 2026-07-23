@@ -1,5 +1,4 @@
 import 'package:appchat/screen/profile/post/add_post_camera_screen.dart';
-import 'package:appchat/screen/profile/post/add_post_screen.dart';
 import 'package:appchat/screen/profile/qr_code/profile_qr_code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,10 +10,10 @@ import '../../data/mock_profile_story_post_data.dart';
 import '../../models/add_post_capture_result.dart';
 import '../../models/profile_story_post_model.dart';
 import '../../route/app_route.dart';
+import '../widgets/settings/account_screen.dart';
 import '../widgets/story/profile_add_post_button.dart';
 import '../widgets/story/profile_post_viewer_screen.dart';
 import '../widgets/story/profile_story_post_section.dart';
-import '../widgets/settings/account_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({
@@ -30,10 +29,12 @@ class ProfileScreen extends StatelessWidget {
       return '?';
     }
 
-    return value.substring(
+    return value
+        .substring(
       0,
       1,
-    ).toUpperCase();
+    )
+        .toUpperCase();
   }
 
   void _openEditProfile() {
@@ -45,16 +46,15 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _copyUsername(
-      BuildContext context,
       String username,
       ) {
     String value = username.trim();
 
     if (value.isEmpty) {
       _showMessage(
-        context: context,
-        message: 'Username is unavailable',
-        isError: true,
+        title: 'username_unavailable_title'.tr,
+        message: 'username_unavailable_message'.tr,
+        icon: Icons.error_outline_rounded,
       );
 
       return;
@@ -67,57 +67,34 @@ class ProfileScreen extends StatelessWidget {
     );
 
     _showMessage(
-      context: context,
-      message: 'Username copied to clipboard',
+      title: 'username_copied'.tr,
+      message: 'username_copied_to_clipboard'.tr,
+      icon: Icons.check_circle_outline_rounded,
     );
   }
 
   void _showMessage({
-    required BuildContext context,
+    required String title,
     required String message,
-    bool isError = false,
+    required IconData icon,
   }) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    Get.closeAllSnackbars();
 
-    Color backgroundColor = isError
-        ? colorScheme.error
-        : colorScheme.primary;
-
-    Color foregroundColor = isError
-        ? colorScheme.onError
-        : colorScheme.onPrimary;
-
-    Get.rawSnackbar(
-      messageText: Row(
-        children: [
-          Icon(
-            isError
-                ? Icons.error_outline_rounded
-                : Icons.check_circle_outline_rounded,
-            color: foregroundColor,
-            size: 20,
-          ),
-          SizedBox(width: 9),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                color: foregroundColor,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: backgroundColor,
-      borderRadius: 14,
-      margin: EdgeInsets.all(14),
+    Get.snackbar(
+      title,
+      message,
       snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(
-        milliseconds: 1500,
+      margin: EdgeInsets.all(16),
+      borderRadius: 16,
+      icon: Icon(
+        icon,
       ),
+      duration: Duration(
+        seconds: 3,
+      ),
+      isDismissible: true,
+      dismissDirection:
+      DismissDirection.horizontal,
     );
   }
 
@@ -142,8 +119,7 @@ class ProfileScreen extends StatelessWidget {
   void _openPost(
       ProfilePostItem post,
       ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     Get.to(
           () => ProfilePostViewerScreen(
@@ -157,8 +133,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _addNewPost() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     AddPostCaptureResult? result =
     await Get.to<AddPostCaptureResult>(
@@ -195,14 +170,12 @@ class ProfileScreen extends StatelessWidget {
     // Open your caption/publish screen here.
   }
 
-
   @override
   Widget build(BuildContext context) {
     SettingsController controller =
     Get.find<SettingsController>();
 
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     bool isDark =
         theme.brightness == Brightness.dark;
@@ -263,7 +236,6 @@ class ProfileScreen extends StatelessWidget {
                       onEdit: _openEditProfile,
                       onCopyUsername: () {
                         _copyUsername(
-                          context,
                           username,
                         );
                       },
@@ -274,11 +246,15 @@ class ProfileScreen extends StatelessWidget {
                         );
                       },
                     ),
+
                     SizedBox(height: 22),
+
                     AccountSettingsSection(
                       controller: controller,
                     ),
+
                     SizedBox(height: 22),
+
                     ProfileStoryPostSection(
                       posts:
                       MockProfileStoryPostData
@@ -338,8 +314,7 @@ class _ProfileHeaderCard
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     ColorScheme colorScheme =
         theme.colorScheme;
@@ -409,6 +384,7 @@ class _ProfileHeaderCard
                   ),
                 ),
               ),
+
               Positioned(
                 right: -2,
                 bottom: 2,
@@ -441,7 +417,7 @@ class _ProfileHeaderCard
 
           Text(
             name.isEmpty
-                ? 'Your Name'
+                ? 'your_name'.tr
                 : name,
             maxLines: 1,
             overflow:
@@ -462,7 +438,7 @@ class _ProfileHeaderCard
 
           Text(
             email.isEmpty
-                ? 'No email address'
+                ? 'no_email_address'.tr
                 : email,
             maxLines: 1,
             overflow:
@@ -486,25 +462,29 @@ class _ProfileHeaderCard
               Expanded(
                 child: _ProfileActionButton(
                   icon: Icons.edit_rounded,
-                  label: 'Edit',
+                  label: 'edit'.tr,
                   onTap: onEdit,
                 ),
               ),
+
               SizedBox(width: 10),
+
               Expanded(
                 child: _ProfileActionButton(
                   icon: Icons
                       .alternate_email_rounded,
-                  label: 'Username',
+                  label: 'username'.tr,
                   onTap: onCopyUsername,
                 ),
               ),
+
               SizedBox(width: 10),
+
               Expanded(
                 child: _ProfileActionButton(
                   icon:
                   Icons.qr_code_rounded,
-                  label: 'QR Code',
+                  label: 'qr_code'.tr,
                   onTap: onQrCode,
                 ),
               ),
@@ -530,8 +510,7 @@ class _ProfileActionButton
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     ColorScheme colorScheme =
         theme.colorScheme;
@@ -579,7 +558,9 @@ class _ProfileActionButton
               color: colorScheme.primary,
               size: 22,
             ),
+
             SizedBox(height: 7),
+
             Text(
               label,
               maxLines: 1,

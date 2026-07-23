@@ -129,26 +129,30 @@ class AddGroupAppBar extends StatelessWidget
         child: Material(
           color: actionBackground,
           shape: CircleBorder(),
-          child: InkWell(
-            onTap: () {
-              FocusManager.instance.primaryFocus
-                  ?.unfocus();
+          child: Tooltip(
+            message: 'back'.tr,
+            child: InkWell(
+              onTap: () {
+                FocusManager
+                    .instance.primaryFocus
+                    ?.unfocus();
 
-              Get.back();
-            },
-            customBorder: CircleBorder(),
-            splashColor: Colors.transparent,
-            highlightColor:
-            Colors.transparent,
-            child: SizedBox(
-              width: 38,
-              height: 38,
-              child: Icon(
-                Icons
-                    .arrow_back_ios_new_rounded,
-                color:
-                colorScheme.onSurface,
-                size: 17,
+                Get.back();
+              },
+              customBorder: CircleBorder(),
+              splashColor: Colors.transparent,
+              highlightColor:
+              Colors.transparent,
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: Icon(
+                  Icons
+                      .arrow_back_ios_new_rounded,
+                  color:
+                  colorScheme.onSurface,
+                  size: 17,
+                ),
               ),
             ),
           ),
@@ -160,11 +164,12 @@ class AddGroupAppBar extends StatelessWidget
         CrossAxisAlignment.start,
         children: [
           Text(
-            'New Group',
+            'new_group'.tr,
             maxLines: 1,
             overflow:
             TextOverflow.ellipsis,
-            style: theme.textTheme.titleMedium
+            style: theme
+                .textTheme.titleMedium
                 ?.copyWith(
               color:
               colorScheme.onSurface,
@@ -175,11 +180,12 @@ class AddGroupAppBar extends StatelessWidget
           ),
           SizedBox(height: 2),
           Text(
-            'Add a name and choose members',
+            'new_group_subtitle'.tr,
             maxLines: 1,
             overflow:
             TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall
+            style: theme
+                .textTheme.bodySmall
                 ?.copyWith(
               color: colorScheme
                   .onSurfaceVariant,
@@ -201,7 +207,8 @@ class AddGroupAppBar extends StatelessWidget
               canCreate && !isCreating
                   ? onCreate
                   : null,
-              style: FilledButton.styleFrom(
+              style:
+              FilledButton.styleFrom(
                 minimumSize: Size(
                   72,
                   38,
@@ -230,7 +237,7 @@ class AddGroupAppBar extends StatelessWidget
                 ),
               )
                   : Text(
-                'Create',
+                'create'.tr,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight:

@@ -139,7 +139,7 @@ class DataStorageAppBar extends StatelessWidget
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Data and Storage',
+            'data_storage'.tr,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -150,7 +150,7 @@ class DataStorageAppBar extends StatelessWidget
           ),
           SizedBox(height: 2),
           Text(
-            'Manage storage, downloads and data usage',
+            'manage_storage_downloads_data'.tr,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall?.copyWith(

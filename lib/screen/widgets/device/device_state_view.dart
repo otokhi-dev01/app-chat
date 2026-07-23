@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class DevicesLoadingView
-    extends StatelessWidget {
+class DevicesLoadingView extends StatelessWidget {
   DevicesLoadingView({
     super.key,
   });
@@ -20,8 +20,7 @@ class DevicesLoadingView
   }
 }
 
-class DevicesErrorView
-    extends StatelessWidget {
+class DevicesErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
@@ -35,6 +34,7 @@ class DevicesErrorView
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -82,9 +82,11 @@ class DevicesErrorView
                   size: 31,
                 ),
               ),
+
               SizedBox(height: 14),
+
               Text(
-                'Unable to load devices',
+                'unable_to_load_devices'.tr,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
@@ -92,7 +94,9 @@ class DevicesErrorView
                   fontWeight: FontWeight.w700,
                 ),
               ),
+
               SizedBox(height: 7),
+
               Text(
                 message,
                 textAlign: TextAlign.center,
@@ -102,7 +106,9 @@ class DevicesErrorView
                   height: 1.4,
                 ),
               ),
+
               SizedBox(height: 18),
+
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: Icon(
@@ -110,20 +116,17 @@ class DevicesErrorView
                   size: 19,
                 ),
                 label: Text(
-                  'Try again',
+                  'try_again'.tr,
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor:
-                  colorScheme.primary,
-                  foregroundColor:
-                  colorScheme.onPrimary,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   minimumSize: Size(
                     double.infinity,
                     48,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
               ),

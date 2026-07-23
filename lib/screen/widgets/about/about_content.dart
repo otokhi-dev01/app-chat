@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'about_header.dart';
 import 'about_menu_card.dart';
@@ -22,40 +23,48 @@ class AboutContent extends StatelessWidget {
       ),
       children: [
         AboutHeader(),
+
         SizedBox(height: 24),
 
         AboutSectionTitle(
-          title: 'Application',
+          title: 'application'.tr,
         ),
+
         SizedBox(height: 10),
 
         AboutMenuCard(
           children: [
             AboutMenuTile(
               icon: Icons.info_outline_rounded,
-              title: 'Version',
+              title: 'version'.tr,
               subtitle: '1.0.0',
               showArrow: false,
             ),
+
             AboutMenuDivider(),
+
             AboutMenuTile(
               icon: Icons.system_update_alt_rounded,
-              title: 'Check for updates',
-              subtitle: 'You are using the latest version',
+              title: 'check_for_updates'.tr,
+              subtitle: 'latest_version_message'.tr,
               onTap: () {},
             ),
+
             AboutMenuDivider(),
+
             AboutMenuTile(
               icon: Icons.description_outlined,
-              title: 'Terms of service',
-              subtitle: 'Read our terms and conditions',
+              title: 'terms_of_service'.tr,
+              subtitle: 'terms_of_service_description'.tr,
               onTap: () {},
             ),
+
             AboutMenuDivider(),
+
             AboutMenuTile(
               icon: Icons.privacy_tip_outlined,
-              title: 'Privacy policy',
-              subtitle: 'Learn how your data is protected',
+              title: 'privacy_policy'.tr,
+              subtitle: 'privacy_policy_description'.tr,
               onTap: () {},
             ),
           ],
@@ -64,30 +73,35 @@ class AboutContent extends StatelessWidget {
         SizedBox(height: 24),
 
         AboutSectionTitle(
-          title: 'Support',
+          title: 'support'.tr,
         ),
+
         SizedBox(height: 10),
 
         AboutMenuCard(
           children: [
             AboutMenuTile(
               icon: Icons.help_outline_rounded,
-              title: 'Help center',
-              subtitle: 'Get help using the application',
+              title: 'help_center'.tr,
+              subtitle: 'help_center_description'.tr,
               onTap: () {},
             ),
+
             AboutMenuDivider(),
+
             AboutMenuTile(
               icon: Icons.mail_outline_rounded,
-              title: 'Contact support',
-              subtitle: 'Send a message to our support team',
+              title: 'contact_support'.tr,
+              subtitle: 'contact_support_description'.tr,
               onTap: () {},
             ),
+
             AboutMenuDivider(),
+
             AboutMenuTile(
               icon: Icons.star_outline_rounded,
-              title: 'Rate application',
-              subtitle: 'Share your experience',
+              title: 'rate_application'.tr,
+              subtitle: 'rate_application_description'.tr,
               onTap: () {},
             ),
           ],

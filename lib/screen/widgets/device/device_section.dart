@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DevicesSecurityHeader
-    extends StatelessWidget {
+class DevicesSecurityHeader extends StatelessWidget {
   DevicesSecurityHeader({
     super.key,
   });
@@ -11,6 +10,7 @@ class DevicesSecurityHeader
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -71,26 +71,29 @@ class DevicesSecurityHeader
               size: 27,
             ),
           ),
+
           SizedBox(width: 14),
+
           Expanded(
             child: Column(
               crossAxisAlignment:
               CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Manage your devices',
+                  'manage_your_devices'.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+
                 SizedBox(height: 5),
+
                 Text(
                   'manage_devices'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                    colorScheme.onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -104,8 +107,7 @@ class DevicesSecurityHeader
   }
 }
 
-class DevicesSectionHeader
-    extends StatelessWidget {
+class DevicesSectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
   final int? count;
@@ -133,7 +135,9 @@ class DevicesSectionHeader
             color: colorScheme.primary,
             size: 19,
           ),
+
           SizedBox(width: 8),
+
           Expanded(
             child: Text(
               title,
@@ -144,6 +148,7 @@ class DevicesSectionHeader
               ),
             ),
           ),
+
           if (count != null)
             Container(
               constraints: BoxConstraints(
@@ -176,8 +181,7 @@ class DevicesSectionHeader
   }
 }
 
-class NoOtherSessionsCard
-    extends StatelessWidget {
+class NoOtherSessionsCard extends StatelessWidget {
   NoOtherSessionsCard({
     super.key,
   });
@@ -186,6 +190,7 @@ class NoOtherSessionsCard
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -232,9 +237,11 @@ class NoOtherSessionsCard
               size: 29,
             ),
           ),
+
           SizedBox(height: 13),
+
           Text(
-            'No other active sessions',
+            'no_other_active_sessions'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.titleSmall?.copyWith(
               color: colorScheme.onSurface,
@@ -242,9 +249,11 @@ class NoOtherSessionsCard
               fontWeight: FontWeight.w700,
             ),
           ),
+
           SizedBox(height: 5),
+
           Text(
-            'Your account is only signed in on this device.',
+            'account_only_signed_in_here'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
@@ -258,8 +267,7 @@ class NoOtherSessionsCard
   }
 }
 
-class EmptyCurrentDeviceCard
-    extends StatelessWidget {
+class EmptyCurrentDeviceCard extends StatelessWidget {
   EmptyCurrentDeviceCard({
     super.key,
   });
@@ -268,6 +276,7 @@ class EmptyCurrentDeviceCard
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -300,10 +309,12 @@ class EmptyCurrentDeviceCard
             color: colorScheme.onSurfaceVariant,
             size: 25,
           ),
+
           SizedBox(width: 12),
+
           Expanded(
             child: Text(
-              'Current device information is unavailable.',
+              'current_device_unavailable'.tr,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 13,

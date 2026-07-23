@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AddGroupHeader extends StatelessWidget {
   final TextEditingController nameController;
@@ -77,7 +78,9 @@ class AddGroupHeader extends StatelessWidget {
             isAssetImage: isAssetImage,
             onPhotoTap: onPhotoTap,
           ),
+
           SizedBox(width: 12),
+
           Expanded(
             child: TextField(
               controller: nameController,
@@ -86,15 +89,16 @@ class AddGroupHeader extends StatelessWidget {
               textInputAction:
               TextInputAction.done,
               maxLength: 50,
-              style: theme.textTheme.bodyMedium
+              style: theme
+                  .textTheme.bodyMedium
                   ?.copyWith(
                 color: colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
-                labelText: 'Group name',
-                hintText: 'Enter group name',
+                labelText: 'group_name'.tr,
+                hintText: 'enter_group_name'.tr,
                 counterText: '',
                 isDense: true,
                 filled: true,
@@ -180,60 +184,15 @@ class _GroupPhoto extends StatelessWidget {
     ColorScheme colorScheme =
         Theme.of(context).colorScheme;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onPhotoTap,
-            customBorder: CircleBorder(),
-            splashColor: Colors.transparent,
-            highlightColor:
-            Colors.transparent,
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            child: Container(
-              width: 56,
-              height: 56,
-              clipBehavior: Clip.antiAlias,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.11,
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colorScheme.primary
-                      .withValues(
-                    alpha: 0.20,
-                  ),
-                ),
-              ),
-              child: hasImage
-                  ? _GroupImage(
-                groupImagePath:
-                groupImagePath,
-                isNetworkImage:
-                isNetworkImage,
-                isAssetImage:
-                isAssetImage,
-              )
-                  : Icon(
-                Icons.add_a_photo_outlined,
-                color: colorScheme.primary,
-                size: 23,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          right: -2,
-          bottom: -2,
-          child: Material(
-            color: colorScheme.primary,
-            shape: CircleBorder(),
+    return Tooltip(
+      message: hasImage
+          ? 'change_group_photo'.tr
+          : 'add_group_photo'.tr,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Material(
+            color: Colors.transparent,
             child: InkWell(
               onTap: onPhotoTap,
               customBorder: CircleBorder(),
@@ -242,19 +201,76 @@ class _GroupPhoto extends StatelessWidget {
               Colors.transparent,
               hoverColor: Colors.transparent,
               focusColor: Colors.transparent,
-              child: SizedBox(
-                width: 22,
-                height: 22,
-                child: Icon(
-                  Icons.camera_alt_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 12,
+              child: Container(
+                width: 56,
+                height: 56,
+                clipBehavior: Clip.antiAlias,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary
+                      .withValues(
+                    alpha: 0.11,
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorScheme.primary
+                        .withValues(
+                      alpha: 0.20,
+                    ),
+                  ),
+                ),
+                child: hasImage
+                    ? _GroupImage(
+                  groupImagePath:
+                  groupImagePath,
+                  isNetworkImage:
+                  isNetworkImage,
+                  isAssetImage:
+                  isAssetImage,
+                )
+                    : Icon(
+                  Icons
+                      .add_a_photo_outlined,
+                  color:
+                  colorScheme.primary,
+                  size: 23,
                 ),
               ),
             ),
           ),
-        ),
-      ],
+
+          Positioned(
+            right: -2,
+            bottom: -2,
+            child: Material(
+              color: colorScheme.primary,
+              shape: CircleBorder(),
+              child: InkWell(
+                onTap: onPhotoTap,
+                customBorder: CircleBorder(),
+                splashColor:
+                Colors.transparent,
+                highlightColor:
+                Colors.transparent,
+                hoverColor:
+                Colors.transparent,
+                focusColor:
+                Colors.transparent,
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color:
+                    colorScheme.onPrimary,
+                    size: 12,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

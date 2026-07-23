@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import '../../../../models/device_session_model.dart';
 import '../../settings/device/device_session_title.dart';
+import 'session_comfirmation_dialog.dart';
 import 'device_action.dart';
 import 'device_section.dart';
 
@@ -27,10 +30,43 @@ class DevicesContent extends StatelessWidget {
     required this.onTerminateAll,
   });
 
+  Future<void> _terminateSession(
+      BuildContext context,
+      DeviceSessionModel session,
+      ) async {
+    bool confirmed =
+    await SessionConfirmationDialog.showTerminateSession(
+      context: context,
+      deviceName: session.deviceName,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await onTerminate(session);
+  }
+
+  Future<void> _terminateAllSessions(
+      BuildContext context,
+      ) async {
+    bool confirmed =
+    await SessionConfirmationDialog.showTerminateAllSessions(
+      context: context,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await onTerminateAll();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -52,12 +88,14 @@ class DevicesContent extends StatelessWidget {
         ),
         children: [
           DevicesSecurityHeader(),
+
           SizedBox(height: 24),
 
           DevicesSectionHeader(
-            title: 'This device',
+            title: 'this_device'.tr,
             icon: Icons.smartphone_rounded,
           ),
+
           SizedBox(height: 10),
 
           if (currentSession != null)
@@ -70,35 +108,40 @@ class DevicesContent extends StatelessWidget {
           SizedBox(height: 26),
 
           DevicesSectionHeader(
-            title: 'Active sessions',
+            title: 'active_sessions'.tr,
             icon: Icons.devices_rounded,
             count: otherSessions.length,
           ),
+
           SizedBox(height: 10),
 
           if (otherSessions.isEmpty)
             NoOtherSessionsCard()
           else
-            ..._buildOtherSessions(),
+            ..._buildOtherSessions(context),
 
           if (otherSessions.isNotEmpty) ...[
             SizedBox(height: 8),
+
             TerminateAllSessionsButton(
               isLoading: isTerminatingAll,
               onPressed: () {
-                onTerminateAll();
+                _terminateAllSessions(context);
               },
             ),
           ],
 
           SizedBox(height: 22),
+
           DevicesSecurityNote(),
         ],
       ),
     );
   }
 
-  List<Widget> _buildOtherSessions() {
+  List<Widget> _buildOtherSessions(
+      BuildContext context,
+      ) {
     return otherSessions.map(
           (DeviceSessionModel session) {
         return Padding(
@@ -108,7 +151,10 @@ class DevicesContent extends StatelessWidget {
           child: DeviceSessionTile(
             session: session,
             onTerminate: () {
-              onTerminate(session);
+              _terminateSession(
+                context,
+                session,
+              );
             },
           ),
         );

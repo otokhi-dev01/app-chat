@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class TerminateAllSessionsButton
-    extends StatelessWidget {
+class TerminateAllSessionsButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
 
@@ -59,15 +59,22 @@ class TerminateAllSessionsButton
                   color: colorScheme.error,
                   size: 20,
                 ),
+
               SizedBox(width: 9),
-              Text(
-                isLoading
-                    ? 'Terminating...'
-                    : 'Terminate all other sessions',
-                style: TextStyle(
-                  color: colorScheme.error,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
+
+              Flexible(
+                child: Text(
+                  isLoading
+                      ? 'terminating_sessions'.tr
+                      : 'terminate_all_other_sessions'.tr,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colorScheme.error,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -78,8 +85,7 @@ class TerminateAllSessionsButton
   }
 }
 
-class DevicesSecurityNote
-    extends StatelessWidget {
+class DevicesSecurityNote extends StatelessWidget {
   DevicesSecurityNote({
     super.key,
   });
@@ -111,10 +117,12 @@ class DevicesSecurityNote
             color: colorScheme.primary,
             size: 20,
           ),
+
           SizedBox(width: 10),
+
           Expanded(
             child: Text(
-              'Terminate any session you do not recognize and change your password.',
+              'unrecognized_session_security_note'.tr,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 11,

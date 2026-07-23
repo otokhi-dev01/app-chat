@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/device_session_model.dart';
 
@@ -16,6 +17,7 @@ class DeviceSessionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -55,12 +57,15 @@ class DeviceSessionTile extends StatelessWidget {
               platform: session.platform,
               isCurrent: session.isCurrent,
             ),
+
             SizedBox(width: 13),
+
             Expanded(
               child: _DeviceSessionInformation(
                 session: session,
               ),
             ),
+
             if (!session.isCurrent)
               _DeviceSessionMenu(
                 onTerminate: onTerminate,
@@ -72,8 +77,7 @@ class DeviceSessionTile extends StatelessWidget {
   }
 }
 
-class _DevicePlatformIcon
-    extends StatelessWidget {
+class _DevicePlatformIcon extends StatelessWidget {
   final DevicePlatform platform;
   final bool isCurrent;
 
@@ -138,13 +142,39 @@ class _DevicePlatformIcon
   }
 }
 
-class _DeviceSessionInformation
-    extends StatelessWidget {
+class _DeviceSessionInformation extends StatelessWidget {
   final DeviceSessionModel session;
 
   _DeviceSessionInformation({
     required this.session,
   });
+
+  String _platformText(
+      DevicePlatform platform,
+      ) {
+    switch (platform) {
+      case DevicePlatform.ios:
+        return 'platform_ios'.tr;
+
+      case DevicePlatform.android:
+        return 'platform_android'.tr;
+
+      case DevicePlatform.macos:
+        return 'platform_macos'.tr;
+
+      case DevicePlatform.windows:
+        return 'platform_windows'.tr;
+
+      case DevicePlatform.linux:
+        return 'platform_linux'.tr;
+
+      case DevicePlatform.web:
+        return 'platform_web'.tr;
+
+      case DevicePlatform.unknown:
+        return 'platform_unknown'.tr;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,15 +193,20 @@ class _DeviceSessionInformation
                 session.deviceName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleSmall?.copyWith(
+                style: theme
+                    .textTheme
+                    .titleSmall
+                    ?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
+
             if (session.isCurrent) ...[
               SizedBox(width: 8),
+
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 8,
@@ -181,10 +216,11 @@ class _DeviceSessionInformation
                   color: colorScheme.primary.withValues(
                     alpha: 0.11,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius:
+                  BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Current',
+                  'current_device'.tr,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontSize: 9,
@@ -195,9 +231,11 @@ class _DeviceSessionInformation
             ],
           ],
         ),
+
         SizedBox(height: 5),
+
         Text(
-          '${session.platformText} • ${session.appVersion}',
+          '${_platformText(session.platform)} • ${session.appVersion}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -206,7 +244,9 @@ class _DeviceSessionInformation
             fontWeight: FontWeight.w500,
           ),
         ),
+
         SizedBox(height: 8),
+
         Row(
           children: [
             Icon(
@@ -214,13 +254,18 @@ class _DeviceSessionInformation
               color: colorScheme.onSurfaceVariant,
               size: 14,
             ),
+
             SizedBox(width: 5),
+
             Expanded(
               child: Text(
                 session.location,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
+                style: theme
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(
                   color:
                   colorScheme.onSurfaceVariant,
                   fontSize: 11,
@@ -229,7 +274,9 @@ class _DeviceSessionInformation
             ),
           ],
         ),
+
         SizedBox(height: 5),
+
         Row(
           children: [
             Icon(
@@ -237,13 +284,18 @@ class _DeviceSessionInformation
               color: colorScheme.onSurfaceVariant,
               size: 14,
             ),
+
             SizedBox(width: 5),
+
             Expanded(
               child: Text(
                 session.ipAddress,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
+                style: theme
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(
                   color:
                   colorScheme.onSurfaceVariant,
                   fontSize: 11,
@@ -252,7 +304,9 @@ class _DeviceSessionInformation
             ),
           ],
         ),
+
         SizedBox(height: 8),
+
         _DeviceActivityStatus(
           session: session,
         ),
@@ -261,13 +315,24 @@ class _DeviceSessionInformation
   }
 }
 
-class _DeviceActivityStatus
-    extends StatelessWidget {
+class _DeviceActivityStatus extends StatelessWidget {
   final DeviceSessionModel session;
 
   _DeviceActivityStatus({
     required this.session,
   });
+
+  String _activityText() {
+    if (session.isCurrent) {
+      return 'active_now'.tr;
+    }
+
+    if (session.isOnline) {
+      return 'online'.tr;
+    }
+
+    return session.lastActiveText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,9 +356,11 @@ class _DeviceActivityStatus
             shape: BoxShape.circle,
           ),
         ),
+
         SizedBox(width: 6),
+
         Text(
-          session.lastActiveText,
+          _activityText(),
           style: TextStyle(
             color: statusColor,
             fontSize: 11,
@@ -305,8 +372,7 @@ class _DeviceActivityStatus
   }
 }
 
-class _DeviceSessionMenu
-    extends StatelessWidget {
+class _DeviceSessionMenu extends StatelessWidget {
   final VoidCallback? onTerminate;
 
   _DeviceSessionMenu({
@@ -315,14 +381,13 @@ class _DeviceSessionMenu
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
     return PopupMenuButton<String>(
-      tooltip: 'Session options',
+      tooltip: 'session_options'.tr,
       padding: EdgeInsets.zero,
-      color: Theme.of(context).brightness ==
-          Brightness.dark
+      color: theme.brightness == Brightness.dark
           ? Color(0xFF1B1D22)
           : Colors.white,
       surfaceTintColor: Colors.transparent,
@@ -363,7 +428,7 @@ class _DeviceSessionMenu
                 ),
                 SizedBox(width: 10),
                 Text(
-                  'Terminate',
+                  'terminate_session'.tr,
                   style: TextStyle(
                     color: colorScheme.error,
                     fontSize: 13,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'data_storage_card.dart';
 import 'data_storage_title.dart';
@@ -56,6 +57,53 @@ class DataStorageContent extends StatelessWidget {
     required this.onResetNetworkTap,
   });
 
+  String _translatedMediaQuality(String value) {
+    switch (value.trim().toLowerCase()) {
+      case 'data saver':
+        return 'data_saver'.tr;
+
+      case 'balanced':
+        return 'balanced'.tr;
+
+      case 'high quality':
+        return 'high_quality'.tr;
+
+      case 'low':
+        return 'quality_low'.tr;
+
+      case 'medium':
+        return 'quality_medium'.tr;
+
+      case 'high':
+        return 'quality_high'.tr;
+
+      case 'original':
+        return 'quality_original'.tr;
+
+      default:
+        return value;
+    }
+  }
+
+  String _translatedKeepMediaDuration(String value) {
+    switch (value.trim().toLowerCase()) {
+      case '3 days':
+        return 'three_days'.tr;
+
+      case '1 week':
+        return 'one_week'.tr;
+
+      case '1 month':
+        return 'one_month'.tr;
+
+      case 'forever':
+        return 'forever'.tr;
+
+      default:
+        return value;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -75,121 +123,155 @@ class DataStorageContent extends StatelessWidget {
           cacheSize: cacheSize,
           networkUsage: networkUsage,
         ),
+
         SizedBox(height: 24),
+
         DataStorageSectionTitle(
-          title: 'Storage',
+          title: 'storage'.tr,
         ),
+
         SizedBox(height: 9),
+
         DataStorageCard(
           children: [
             DataStorageActionTile(
               icon: Icons.cleaning_services_outlined,
-              title: 'Clear Cache',
-              subtitle: 'Remove temporary photos, videos and files',
+              title: 'clear_cache'.tr,
+              subtitle: 'clear_cache_description'.tr,
               trailingText: cacheSize,
               loading: isClearingCache,
               onTap: onClearCacheTap,
             ),
+
             DataStorageDivider(),
+
             DataStorageNavigationTile(
               icon: Icons.access_time_rounded,
-              title: 'Keep Media',
-              subtitle: 'Choose how long downloaded media is stored',
-              trailingText: keepMediaDuration,
+              title: 'keep_media'.tr,
+              subtitle: 'keep_media_description'.tr,
+              trailingText: _translatedKeepMediaDuration(
+                keepMediaDuration,
+              ),
               onTap: onKeepMediaTap,
             ),
           ],
         ),
+
         SizedBox(height: 24),
+
         DataStorageSectionTitle(
-          title: 'Automatic Media Download',
+          title: 'automatic_media_download'.tr,
         ),
+
         SizedBox(height: 9),
+
         DataStorageCard(
           children: [
             DataStorageSwitchTile(
               icon: Icons.signal_cellular_alt_rounded,
-              title: 'Using Mobile Data',
-              subtitle: 'Automatically download media on mobile data',
+              title: 'using_mobile_data'.tr,
+              subtitle: 'mobile_data_download_description'.tr,
               value: autoDownloadMobileData,
               onChanged: onMobileDataChanged,
             ),
+
             DataStorageDivider(),
+
             DataStorageSwitchTile(
               icon: Icons.wifi_rounded,
-              title: 'Connected to Wi-Fi',
-              subtitle: 'Automatically download media on Wi-Fi',
+              title: 'connected_to_wifi'.tr,
+              subtitle: 'wifi_download_description'.tr,
               value: autoDownloadWifi,
               onChanged: onWifiChanged,
             ),
+
             DataStorageDivider(),
+
             DataStorageSwitchTile(
               icon: Icons.public_rounded,
-              title: 'While Roaming',
-              subtitle: 'Downloading while roaming may cost more',
+              title: 'while_roaming'.tr,
+              subtitle: 'roaming_download_description'.tr,
               value: autoDownloadRoaming,
               onChanged: onRoamingChanged,
             ),
           ],
         ),
+
         SizedBox(height: 24),
+
         DataStorageSectionTitle(
-          title: 'Media',
+          title: 'media'.tr,
         ),
+
         SizedBox(height: 9),
+
         DataStorageCard(
           children: [
             DataStorageNavigationTile(
               icon: Icons.high_quality_outlined,
-              title: 'Media Quality',
-              subtitle: 'Choose upload and download quality',
-              trailingText: mediaQuality,
+              title: 'media_quality'.tr,
+              subtitle: 'media_quality_description'.tr,
+              trailingText: _translatedMediaQuality(
+                mediaQuality,
+              ),
               onTap: onMediaQualityTap,
             ),
+
             DataStorageDivider(),
+
             DataStorageSwitchTile(
               icon: Icons.play_circle_outline_rounded,
-              title: 'Stream Videos',
-              subtitle: 'Play videos without waiting for full download',
+              title: 'stream_videos'.tr,
+              subtitle: 'stream_videos_description'.tr,
               value: streamVideos,
               onChanged: onStreamVideosChanged,
             ),
+
             DataStorageDivider(),
+
             DataStorageSwitchTile(
               icon: Icons.photo_library_outlined,
-              title: 'Save to Gallery',
-              subtitle: 'Save new photos and videos to your gallery',
+              title: 'save_to_gallery'.tr,
+              subtitle: 'save_to_gallery_description'.tr,
               value: saveToGallery,
               onChanged: onSaveToGalleryChanged,
             ),
           ],
         ),
+
         SizedBox(height: 24),
+
         DataStorageSectionTitle(
-          title: 'Data Usage',
+          title: 'data_usage'.tr,
         ),
+
         SizedBox(height: 9),
+
         DataStorageCard(
           children: [
             DataStorageSwitchTile(
               icon: Icons.data_saver_on_rounded,
-              title: 'Data Saver',
-              subtitle: 'Use less mobile data for calls and media',
+              title: 'data_saver'.tr,
+              subtitle: 'data_saver_description'.tr,
               value: dataSaverEnabled,
               onChanged: onDataSaverChanged,
             ),
+
             DataStorageDivider(),
+
             DataStorageActionTile(
               icon: Icons.restart_alt_rounded,
-              title: 'Reset Network Usage',
-              subtitle: 'Reset sent and received data statistics',
+              title: 'reset_network_usage'.tr,
+              subtitle: 'reset_network_usage_description'.tr,
               trailingText: networkUsage,
               loading: isResettingNetwork,
               onTap: onResetNetworkTap,
             ),
           ],
         ),
+
         SizedBox(height: 18),
+
         DataStorageInformationCard(),
       ],
     );

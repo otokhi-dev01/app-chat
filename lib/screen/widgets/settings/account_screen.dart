@@ -1,32 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for Clipboard and Haptics
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
+import '../../../route/app_route.dart';
 
 class AccountSettingsSection extends StatelessWidget {
   final SettingsController controller;
 
-  const AccountSettingsSection({
+  AccountSettingsSection({
     super.key,
     required this.controller,
   });
 
+  void _openProfileDetails() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (Get.currentRoute == AppRoutes.editProfile) {
+      return;
+    }
+
+    Get.toNamed(
+      AppRoutes.editProfile,
+      preventDuplicates: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final bool isDark = theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
-    final Color dividerColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color dividerColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
+
+    Color cardColor = isDark
+        ? Color(0xFF1B1D22)
+        : Colors.white;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(
+          padding: EdgeInsets.only(
             left: 6,
             right: 6,
             bottom: 8,
@@ -39,38 +62,52 @@ class AccountSettingsSection extends StatelessWidget {
             ),
           ),
         ),
+
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1B1D22) : Colors.white,
+            color: cardColor,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: dividerColor,
             ),
           ),
           child: Obx(
-                () => Column(
-              children: [
-                _AccountTile(
-                  icon: Icons.person_outline_rounded,
-                  label: 'name'.tr,
-                  value: controller.userName.value,
-                ),
-                _AccountDivider(color: dividerColor),
-                _AccountTile(
-                  icon: Icons.phone_outlined,
-                  label: 'phone'.tr,
-                  value: controller.userPhone.value,
-                ),
-                _AccountDivider(color: dividerColor),
-                _AccountTile(
-                  icon: Icons.email_outlined,
-                  label: 'email'.tr,
-                  value: controller.userEmail.value,
-                ),
-              ],
-            ),
+                () {
+              return Column(
+                children: [
+                  _AccountTile(
+                    icon: Icons.person_outline_rounded,
+                    label: 'name'.tr,
+                    value: controller.userName.value,
+                    onTap: _openProfileDetails,
+                  ),
+
+                  _AccountDivider(
+                    color: dividerColor,
+                  ),
+
+                  _AccountTile(
+                    icon: Icons.phone_outlined,
+                    label: 'phone'.tr,
+                    value: controller.userPhone.value,
+                    onTap: _openProfileDetails,
+                  ),
+
+                  _AccountDivider(
+                    color: dividerColor,
+                  ),
+
+                  _AccountTile(
+                    icon: Icons.email_outlined,
+                    label: 'email'.tr,
+                    value: controller.userEmail.value,
+                    onTap: _openProfileDetails,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -82,52 +119,30 @@ class _AccountTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback onTap;
 
-  const _AccountTile({
+  _AccountTile({
     required this.icon,
     required this.label,
     required this.value,
+    required this.onTap,
   });
-
-  void _copyToClipboard(BuildContext context) {
-    if (value.trim().isEmpty) return;
-
-    // Copies to clipboard and gives feedback
-    Clipboard.setData(ClipboardData(text: value));
-    HapticFeedback.mediumImpact();
-
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    // Smooth floaty GetX snackbar
-    Get.rawSnackbar(
-      messageText: Text(
-        '${label.capitalizeFirst} copied to clipboard',
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-      ),
-      backgroundColor: colorScheme.primary,
-      borderRadius: 14,
-      margin: const EdgeInsets.all(14),
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(milliseconds: 1500),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final primary = colorScheme.primary;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
-    final String displayValue = value.trim().isEmpty ? 'not_set'.tr : value;
+    Color primary = colorScheme.primary;
+
+    String displayValue = value.trim().isEmpty
+        ? 'not_set'.tr
+        : value;
 
     return _BouncyTileEffect(
-      onTap: () => _copyToClipboard(context),
+      onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 13,
         ),
@@ -136,8 +151,11 @@ class _AccountTile extends StatelessWidget {
             Container(
               width: 42,
               height: 42,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: primary.withValues(alpha: 0.11),
+                color: primary.withValues(
+                  alpha: 0.11,
+                ),
                 borderRadius: BorderRadius.circular(13),
               ),
               child: Icon(
@@ -146,26 +164,34 @@ class _AccountTile extends StatelessWidget {
                 color: primary,
               ),
             ),
-            const SizedBox(width: 13),
+
+            SizedBox(width: 13),
+
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style:
+                    theme.textTheme.bodySmall?.copyWith(
+                      color:
+                      colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 3),
+
+                  SizedBox(height: 3),
+
                   Text(
                     displayValue,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyLarge?.copyWith(
+                    style:
+                    theme.textTheme.bodyLarge?.copyWith(
                       color: value.trim().isEmpty
                           ? colorScheme.onSurfaceVariant
                           : colorScheme.onSurface,
@@ -175,15 +201,17 @@ class _AccountTile extends StatelessWidget {
                 ],
               ),
             ),
-            // Subtle, clean indicator that blends seamlessly into the design
-            if (value.trim().isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Icon(
-                Icons.copy_rounded,
-                size: 16,
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+
+            SizedBox(width: 8),
+
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 22,
+              color: colorScheme.onSurfaceVariant
+                  .withValues(
+                alpha: 0.55,
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -194,7 +222,7 @@ class _AccountTile extends StatelessWidget {
 class _AccountDivider extends StatelessWidget {
   final Color color;
 
-  const _AccountDivider({
+  _AccountDivider({
     required this.color,
   });
 
@@ -209,45 +237,54 @@ class _AccountDivider extends StatelessWidget {
   }
 }
 
-// 4. Lightweight private stateful gesture handler to keep tiles stateless and reusable
 class _BouncyTileEffect extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  const _BouncyTileEffect({
+  _BouncyTileEffect({
     required this.child,
     required this.onTap,
   });
 
   @override
-  State<_BouncyTileEffect> createState() => _BouncyTileEffectState();
+  State<_BouncyTileEffect> createState() {
+    return _BouncyTileEffectState();
+  }
 }
 
-class _BouncyTileEffectState extends State<_BouncyTileEffect> {
+class _BouncyTileEffectState
+    extends State<_BouncyTileEffect> {
   bool _isPressed = false;
+
+  void _resetPressedState() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isPressed = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) {
         setState(() {
           _isPressed = true;
         });
       },
       onTapUp: (_) {
-        setState(() {
-          _isPressed = false;
-        });
+        _resetPressedState();
         widget.onTap();
       },
-      onTapCancel: () {
-        setState(() {
-          _isPressed = false;
-        });
-      },
+      onTapCancel: _resetPressedState,
       child: AnimatedScale(
-        scale: _isPressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 100),
+        scale: _isPressed ? 0.98 : 1,
+        duration: Duration(
+          milliseconds: 100,
+        ),
         curve: Curves.easeOutCubic,
         child: widget.child,
       ),

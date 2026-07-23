@@ -2,101 +2,175 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileEditController extends GetxController {
-  final formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey =
+  GlobalKey<FormState>();
 
-  final nameController = TextEditingController(
+  final TextEditingController nameController =
+  TextEditingController(
     text: 'User Name',
   );
 
-  final usernameController = TextEditingController(
-    text: 'username',
+  final TextEditingController firstNameController =
+  TextEditingController(
+    text: 'User',
   );
 
-  final phoneController = TextEditingController(
-    text: '+855 12 345 678',
+  final TextEditingController lastNameController =
+  TextEditingController(
+    text: 'Name',
   );
 
-  final emailController = TextEditingController(
-    text: 'user@gmail.com',
-  );
-
-  final bioController = TextEditingController(
+  final TextEditingController bioController =
+  TextEditingController(
     text: 'Available',
   );
 
-  final isSaving = false.obs;
+  final TextEditingController phoneController =
+  TextEditingController(
+    text: '+855 12 345 678',
+  );
+
+  final TextEditingController usernameController =
+  TextEditingController(
+    text: 'username',
+  );
+
+  final RxBool isSaving = false.obs;
+
   final RxString profileImagePath = ''.obs;
 
-  void setProfileImage(String value) {
-    profileImagePath.value = value.trim();
+  void setProfileImage(
+      String value,
+      ) {
+    profileImagePath.value =
+        value.trim();
   }
 
   void removeProfileImage() {
     profileImagePath.value = '';
   }
 
-  String? validateRequired(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'This field is required';
+  String? validateRequired(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return 'field_required'.tr;
     }
 
     return null;
   }
 
-  String? validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+  String? validateUsername(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return 'username_required'.tr;
     }
 
-    if (!GetUtils.isEmail(value.trim())) {
-      return 'Enter a valid email';
+    String username = value
+        .trim()
+        .replaceFirst(
+      '@',
+      '',
+    );
+
+    if (username.length < 3) {
+      return 'username_too_short'.tr;
+    }
+
+    RegExp usernamePattern = RegExp(
+      r'^[a-zA-Z0-9_]+$',
+    );
+
+    if (!usernamePattern.hasMatch(
+      username,
+    )) {
+      return 'invalid_username'.tr;
+    }
+
+    return null;
+  }
+
+  String? validatePhone(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return 'phone_required'.tr;
+    }
+
+    String phone = value.replaceAll(
+      RegExp(r'[\s\-\(\)]'),
+      '',
+    );
+
+    if (phone.length < 8) {
+      return 'invalid_phone_number'.tr;
     }
 
     return null;
   }
 
   Future<void> saveProfile() async {
-    FocusManager.instance.primaryFocus?.unfocus();
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
 
-    if (!(formKey.currentState?.validate() ?? false)) {
+    if (isSaving.value) {
       return;
     }
 
-    isSaving.value = true;
+    bool isValid =
+        formKey.currentState?.validate() ??
+            false;
+
+    if (!isValid) {
+      return;
+    }
 
     try {
+      isSaving.value = true;
+
+      Map<String, dynamic> profileData = {
+        'name':
+        nameController.text.trim(),
+        'firstName':
+        firstNameController.text.trim(),
+        'lastName':
+        lastNameController.text.trim(),
+        'bio':
+        bioController.text.trim(),
+        'phone':
+        phoneController.text.trim(),
+        'username': usernameController
+            .text
+            .trim()
+            .replaceFirst(
+          '@',
+          '',
+        ),
+        'profileImagePath':
+        profileImagePath.value.trim(),
+      };
+
+      debugPrint(
+        'Saving profile: $profileData',
+      );
+
       // Replace this delay with your API request.
       await Future.delayed(
-        const Duration(milliseconds: 800),
+        Duration(
+          milliseconds: 800,
+        ),
       );
 
-      Get.back(
-        result: {
-          'name': nameController.text.trim(),
-          'username': usernameController.text.trim(),
-          'phone': phoneController.text.trim(),
-          'email': emailController.text.trim(),
-          'bio': bioController.text.trim(),
-        },
-      );
-
-      Get.snackbar(
-        'Success',
-        'Profile updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(12),
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } catch (_) {
-      Get.snackbar(
-        'Error',
-        'Unable to update profile',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(12),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      // Example:
+      // await profileService.updateProfile(
+      //   profileData,
+      // );
+    } catch (error) {
+      rethrow;
     } finally {
       isSaving.value = false;
     }
@@ -105,10 +179,11 @@ class ProfileEditController extends GetxController {
   @override
   void onClose() {
     nameController.dispose();
-    usernameController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     bioController.dispose();
+    phoneController.dispose();
+    usernameController.dispose();
 
     super.onClose();
   }

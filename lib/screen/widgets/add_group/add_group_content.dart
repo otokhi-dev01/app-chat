@@ -10,8 +10,7 @@ import 'add_group_header.dart';
 import 'add_group_photo_sheet.dart';
 import 'add_group_select_members.dart';
 
-class AddGroupContent
-    extends StatefulWidget {
+class AddGroupContent extends StatefulWidget {
   final AddGroupController controller;
 
   AddGroupContent({
@@ -27,15 +26,11 @@ class AddGroupContent
 
 class _AddGroupContentState
     extends State<AddGroupContent> {
-  final ChatCameraService
-  _chatCameraService =
+  final ChatCameraService _chatCameraService =
   ChatCameraService();
 
-  late TextEditingController
-  groupNameController;
-
-  late TextEditingController
-  searchController;
+  late TextEditingController groupNameController;
+  late TextEditingController searchController;
 
   AddGroupController get controller {
     return widget.controller;
@@ -45,15 +40,13 @@ class _AddGroupContentState
   void initState() {
     super.initState();
 
-    groupNameController =
-        TextEditingController(
-          text: controller.groupName.value,
-        );
+    groupNameController = TextEditingController(
+      text: controller.groupName.value,
+    );
 
-    searchController =
-        TextEditingController(
-          text: controller.searchQuery.value,
-        );
+    searchController = TextEditingController(
+      text: controller.searchQuery.value,
+    );
 
     groupNameController.addListener(
       _handleGroupNameChanged,
@@ -81,18 +74,15 @@ class _AddGroupContentState
     controller.clearSearchQuery();
   }
 
-  Future<void>
-  _openGroupPhotoSheet() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+  Future<void> _openGroupPhotoSheet() async {
+    FocusManager.instance.primaryFocus?.unfocus();
 
     await showAddGroupPhotoSheet(
       context: context,
-      hasPhoto: controller
-          .groupImagePath.value
-          .isNotEmpty,
-      groupImagePath: controller
-          .groupImagePath.value,
+      hasPhoto:
+      controller.groupImagePath.value.isNotEmpty,
+      groupImagePath:
+      controller.groupImagePath.value,
       onGallery:
       _pickGroupImageFromGallery,
       onCamera: _takeGroupPhoto,
@@ -105,14 +95,11 @@ class _AddGroupContentState
   _pickGroupImageFromGallery() async {
     try {
       ChatMessageModel? result =
-      await _chatCameraService
-          .pickFromGallery();
+      await _chatCameraService.pickFromGallery();
 
       if (result == null ||
           result.mediaPath == null ||
-          result.mediaPath!
-              .trim()
-              .isEmpty) {
+          result.mediaPath!.trim().isEmpty) {
         return;
       }
 
@@ -137,14 +124,11 @@ class _AddGroupContentState
   Future<void> _takeGroupPhoto() async {
     try {
       ChatMessageModel? result =
-      await _chatCameraService
-          .takePhoto();
+      await _chatCameraService.takePhoto();
 
       if (result == null ||
           result.mediaPath == null ||
-          result.mediaPath!
-              .trim()
-              .isEmpty) {
+          result.mediaPath!.trim().isEmpty) {
         return;
       }
 
@@ -221,8 +205,7 @@ class _AddGroupContentState
         theme.colorScheme;
 
     bool isDark =
-        theme.brightness ==
-            Brightness.dark;
+        theme.brightness == Brightness.dark;
 
     Color cardColor = isDark
         ? Color(0xFF1B1D22)
@@ -238,13 +221,13 @@ class _AddGroupContentState
 
     return SafeArea(
       top: false,
+      bottom: false,
       child: Column(
         children: [
           Obx(
                 () {
               return Padding(
-                padding:
-                EdgeInsets.fromLTRB(
+                padding: EdgeInsets.fromLTRB(
                   14,
                   14,
                   14,
@@ -266,17 +249,16 @@ class _AddGroupContentState
               );
             },
           ),
+
           Obx(
                 () {
               if (controller
-                  .selectedMembers
-                  .isEmpty) {
+                  .selectedMembers.isEmpty) {
                 return SizedBox.shrink();
               }
 
               return Padding(
-                padding:
-                EdgeInsets.fromLTRB(
+                padding: EdgeInsets.fromLTRB(
                   14,
                   10,
                   14,
@@ -290,12 +272,12 @@ class _AddGroupContentState
                     growable: false,
                   ),
                   onRemoveMember:
-                  controller
-                      .removeMember,
+                  controller.removeMember,
                 ),
               );
             },
           ),
+
           Padding(
             padding: EdgeInsets.fromLTRB(
               14,
@@ -334,72 +316,87 @@ class _AddGroupContentState
                         },
                       ),
                     ),
+
                     SizedBox(width: 10),
+
                     Obx(
                           () {
                         return Text(
                           '${controller.filteredContacts.length} contacts',
                           style: theme
-                              .textTheme
-                              .bodySmall
+                              .textTheme.bodySmall
                               ?.copyWith(
                             color: colorScheme
                                 .onSurfaceVariant,
                             fontSize: 11,
                             fontWeight:
-                            FontWeight
-                                .w500,
+                            FontWeight.w500,
                           ),
                         );
                       },
                     ),
                   ],
                 ),
+
                 SizedBox(height: 9),
-                ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: searchController,
+
+                ValueListenableBuilder<
+                    TextEditingValue>(
+                  valueListenable:
+                  searchController,
                   builder: (
                       BuildContext context,
                       TextEditingValue value,
                       Widget? child,
                       ) {
                     bool hasSearchText =
-                        value.text.trim().isNotEmpty;
+                        value.text
+                            .trim()
+                            .isNotEmpty;
 
                     return SizedBox(
                       height: 46,
                       child: TextField(
-                        controller: searchController,
+                        controller:
+                        searchController,
                         textInputAction:
                         TextInputAction.search,
                         textAlignVertical:
                         TextAlignVertical.center,
-                        style: theme.textTheme.bodyMedium
+                        style: theme
+                            .textTheme.bodyMedium
                             ?.copyWith(
-                          color: colorScheme.onSurface,
+                          color:
+                          colorScheme.onSurface,
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontWeight:
+                          FontWeight.w500,
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Search contacts',
-                          hintStyle: theme.textTheme.bodyMedium
+                        decoration:
+                        InputDecoration(
+                          hintText:
+                          'Search contacts',
+                          hintStyle: theme
+                              .textTheme.bodyMedium
                               ?.copyWith(
                             color: colorScheme
                                 .onSurfaceVariant,
                             fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                            fontWeight:
+                            FontWeight.w400,
                           ),
                           isDense: true,
                           filled: true,
                           fillColor: cardColor,
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding:
+                          EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 10,
                           ),
                           prefixIcon: Icon(
                             Icons.search_rounded,
-                            color:
-                            colorScheme.onSurfaceVariant,
+                            color: colorScheme
+                                .onSurfaceVariant,
                             size: 20,
                           ),
                           prefixIconConstraints:
@@ -409,14 +406,18 @@ class _AddGroupContentState
                           ),
                           suffixIcon: hasSearchText
                               ? IconButton(
-                            onPressed: _clearSearch,
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(
+                            onPressed:
+                            _clearSearch,
+                            padding:
+                            EdgeInsets.zero,
+                            constraints:
+                            BoxConstraints(
                               minWidth: 42,
                               minHeight: 42,
                             ),
                             icon: Icon(
-                              Icons.close_rounded,
+                              Icons
+                                  .close_rounded,
                               color: colorScheme
                                   .onSurfaceVariant,
                               size: 19,
@@ -436,25 +437,38 @@ class _AddGroupContentState
                             minWidth: 42,
                             minHeight: 42,
                           ),
-                          border: OutlineInputBorder(
+                          border:
+                          OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.circular(14),
-                            borderSide: BorderSide(
+                            BorderRadius.circular(
+                              14,
+                            ),
+                            borderSide:
+                            BorderSide(
                               color: borderColor,
                             ),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder:
+                          OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.circular(14),
-                            borderSide: BorderSide(
+                            BorderRadius.circular(
+                              14,
+                            ),
+                            borderSide:
+                            BorderSide(
                               color: borderColor,
                             ),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder:
+                          OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: colorScheme.primary,
+                            BorderRadius.circular(
+                              14,
+                            ),
+                            borderSide:
+                            BorderSide(
+                              color:
+                              colorScheme.primary,
                               width: 1.35,
                             ),
                           ),
@@ -466,23 +480,22 @@ class _AddGroupContentState
               ],
             ),
           ),
+
           Expanded(
             child: Obx(
                   () {
-                List<ContactModel>
-                contacts = controller
-                    .filteredContacts;
+                List<ContactModel> contacts =
+                    controller.filteredContacts;
 
                 if (controller
                     .isLoading.value &&
-                    controller
-                        .contacts.isEmpty) {
+                    controller.contacts.isEmpty) {
                   return Center(
                     child:
                     CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      color: colorScheme
-                          .primary,
+                      color:
+                      colorScheme.primary,
                     ),
                   );
                 }
@@ -493,10 +506,9 @@ class _AddGroupContentState
                     .isNotEmpty) {
                   return _AddGroupErrorView(
                     message: controller
-                        .loadErrorMessage
-                        .value,
-                    onRetry: controller
-                        .loadContacts,
+                        .loadErrorMessage.value,
+                    onRetry:
+                    controller.loadContacts,
                   );
                 }
 
@@ -511,93 +523,65 @@ class _AddGroupContentState
                   );
                 }
 
-                return Container(
-                  margin:
-                  EdgeInsets.fromLTRB(
-                    14,
-                    0,
-                    14,
-                    14,
+                return ListView.separated(
+                  keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior
+                      .onDrag,
+                  physics:
+                  BouncingScrollPhysics(
+                    parent:
+                    AlwaysScrollableScrollPhysics(),
                   ),
-                  clipBehavior:
-                  Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius:
-                    BorderRadius.circular(
-                      20,
-                    ),
-                    border: Border.all(
-                      color: borderColor,
-                    ),
-                  ),
-                  child:
-                  ListView.separated(
-                    keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior
-                        .onDrag,
-                    physics:
-                    BouncingScrollPhysics(
-                      parent:
-                      AlwaysScrollableScrollPhysics(),
-                    ),
-                    padding:
-                    EdgeInsets.symmetric(
-                      vertical: 4,
-                    ),
-                    itemCount:
-                    contacts.length,
-                    separatorBuilder: (
-                        BuildContext context,
-                        int index,
-                        ) {
-                      return Padding(
-                        padding:
-                        EdgeInsets.only(
-                          left: 76,
-                        ),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: borderColor,
-                        ),
-                      );
-                    },
-                    itemBuilder: (
-                        BuildContext context,
-                        int index,
-                        ) {
-                      ContactModel contact =
-                      contacts[index];
+                  padding: EdgeInsets.zero,
+                  itemCount: contacts.length,
+                  separatorBuilder: (
+                      BuildContext context,
+                      int index,
+                      ) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        left: 76,
+                      ),
+                      child: Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: borderColor,
+                      ),
+                    );
+                  },
+                  itemBuilder: (
+                      BuildContext context,
+                      int index,
+                      ) {
+                    ContactModel contact =
+                    contacts[index];
 
-                      return GetBuilder<
-                          AddGroupController>(
-                        id:
-                        'contact_${contact.id}',
-                        builder: (
-                            AddGroupController
-                            controller,
-                            ) {
-                          return AddGroupContactTile(
-                            key: ValueKey<String>(
-                              contact.id,
-                            ),
-                            contact: contact,
-                            selected: controller
-                                .isSelected(
+                    return GetBuilder<
+                        AddGroupController>(
+                      id:
+                      'contact_${contact.id}',
+                      builder: (
+                          AddGroupController
+                          controller,
+                          ) {
+                        return AddGroupContactTile(
+                          key: ValueKey<String>(
+                            contact.id,
+                          ),
+                          contact: contact,
+                          selected:
+                          controller.isSelected(
+                            contact,
+                          ),
+                          onTap: () {
+                            controller.toggleMember(
                               contact,
-                            ),
-                            onTap: () {
-                              controller
-                                  .toggleMember(
-                                contact,
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
                 );
               },
             ),
@@ -643,7 +627,9 @@ class _AddGroupEmptyView
                   .onSurfaceVariant,
               size: 44,
             ),
+
             SizedBox(height: 12),
+
             Text(
               hasSearch
                   ? 'No contacts found'
@@ -657,10 +643,12 @@ class _AddGroupEmptyView
                 FontWeight.w700,
               ),
             ),
+
             if (hasSearch) ...[
               SizedBox(height: 10),
               TextButton(
-                onPressed: onClearSearch,
+                onPressed:
+                onClearSearch,
                 child: Text(
                   'Clear search',
                 ),
@@ -703,10 +691,13 @@ class _AddGroupErrorView
               color: colorScheme.error,
               size: 44,
             ),
+
             SizedBox(height: 12),
+
             Text(
               message,
-              textAlign: TextAlign.center,
+              textAlign:
+              TextAlign.center,
               style: theme
                   .textTheme.bodyMedium
                   ?.copyWith(
@@ -714,7 +705,9 @@ class _AddGroupErrorView
                     .onSurfaceVariant,
               ),
             ),
+
             SizedBox(height: 12),
+
             FilledButton.icon(
               onPressed: onRetry,
               icon: Icon(
