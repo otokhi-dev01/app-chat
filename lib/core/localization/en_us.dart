@@ -449,4 +449,95 @@ final Map<String, String> enUS = {
   'gallery': 'Gallery',
   'camera': 'Camera',
   'remove': 'Remove',
+
+  'profile_details': 'Profile Details',
+
+  'open_conversation': 'Open Conversation',
+  'opening_conversation_with':
+  'Opening conversation with @name.',
+  'start_call': 'Start Call',
+  'start_call_confirmation':
+  'Do you want to call @name?',
+  'call': 'Call',
+  'calling': 'Calling',
+  'calling_user': 'Calling @name...',
+  'profile_shared': 'Profile Shared',
+  'profile_shared_message':
+  'The profile was shared successfully.',
+  'sharing_unavailable':
+  'Sharing Unavailable',
+  'sharing_unavailable_message':
+  'Sharing is unavailable on this device.',
+  'unable_to_share_profile':
+  'Unable to Share Profile',
+  'unable_to_share_profile_message':
+  'Something went wrong. Please try again.',
+  'notification_settings':
+  'Notification Settings',
+  'notification_settings_message':
+  'Notification settings selected.',
+  'block_user': 'Block User',
+  'block_user_confirmation':
+  'Are you sure you want to block @name?',
+  'block': 'Block',
+  'user_blocked': 'User Blocked',
+  'user_blocked_message':
+  '@name has been blocked.',
+  'report_user': 'Report User',
+  'report_user_confirmation':
+  'Are you sure you want to report @name?',
+  'report': 'Report',
+  'report_submitted': 'Report Submitted',
+  'report_submitted_message':
+  'Your report about @name has been submitted.',
+
+  'contact_information': 'Contact Information',
+  'contact_name': 'Contact Name',
+  'enter_contact_name': 'Enter contact name',
+  'contact_name_required': 'Contact name is required',
+  'enter_phone_number': 'Enter phone number',
+  'add_to_contacts': 'Add to Contacts',
+  'new_contact': 'New Contact',
+  'saving_contact': 'Saving contact...',
+  'contact_added_successfully': 'Contact added successfully',
+  'unable_to_add_contact': 'Unable to add contact',
+
+  'sync_contacts': 'Sync Contacts',
+  'sync_contacts_description':
+  'Find friends from your phone contacts who use AppChat.',
+  'sync_now': 'Sync Now',
+  'sync_completed': 'Sync Completed',
+  'contacts_synced_successfully':
+  'Your phone contacts were synced successfully.',
+  'sync_failed': 'Sync Failed',
+  'contacts_sync_failed':
+  'Unable to sync your phone contacts.',
+
+  'notifications_enabled': 'Notifications Enabled',
+  'notifications_enabled_message':
+  'You will receive new message notifications.',
+  'notifications_disabled': 'Notifications Disabled',
+  'notifications_disabled_message':
+  'New message notifications are turned off.',
+  'permission_denied': 'Permission Denied',
+  'notification_permission_denied':
+  'Notification permission was not allowed.',
+  'permission_required': 'Permission Required',
+  'enable_notifications_in_settings':
+  'Enable notifications from your device settings.',
+  'unable_to_update': 'Unable to Update',
+  'notification_update_failed':
+  'Notification settings could not be changed.',
+  'updating': 'Updating...',
+
+  'contacts_synced': 'Contacts Synced',
+  'contacts_synced_message':
+  'Your phone contacts have been synced successfully.',
+  'contacts_permission_settings_message':
+  'Allow contacts access from your device settings.',
+  'contacts_permission_denied_message':
+  'Contacts permission was not allowed.',
+  'unable_to_sync': 'Unable to Sync',
+  'contacts_sync_failed_message':
+  'Your contacts could not be synced.',
 };

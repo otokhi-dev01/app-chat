@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Piisiit Chat</string>
+	<string>OTOKHI Chat</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,37 +15,41 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Piisiit Chat</string>
+	<string>OTOKHI Chat</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+    <string>OTOKHI Chat needs camera access to take photos and videos, scan contact QR codes, and create posts.</string>
+
+    <key>NSContactsUsageDescription</key>
+    <string>OTOKHI Chat needs access to your contacts to help you find friends who use the app.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>OTOKHI Chat needs your location so you can share it in chat.</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>OTOKHI Chat needs microphone access to record voice messages and audio for videos.</string>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>OTOKHI Chat needs permission to save photos and QR codes to your photo library.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>OTOKHI Chat needs photo library access to select photos and videos for chats and posts.</string>
+
+    <key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-
-	<key>NSCameraUsageDescription</key>
-    <string>PiitsiitChat needs camera access to take photos and videos, scan contact QR codes, and create posts.</string>
-
-    <key>NSMicrophoneUsageDescription</key>
-    <string>PiitsiitChat needs microphone access to record voice messages and audio for videos.</string>
-
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>PiitsiitChat needs photo library access to select photos and videos for chats and posts.</string>
-
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>PiitsiitChat needs permission to save photos and QR codes to your photo library.</string>
-
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>PiitsiitChat needs your location so you can share it in chat.</string>
-
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -57,9 +63,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
 </dict>
 </plist>

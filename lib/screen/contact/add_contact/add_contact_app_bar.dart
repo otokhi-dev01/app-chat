@@ -4,17 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class ProfileAppBar extends StatelessWidget
+class AddContactAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  final String title;
-  final VoidCallback? onBack;
-  final VoidCallback? onQrCodeTap;
+  final VoidCallback onBack;
 
-  ProfileAppBar({
+  AddContactAppBar({
     super.key,
-    required this.title,
-    this.onBack,
-    this.onQrCodeTap,
+    required this.onBack,
   });
 
   @override
@@ -26,30 +22,30 @@ class ProfileAppBar extends StatelessWidget
     required ThemeData theme,
     required bool isDark,
   }) {
-    if (isDark) {
-      return SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
-      );
-    }
+    Brightness iconBrightness = isDark
+        ? Brightness.light
+        : Brightness.dark;
 
-    return SystemUiOverlayStyle.dark.copyWith(
+    Brightness statusBrightness = isDark
+        ? Brightness.dark
+        : Brightness.light;
+
+    return SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness:
-      Brightness.dark,
+      iconBrightness,
       statusBarBrightness:
-      Brightness.light,
+      statusBrightness,
+      systemStatusBarContrastEnforced:
+      false,
       systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
+      Colors.transparent,
+      systemNavigationBarDividerColor:
+      Colors.transparent,
       systemNavigationBarIconBrightness:
-      Brightness.dark,
+      iconBrightness,
+      systemNavigationBarContrastEnforced:
+      false,
     );
   }
 
@@ -64,7 +60,7 @@ class ProfileAppBar extends StatelessWidget
 
     Color appBarColor = isDark
         ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
+      alpha: 0.96,
     )
         : Colors.white.withValues(
       alpha: 0.98,
@@ -74,13 +70,18 @@ class ProfileAppBar extends StatelessWidget
         ? Colors.white.withValues(
       alpha: 0.08,
     )
-        : Color(0xFFF2F4F7);
+        : colorScheme.surfaceContainerHighest
+        .withValues(
+      alpha: 0.75,
+    );
 
     Color borderColor = isDark
         ? Colors.white.withValues(
       alpha: 0.08,
     )
-        : Color(0xFFE7E9ED);
+        : colorScheme.outlineVariant.withValues(
+      alpha: 0.45,
+    );
 
     return AppBar(
       toolbarHeight: 60,
@@ -90,8 +91,10 @@ class ProfileAppBar extends StatelessWidget
       backgroundColor: Colors.transparent,
       foregroundColor:
       colorScheme.onSurface,
-      surfaceTintColor: Colors.transparent,
-      shadowColor: Colors.transparent,
+      surfaceTintColor:
+      Colors.transparent,
+      shadowColor:
+      Colors.transparent,
       forceMaterialTransparency: true,
       leadingWidth: 54,
       titleSpacing: 0,
@@ -157,7 +160,7 @@ class ProfileAppBar extends StatelessWidget
         ),
       ),
       title: Text(
-        title,
+        'add_contact'.tr,
         maxLines: 1,
         overflow:
         TextOverflow.ellipsis,
@@ -167,48 +170,10 @@ class ProfileAppBar extends StatelessWidget
           color: colorScheme.onSurface,
           fontSize: 17,
           height: 1.1,
-          fontWeight: FontWeight.w700,
+          fontWeight:
+          FontWeight.w700,
         ),
       ),
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(
-            right: 8,
-          ),
-          child: Center(
-            child: Material(
-              color: actionBackground,
-              shape: CircleBorder(),
-              child: Tooltip(
-                message: 'qr_code'.tr,
-                child: InkWell(
-                  onTap: onQrCodeTap,
-                  customBorder:
-                  CircleBorder(),
-                  splashColor:
-                  Colors.transparent,
-                  highlightColor:
-                  Colors.transparent,
-                  hoverColor:
-                  Colors.transparent,
-                  focusColor:
-                  Colors.transparent,
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Icon(
-                      Icons.qr_code_rounded,
-                      color: colorScheme
-                          .onSurface,
-                      size: 21,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

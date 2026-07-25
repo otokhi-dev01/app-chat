@@ -1,458 +1,397 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../controllers/user/user_controller.dart';
-import '../widgets/profile_detail/profile_detail_action.dart';
+import '../../route/app_route.dart';
+import '../contact/add_contact/add_contact_screen.dart';
+import '../widgets/common/app_feedback.dart';
+import '../widgets/profile_detail/profile_content_filter.dart';
 import '../widgets/profile_detail/profile_detail_app_bar.dart';
-import '../widgets/profile_detail/profile_detail_header.dart';
-import '../widgets/profile_detail/profile_detail_info_section.dart';
+import '../widgets/profile_detail/profile_detail_content.dart';
 import '../widgets/profile_detail/profile_more_option_sheet.dart';
 
-class ProfileDetailScreen
-    extends StatelessWidget {
+class ProfileDetailScreen extends StatefulWidget {
   final UserController controller;
 
   ProfileDetailScreen({
     super.key,
     UserController? controller,
   }) : controller = controller ??
-      (Get.isRegistered<
-          UserController>()
-          ? Get.find<
-          UserController>()
+      (Get.isRegistered<UserController>()
+          ? Get.find<UserController>()
           : Get.put(
         UserController(),
       ));
 
-  void _showMessage(
+  @override
+  State<ProfileDetailScreen> createState() {
+    return _ProfileDetailScreenState();
+  }
+}
+
+class _ProfileDetailScreenState
+    extends State<ProfileDetailScreen> {
+  ProfileContentFilterType selectedFilter =
+      ProfileContentFilterType.posts;
+
+  UserController get controller {
+    return widget.controller;
+  }
+
+  Future<void> _openAddContact(
       BuildContext context,
-      String message, {
-        bool isError = false,
-      }) {
-    ThemeData theme =
-    Theme.of(context);
+      ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    dynamic result = await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(
+      MaterialPageRoute<dynamic>(
+        fullscreenDialog: false,
+        builder: (
+            BuildContext routeContext,
+            ) {
+          return AddContactScreen(
+            name: controller.name.value,
+            username: controller.username.value,
+            phoneNumber:
+            controller.phoneNumber.value,
+            imageUrl:
+            controller.profileImageUrl.value,
+          );
+        },
+      ),
+    );
 
-    Color backgroundColor = isError
-        ? colorScheme.error
-        : colorScheme.primary;
+    if (!mounted || result is! Map) {
+      return;
+    }
 
-    Color foregroundColor = isError
-        ? colorScheme.onError
-        : colorScheme.onPrimary;
+    Map<dynamic, dynamic> resultData =
+        result;
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                isError
-                    ? Icons
-                    .error_outline_rounded
-                    : Icons
-                    .check_circle_outline_rounded,
-                color: foregroundColor,
-                size: 20,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight:
-                    FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
+    if (resultData['saved'] != true) {
+      return;
+    }
+
+    String contactName =
+        resultData['name']?.toString() ??
+            controller.name.value;
+
+    AppFeedback.showMessage(
+      title: 'contact_added'.tr,
+      message: 'contact_added_message'.trParams(
+        {
+          'name': contactName,
+        },
+      ),
+      icon: Icons.person_add_alt_1_rounded,
+    );
+  }
+
+  void _openMessage() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    AppFeedback.showMessage(
+      title: 'open_conversation'.tr,
+      message:
+      'opening_conversation_with'.trParams(
+        {
+          'name': controller.name.value,
+        },
+      ),
+      icon: Icons.chat_bubble_outline_rounded,
+    );
+  }
+
+  void _startCall() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    AppFeedback.showMessage(
+      title: 'calling'.tr,
+      message: 'calling_user'.trParams(
+        {
+          'name': controller.name.value,
+        },
+      ),
+      icon: Icons.call_outlined,
+    );
+  }
+
+  Future<void> _shareProfile(
+      BuildContext context,
+      ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    String name =
+    controller.name.value.trim();
+
+    if (name.isEmpty) {
+      name = 'appchat_user'.tr;
+    }
+
+    String username =
+    controller.username.value.trim();
+
+    String normalizedUsername =
+    username.startsWith('@')
+        ? username.substring(1)
+        : username;
+
+    String displayUsername =
+    normalizedUsername.isEmpty
+        ? ''
+        : '@$normalizedUsername';
+
+    StringBuffer shareMessage =
+    StringBuffer();
+
+    shareMessage.writeln(
+      'share_profile_intro'.trParams(
+        {
+          'name': name,
+        },
+      ),
+    );
+
+    if (displayUsername.isNotEmpty) {
+      shareMessage.writeln();
+
+      shareMessage.writeln(
+        'share_profile_username'.trParams(
+          {
+            'username': displayUsername,
+          },
+        ),
+      );
+    }
+
+    shareMessage.writeln();
+
+    shareMessage.write(
+      'share_profile_instruction'.tr,
+    );
+
+    try {
+      ShareResult result =
+      await SharePlus.instance.share(
+        ShareParams(
+          title: 'share_profile'.tr,
+          subject:
+          'share_profile_subject'.trParams(
+            {
+              'name': name,
+            },
           ),
-          behavior:
-          SnackBarBehavior.floating,
-          backgroundColor:
-          backgroundColor,
-          margin: EdgeInsets.all(14),
-          duration: Duration(
-            milliseconds: 1800,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(14),
+          text: shareMessage.toString().trim(),
+          sharePositionOrigin:
+          _getSharePositionOrigin(
+            context,
           ),
         ),
       );
-  }
 
-  void _handleMenu(
-      BuildContext context,
-      String value,
-      ) {
-    switch (value) {
-      case 'share':
-        _shareProfile(context);
-        break;
+      if (!mounted) {
+        return;
+      }
 
-      case 'block':
-        _blockUser(context);
-        break;
+      switch (result.status) {
+        case ShareResultStatus.success:
+          AppFeedback.showMessage(
+            title: 'profile_shared'.tr,
+            message:
+            'profile_shared_message'.tr,
+            icon: Icons.share_outlined,
+          );
+          break;
+
+        case ShareResultStatus.dismissed:
+          break;
+
+        case ShareResultStatus.unavailable:
+          AppFeedback.showMessage(
+            title:
+            'sharing_unavailable'.tr,
+            message:
+            'sharing_unavailable_message'.tr,
+            icon:
+            Icons.error_outline_rounded,
+          );
+          break;
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        'Share profile error: $error',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      AppFeedback.showMessage(
+        title:
+        'unable_to_share_profile'.tr,
+        message:
+        'unable_to_share_profile_message'.tr,
+        icon: Icons.error_outline_rounded,
+      );
     }
   }
 
-  void _openMessage(
+  Rect _getSharePositionOrigin(
       BuildContext context,
       ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    RenderObject? renderObject =
+    context.findRenderObject();
 
-    _showMessage(
-      context,
-      'Open conversation with ${controller.name.value}',
+    if (renderObject is RenderBox &&
+        renderObject.hasSize) {
+      Offset globalPosition =
+      renderObject.localToGlobal(
+        Offset.zero,
+      );
+
+      Size size = renderObject.size;
+
+      if (size.width > 0 &&
+          size.height > 0) {
+        return Rect.fromLTWH(
+          globalPosition.dx,
+          globalPosition.dy,
+          size.width,
+          size.height,
+        );
+      }
+    }
+
+    Size screenSize =
+    MediaQuery.sizeOf(context);
+
+    return Rect.fromLTWH(
+      screenSize.width / 2,
+      screenSize.height / 2,
+      1,
+      1,
     );
   }
 
-  void _startCall(
-      BuildContext context,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+  void _openNotificationSettings() {
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    _showMessage(
-      context,
-      'Calling ${controller.name.value}...',
+    AppFeedback.showMessage(
+      title: 'notification_settings'.tr,
+      message:
+      'notification_settings_message'.tr,
+      icon: Icons.notifications_outlined,
     );
   }
 
-  void _shareProfile(
-      BuildContext context,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+  void _blockUser() {
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    _showMessage(
-      context,
-      'Share profile selected',
-    );
-  }
-
-  void _openNotificationSettings(
-      BuildContext context,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
-    _showMessage(
-      context,
-      'Notification settings selected',
-    );
-  }
-
-  void _blockUser(
-      BuildContext context,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
-    _showMessage(
-      context,
-      'Block user selected',
-      isError: true,
-    );
-  }
-
-  void _reportUser(
-      BuildContext context,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
-    _showMessage(
-      context,
-      'Report user selected',
-      isError: true,
+    AppFeedback.showMessage(
+      title: 'user_blocked'.tr,
+      message: 'user_blocked_message'.trParams(
+        {
+          'name': controller.name.value,
+        },
+      ),
+      icon: Icons.block_rounded,
     );
   }
 
   Future<void> _openMoreOptions(
       BuildContext context,
       ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     await showProfileMoreOptionsSheet(
       context: context,
       userName: controller.name.value,
       onShareProfile: () {
-        _shareProfile(context);
-      },
-      onNotifications: () {
-        _openNotificationSettings(
+        _shareProfile(
           context,
         );
       },
-      onBlockUser: () {
-        _blockUser(context);
-      },
-      onReportUser: () {
-        _reportUser(context);
+      onNotifications:
+      _openNotificationSettings,
+      onBlockUser: _blockUser,
+    );
+  }
+
+  void _changeFilter(
+      ProfileContentFilterType filter,
+      ) {
+    if (selectedFilter == filter) {
+      return;
+    }
+
+    setState(() {
+      selectedFilter = filter;
+    });
+  }
+
+  void _openQrCode() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    Get.toNamed(
+      AppRoutes.profileQrCode,
+      arguments: <String, dynamic>{
+        'name': controller.name.value,
+        'username':
+        controller.username.value,
       },
     );
   }
 
+  void _closeScreen() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    Get.back();
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     bool isDark =
-        theme.brightness ==
-            Brightness.dark;
+        theme.brightness == Brightness.dark;
 
     Color pageBackground = isDark
         ? theme.scaffoldBackgroundColor
         : Color(0xFFF6F7F9);
 
     return Scaffold(
-      backgroundColor:
-      pageBackground,
+      resizeToAvoidBottomInset: true,
+      extendBody: false,
+      backgroundColor: pageBackground,
       appBar: ProfileAppBar(
-        title: 'Profile Details',
-        onBack: () {
-          FocusManager.instance
-              .primaryFocus
-              ?.unfocus();
-
-          Get.back();
-        },
-        onMenuSelected: (
-            String value,
-            ) {
-          _handleMenu(
-            context,
-            value,
-          );
-        },
+        title: 'profile_details'.tr,
+        onBack: _closeScreen,
+        onQrCodeTap: _openQrCode,
       ),
-      body: Obx(
-            () {
-          return _buildProfileContent(
+      body: ProfileDetailContent(
+        controller: controller,
+        selectedFilter: selectedFilter,
+        onFilterChanged: _changeFilter,
+        onMessage: _openMessage,
+        onCall: _startCall,
+        onMore: () {
+          _openMoreOptions(
             context,
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildProfileContent(
-      BuildContext context,
-      ) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    bool isOnline = controller
-        .status.value
-        .trim()
-        .toLowerCase() ==
-        'online';
-
-    return SafeArea(
-      top: false,
-      child: CustomScrollView(
-        keyboardDismissBehavior:
-        ScrollViewKeyboardDismissBehavior
-            .onDrag,
-        physics:
-        BouncingScrollPhysics(
-          parent:
-          AlwaysScrollableScrollPhysics(),
-        ),
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              14,
-              14,
-              14,
-              30,
-            ),
-            sliver: SliverList(
-              delegate:
-              SliverChildListDelegate(
-                [
-                  ProfileDetailHeader(
-                    name:
-                    controller.name.value,
-                    status: controller
-                        .status.value,
-                    imageUrl: controller
-                        .profileImageUrl
-                        .value,
-                    isOnline: isOnline,
-                  ),
-                  SizedBox(height: 14),
-                  ProfileActions(
-                    onMessage: () {
-                      _openMessage(
-                        context,
-                      );
-                    },
-                    onCall: () {
-                      _startCall(
-                        context,
-                      );
-                    },
-                    onMore: () {
-                      _openMoreOptions(
-                        context,
-                      );
-                    },
-                  ),
-                  SizedBox(height: 14),
-                  ProfileInfoSection(
-                    phoneNumber: controller
-                        .phoneNumber.value,
-                    username: controller
-                        .username.value,
-                    bio:
-                    controller.bio.value,
-                  ),
-                  SizedBox(height: 14),
-                  _buildNotificationCard(
-                    context,
-                    colorScheme,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationCard(
-      BuildContext context,
-      ColorScheme colorScheme,
-      ) {
-    ThemeData theme =
-    Theme.of(context);
-
-    bool isDark =
-        theme.brightness ==
-            Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
-    Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
-
-    return Material(
-      color: cardColor,
-      borderRadius:
-      BorderRadius.circular(20),
-      child: InkWell(
-        onTap: () {
-          _openNotificationSettings(
+        onAddContact: () {
+          _openAddContact(
             context,
           );
         },
-        borderRadius:
-        BorderRadius.circular(20),
-        splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
-        hoverColor: Colors.transparent,
-        focusColor: Colors.transparent,
-        child: Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius:
-            BorderRadius.circular(
-              20,
-            ),
-            border: Border.all(
-              color: borderColor,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colorScheme
-                      .primary
-                      .withValues(
-                    alpha: 0.11,
-                  ),
-                  borderRadius:
-                  BorderRadius.circular(
-                    14,
-                  ),
-                ),
-                child: Icon(
-                  Icons
-                      .notifications_none_rounded,
-                  color:
-                  colorScheme.primary,
-                  size: 24,
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
-                  children: [
-                    Text(
-                      'Notifications',
-                      style: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurface,
-                        fontWeight:
-                        FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Manage notifications from this user',
-                      maxLines: 2,
-                      overflow:
-                      TextOverflow
-                          .ellipsis,
-                      style: theme
-                          .textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
-                        fontSize: 12,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 8),
-              Icon(
-                Icons
-                    .chevron_right_rounded,
-                color: colorScheme
-                    .onSurfaceVariant,
-                size: 23,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

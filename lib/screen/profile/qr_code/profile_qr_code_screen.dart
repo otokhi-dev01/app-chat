@@ -8,20 +8,16 @@ import '../../../services/download/profile_qr_download_service.dart';
 import '../../widgets/qr_code/profile_qr_content.dart';
 import 'profile_qr_app_bar.dart';
 
-class ProfileQrCodeScreen
-    extends StatelessWidget {
+class ProfileQrCodeScreen extends StatelessWidget {
   final String name;
   final String username;
-
-  final ProfileQrDownloadService
-  downloadService;
+  final ProfileQrDownloadService downloadService;
 
   ProfileQrCodeScreen({
     super.key,
     required this.name,
     required this.username,
-    ProfileQrDownloadService?
-    downloadService,
+    ProfileQrDownloadService? downloadService,
   }) : downloadService =
       downloadService ??
           ProfileQrDownloadService();
@@ -52,8 +48,7 @@ class ProfileQrCodeScreen
   }
 
   String get profileQrData {
-    String profileKey =
-    cleanUsername.isNotEmpty
+    String profileKey = cleanUsername.isNotEmpty
         ? cleanUsername
         : cleanName;
 
@@ -108,10 +103,12 @@ class ProfileQrCodeScreen
     if (result is ContactModel) {
       _showMessage(
         title: 'contact_added'.tr,
-        message: 'contact_added_message'
-            .trParams({
-          'name': result.name,
-        }),
+        message:
+        'contact_added_message'.trParams(
+          <String, String>{
+            'name': result.name,
+          },
+        ),
         icon:
         Icons.person_add_alt_1_rounded,
       );
@@ -159,8 +156,7 @@ class ProfileQrCodeScreen
   }
 
   void _copyProfileValue() {
-    String value =
-    cleanUsername.isNotEmpty
+    String value = cleanUsername.isNotEmpty
         ? '@$cleanUsername'
         : profileQrData;
 
@@ -201,8 +197,7 @@ class ProfileQrCodeScreen
     Get.snackbar(
       title,
       message,
-      snackPosition:
-      SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.BOTTOM,
       margin: EdgeInsets.all(16),
       borderRadius: 16,
       icon: Icon(
@@ -234,33 +229,96 @@ class ProfileQrCodeScreen
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor:
-      theme.scaffoldBackgroundColor,
-      appBar: ProfileQrAppBar(
-        onBack: _closeScreen,
-        onScan: () {
-          _openScanner(
-            context,
-          );
-        },
-      ),
-      body: ProfileQrContent(
-        name: cleanName,
-        username: displayUsername,
-        qrData: profileQrData,
-        firstLetter: firstLetter,
-        hasUsername:
-        cleanUsername.isNotEmpty,
-        onCopy: _copyProfileValue,
-        onDownload: () {
-          return _downloadQrCode(
-            context,
-          );
-        },
+    bool isDark =
+        theme.brightness == Brightness.dark;
+
+    Color pageColor =
+        theme.scaffoldBackgroundColor;
+
+    SystemUiOverlayStyle overlayStyle =
+    isDark
+        ? SystemUiOverlayStyle.light
+        .copyWith(
+      statusBarColor:
+      Colors.transparent,
+      statusBarIconBrightness:
+      Brightness.light,
+      statusBarBrightness:
+      Brightness.dark,
+      systemNavigationBarColor:
+      pageColor,
+      systemNavigationBarDividerColor:
+      pageColor,
+      systemNavigationBarIconBrightness:
+      Brightness.light,
+      systemNavigationBarContrastEnforced:
+      false,
+    )
+        : SystemUiOverlayStyle.dark
+        .copyWith(
+      statusBarColor:
+      Colors.transparent,
+      statusBarIconBrightness:
+      Brightness.dark,
+      statusBarBrightness:
+      Brightness.light,
+      systemNavigationBarColor:
+      pageColor,
+      systemNavigationBarDividerColor:
+      pageColor,
+      systemNavigationBarIconBrightness:
+      Brightness.dark,
+      systemNavigationBarContrastEnforced:
+      false,
+    );
+
+    return AnnotatedRegion<
+        SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: Scaffold(
+        backgroundColor: pageColor,
+        extendBody: true,
+        extendBodyBehindAppBar: false,
+        resizeToAvoidBottomInset: false,
+        appBar: ProfileQrAppBar(
+          onBack: _closeScreen,
+          onScan: () {
+            _openScanner(
+              context,
+            );
+          },
+        ),
+        body: MediaQuery.removeViewPadding(
+          context: context,
+          removeBottom: true,
+          child: SizedBox.expand(
+            child: ColoredBox(
+              color: pageColor,
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                child: ProfileQrContent(
+                  name: cleanName,
+                  username:
+                  displayUsername,
+                  qrData: profileQrData,
+                  firstLetter: firstLetter,
+                  hasUsername:
+                  cleanUsername.isNotEmpty,
+                  onCopy:
+                  _copyProfileValue,
+                  onDownload: () {
+                    return _downloadQrCode(
+                      context,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

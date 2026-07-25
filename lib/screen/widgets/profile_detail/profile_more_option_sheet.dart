@@ -6,7 +6,6 @@ Future<void> showProfileMoreOptionsSheet({
   VoidCallback? onShareProfile,
   VoidCallback? onNotifications,
   VoidCallback? onBlockUser,
-  VoidCallback? onReportUser,
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
 
@@ -109,20 +108,6 @@ Future<void> showProfileMoreOptionsSheet({
                 _closeAndRun(
                   context: sheetContext,
                   action: onBlockUser,
-                );
-              },
-            ),
-            SizedBox(height: 6),
-            ProfileMoreOptionTile(
-              icon: Icons.flag_outlined,
-              title: 'Report User',
-              subtitle:
-              'Report this account',
-              isDanger: true,
-              onTap: () {
-                _closeAndRun(
-                  context: sheetContext,
-                  action: onReportUser,
                 );
               },
             ),

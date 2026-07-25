@@ -460,5 +460,98 @@ final Map<String, String> kmKH = {
   'camera': 'កាមេរ៉ា',
   'remove': 'លុបចេញ',
 
+  'profile_details': 'ព័ត៌មានលម្អិតប្រវត្តិរូប',
+
+  'open_conversation': 'បើកការសន្ទនា',
+  'opening_conversation_with':
+  'កំពុងបើកការសន្ទនាជាមួយ @name។',
+  'start_call': 'ចាប់ផ្ដើមការហៅ',
+  'start_call_confirmation':
+  'តើអ្នកចង់ហៅទៅ @name មែនទេ?',
+  'call': 'ហៅ',
+  'calling': 'កំពុងហៅ',
+  'calling_user': 'កំពុងហៅទៅ @name...',
+  'profile_shared': 'បានចែករំលែកប្រវត្តិរូប',
+  'profile_shared_message':
+  'ប្រវត្តិរូបត្រូវបានចែករំលែកដោយជោគជ័យ។',
+  'sharing_unavailable':
+  'មិនអាចចែករំលែកបាន',
+  'sharing_unavailable_message':
+  'មុខងារចែករំលែកមិនអាចប្រើបានលើឧបករណ៍នេះទេ។',
+  'unable_to_share_profile':
+  'មិនអាចចែករំលែកប្រវត្តិរូបបាន',
+  'unable_to_share_profile_message':
+  'មានបញ្ហាកើតឡើង។ សូមព្យាយាមម្ដងទៀត។',
+  'notification_settings':
+  'ការកំណត់ការជូនដំណឹង',
+  'notification_settings_message':
+  'បានជ្រើសរើសការកំណត់ការជូនដំណឹង។',
+  'block_user': 'រារាំងអ្នកប្រើប្រាស់',
+  'block_user_confirmation':
+  'តើអ្នកពិតជាចង់រារាំង @name មែនទេ?',
+  'block': 'រារាំង',
+  'user_blocked':
+  'បានរារាំងអ្នកប្រើប្រាស់',
+  'user_blocked_message':
+  'បានរារាំង @name រួចរាល់។',
+  'report_user':
+  'រាយការណ៍អ្នកប្រើប្រាស់',
+  'report_user_confirmation':
+  'តើអ្នកពិតជាចង់រាយការណ៍ @name មែនទេ?',
+  'report': 'រាយការណ៍',
+  'report_submitted':
+  'បានផ្ញើរបាយការណ៍',
+  'report_submitted_message':
+  'របាយការណ៍របស់អ្នកអំពី @name ត្រូវបានផ្ញើរួចរាល់។',
+
+  'contact_information': 'ព័ត៌មានទំនាក់ទំនង',
+  'contact_name': 'ឈ្មោះទំនាក់ទំនង',
+  'enter_contact_name': 'បញ្ចូលឈ្មោះទំនាក់ទំនង',
+  'contact_name_required': 'សូមបញ្ចូលឈ្មោះទំនាក់ទំនង',
+  'enter_phone_number': 'បញ្ចូលលេខទូរស័ព្ទ',
+  'add_to_contacts': 'បន្ថែមទៅក្នុងទំនាក់ទំនង',
+  'new_contact': 'ទំនាក់ទំនងថ្មី',
+  'saving_contact': 'កំពុងរក្សាទុកទំនាក់ទំនង...',
+  'contact_added_successfully': 'បានបន្ថែមទំនាក់ទំនងដោយជោគជ័យ',
+  'unable_to_add_contact': 'មិនអាចបន្ថែមទំនាក់ទំនងបានទេ',
+
+  'sync_contacts': 'ធ្វើសមកាលកម្មទំនាក់ទំនង',
+  'sync_contacts_description':
+  'ស្វែងរកមិត្តភក្តិពីទំនាក់ទំនងក្នុងទូរស័ព្ទរបស់អ្នកដែលប្រើ AppChat។',
+  'sync_now': 'ធ្វើសមកាលកម្ម',
+  'sync_completed': 'បានធ្វើសមកាលកម្ម',
+  'contacts_synced_successfully':
+  'ទំនាក់ទំនងក្នុងទូរស័ព្ទរបស់អ្នកត្រូវបានធ្វើសមកាលកម្មដោយជោគជ័យ។',
+  'sync_failed': 'ការធ្វើសមកាលកម្មបរាជ័យ',
+  'contacts_sync_failed':
+  'មិនអាចធ្វើសមកាលកម្មទំនាក់ទំនងក្នុងទូរស័ព្ទបានទេ។',
+
+  'notifications_enabled': 'បានបើកការជូនដំណឹង',
+  'notifications_enabled_message':
+  'អ្នកនឹងទទួលបានការជូនដំណឹងសារថ្មី។',
+  'notifications_disabled': 'បានបិទការជូនដំណឹង',
+  'notifications_disabled_message':
+  'ការជូនដំណឹងសារថ្មីត្រូវបានបិទ។',
+  'permission_denied': 'ការអនុញ្ញាតត្រូវបានបដិសេធ',
+  'notification_permission_denied':
+  'អ្នកមិនបានអនុញ្ញាតការជូនដំណឹងទេ។',
+  'permission_required': 'ត្រូវការការអនុញ្ញាត',
+  'enable_notifications_in_settings':
+  'សូមបើកការជូនដំណឹងក្នុងការកំណត់ឧបករណ៍។',
+  'unable_to_update': 'មិនអាចកែប្រែបាន',
+  'notification_update_failed':
+  'មិនអាចកែប្រែការកំណត់ការជូនដំណឹងបានទេ។',
+  'updating': 'កំពុងកែប្រែ...',
+
+  'contacts_synced': 'បានធ្វើសមកាលកម្មទំនាក់ទំនង',
+  'contacts_synced_message':
+  'ទំនាក់ទំនងក្នុងទូរស័ព្ទរបស់អ្នកត្រូវបានធ្វើសមកាលកម្មដោយជោគជ័យ។',
+  'contacts_permission_settings_message':
+  'សូមអនុញ្ញាតការចូលប្រើទំនាក់ទំនងក្នុងការកំណត់ឧបករណ៍។',
+  'contacts_permission_denied_message':
+  'ការអនុញ្ញាតចូលប្រើទំនាក់ទំនងត្រូវបានបដិសេធ។',
+  'unable_to_sync': 'មិនអាចធ្វើសមកាលកម្មបាន',
+  'contacts_sync_failed_message':
+  'មិនអាចធ្វើសមកាលកម្មទំនាក់ទំនងបានទេ។',
 };
 

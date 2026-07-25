@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import '../../models/chat_model.dart';
 import '../../models/contact_model.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
+import '../../screen/widgets/common/app_feedback.dart';
 import '../../services/contact_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ContactController extends GetxController {
   final ContactService contactService;
@@ -14,11 +16,14 @@ class ContactController extends GetxController {
     required this.contactService,
   });
 
+
   final TextEditingController searchController =
   TextEditingController();
 
   final ScrollController scrollController =
   ScrollController();
+
+  final RxBool isSyncingContacts = false.obs;
 
   final RxList<ContactModel> contacts =
       <ContactModel>[].obs;
@@ -40,6 +45,82 @@ class ContactController extends GetxController {
     );
 
     loadContacts();
+  }
+
+  Future<void> syncPhoneContacts() async {
+    if (isSyncingContacts.value) {
+      return;
+    }
+
+    try {
+      PermissionStatus status =
+      await Permission.contacts.status;
+
+      if (status.isDenied) {
+        status =
+        await Permission.contacts.request();
+      }
+
+      bool hasPermission =
+          status.isGranted || status.isLimited;
+
+      if (!hasPermission) {
+        if (status.isPermanentlyDenied ||
+            status.isRestricted) {
+          AppFeedback.showMessage(
+            title: 'permission_required'.tr,
+            message:
+            'contacts_permission_settings_message'.tr,
+            icon: Icons.settings_outlined,
+          );
+
+          await openAppSettings();
+          return;
+        }
+
+        AppFeedback.showMessage(
+          title: 'permission_denied'.tr,
+          message:
+          'contacts_permission_denied_message'.tr,
+          icon: Icons.contacts_outlined,
+        );
+
+        return;
+      }
+
+      isSyncingContacts.value = true;
+
+      // Replace this delay with your real contact-sync function.
+      await Future<void>.delayed(
+        Duration(seconds: 2),
+      );
+
+      // Example:
+      // List<ContactModel> syncedContacts =
+      //     await contactService.syncPhoneContacts();
+      //
+      // contacts.assignAll(syncedContacts);
+
+      AppFeedback.showMessage(
+        title: 'contacts_synced'.tr,
+        message:
+        'contacts_synced_message'.tr,
+        icon: Icons.check_circle_outline,
+      );
+    } catch (error) {
+      debugPrint(
+        'Sync contacts error: $error',
+      );
+
+      AppFeedback.showMessage(
+        title: 'unable_to_sync'.tr,
+        message:
+        'contacts_sync_failed_message'.tr,
+        icon: Icons.error_outline,
+      );
+    } finally {
+      isSyncingContacts.value = false;
+    }
   }
 
   Future<void> loadContacts() async {

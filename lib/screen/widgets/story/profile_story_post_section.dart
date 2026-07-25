@@ -99,9 +99,6 @@ class _ProfileStoryPostSectionState
         children: [
           ProfilePostFilter(
             showArchived: showArchived,
-            postCount: activePosts.length,
-            archivedCount:
-            archivedPosts.length,
             onChanged: _changeFilter,
           ),
           Divider(

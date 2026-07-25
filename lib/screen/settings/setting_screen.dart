@@ -2,6 +2,7 @@ import 'package:appchat/screen/widgets/logout_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/contact/contact_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../widgets/settings/account_screen.dart';
 import '../widgets/settings/display_settings_section.dart';
@@ -10,6 +11,9 @@ import '../widgets/settings/language_settings_section.dart';
 
 class SettingScreen extends StatelessWidget {
   final bool showTopPadding;
+
+  final ContactController contactController =
+  Get.find<ContactController>();
 
   SettingScreen({
     super.key,
@@ -40,6 +44,7 @@ class SettingScreen extends StatelessWidget {
 
         GeneralSettingsSection(
           controller: controller,
+          contactController: contactController,
         ),
 
         SizedBox(height: 24),

@@ -4,6 +4,7 @@ abstract class AppRoutes {
   static const String splash = '/';
   // auth
   static const String login = '/login';
+  static const String register = '/register';
   // home chat
   static const String home = '/home';
   static const String archivedChats = '/archived-chats';
@@ -12,6 +13,7 @@ abstract class AppRoutes {
   // profile
   static const String editProfile = '/edit-profile';
   static const String profileDetail = '/profile-detail';
+  static const String profileQrCode = '/profile-qr-code';
 
   // settings
   static const String settings = '/settings';
@@ -22,8 +24,10 @@ abstract class AppRoutes {
   static const String dataStorage = '/data-storage';
   static const String chatFolders = '/chat-folder';
   // contact
+  static const String contacts = '/contacts';
   static const String qrScanner = '/qr-scanner';
   static const String addGroup = '/add-group';
+  static const String addContact = '/add-contact';
 
 
   // testing

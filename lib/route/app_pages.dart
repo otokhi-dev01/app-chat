@@ -6,16 +6,23 @@ import '../controllers/chat/chat_controller.dart';
 import '../controllers/contact/qr_contact_scanner_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
 import '../models/chat_model.dart';
+import '../screen/auth/auth_binding.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/auth/register_screen.dart';
+import '../screen/contact/add_contact/add_contact_screen.dart';
 import '../screen/contact/add_group/add_group_binding.dart';
 import '../screen/contact/add_group/add_group_screen.dart';
+import '../screen/contact/contact_binding.dart';
+import '../screen/contact/contact_screen.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_binding.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_screen.dart';
+import '../screen/home/home_binding.dart';
 import '../screen/home/home_screen.dart';
 import '../screen/home/save/save_message_screen.dart';
 import '../screen/home/search/search_screen.dart';
 import '../screen/profile/profile_detail_screen.dart';
 import '../screen/profile/profile_edit_screen.dart';
+import '../screen/profile/qr_code/profile_qr_code_screen.dart';
 import '../screen/settings/about/about_screen.dart';
 import '../screen/settings/chat_folder/chat_folder_binding.dart';
 import '../screen/settings/chat_folder/chat_folder_screen.dart';
@@ -42,9 +49,21 @@ class AppPages {
     GetPage(
       name: AppRoutes.login,
       page: () => LoginScreen(),
+      binding: AuthBinding(),
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 200, // Reduced to 200ms for snappier feel
+      ),
+    ),
+
+    // Register
+    GetPage(
+      name: AppRoutes.register,
+      page: () => RegisterScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
       ),
     ),
 
@@ -52,18 +71,30 @@ class AppPages {
     GetPage(
       name: AppRoutes.home,
       page: () => HomeScreen(),
+      binding: HomeBinding(),
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 200, // Reduced to 200ms
       ),
     ),
+
+    GetPage(
+      name: AppRoutes.contacts,
+      page: () => ContactScreen(),
+      binding: ContactBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: Duration(
+        milliseconds: 200, // Reduced to 200ms
+      ),
+    ),
+
 
     // ── Settings ────────────────────────────────────────────
     GetPage(
       name: AppRoutes.settings,
       page: () => SettingScreen(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced from 280ms to 220ms
       ),
     ),
@@ -73,8 +104,34 @@ class AppPages {
       page: () => DevicesScreen(),
       binding: DeviceBinding(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.profileQrCode,
+      page: () {
+        Map<String, dynamic> arguments =
+        Get.arguments is Map
+            ? Map<String, dynamic>.from(
+          Get.arguments as Map,
+        )
+            : <String, dynamic>{};
+
+        return ProfileQrCodeScreen(
+          name:
+          arguments['name']?.toString() ??
+              '',
+          username:
+          arguments['username']
+              ?.toString() ??
+              '',
+        );
+      },
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 200,
       ),
     ),
 
@@ -84,7 +141,7 @@ class AppPages {
       page: () => QrContactScannerScreen(),
       binding: QrContactScannerBinding(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms
       ),
     ),
@@ -105,7 +162,7 @@ class AppPages {
       page: () => SettingsSearchScreen(),
       binding: SettingsSearchBinding(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms
       ),
     ),
@@ -158,7 +215,7 @@ class AppPages {
       name: AppRoutes.profileDetail,
       page: () => ProfileDetailScreen(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms
       ),
     ),
@@ -168,8 +225,42 @@ class AppPages {
       name: AppRoutes.editProfile,
       page: () => ProfileEditScreen(),
       transition: Transition.rightToLeft,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 200, // Reduced to 200ms
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.addContact,
+      page: () {
+        dynamic routeArguments = Get.arguments;
+
+        Map<String, dynamic> arguments =
+        routeArguments is Map
+            ? Map<String, dynamic>.from(
+          routeArguments,
+        )
+            : <String, dynamic>{};
+
+        return AddContactScreen(
+          name:
+          arguments['name']?.toString() ??
+              '',
+          username:
+          arguments['username']?.toString() ??
+              '',
+          phoneNumber:
+          arguments['phoneNumber']
+              ?.toString() ??
+              '',
+          imageUrl:
+          arguments['imageUrl']?.toString() ??
+              '',
+        );
+      },
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 220,
       ),
     ),
 
@@ -179,9 +270,9 @@ class AppPages {
       page: () => SearchScreen(
         controller: Get.find<ChatController>(),
       ),
-      transition: Transition.rightToLeft,
-      transitionDuration: const Duration(
-        milliseconds: 200, // Reduced to 200ms
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 280, // Reduced to 200ms
       ),
     ),
 
@@ -189,7 +280,7 @@ class AppPages {
       name: AppRoutes.savedMessages,
       page: () => SavedMessagesScreen(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms
       ),
     ),
@@ -199,7 +290,7 @@ class AppPages {
       name: AppRoutes.testing,
       page: () => PhoneInputScreen(),
       transition: Transition.rightToLeft,
-      transitionDuration: const Duration(
+      transitionDuration: Duration(
         milliseconds: 200, // Reduced to 200ms
       ),
     ),

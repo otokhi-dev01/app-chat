@@ -16,7 +16,7 @@ class SplashScreen extends StatelessWidget {
       Timer(
         Duration(seconds: 3),
             () {
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.login);
         },
       );
     });
@@ -35,7 +35,7 @@ class SplashScreen extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Text(
-                'Piisiit Chat',
+                'OTOKHI Chat',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

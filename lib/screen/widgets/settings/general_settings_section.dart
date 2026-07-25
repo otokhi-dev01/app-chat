@@ -1,20 +1,23 @@
+import 'package:appchat/screen/widgets/settings/settings_section_title.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../controllers/contact/contact_controller.dart';
 import '../../../controllers/settings/settings_controller.dart';
 import '../../../route/app_route.dart';
+import 'action_section_title.dart';
 
 class GeneralSettingsSection extends StatelessWidget {
   final SettingsController controller;
+  final ContactController contactController;
 
   GeneralSettingsSection({
     super.key,
     required this.controller,
+    required this.contactController,
   });
 
-  void _openRoute(
-      String route,
-      ) {
+  void _openRoute(String route) {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (Get.currentRoute == route) {
@@ -30,6 +33,7 @@ class GeneralSettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -46,20 +50,20 @@ class GeneralSettingsSection extends StatelessWidget {
     );
 
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(
+        SettingsSectionTitle(
           title: 'general'.tr,
         ),
+
         SizedBox(height: 8),
+
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius:
-            BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: dividerColor,
             ),
@@ -69,92 +73,108 @@ class GeneralSettingsSection extends StatelessWidget {
               Obx(
                     () {
                   return _SwitchSettingsTile(
-                    icon:
-                    Icons.notifications_outlined,
+                    icon: Icons.notifications_outlined,
                     title: 'notifications'.tr,
-                    subtitle:
-                    'enable_notifications'.tr,
-                    value: controller
-                        .notificationsEnabled.value,
-                    onChanged:
-                    controller.toggleNotifications,
+                    subtitle: controller
+                        .isUpdatingNotifications.value
+                        ? 'updating'.tr
+                        : 'enable_notifications'.tr,
+                    value:
+                    controller.notificationsEnabled.value,
+                    onChanged: (bool value) {
+                      controller.toggleNotifications(value);
+                    },
                   );
                 },
               ),
+
               _SettingsDivider(
                 color: dividerColor,
               ),
+
+              Obx(
+                    () {
+                  return ActionSettingsTile(
+                    icon: Icons.contacts_outlined,
+                    title: 'sync_contacts'.tr,
+                    subtitle: 'sync_contacts_description'.tr,
+                    buttonText: 'sync_now'.tr,
+                    isLoading:
+                    contactController.isSyncingContacts.value,
+                    onPressed:
+                    contactController.syncPhoneContacts,
+                  );
+                },
+              ),
+
+              _SettingsDivider(
+                color: dividerColor,
+              ),
+
               _NavigationSettingsTile(
                 icon: Icons.lock_outline_rounded,
                 title: 'privacy_security'.tr,
                 subtitle: 'manage_privacy'.tr,
                 onTap: () {
-                  FocusManager.instance.primaryFocus
-                      ?.unfocus();
-
-                  Get.toNamed(
+                  _openRoute(
                     AppRoutes.privacySecurity,
-                    preventDuplicates: true,
                   );
                 },
               ),
+
               _SettingsDivider(
                 color: dividerColor,
               ),
+
               _NavigationSettingsTile(
                 icon: Icons.folder_open_outlined,
                 title: 'chat_folders'.tr,
                 subtitle: 'manage_folders'.tr,
                 onTap: () {
-                  FocusManager.instance.primaryFocus
-                      ?.unfocus();
-
-                  Get.toNamed(
+                  _openRoute(
                     AppRoutes.chatFolders,
-                    preventDuplicates: true,
                   );
                 },
               ),
+
               _SettingsDivider(
                 color: dividerColor,
               ),
+
               _NavigationSettingsTile(
-                icon:
-                Icons.devices_outlined,
+                icon: Icons.devices_outlined,
                 title: 'devices'.tr,
-                subtitle:
-                'manage_devices'.tr,
+                subtitle: 'manage_devices'.tr,
                 onTap: () {
                   _openRoute(
                     AppRoutes.devices,
                   );
                 },
               ),
+
               _SettingsDivider(
                 color: dividerColor,
               ),
+
               _NavigationSettingsTile(
                 icon: Icons.storage_outlined,
                 title: 'data_storage'.tr,
                 subtitle: 'manage_storage'.tr,
                 onTap: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-
-                  Get.toNamed(
+                  _openRoute(
                     AppRoutes.dataStorage,
-                    preventDuplicates: true,
                   );
                 },
               ),
+
               _SettingsDivider(
                 color: dividerColor,
               ),
+
               _NavigationSettingsTile(
-                icon:
-                Icons.info_outline_rounded,
+                icon: Icons.info_outline_rounded,
                 title: 'about_app'.tr,
-                subtitle:
-                'version_information'.tr,
+                subtitle: 'version_information'.tr,
                 onTap: () {
                   _openRoute(
                     AppRoutes.about,
@@ -169,8 +189,7 @@ class GeneralSettingsSection extends StatelessWidget {
   }
 }
 
-class _SwitchSettingsTile
-    extends StatelessWidget {
+class _SwitchSettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -214,7 +233,9 @@ class _SwitchSettingsTile
               icon: icon,
               active: value,
             ),
+
             SizedBox(width: 13),
+
             Expanded(
               child: _SettingsTileText(
                 title: title,
@@ -222,10 +243,9 @@ class _SwitchSettingsTile
                 active: value,
               ),
             ),
+
             SizedBox(width: 10),
 
-            // Ignore direct switch taps so the value
-            // changes only once through the tile.
             IgnorePointer(
               child: Switch.adaptive(
                 value: value,
@@ -273,34 +293,34 @@ class _NavigationSettingsTile
             _SettingsIcon(
               icon: icon,
             ),
+
             SizedBox(width: 13),
+
             Expanded(
               child: _SettingsTileText(
                 title: title,
                 subtitle: subtitle,
               ),
             ),
+
             if (trailingText != null) ...[
               Text(
                 trailingText!,
                 maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
-                  fontWeight:
-                  FontWeight.w500,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color:
+                  colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
+
               SizedBox(width: 5),
             ],
+
             Icon(
               Icons.chevron_right_rounded,
-              color: colorScheme
-                  .onSurfaceVariant,
+              color: colorScheme.onSurfaceVariant,
               size: 23,
             ),
           ],
@@ -323,6 +343,7 @@ class _SmoothSettingsTile
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
     bool isDark =
         theme.brightness == Brightness.dark;
 
@@ -338,14 +359,10 @@ class _SmoothSettingsTile
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        splashFactory:
-        InkRipple.splashFactory,
-        highlightColor:
-        Colors.transparent,
-        hoverColor:
-        Colors.transparent,
-        focusColor:
-        Colors.transparent,
+        splashFactory: InkRipple.splashFactory,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
         overlayColor:
         WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
@@ -367,8 +384,7 @@ class _SmoothSettingsTile
   }
 }
 
-class _SettingsIcon
-    extends StatelessWidget {
+class _SettingsIcon extends StatelessWidget {
   final IconData icon;
   final bool active;
 
@@ -397,23 +413,20 @@ class _SettingsIcon
         )
             : colorScheme
             .surfaceContainerHighest,
-        borderRadius:
-        BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(13),
       ),
       child: Icon(
         icon,
         size: 22,
         color: active
             ? colorScheme.primary
-            : colorScheme
-            .onSurfaceVariant,
+            : colorScheme.onSurfaceVariant,
       ),
     );
   }
 }
 
-class _SettingsTileText
-    extends StatelessWidget {
+class _SettingsTileText extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool active;
@@ -430,6 +443,15 @@ class _SettingsTileText
     ColorScheme colorScheme =
         theme.colorScheme;
 
+    TextStyle fallbackStyle = TextStyle(
+      color: active
+          ? colorScheme.primary
+          : colorScheme.onSurface,
+      fontWeight: active
+          ? FontWeight.w700
+          : FontWeight.w600,
+    );
+
     return Column(
       crossAxisAlignment:
       CrossAxisAlignment.start,
@@ -439,8 +461,8 @@ class _SettingsTileText
             milliseconds: 180,
           ),
           curve: Curves.easeOutCubic,
-          style: theme.textTheme.bodyLarge
-              ?.copyWith(
+          style:
+          theme.textTheme.bodyLarge?.copyWith(
             color: active
                 ? colorScheme.primary
                 : colorScheme.onSurface,
@@ -448,31 +470,23 @@ class _SettingsTileText
                 ? FontWeight.w700
                 : FontWeight.w600,
           ) ??
-              TextStyle(
-                color: active
-                    ? colorScheme.primary
-                    : colorScheme.onSurface,
-                fontWeight: active
-                    ? FontWeight.w700
-                    : FontWeight.w600,
-              ),
+              fallbackStyle,
           child: Text(
             title,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+
         SizedBox(height: 3),
+
         Text(
           subtitle,
           maxLines: 1,
-          overflow:
-          TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall
-              ?.copyWith(
-            color: colorScheme
-                .onSurfaceVariant,
+          overflow: TextOverflow.ellipsis,
+          style:
+          theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -480,8 +494,7 @@ class _SettingsTileText
   }
 }
 
-class _SettingsDivider
-    extends StatelessWidget {
+class _SettingsDivider extends StatelessWidget {
   final Color color;
 
   _SettingsDivider({
@@ -498,35 +511,6 @@ class _SettingsDivider
         height: 1,
         thickness: 1,
         color: color,
-      ),
-    );
-  }
-}
-
-class _SectionTitle
-    extends StatelessWidget {
-  final String title;
-
-  _SectionTitle({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 6,
-      ),
-      child: Text(
-        title,
-        style: theme.textTheme.titleSmall
-            ?.copyWith(
-          color:
-          theme.colorScheme.primary,
-          fontWeight: FontWeight.w700,
-        ),
       ),
     );
   }
