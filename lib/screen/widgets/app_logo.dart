@@ -1,68 +1,63 @@
 import 'package:flutter/material.dart';
 
 class AppLogo extends StatelessWidget {
-  final double size;
-  final double padding;
-  final BoxFit fit;
+  final double width;
+  final double borderRadius;
 
   const AppLogo({
     super.key,
-    this.size = 100,
-    this.padding = 0,
-    this.fit = BoxFit.contain,
-  });
+    this.width = 160,
+    this.borderRadius = 16,
+  })  : assert(width > 0),
+        assert(borderRadius >= 0);
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
-    final bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme =
+        Theme.of(context).colorScheme;
 
-    final Color backgroundColor = isDark
-        ? const Color(0xFF1B1D22)
-        : Colors.white;
-
-    final Color borderColor =
-    colorScheme.primary.withValues(alpha: 0.20);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOutCubic,
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: borderColor,
-          width: 1.5,
-        ),
-      ),
-      child: ClipOval(
-        child: Container(
-          color: backgroundColor,
-          alignment: Alignment.center,
+    return RepaintBoundary(
+      child: Semantics(
+        label: 'OTOKHI Chat logo',
+        image: true,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+            borderRadius,
+          ),
+          clipBehavior: Clip.antiAlias,
           child: Image.asset(
-            'assets/icon/app_icon.jpg',
-            width: size,
-            height: size,
-            fit: fit,
+            'assets/icon/otokhi_app_logo.jpg',
+
+            // Set only width.
+            // Height follows the original image ratio.
+            width: width,
+
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
             filterQuality: FilterQuality.high,
+            isAntiAlias: true,
+            gaplessPlayback: true,
+
             errorBuilder: (
                 BuildContext context,
                 Object error,
                 StackTrace? stackTrace,
                 ) {
               return Container(
-                color: colorScheme.primary.withValues(
-                  alpha: 0.11,
-                ),
+                width: width,
+                height: width,
                 alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(
+                    alpha: 0.12,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    borderRadius,
+                  ),
+                ),
                 child: Icon(
                   Icons.chat_rounded,
-                  size: size * 0.50,
+                  size: width * 0.45,
                   color: colorScheme.primary,
                 ),
               );

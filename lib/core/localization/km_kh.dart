@@ -5,6 +5,22 @@ final Map<String, String> kmKH = {
 'settings': 'ការកំណត់',
 'profile': 'ប្រវត្តិរូប',
 
+  'welcome_back': 'សូមស្វាគមន៍មកវិញ',
+  'login_continue_chatting':
+  'ចូលគណនីដើម្បីបន្តការជជែក',
+  'email': 'អ៊ីមែល',
+  'password': 'ពាក្យសម្ងាត់',
+  'show_password': 'បង្ហាញពាក្យសម្ងាត់',
+  'hide_password': 'លាក់ពាក្យសម្ងាត់',
+  'forgot_password':
+  'ភ្លេចពាក្យសម្ងាត់?',
+  'logging_in': 'កំពុងចូលគណនី...',
+  'login': 'ចូលគណនី',
+  'dont_have_account':
+  'មិនទាន់មានគណនីមែនទេ?',
+  'create_account': 'បង្កើតគណនី',
+
+
 // General
 'general': 'ទូទៅ',
 
@@ -44,8 +60,24 @@ final Map<String, String> kmKH = {
 'account': 'គណនី',
 'name': 'ឈ្មោះ',
 'phone': 'លេខទូរស័ព្ទ',
-'email': 'អ៊ីមែល',
 'not_set': 'មិនទាន់បានកំណត់',
+
+  'back': 'ត្រឡប់ក្រោយ',
+  'forgot_password_title':
+  'ភ្លេចពាក្យសម្ងាត់?',
+  'forgot_password_description':
+  'បញ្ចូលអាសយដ្ឋានអ៊ីមែលរបស់អ្នក ហើយយើងនឹងផ្ញើតំណសម្រាប់កំណត់ពាក្យសម្ងាត់ឡើងវិញ។',
+  'send_reset_link':
+  'ផ្ញើតំណកំណត់ពាក្យសម្ងាត់',
+  'sending': 'កំពុងផ្ញើ...',
+  'email_required':
+  'សូមបញ្ចូលអ៊ីមែល',
+  'invalid_email':
+  'សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលត្រឹមត្រូវ',
+  'reset_link_sent':
+  'បានផ្ញើតំណរួចរាល់',
+  'reset_link_sent_message':
+  'សូមពិនិត្យអ៊ីមែលរបស់អ្នកសម្រាប់ការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញ។',
 
 // Account editing
 'edit': 'កែប្រែ @field',
@@ -57,8 +89,24 @@ final Map<String, String> kmKH = {
 'update_account_information':
 'ធ្វើបច្ចុប្បន្នភាពព័ត៌មានគណនីរបស់អ្នក',
 'field_required': 'សូមបញ្ចូលព័ត៌មាននេះ',
-'invalid_email':
-'សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលឱ្យបានត្រឹមត្រូវ',
+
+  'back_to_login':
+  'ត្រឡប់ទៅចូលគណនី',
+
+  'api_not_connected':
+  'មិនទាន់ភ្ជាប់ API',
+  'forgot_password_api_not_connected_message':
+  'សូមភ្ជាប់ API ភ្លេចពាក្យសម្ងាត់ ដើម្បីបន្ត។',
+
+  'email_sent':
+  'បានផ្ញើអ៊ីមែល',
+  'reset_instructions_sent_message':
+  'ការណែនាំសម្រាប់កំណត់ពាក្យសម្ងាត់ឡើងវិញ ត្រូវបានផ្ញើទៅអ៊ីមែលរបស់អ្នក។',
+
+  'unable_to_send':
+  'មិនអាចផ្ញើបាន',
+  'unable_to_send_reset_link_message':
+  'មិនអាចផ្ញើតំណកំណត់ពាក្យសម្ងាត់បានទេ។ សូមព្យាយាមម្តងទៀត។',
 
 // Display
 'display': 'ការបង្ហាញ',
@@ -118,17 +166,6 @@ final Map<String, String> kmKH = {
 'storage_usage_downloads':
 'ការប្រើប្រាស់ទំហំផ្ទុក និងការទាញយក',
 
-// Authentication
-'welcome_back': 'សូមស្វាគមន៍មកវិញ',
-'login_to_continue': 'ចូលគណនីដើម្បីបន្ត',
-'password': 'ពាក្យសម្ងាត់',
-'login': 'ចូលគណនី',
-'logging_in': 'កំពុងចូលគណនី...',
-'forgot_password': 'ភ្លេចពាក្យសម្ងាត់មែនទេ?',
-'dont_have_account': 'មិនទាន់មានគណនីទេ?',
-'create_account': 'បង្កើតគណនីថ្មី',
-'show_password': 'បង្ហាញពាក្យសម្ងាត់',
-'hide_password': 'លាក់ពាក្យសម្ងាត់',
 
 'enter_email': 'សូមបញ្ចូលអ៊ីមែលរបស់អ្នក',
 'enter_password': 'សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក',
@@ -447,7 +484,6 @@ final Map<String, String> kmKH = {
   'new_group_subtitle':
   'បញ្ចូលឈ្មោះ និងជ្រើសរើសសមាជិក',
   'create': 'បង្កើត',
-  'back': 'ត្រឡប់ក្រោយ',
   'group_name': 'ឈ្មោះក្រុម',
   'enter_group_name': 'បញ្ចូលឈ្មោះក្រុម',
   'add_group_photo': 'បន្ថែមរូបថតក្រុម',

@@ -1,0 +1,64 @@
+Map<String, String> zhCN = {
+  'language': '语言',
+  'english': '英语',
+  'khmer': '高棉语',
+  'chinese': '中文',
+
+  'settings': '设置',
+  'notifications': '通知',
+  'enable_notifications': '启用通知',
+  'sync_contacts': '同步联系人',
+  'sync_contacts_description': '从手机同步联系人',
+  'sync_now': '立即同步',
+
+  'appearance': '外观',
+  'system': '跟随系统',
+  'light': '浅色模式',
+  'dark': '深色模式',
+
+  'profile': '个人资料',
+  'logout': '退出登录',
+
+  'welcome_back': '欢迎回来',
+  'login_continue_chatting':
+  '登录以继续聊天',
+  'email': '电子邮箱',
+  'password': '密码',
+  'show_password': '显示密码',
+  'hide_password': '隐藏密码',
+  'forgot_password': '忘记密码？',
+  'logging_in': '正在登录...',
+  'login': '登录',
+  'dont_have_account': '还没有账号？',
+  'create_account': '创建账号',
+
+  'back': '返回',
+  'forgot_password_title':
+  '忘记密码？',
+  'forgot_password_description':
+  '请输入您的电子邮箱，我们会向您发送密码重置链接。',
+  'send_reset_link':
+  '发送重置链接',
+  'sending': '正在发送...',
+  'email_required':
+  '请输入电子邮箱',
+  'invalid_email':
+  '请输入有效的电子邮箱地址',
+  'reset_link_sent':
+  '重置链接已发送',
+  'reset_link_sent_message':
+  '请查看您的电子邮箱并按照说明重置密码。',
+
+  'api_not_connected': 'API 尚未连接',
+  'forgot_password_api_not_connected_message':
+  '请连接忘记密码 API 后继续。',
+
+  'email_sent': '邮件已发送',
+  'reset_instructions_sent_message':
+  '密码重置说明已发送到您的电子邮箱。',
+
+  'unable_to_send': '无法发送',
+  'unable_to_send_reset_link_message':
+  '无法发送重置链接，请重试。',
+  'back_to_login': '返回登录',
+};

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/contact/contact_controller.dart';
+import '../../controllers/notification/notification_controller.dart';
+import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../widgets/settings/account_screen.dart';
 import '../widgets/settings/display_settings_section.dart';
@@ -12,18 +14,24 @@ import '../widgets/settings/language_settings_section.dart';
 class SettingScreen extends StatelessWidget {
   final bool showTopPadding;
 
-  final ContactController contactController =
-  Get.find<ContactController>();
-
-  SettingScreen({
+  const SettingScreen({
     super.key,
     this.showTopPadding = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    SettingsController controller =
+    SettingsController settingsController =
     Get.find<SettingsController>();
+
+    ProfileController profileController =
+    Get.find<ProfileController>();
+
+    NotificationController notificationController =
+    Get.find<NotificationController>();
+
+    ContactController contactController =
+    Get.find<ContactController>();
 
     return ListView(
       physics: BouncingScrollPhysics(),
@@ -37,32 +45,34 @@ class SettingScreen extends StatelessWidget {
       ),
       children: [
         AccountSettingsSection(
-          controller: controller,
+          controller: profileController,
         ),
 
         SizedBox(height: 24),
 
         GeneralSettingsSection(
-          controller: controller,
+          settingsController: settingsController,
+          notificationController:
+          notificationController,
           contactController: contactController,
         ),
 
         SizedBox(height: 24),
 
         DisplaySettingsSection(
-          controller: controller,
+          controller: settingsController,
         ),
 
         SizedBox(height: 24),
 
         LanguageSettingsSection(
-          controller: controller,
+          controller: settingsController,
         ),
 
         SizedBox(height: 24),
 
         LogoutButton(
-          controller: controller,
+          controller: settingsController,
         ),
       ],
     );

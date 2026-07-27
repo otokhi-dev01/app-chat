@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'controllers/notification/notification_controller.dart';
+import 'controllers/profile/profile_controller.dart';
 import 'controllers/settings/settings_controller.dart';
 import 'core/localization/app_translation.dart';
 import 'core/theme/app_theme.dart';
@@ -15,6 +17,16 @@ Future<void> main() async {
 
   Get.put<SettingsController>(
     SettingsController(),
+    permanent: true,
+  );
+
+  Get.put<NotificationController>(
+    NotificationController(),
+    permanent: true,
+  );
+
+  Get.put<ProfileController>(
+    ProfileController(),
     permanent: true,
   );
 
@@ -37,10 +49,11 @@ class MyApp extends StatelessWidget {
           () {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'AppChat',
+          title: 'OTOKHI Chat',
 
           translations: AppTranslations(),
-          locale: settingsController.currentLocale,
+          locale:
+          settingsController.currentLocale,
           fallbackLocale: Locale(
             'en',
             'US',

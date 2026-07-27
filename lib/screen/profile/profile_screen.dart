@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/profile/add_post_camera_controller.dart';
-import '../../controllers/settings/settings_controller.dart';
+import '../../controllers/profile/profile_controller.dart';
 import '../../data/mock_profile_story_post_data.dart';
 import '../../models/add_post_capture_result.dart';
 import '../../models/profile_story_post_model.dart';
@@ -15,7 +15,7 @@ import '../widgets/story/profile_add_post_button.dart';
 import '../widgets/story/profile_post_viewer_screen.dart';
 import '../widgets/story/profile_story_post_section.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends GetView<ProfileController> {
   ProfileScreen({
     super.key,
   });
@@ -172,9 +172,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SettingsController controller =
-    Get.find<SettingsController>();
-
     ThemeData theme = Theme.of(context);
 
     bool isDark =
@@ -209,7 +206,8 @@ class ProfileScreen extends StatelessWidget {
                 controller.userEmail.value.trim();
 
                 String username =
-                controller.userUsername.value.trim();
+                controller.userUsername.value
+                    .trim();
 
                 return ListView(
                   keyboardDismissBehavior:
@@ -235,9 +233,7 @@ class ProfileScreen extends StatelessWidget {
                       borderColor: borderColor,
                       onEdit: _openEditProfile,
                       onCopyUsername: () {
-                        _copyUsername(
-                          username,
-                        );
+                        _copyUsername(username);
                       },
                       onQrCode: () {
                         _openQrCode(

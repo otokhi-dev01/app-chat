@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/contact_controller.dart';
+import '../../../controllers/notification/notification_controller.dart';
 import '../../../controllers/settings/settings_controller.dart';
 import '../../../route/app_route.dart';
 import 'action_section_title.dart';
 
 class GeneralSettingsSection extends StatelessWidget {
-  final SettingsController controller;
+  final SettingsController settingsController;
+  final NotificationController notificationController;
   final ContactController contactController;
 
-  GeneralSettingsSection({
+  const GeneralSettingsSection({
     super.key,
-    required this.controller,
+    required this.settingsController,
+    required this.notificationController,
     required this.contactController,
   });
 
@@ -75,14 +78,15 @@ class GeneralSettingsSection extends StatelessWidget {
                   return _SwitchSettingsTile(
                     icon: Icons.notifications_outlined,
                     title: 'notifications'.tr,
-                    subtitle: controller
+                    subtitle: notificationController
                         .isUpdatingNotifications.value
                         ? 'updating'.tr
                         : 'enable_notifications'.tr,
-                    value:
-                    controller.notificationsEnabled.value,
+                    value: notificationController
+                        .notificationsEnabled.value,
                     onChanged: (bool value) {
-                      controller.toggleNotifications(value);
+                      notificationController
+                          .toggleNotifications(value);
                     },
                   );
                 },

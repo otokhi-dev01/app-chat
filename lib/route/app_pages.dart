@@ -1,14 +1,14 @@
-import 'package:appchat/screen/chat_detail/chat_detail_screen.dart';
+
 import 'package:appchat/screen/settings/setting_screen.dart';
 import 'package:get/get.dart';
-
 import '../controllers/chat/chat_controller.dart';
-import '../controllers/contact/qr_contact_scanner_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
-import '../models/chat_model.dart';
 import '../screen/auth/auth_binding.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/auth/phone_input_screen.dart';
 import '../screen/auth/register_screen.dart';
+import '../screen/auth/reset_password_screen.dart';
+import '../screen/auth/verity_otp_screen.dart';
 import '../screen/contact/add_contact/add_contact_screen.dart';
 import '../screen/contact/add_group/add_group_binding.dart';
 import '../screen/contact/add_group/add_group_screen.dart';
@@ -34,7 +34,6 @@ import '../screen/settings/privacy_security/privacy_security_binding.dart';
 import '../screen/settings/privacy_security/privacy_security_screen.dart';
 import '../screen/settings/settings_search_screen.dart';
 import '../screen/splash/splash_screen.dart';
-import '../screen/testing/phone_input_screen.dart';
 import 'app_route.dart';
 
 class AppPages {
@@ -60,6 +59,54 @@ class AppPages {
     GetPage(
       name: AppRoutes.register,
       page: () => RegisterScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      ),
+    ),
+
+    // ForgotPassword
+
+    GetPage(
+      name: AppRoutes.forgotPassword,
+      page: () => RegisterScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      ),
+    ),
+
+    // PhoneInput
+
+    GetPage( name: AppRoutes.phoneInput,
+      page: () => PhoneInputScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      )
+    ),
+
+    // ResetPassword
+    GetPage(
+      name: AppRoutes.resetPassword,
+      page: () => ResetPasswordScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      ),
+    ),
+
+    // VerifyOtp
+    GetPage(
+      name: AppRoutes.verifyOtp,
+      page: () => VerifyOtpScreen(
+        destination:
+        Get.arguments?['destination']?.toString() ?? '',
+      ),
       binding: AuthBinding(),
       transition: Transition.rightToLeft,
       transitionDuration: Duration(
@@ -285,14 +332,5 @@ class AppPages {
       ),
     ),
 
-    // ── Testing / Dev screen ────────────────────────────────
-    GetPage(
-      name: AppRoutes.testing,
-      page: () => PhoneInputScreen(),
-      transition: Transition.rightToLeft,
-      transitionDuration: Duration(
-        milliseconds: 200, // Reduced to 200ms
-      ),
-    ),
   ];
 }

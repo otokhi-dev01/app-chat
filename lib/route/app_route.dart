@@ -5,6 +5,10 @@ abstract class AppRoutes {
   // auth
   static const String login = '/login';
   static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
+  static const String verifyOtp = '/verify-otp';
+  static const String phoneInput = '/phone-input';
   // home chat
   static const String home = '/home';
   static const String archivedChats = '/archived-chats';
@@ -30,8 +34,6 @@ abstract class AppRoutes {
   static const String addContact = '/add-contact';
 
 
-  // testing
-  static const String testing = '/testing';
 
 
 }

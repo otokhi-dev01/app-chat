@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/settings/settings_controller.dart';
+import '../../../controllers/profile/profile_controller.dart';
 import '../../../route/app_route.dart';
 
 class AccountSettingsSection extends StatelessWidget {
-  final SettingsController controller;
+  final ProfileController controller;
 
   AccountSettingsSection({
     super.key,

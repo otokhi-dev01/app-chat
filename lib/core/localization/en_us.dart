@@ -6,6 +6,20 @@ final Map<String, String> enUS = {
 'settings': 'Settings',
 'profile': 'Profile',
 
+  'welcome_back': 'Welcome Back',
+  'login_continue_chatting':
+  'Log in to continue chatting',
+  'email': 'Email',
+  'password': 'Password',
+  'show_password': 'Show password',
+  'hide_password': 'Hide password',
+  'forgot_password': 'Forgot Password?',
+  'logging_in': 'Logging in...',
+  'login': 'Login',
+  'dont_have_account':
+  "Don't have an account?",
+  'create_account': 'Create Account',
+
 // General
 'general': 'General',
 
@@ -45,8 +59,24 @@ final Map<String, String> enUS = {
 'account': 'Account',
 'name': 'Name',
 'phone': 'Phone number',
-'email': 'Email address',
 'not_set': 'Not set',
+
+  'back': 'Back',
+  'forgot_password_title':
+  'Forgot Password?',
+  'forgot_password_description':
+  'Enter your email address and we will send you a link to reset your password.',
+  'send_reset_link':
+  'Send Reset Link',
+  'sending': 'Sending...',
+  'email_required':
+  'Email is required',
+  'invalid_email':
+  'Please enter a valid email address',
+  'reset_link_sent':
+  'Reset link sent',
+  'reset_link_sent_message':
+  'Please check your email for password reset instructions.',
 
 // Account editing
 'edit': 'Edit @field',
@@ -58,8 +88,20 @@ final Map<String, String> enUS = {
 'update_account_information':
 'Update your account information',
 'field_required': 'This field is required',
-'invalid_email':
-'Please enter a valid email address',
+
+  'back_to_login': 'Back to Login',
+
+  'api_not_connected': 'API Not Connected',
+  'forgot_password_api_not_connected_message':
+  'Connect your forgot-password API to continue.',
+
+  'email_sent': 'Email Sent',
+  'reset_instructions_sent_message':
+  'Password reset instructions were sent to your email.',
+
+  'unable_to_send': 'Unable to Send',
+  'unable_to_send_reset_link_message':
+  'Unable to send the reset link. Please try again.',
 
 // Display
 'display': 'Display',
@@ -118,18 +160,6 @@ final Map<String, String> enUS = {
 'Blocked users and permissions',
 'storage_usage_downloads':
 'Storage usage and downloads',
-
-// Authentication
-'welcome_back': 'Welcome back',
-'login_to_continue': 'Sign in to continue',
-'password': 'Password',
-'login': 'Sign in',
-'logging_in': 'Signing in...',
-'forgot_password': 'Forgot your password?',
-'dont_have_account': "Don't have an account?",
-'create_account': 'Create an account',
-'show_password': 'Show password',
-'hide_password': 'Hide password',
 
 'enter_email': 'Please enter your email address',
 'enter_password': 'Please enter your password',
@@ -436,7 +466,6 @@ final Map<String, String> enUS = {
   'new_group_subtitle':
   'Add a name and choose members',
   'create': 'Create',
-  'back': 'Back',
 
   'group_name': 'Group Name',
   'enter_group_name': 'Enter group name',

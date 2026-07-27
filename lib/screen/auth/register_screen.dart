@@ -9,8 +9,7 @@ class RegisterScreen extends StatelessWidget {
     super.key,
   });
 
-  final AuthController controller =
-  Get.find<AuthController>();
+  final AuthController controller = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +19,14 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Create Account'),
-        centerTitle: true,
-        scrolledUnderElevation: 0,
+        title: Text(
+          'Create Account',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -44,102 +48,47 @@ class RegisterScreen extends StatelessWidget {
                 key: controller.registerFormKey,
                 child: Column(
                   children: [
-                    Container(
-                      width: 88,
-                      height: 88,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary
-                            .withValues(alpha: 0.12),
-                        borderRadius:
-                        BorderRadius.circular(28),
-                        border: Border.all(
-                          color: colorScheme.primary
-                              .withValues(alpha: 0.18),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.mark_chat_unread_rounded,
-                        size: 44,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-
-                    SizedBox(height: 22),
-
-                    Text(
-                      'Create Account',
-                      style: theme
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 8),
-
                     Text(
                       'Enter your information to get started',
                       textAlign: TextAlign.center,
-                      style: theme
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(
-                        color:
-                        colorScheme.onSurfaceVariant,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
 
                     SizedBox(height: 32),
 
                     AuthTextField(
-                      controller: controller
-                          .registerNameController,
-                      focusNode:
-                      controller.registerNameFocusNode,
+                      controller: controller.registerNameController,
+                      focusNode: controller.registerNameFocusNode,
                       label: 'Full Name',
-                      icon:
-                      Icons.person_outline_rounded,
-                      keyboardType:
-                      TextInputType.name,
-                      textInputAction:
-                      TextInputAction.next,
+                      icon: Icons.person_outline_rounded,
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
                       autofillHints: [
                         AutofillHints.name,
                       ],
-                      validator:
-                      controller.validateName,
+                      validator: controller.validateName,
                       onFieldSubmitted: (_) {
-                        controller
-                            .registerEmailFocusNode
-                            .requestFocus();
+                        controller.registerEmailFocusNode.requestFocus();
                       },
                     ),
 
                     SizedBox(height: 18),
 
                     AuthTextField(
-                      controller: controller
-                          .registerEmailController,
-                      focusNode: controller
-                          .registerEmailFocusNode,
+                      controller: controller.registerEmailController,
+                      focusNode: controller.registerEmailFocusNode,
                       label: 'Email',
                       icon: Icons.email_outlined,
-                      keyboardType:
-                      TextInputType.emailAddress,
-                      textInputAction:
-                      TextInputAction.next,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
                       autofillHints: [
                         AutofillHints.email,
                       ],
-                      validator:
-                      controller.validateEmail,
+                      validator: controller.validateEmail,
                       onFieldSubmitted: (_) {
-                        controller
-                            .registerPasswordFocusNode
-                            .requestFocus();
+                        controller.registerPasswordFocusNode.requestFocus();
                       },
                     ),
 
@@ -147,45 +96,32 @@ class RegisterScreen extends StatelessWidget {
 
                     Obx(() {
                       return AuthTextField(
-                        controller: controller
-                            .registerPasswordController,
-                        focusNode: controller
-                            .registerPasswordFocusNode,
+                        controller: controller.registerPasswordController,
+                        focusNode: controller.registerPasswordFocusNode,
                         label: 'Password',
-                        icon:
-                        Icons.lock_outline_rounded,
-                        obscureText: controller
-                            .obscureRegisterPassword
-                            .value,
-                        textInputAction:
-                        TextInputAction.next,
+                        icon: Icons.lock_outline_rounded,
+                        obscureText:
+                        controller.obscureRegisterPassword.value,
+                        textInputAction: TextInputAction.next,
                         autofillHints: [
                           AutofillHints.newPassword,
                         ],
-                        validator:
-                        controller.validatePassword,
+                        validator: controller.validatePassword,
                         onFieldSubmitted: (_) {
-                          controller
-                              .registerConfirmPasswordFocusNode
+                          controller.registerConfirmPasswordFocusNode
                               .requestFocus();
                         },
                         suffixIcon: IconButton(
-                          tooltip: controller
-                              .obscureRegisterPassword
-                              .value
+                          tooltip:
+                          controller.obscureRegisterPassword.value
                               ? 'Show password'
                               : 'Hide password',
-                          onPressed: controller
-                              .toggleRegisterPassword,
+                          onPressed: controller.toggleRegisterPassword,
                           icon: Icon(
-                            controller
-                                .obscureRegisterPassword
-                                .value
+                            controller.obscureRegisterPassword.value
                                 ? Icons.visibility_outlined
-                                : Icons
-                                .visibility_off_outlined,
-                            color: colorScheme
-                                .onSurfaceVariant,
+                                : Icons.visibility_off_outlined,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       );
@@ -195,41 +131,33 @@ class RegisterScreen extends StatelessWidget {
 
                     Obx(() {
                       return AuthTextField(
-                        controller: controller
-                            .registerConfirmPasswordController,
-                        focusNode: controller
-                            .registerConfirmPasswordFocusNode,
+                        controller:
+                        controller.registerConfirmPasswordController,
+                        focusNode:
+                        controller.registerConfirmPasswordFocusNode,
                         label: 'Confirm Password',
                         icon: Icons.lock_reset_rounded,
-                        obscureText: controller
-                            .obscureConfirmPassword.value,
-                        textInputAction:
-                        TextInputAction.done,
+                        obscureText:
+                        controller.obscureConfirmPassword.value,
+                        textInputAction: TextInputAction.done,
                         autofillHints: [
                           AutofillHints.newPassword,
                         ],
-                        validator: controller
-                            .validateConfirmPassword,
+                        validator: controller.validateConfirmPassword,
                         onFieldSubmitted: (_) {
                           controller.register();
                         },
                         suffixIcon: IconButton(
-                          tooltip: controller
-                              .obscureConfirmPassword
-                              .value
+                          tooltip:
+                          controller.obscureConfirmPassword.value
                               ? 'Show password'
                               : 'Hide password',
-                          onPressed: controller
-                              .toggleConfirmPassword,
+                          onPressed: controller.toggleConfirmPassword,
                           icon: Icon(
-                            controller
-                                .obscureConfirmPassword
-                                .value
+                            controller.obscureConfirmPassword.value
                                 ? Icons.visibility_outlined
-                                : Icons
-                                .visibility_off_outlined,
-                            color: colorScheme
-                                .onSurfaceVariant,
+                                : Icons.visibility_off_outlined,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       );
@@ -238,48 +166,36 @@ class RegisterScreen extends StatelessWidget {
                     SizedBox(height: 24),
 
                     Obx(() {
-                      bool isLoading = controller
-                          .isRegisterLoading.value;
+                      bool isLoading =
+                          controller.isRegisterLoading.value;
 
                       return SizedBox(
                         width: double.infinity,
                         height: 55,
                         child: FilledButton(
-                          onPressed: isLoading
-                              ? null
-                              : controller.register,
-                          style:
-                          FilledButton.styleFrom(
-                            backgroundColor:
-                            colorScheme.primary,
-                            foregroundColor:
-                            colorScheme.onPrimary,
+                          onPressed:
+                          isLoading ? null : controller.register,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
                             disabledBackgroundColor:
-                            colorScheme.primary
-                                .withValues(
+                            colorScheme.primary.withValues(
                               alpha: 0.48,
                             ),
                             elevation: 0,
-                            shape:
-                            RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(
-                                14,
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
                           child: AnimatedSwitcher(
-                            duration: Duration(
-                              milliseconds: 200,
-                            ),
+                            duration: Duration(milliseconds: 200),
                             child: isLoading
                                 ? Row(
                               key: ValueKey(
                                 'register-loading',
                               ),
                               mainAxisAlignment:
-                              MainAxisAlignment
-                                  .center,
+                              MainAxisAlignment.center,
                               children: [
                                 SizedBox(
                                   width: 21,
@@ -287,8 +203,7 @@ class RegisterScreen extends StatelessWidget {
                                   child:
                                   CircularProgressIndicator(
                                     strokeWidth: 2.4,
-                                    color: colorScheme
-                                        .onPrimary,
+                                    color: colorScheme.onPrimary,
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -297,8 +212,7 @@ class RegisterScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight:
-                                    FontWeight
-                                        .w600,
+                                    FontWeight.w600,
                                   ),
                                 ),
                               ],
@@ -310,8 +224,7 @@ class RegisterScreen extends StatelessWidget {
                               ),
                               style: TextStyle(
                                 fontSize: 17,
-                                fontWeight:
-                                FontWeight.w600,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -323,29 +236,24 @@ class RegisterScreen extends StatelessWidget {
 
                     Wrap(
                       alignment: WrapAlignment.center,
-                      crossAxisAlignment:
-                      WrapCrossAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'Already have an account?',
                           style: TextStyle(
-                            color: colorScheme
-                                .onSurfaceVariant,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         TextButton(
                           onPressed: () {
-                            FocusManager
-                                .instance.primaryFocus
+                            FocusManager.instance.primaryFocus
                                 ?.unfocus();
-
                             Get.back();
                           },
                           child: Text(
                             'Login',
                             style: TextStyle(
-                              fontWeight:
-                              FontWeight.w700,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),

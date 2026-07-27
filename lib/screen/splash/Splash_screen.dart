@@ -8,32 +8,55 @@ import '../../route/app_route.dart';
 import '../widgets/app_logo.dart';
 
 class SplashScreen extends StatelessWidget {
-  SplashScreen({super.key});
+  SplashScreen({
+    super.key,
+  });
+
+  final Completer<void> _navigationCompleter =
+  Completer<void>();
+
+  void _startNavigation() {
+    if (_navigationCompleter.isCompleted) {
+      return;
+    }
+
+    _navigationCompleter.complete();
+
+    Future<void>.delayed(
+      Duration(seconds: 3),
+          () {
+        if (Get.currentRoute == AppRoutes.splash) {
+          Get.offAllNamed(
+            AppRoutes.login,
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Timer(
-        Duration(seconds: 3),
-            () {
-          Get.offAllNamed(AppRoutes.login);
-        },
-      );
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+        _startNavigation();
+      },
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.primaryColor,
       body: SafeArea(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment:
+            MainAxisAlignment.center,
             children: [
               AppLogo(
-                size: 120,
-                padding: 0,
-                fit: BoxFit.contain,
+                width: 170,
+                borderRadius: 90,
               ),
-              SizedBox(height: 30),
+              SizedBox(
+                height: 30,
+              ),
               Text(
                 'OTOKHI Chat',
                 style: TextStyle(
@@ -43,7 +66,9 @@ class SplashScreen extends StatelessWidget {
                   letterSpacing: 1,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(
+                height: 10,
+              ),
               Text(
                 'Fast. Secure. Simple.',
                 style: TextStyle(
@@ -51,7 +76,9 @@ class SplashScreen extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 60),
+              SizedBox(
+                height: 60,
+              ),
               CircularProgressIndicator(
                 color: Colors.white,
               ),
