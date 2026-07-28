@@ -61,4 +61,29 @@ Map<String, String> zhCN = {
   'unable_to_send_reset_link_message':
   '无法发送重置链接，请重试。',
   'back_to_login': '返回登录',
+
+  'enter_information_to_get_started': '输入您的信息以开始',
+  'full_name': '姓名',
+  'confirm_password': '确认密码',
+  'creating_account': '正在创建账户...',
+  'already_have_account': '已有账户？',
+
+  'reset_password': '重置密码',
+  'create_new_password_description':
+  '为您的账户创建一个新密码。',
+  'new_password': '新密码',
+  'confirm_new_password': '确认新密码',
+  'please_enter_new_password': '请输入您的新密码',
+  'password_min_6_characters': '密码至少需要6个字符',
+  'please_confirm_new_password': '请确认您的新密码',
+  'passwords_do_not_match': '两次输入的密码不一致',
+  'resetting': '正在重置...',
+  'connect_reset_password_api':
+  '请连接重置密码API以继续。',
+  'password_updated': '密码已更新',
+  'password_reset_successfully':
+  '您的密码已成功重置。',
+  'reset_failed': '重置失败',
+  'unable_to_reset_password':
+  '无法重置您的密码，请重试。',
 };

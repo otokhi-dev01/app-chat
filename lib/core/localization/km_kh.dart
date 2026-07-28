@@ -93,6 +93,12 @@ final Map<String, String> kmKH = {
   'back_to_login':
   'ត្រឡប់ទៅចូលគណនី',
 
+  'enter_information_to_get_started':
+  'បញ្ចូលព័ត៌មានរបស់អ្នកដើម្បីចាប់ផ្តើម',
+  'full_name': 'ឈ្មោះពេញ',
+  'confirm_password': 'បញ្ជាក់ពាក្យសម្ងាត់',
+  'creating_account': 'កំពុងបង្កើតគណនី...',
+  'already_have_account': 'មានគណនីរួចហើយ?',
   'api_not_connected':
   'មិនទាន់ភ្ជាប់ API',
   'forgot_password_api_not_connected_message':
@@ -139,8 +145,30 @@ final Map<String, String> kmKH = {
 'profile_information': 'ព័ត៌មានប្រវត្តិរូប',
 'personal_information': 'ព័ត៌មានផ្ទាល់ខ្លួន',
 
+  'reset_password': 'កំណត់ពាក្យសម្ងាត់ឡើងវិញ',
+  'create_new_password_description':
+  'បង្កើតពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក។',
+  'new_password': 'ពាក្យសម្ងាត់ថ្មី',
+  'confirm_new_password': 'បញ្ជាក់ពាក្យសម្ងាត់ថ្មី',
+  'please_enter_new_password':
+  'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មីរបស់អ្នក',
+  'password_min_6_characters':
+  'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួអក្សរ',
+  'please_confirm_new_password':
+  'សូមបញ្ជាក់ពាក្យសម្ងាត់ថ្មីរបស់អ្នក',
+  'passwords_do_not_match':
+  'ពាក្យសម្ងាត់មិនត្រូវគ្នា',
+  'resetting': 'កំពុងកំណត់ឡើងវិញ...',
+  'connect_reset_password_api':
+  'សូមភ្ជាប់ API កំណត់ពាក្យសម្ងាត់ឡើងវិញដើម្បីបន្ត។',
+  'password_updated': 'បានកែប្រែពាក្យសម្ងាត់',
+  'password_reset_successfully':
+  'ពាក្យសម្ងាត់របស់អ្នកត្រូវបានកំណត់ឡើងវិញដោយជោគជ័យ។',
+  'reset_failed': 'កំណត់ឡើងវិញមិនបានសម្រេច',
+  'unable_to_reset_password':
+  'មិនអាចកំណត់ពាក្យសម្ងាត់ឡើងវិញបានទេ។ សូមព្យាយាមម្តងទៀត។',
+
 'your_name': 'ឈ្មោះរបស់អ្នក',
-'full_name': 'ឈ្មោះពេញ',
 'username': 'ឈ្មោះអ្នកប្រើ',
 'phone_number': 'លេខទូរស័ព្ទ',
 'bio': 'អំពីខ្លួន',

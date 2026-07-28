@@ -1,85 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
+import '../../data/mock_auth_user.dart';
 import '../../route/app_route.dart';
 import '../../screen/widgets/common/app_feedback.dart';
-
-class MockAuthUser {
-  final String id;
-  final String name;
-  final String email;
-  final String password;
-
-  MockAuthUser({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.password,
-  });
-}
+import '../../services/auth_service.dart';
+import '../../services/mock/mock_auth_service.dart';
 
 class AuthController extends GetxController {
+  final AuthService authService;
+
+  AuthController({
+    AuthService? authService,
+  }) : authService =
+      authService ?? MockAuthService();
+
   final GlobalKey<FormState> loginFormKey =
   GlobalKey<FormState>();
 
   final GlobalKey<FormState> registerFormKey =
   GlobalKey<FormState>();
 
-  final TextEditingController loginEmailController =
+  final TextEditingController
+  loginEmailController =
   TextEditingController();
 
-  final TextEditingController loginPasswordController =
+  final TextEditingController
+  loginPasswordController =
   TextEditingController();
 
-  final TextEditingController registerNameController =
+  final TextEditingController
+  registerNameController =
   TextEditingController();
 
-  final TextEditingController registerEmailController =
+  final TextEditingController
+  registerEmailController =
   TextEditingController();
 
-  final TextEditingController registerPasswordController =
+  final TextEditingController
+  registerPasswordController =
   TextEditingController();
 
   final TextEditingController
   registerConfirmPasswordController =
   TextEditingController();
 
-  final FocusNode loginEmailFocusNode = FocusNode();
-  final FocusNode loginPasswordFocusNode = FocusNode();
+  final FocusNode loginEmailFocusNode =
+  FocusNode();
 
-  final FocusNode registerNameFocusNode = FocusNode();
-  final FocusNode registerEmailFocusNode = FocusNode();
+  final FocusNode loginPasswordFocusNode =
+  FocusNode();
+
+  final FocusNode registerNameFocusNode =
+  FocusNode();
+
+  final FocusNode registerEmailFocusNode =
+  FocusNode();
+
   final FocusNode registerPasswordFocusNode =
   FocusNode();
 
-  final FocusNode registerConfirmPasswordFocusNode =
+  final FocusNode
+  registerConfirmPasswordFocusNode =
   FocusNode();
 
-  final RxBool isLoginLoading = false.obs;
-  final RxBool isRegisterLoading = false.obs;
+  final RxBool isLoginLoading =
+      false.obs;
 
-  final RxBool obscureLoginPassword = true.obs;
-  final RxBool obscureRegisterPassword = true.obs;
-  final RxBool obscureConfirmPassword = true.obs;
+  final RxBool isRegisterLoading =
+      false.obs;
+
+  final RxBool obscureLoginPassword =
+      true.obs;
+
+  final RxBool obscureRegisterPassword =
+      true.obs;
+
+  final RxBool obscureConfirmPassword =
+      true.obs;
 
   final Rxn<MockAuthUser> currentUser =
   Rxn<MockAuthUser>();
 
-  final RxList<MockAuthUser> users =
-      <MockAuthUser>[
-        MockAuthUser(
-          id: '1',
-          name: 'Alex Morgan',
-          email: 'otokhichat@gmail.com',
-          password: 'ch757595',
-        ),
-        MockAuthUser(
-          id: '2',
-          name: 'Demo User',
-          email: 'demo@appchat.com',
-          password: '123456',
-        ),
-      ].obs;
+  RxList<MockAuthUser> get users =>
+      authService.users;
 
   String? validateName(String? value) {
     String name = value?.trim() ?? '';
@@ -156,7 +161,8 @@ class AuthController extends GetxController {
   }
 
   Future<void> login() async {
-    FocusManager.instance.primaryFocus?.unfocus();
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
 
     if (isLoginLoading.value) {
       return;
@@ -180,43 +186,12 @@ class AuthController extends GetxController {
     isLoginLoading.value = true;
 
     try {
-      await Future<void>.delayed(
-        Duration(milliseconds: 900),
+      MockAuthUser matchedUser =
+      await authService.login(
+        email: loginEmailController.text,
+        password:
+        loginPasswordController.text,
       );
-
-      String email = loginEmailController.text
-          .trim()
-          .toLowerCase();
-
-      String password =
-          loginPasswordController.text;
-
-      MockAuthUser? matchedUser;
-
-      for (MockAuthUser user in users) {
-        bool emailMatches =
-            user.email.toLowerCase() == email;
-
-        bool passwordMatches =
-            user.password == password;
-
-        if (emailMatches &&
-            passwordMatches) {
-          matchedUser = user;
-          break;
-        }
-      }
-
-      if (matchedUser == null) {
-        AppFeedback.showMessage(
-          title: 'Login Failed',
-          message:
-          'The email or password is incorrect.',
-          icon: Icons.error_outline_rounded,
-        );
-
-        return;
-      }
 
       currentUser.value = matchedUser;
 
@@ -226,8 +201,8 @@ class AuthController extends GetxController {
         title: 'Login Successful',
         message:
         'Welcome back, ${matchedUser.name}.',
-        icon: Icons
-            .check_circle_outline_rounded,
+        icon:
+        Icons.check_circle_outline_rounded,
       );
 
       isLoginLoading.value = false;
@@ -239,12 +214,22 @@ class AuthController extends GetxController {
       Get.offAllNamed(
         AppRoutes.home,
       );
+    } on AuthServiceException catch (error) {
+      AppFeedback.showMessage(
+        title: 'Login Failed',
+        message: error.message,
+        icon: Icons.error_outline_rounded,
+      );
     } catch (error) {
       AppFeedback.showMessage(
         title: 'Login Failed',
         message:
         'Something went wrong. Please try again.',
         icon: Icons.error_outline_rounded,
+      );
+
+      debugPrint(
+        'Login error: $error',
       );
     } finally {
       if (!isClosed) {
@@ -254,14 +239,16 @@ class AuthController extends GetxController {
   }
 
   Future<void> register() async {
-    FocusManager.instance.primaryFocus?.unfocus();
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
 
     if (isRegisterLoading.value) {
       return;
     }
 
     bool isValid =
-        registerFormKey.currentState?.validate() ??
+        registerFormKey.currentState
+            ?.validate() ??
             false;
 
     if (!isValid) {
@@ -278,48 +265,18 @@ class AuthController extends GetxController {
     isRegisterLoading.value = true;
 
     try {
-      await Future<void>.delayed(
-        Duration(milliseconds: 900),
-      );
-
-      String name =
-      registerNameController.text.trim();
-
-      String email = registerEmailController.text
+      String email =
+      registerEmailController.text
           .trim()
           .toLowerCase();
 
-      String password =
-          registerPasswordController.text;
-
-      bool emailAlreadyExists = users.any(
-            (MockAuthUser user) {
-          return user.email.toLowerCase() ==
-              email;
-        },
-      );
-
-      if (emailAlreadyExists) {
-        AppFeedback.showMessage(
-          title: 'Registration Failed',
-          message:
-          'This email is already registered.',
-          icon: Icons.error_outline_rounded,
-        );
-
-        return;
-      }
-
-      MockAuthUser newUser = MockAuthUser(
-        id: DateTime.now()
-            .microsecondsSinceEpoch
-            .toString(),
-        name: name,
+      await authService.register(
+        name:
+        registerNameController.text,
         email: email,
-        password: password,
+        password:
+        registerPasswordController.text,
       );
-
-      users.add(newUser);
 
       loginEmailController.text = email;
       loginPasswordController.clear();
@@ -334,8 +291,14 @@ class AuthController extends GetxController {
         title: 'Account Created',
         message:
         'You can now log in with your new account.',
-        icon: Icons
-            .check_circle_outline_rounded,
+        icon:
+        Icons.check_circle_outline_rounded,
+      );
+    } on AuthServiceException catch (error) {
+      AppFeedback.showMessage(
+        title: 'Registration Failed',
+        message: error.message,
+        icon: Icons.error_outline_rounded,
       );
     } catch (error) {
       AppFeedback.showMessage(
@@ -344,6 +307,10 @@ class AuthController extends GetxController {
         'Something went wrong. Please try again.',
         icon: Icons.error_outline_rounded,
       );
+
+      debugPrint(
+        'Registration error: $error',
+      );
     } finally {
       if (!isClosed) {
         isRegisterLoading.value = false;
@@ -351,8 +318,17 @@ class AuthController extends GetxController {
     }
   }
 
-  void logout() {
-    FocusManager.instance.primaryFocus?.unfocus();
+  Future<void> logout() async {
+    FocusManager.instance.primaryFocus
+        ?.unfocus();
+
+    try {
+      await authService.logout();
+    } catch (error) {
+      debugPrint(
+        'Logout error: $error',
+      );
+    }
 
     currentUser.value = null;
     loginPasswordController.clear();
@@ -373,7 +349,8 @@ class AuthController extends GetxController {
     registerNameController.clear();
     registerEmailController.clear();
     registerPasswordController.clear();
-    registerConfirmPasswordController.clear();
+    registerConfirmPasswordController
+        .clear();
 
     obscureRegisterPassword.value = true;
     obscureConfirmPassword.value = true;

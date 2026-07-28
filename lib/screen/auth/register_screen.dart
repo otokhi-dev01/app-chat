@@ -20,7 +20,7 @@ class RegisterScreen extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Create Account',
+          'create_account'.tr,
           textAlign: TextAlign.center,
           style: theme.textTheme.headlineMedium?.copyWith(
             color: colorScheme.onSurface,
@@ -49,7 +49,7 @@ class RegisterScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Enter your information to get started',
+                      'enter_information_to_get_started'.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
@@ -61,7 +61,7 @@ class RegisterScreen extends StatelessWidget {
                     AuthTextField(
                       controller: controller.registerNameController,
                       focusNode: controller.registerNameFocusNode,
-                      label: 'Full Name',
+                      label: 'full_name'.tr,
                       icon: Icons.person_outline_rounded,
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
@@ -79,7 +79,7 @@ class RegisterScreen extends StatelessWidget {
                     AuthTextField(
                       controller: controller.registerEmailController,
                       focusNode: controller.registerEmailFocusNode,
-                      label: 'Email',
+                      label: 'email'.tr,
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
@@ -98,7 +98,7 @@ class RegisterScreen extends StatelessWidget {
                       return AuthTextField(
                         controller: controller.registerPasswordController,
                         focusNode: controller.registerPasswordFocusNode,
-                        label: 'Password',
+                        label: 'password'.tr,
                         icon: Icons.lock_outline_rounded,
                         obscureText:
                         controller.obscureRegisterPassword.value,
@@ -114,8 +114,8 @@ class RegisterScreen extends StatelessWidget {
                         suffixIcon: IconButton(
                           tooltip:
                           controller.obscureRegisterPassword.value
-                              ? 'Show password'
-                              : 'Hide password',
+                              ? 'show_password'.tr
+                              : 'hide_password'.tr,
                           onPressed: controller.toggleRegisterPassword,
                           icon: Icon(
                             controller.obscureRegisterPassword.value
@@ -135,7 +135,7 @@ class RegisterScreen extends StatelessWidget {
                         controller.registerConfirmPasswordController,
                         focusNode:
                         controller.registerConfirmPasswordFocusNode,
-                        label: 'Confirm Password',
+                        label: 'confirm_password'.tr,
                         icon: Icons.lock_reset_rounded,
                         obscureText:
                         controller.obscureConfirmPassword.value,
@@ -150,8 +150,8 @@ class RegisterScreen extends StatelessWidget {
                         suffixIcon: IconButton(
                           tooltip:
                           controller.obscureConfirmPassword.value
-                              ? 'Show password'
-                              : 'Hide password',
+                              ? 'show_password'.tr
+                              : 'hide_password'.tr,
                           onPressed: controller.toggleConfirmPassword,
                           icon: Icon(
                             controller.obscureConfirmPassword.value
@@ -208,7 +208,7 @@ class RegisterScreen extends StatelessWidget {
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  'Creating account...',
+                                  'create_account'.tr,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight:
@@ -218,7 +218,7 @@ class RegisterScreen extends StatelessWidget {
                               ],
                             )
                                 : Text(
-                              'Create Account',
+                              'create_account'.tr,
                               key: ValueKey(
                                 'register-button',
                               ),
@@ -239,7 +239,7 @@ class RegisterScreen extends StatelessWidget {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          'Already have an account?',
+                          'already_have_account'.tr,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -251,7 +251,7 @@ class RegisterScreen extends StatelessWidget {
                             Get.back();
                           },
                           child: Text(
-                            'Login',
+                            'login'.tr,
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                             ),

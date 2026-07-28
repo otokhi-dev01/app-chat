@@ -103,6 +103,13 @@ final Map<String, String> enUS = {
   'unable_to_send_reset_link_message':
   'Unable to send the reset link. Please try again.',
 
+  'enter_information_to_get_started':
+  'Enter your information to get started',
+  'full_name': 'Full Name',
+  'confirm_password': 'Confirm Password',
+  'creating_account': 'Creating account...',
+  'already_have_account': 'Already have an account?',
+
 // Display
 'display': 'Display',
 'theme': 'Theme',
@@ -135,11 +142,33 @@ final Map<String, String> enUS = {
 'personal_information': 'Personal Information',
 
 'your_name': 'Your Name',
-'full_name': 'Full Name',
 'username': 'Username',
 'phone_number': 'Phone Number',
 'bio': 'Bio',
 'user': 'User',
+
+  'reset_password': 'Reset Password',
+  'create_new_password_description':
+  'Create a new password for your account.',
+  'new_password': 'New Password',
+  'confirm_new_password': 'Confirm New Password',
+  'please_enter_new_password':
+  'Please enter your new password',
+  'password_min_6_characters':
+  'Password must contain at least 6 characters',
+  'please_confirm_new_password':
+  'Please confirm your new password',
+  'passwords_do_not_match':
+  'Passwords do not match',
+  'resetting': 'Resetting...',
+  'connect_reset_password_api':
+  'Connect your reset-password API to continue.',
+  'password_updated': 'Password Updated',
+  'password_reset_successfully':
+  'Your password has been reset successfully.',
+  'reset_failed': 'Reset Failed',
+  'unable_to_reset_password':
+  'Unable to reset your password. Please try again.',
 
 'no_username': 'No username',
 'no_email_address': 'No email address',

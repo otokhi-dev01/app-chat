@@ -46,11 +46,11 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
     String password = value ?? '';
 
     if (password.isEmpty) {
-      return 'Please enter your new password';
+      return 'please_enter_new_password'.tr;
     }
 
     if (password.length < 6) {
-      return 'Password must contain at least 6 characters';
+      return 'password_min_6_characters'.tr;
     }
 
     return null;
@@ -60,11 +60,11 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
     String confirmPassword = value ?? '';
 
     if (confirmPassword.isEmpty) {
-      return 'Please confirm your new password';
+      return 'please_confirm_new_password'.tr;
     }
 
     if (confirmPassword != _passwordController.text) {
-      return 'Passwords do not match';
+      return 'passwords_do_not_match'.tr;
     }
 
     return null;
@@ -79,8 +79,8 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
 
     if (widget.onSubmit == null) {
       AppFeedback.showMessage(
-        title: 'API Not Connected',
-        message: 'Connect your reset-password API to continue.',
+        title: 'api_not_connected'.tr,
+        message: 'connect_reset_password_api'.tr,
         icon: Icons.info_outline_rounded,
       );
 
@@ -101,8 +101,8 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
       }
 
       AppFeedback.showMessage(
-        title: 'Password Updated',
-        message: 'Your password has been reset successfully.',
+        title: 'password_updated'.tr,
+        message: 'password_reset_successfully'.tr,
         icon: Icons.check_circle_outline_rounded,
       );
     } catch (error) {
@@ -111,8 +111,8 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
       }
 
       AppFeedback.showMessage(
-        title: 'Reset Failed',
-        message: 'Unable to reset your password. Please try again.',
+        title: 'reset_failed'.tr,
+        message: 'unable_to_reset_password'.tr,
         icon: Icons.error_outline_rounded,
       );
     } finally {
@@ -136,7 +136,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Reset Password',
+            'reset_password'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineMedium?.copyWith(
               color: colorScheme.onSurface,
@@ -147,7 +147,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           SizedBox(height: 8),
 
           Text(
-            'Create a new password for your account.',
+            'create_new_password_description'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
@@ -160,7 +160,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           AuthTextField(
             controller: _passwordController,
             focusNode: _passwordFocusNode,
-            label: 'New Password',
+            label: 'new_password'.tr,
             icon: Icons.lock_outline_rounded,
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.next,
@@ -173,8 +173,8 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
             },
             suffixIcon: IconButton(
               tooltip: _obscurePassword
-                  ? 'Show password'
-                  : 'Hide password',
+                  ? 'show_password'.tr
+                  : 'hide_password'.tr,
               onPressed: () {
                 setState(() {
                   _obscurePassword = !_obscurePassword;
@@ -194,7 +194,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           AuthTextField(
             controller: _confirmPasswordController,
             focusNode: _confirmPasswordFocusNode,
-            label: 'Confirm New Password',
+            label: 'confirm_new_password'.tr,
             icon: Icons.lock_reset_rounded,
             obscureText: _obscureConfirmPassword,
             textInputAction: TextInputAction.done,
@@ -207,8 +207,8 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
             },
             suffixIcon: IconButton(
               tooltip: _obscureConfirmPassword
-                  ? 'Show password'
-                  : 'Hide password',
+                  ? 'show_password'.tr
+                  : 'hide_password'.tr,
               onPressed: () {
                 setState(() {
                   _obscureConfirmPassword =
@@ -260,7 +260,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      'Resetting...',
+                      'resetting'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -269,7 +269,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                   ],
                 )
                     : Text(
-                  'Reset Password',
+                  'reset_password'.tr,
                   key: ValueKey<String>(
                     'reset-password-button',
                   ),
@@ -297,7 +297,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                 size: 19,
               ),
               label: Text(
-                'Back to Login',
+                'back_to_login'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                 ),
