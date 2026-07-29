@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ class ChatVoiceRecordingBar extends StatefulWidget {
   final VoidCallback onCancel;
   final ValueChanged<Duration> onSend;
 
-  ChatVoiceRecordingBar({
+  const ChatVoiceRecordingBar({
     super.key,
     required this.dragDx,
     required this.cancelThreshold,
@@ -26,13 +27,16 @@ class ChatVoiceRecordingBar extends StatefulWidget {
 
 class _ChatVoiceRecordingBarState
     extends State<ChatVoiceRecordingBar>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Timer? _timer;
 
   Duration _elapsed = Duration.zero;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+
+  // Bouncing "slide to cancel" chevrons — Telegram-style nudge
+  late AnimationController _chevronController;
 
   @override
   void initState() {
@@ -56,6 +60,11 @@ class _ChatVoiceRecordingBarState
     _pulseController.repeat(
       reverse: true,
     );
+
+    _chevronController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 900),
+    )..repeat();
 
     _timer = Timer.periodic(
       Duration(seconds: 1),
@@ -95,6 +104,7 @@ class _ChatVoiceRecordingBarState
   void dispose() {
     _timer?.cancel();
     _pulseController.dispose();
+    _chevronController.dispose();
 
     super.dispose();
   }
@@ -223,44 +233,63 @@ class _ChatVoiceRecordingBarState
                         translationX * 0.20,
                         0,
                       ),
-                      child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons
-                                .keyboard_double_arrow_left_rounded,
-                            color: nearCancel
-                                ? dangerColor
-                                : colorScheme
-                                .onSurfaceVariant,
-                            size: 18,
-                          ),
+                      child: AnimatedBuilder(
+                        // Stop bouncing once the user is committed to
+                        // cancelling — Telegram freezes the chevrons here.
+                        animation: _chevronController,
+                        builder: (context, child) {
+                          double bounce = nearCancel
+                              ? 0.0
+                              : math.sin(
+                            _chevronController.value *
+                                2 *
+                                math.pi,
+                          ) * 3;
 
-                          SizedBox(width: 3),
+                          return Transform.translate(
+                            offset: Offset(bounce, 0),
+                            child: child,
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons
+                                  .keyboard_double_arrow_left_rounded,
+                              color: nearCancel
+                                  ? dangerColor
+                                  : colorScheme
+                                  .onSurfaceVariant,
+                              size: 18,
+                            ),
 
-                          Flexible(
-                            child: Text(
-                              nearCancel
-                                  ? 'Release to cancel'
-                                  : 'Slide left to cancel',
-                              maxLines: 1,
-                              overflow:
-                              TextOverflow.ellipsis,
-                              style: theme
-                                  .textTheme.bodySmall
-                                  ?.copyWith(
-                                color: nearCancel
-                                    ? dangerColor
-                                    : colorScheme
-                                    .onSurfaceVariant,
-                                fontWeight: nearCancel
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
+                            SizedBox(width: 3),
+
+                            Flexible(
+                              child: Text(
+                                nearCancel
+                                    ? 'Release to cancel'
+                                    : 'Slide left to cancel',
+                                maxLines: 1,
+                                overflow:
+                                TextOverflow.ellipsis,
+                                style: theme
+                                    .textTheme.bodySmall
+                                    ?.copyWith(
+                                  color: nearCancel
+                                      ? dangerColor
+                                      : colorScheme
+                                      .onSurfaceVariant,
+                                  fontWeight: nearCancel
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     )
                         : Text(

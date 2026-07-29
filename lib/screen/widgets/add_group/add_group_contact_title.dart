@@ -7,7 +7,7 @@ class AddGroupContactTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  AddGroupContactTile({
+  const AddGroupContactTile({
     super.key,
     required this.contact,
     required this.selected,

@@ -14,7 +14,7 @@ class AddPostCameraControls
   final ValueChanged<AddPostCameraMode>
   onModeChanged;
 
-  AddPostCameraControls({
+  const AddPostCameraControls({
     super.key,
     required this.selectedMode,
     required this.recording,
@@ -99,7 +99,7 @@ class _SideControlButton
   final bool enabled;
   final VoidCallback onTap;
 
-  _SideControlButton({
+  const _SideControlButton({
     required this.icon,
     required this.enabled,
     required this.onTap,
@@ -141,7 +141,7 @@ class _CaptureButton extends StatelessWidget {
   final bool busy;
   final VoidCallback onTap;
 
-  _CaptureButton({
+  const _CaptureButton({
     required this.mode,
     required this.recording,
     required this.busy,
@@ -228,7 +228,7 @@ class _CameraModeNavigation
   final ValueChanged<AddPostCameraMode>
   onChanged;
 
-  _CameraModeNavigation({
+ const _CameraModeNavigation({
     required this.selectedMode,
     required this.enabled,
     required this.onChanged,
@@ -276,7 +276,7 @@ class _ModeButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onTap;
 
-  _ModeButton({
+ const _ModeButton({
     required this.title,
     required this.selected,
     required this.enabled,

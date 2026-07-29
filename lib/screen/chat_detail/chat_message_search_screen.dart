@@ -9,7 +9,7 @@ class ChatMessageSearchScreen extends StatefulWidget {
   final String chatName;
   final List<ChatMessageModel> messages;
 
-  ChatMessageSearchScreen({
+  const ChatMessageSearchScreen({
     super.key,
     required this.chatName,
     required this.messages,

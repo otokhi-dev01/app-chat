@@ -14,7 +14,7 @@ class CallControls extends StatelessWidget {
   final VoidCallback onFlipCamera;
   final VoidCallback onEndCall;
 
-  CallControls({
+  const CallControls({
     super.key,
     required this.isVideoCall,
     required this.isMuted,

@@ -6,7 +6,7 @@ import '../../../models/chat_message_model.dart';
 class ChatLocationMessage extends StatelessWidget {
   final ChatMessageModel message;
 
-  ChatLocationMessage({
+  const ChatLocationMessage({
     super.key,
     required this.message,
   });

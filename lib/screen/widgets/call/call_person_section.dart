@@ -8,7 +8,7 @@ class CallPersonSection extends StatelessWidget {
   final bool showAvatar;
   final bool showLocalPreview;
 
-  CallPersonSection({
+  const CallPersonSection({
     super.key,
     required this.name,
     required this.avatarUrl,
@@ -108,7 +108,7 @@ class _CallAvatar extends StatelessWidget {
   final String avatarUrl;
   final String initials;
 
-  _CallAvatar({
+  const _CallAvatar({
     super.key,
     required this.avatarUrl,
     required this.initials,
@@ -187,7 +187,7 @@ class _CallStatus extends StatelessWidget {
   final String text;
   final bool isConnecting;
 
-  _CallStatus({
+ const _CallStatus({
     required this.text,
     required this.isConnecting,
   });

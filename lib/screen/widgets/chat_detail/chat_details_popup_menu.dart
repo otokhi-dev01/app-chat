@@ -7,7 +7,7 @@ class ChatDetailPopupMenu extends StatelessWidget {
   final ValueChanged<String>? onSelected;
   final Color buttonBackground;
 
-  ChatDetailPopupMenu({
+  const ChatDetailPopupMenu({
     super.key,
     required this.chat,
     required this.onSelected,
@@ -111,7 +111,7 @@ class _ChatPopupMenuItem extends StatelessWidget {
   final String title;
   final bool isDanger;
 
-  _ChatPopupMenuItem({
+  const _ChatPopupMenuItem({
     required this.icon,
     required this.title,
     this.isDanger = false,

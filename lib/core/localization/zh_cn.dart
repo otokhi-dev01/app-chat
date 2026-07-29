@@ -68,6 +68,10 @@ Map<String, String> zhCN = {
   'creating_account': '正在创建账户...',
   'already_have_account': '已有账户？',
 
+  'add_group': '创建群组',
+  'saved_messages': '已保存的消息',
+  'archived_chats': '已归档的聊天',
+
   'reset_password': '重置密码',
   'create_new_password_description':
   '为您的账户创建一个新密码。',

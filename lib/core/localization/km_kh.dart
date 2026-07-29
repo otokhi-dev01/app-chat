@@ -140,6 +140,11 @@ final Map<String, String> kmKH = {
 'logout_confirmation':
 'តើអ្នកពិតជាចង់ចាកចេញពីគណនីរបស់អ្នកមែនទេ?',
 
+  'add_group': 'បង្កើតក្រុម',
+  'saved_messages': 'សារដែលបានរក្សាទុក',
+  'archived_chats': 'ការជជែកដែលបានទុកក្នុងបណ្ណសារ',
+
+
 // Profile
 'edit_profile': 'កែប្រែប្រវត្តិរូប',
 'profile_information': 'ព័ត៌មានប្រវត្តិរូប',
@@ -214,7 +219,6 @@ final Map<String, String> kmKH = {
 
 // Chat menu
 'mark_all_read': 'សម្គាល់ទាំងអស់ថាបានអាន',
-'archived_chats': 'ការជជែកដែលបានរក្សាទុក',
 'chat_settings': 'ការកំណត់ការជជែក',
 
 'all_chats_marked_as_read':

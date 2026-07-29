@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-
-import '../controllers/auth/auth_controller.dart';
 import '../data/mock_auth_user.dart';
 
 enum AuthServiceError {

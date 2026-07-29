@@ -4,7 +4,7 @@ class HomeChatArchivedTile extends StatelessWidget {
   final int count;
   final VoidCallback onTap;
 
-  HomeChatArchivedTile({
+  const HomeChatArchivedTile({
     super.key,
     required this.count,
     required this.onTap,

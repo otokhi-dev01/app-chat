@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomeChatMenu extends StatelessWidget {
   final ValueChanged<String> onSelected;
 
-  HomeChatMenu({
+  const HomeChatMenu({
     super.key,
     required this.onSelected,
   });
@@ -69,13 +70,19 @@ class HomeChatMenu extends StatelessWidget {
           ) {
         return [
           PopupMenuItem<String>(
-            value: 'mark_all_read',
+            value: 'add_group',
             child: _HomeChatMenuItem(
-              icon: Icons.mark_chat_read_outlined,
-              title: 'Mark all as read',
+              icon: Icons.group_add_outlined,
+              title: 'add_group'.tr,
             ),
           ),
-
+          PopupMenuItem<String>(
+            value: 'saved_messages',
+            child: _HomeChatMenuItem(
+              icon: Icons.bookmark_border_rounded,
+              title: 'Saved messages',
+            ),
+          ),
           PopupMenuItem<String>(
             value: 'archived_chats',
             child: _HomeChatMenuItem(
@@ -93,7 +100,7 @@ class _HomeChatMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  _HomeChatMenuItem({
+  const _HomeChatMenuItem({
     required this.icon,
     required this.title,
   });

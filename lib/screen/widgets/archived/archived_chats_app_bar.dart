@@ -8,7 +8,7 @@ class ArchivedChatsAppBar extends StatelessWidget
   final int archivedCount;
   final VoidCallback onBack;
 
-  ArchivedChatsAppBar({
+ const ArchivedChatsAppBar({
     super.key,
     required this.archivedCount,
     required this.onBack,

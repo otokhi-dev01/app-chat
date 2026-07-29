@@ -9,7 +9,7 @@ class ArchivedChatActionsSheet extends StatelessWidget {
   final VoidCallback onMuteToggle;
   final VoidCallback onDelete;
 
-  ArchivedChatActionsSheet({
+ const ArchivedChatActionsSheet({
     super.key,
     required this.chat,
     required this.onUnarchive,
@@ -190,7 +190,7 @@ class _ArchivedActionTile extends StatelessWidget {
   final Color? titleColor;
   final VoidCallback onTap;
 
-  _ArchivedActionTile({
+  const _ArchivedActionTile({
     required this.icon,
     required this.title,
     required this.subtitle,

@@ -13,7 +13,7 @@ import 'add_group_select_members.dart';
 class AddGroupContent extends StatefulWidget {
   final AddGroupController controller;
 
-  AddGroupContent({
+ const AddGroupContent({
     super.key,
     required this.controller,
   });
@@ -597,7 +597,7 @@ class _AddGroupEmptyView
   final bool hasSearch;
   final VoidCallback onClearSearch;
 
-  _AddGroupEmptyView({
+  const _AddGroupEmptyView({
     required this.hasSearch,
     required this.onClearSearch,
   });
@@ -666,7 +666,7 @@ class _AddGroupErrorView
   final String message;
   final VoidCallback onRetry;
 
-  _AddGroupErrorView({
+  const _AddGroupErrorView({
     required this.message,
     required this.onRetry,
   });

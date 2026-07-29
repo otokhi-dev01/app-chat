@@ -7,7 +7,7 @@ class CallActionButton extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  CallActionButton({
+  const CallActionButton({
     super.key,
     required this.label,
     required this.tooltip,

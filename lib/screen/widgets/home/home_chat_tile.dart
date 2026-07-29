@@ -16,7 +16,7 @@ class HomeChatTileWrapper extends StatelessWidget {
   final VoidCallback onMarkRead;
   final VoidCallback onDelete;
 
-  HomeChatTileWrapper({
+  const HomeChatTileWrapper({
     super.key,
     required this.chat,
     required this.onTap,
@@ -104,7 +104,7 @@ class HomeChatTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
-  HomeChatTile({
+  const HomeChatTile({
     super.key,
     required this.chat,
     required this.onTap,

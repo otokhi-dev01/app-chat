@@ -8,7 +8,7 @@ import '../../widgets/call/call_person_section.dart';
 import '../../widgets/call/call_top_app.dart';
 
 class CallScreen extends GetView<CallController> {
-  CallScreen({
+  const CallScreen({
     super.key,
   });
 

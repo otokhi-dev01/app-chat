@@ -7,7 +7,7 @@ import 'auth_text_field.dart';
 class ForgotPasswordForm extends StatefulWidget {
   final Future<void> Function(String email)? onSubmit;
 
-  ForgotPasswordForm({
+  const ForgotPasswordForm({
     super.key,
     this.onSubmit,
   });

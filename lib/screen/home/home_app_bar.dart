@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
+import '../../route/app_route.dart';
 import 'home_app_bar_actions.dart';
 import 'home_category_filter.dart';
 
@@ -58,12 +59,12 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     FocusManager.instance.primaryFocus?.unfocus();
 
     switch (value) {
-      case 'mark_all_read':
-        controller.markAllAsRead();
-        _showMessage(
-          context,
-          'all_chats_marked_as_read'.tr,
-        );
+      case 'add_group':
+        await Get.toNamed(AppRoutes.addGroup);
+        break;
+
+      case 'saved_messages':
+        await Get.toNamed(AppRoutes.savedMessages);
         break;
 
       case 'archived_chats':

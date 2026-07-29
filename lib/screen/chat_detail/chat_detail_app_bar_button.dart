@@ -8,7 +8,7 @@ class ChatDetailAppBarButton extends StatelessWidget {
   final Color foregroundColor;
   final VoidCallback? onPressed;
 
-  ChatDetailAppBarButton({
+  const ChatDetailAppBarButton({
     super.key,
     required this.tooltip,
     required this.icon,

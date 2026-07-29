@@ -3,172 +3,97 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import '../../../controllers/save/save_message_controller.dart';
+import '../../../models/chat_message_model.dart';
 import '../../../models/save_message_model.dart';
 import '../../../services/message_service.dart';
 import '../../../services/mock/mock_message_service.dart';
 import '../../../services/mock/mock_saved_message_service.dart';
 import '../../../services/save_message_service.dart';
 import '../../chat_detail/chat_detail_app_bar_button.dart';
-import '../../widgets/save/saved_nessage_input_bar.dart';
+import '../../widgets/chat_detail/chat_attachment_sheet.dart';
+import '../../widgets/chat_detail/chat_input_bar.dart';
+import '../../widgets/chat_detail/chat_message_list.dart';
 
 class SavedMessagesScreen extends StatelessWidget {
-  SavedMessagesScreen({
-    super.key,
-  });
+  const SavedMessagesScreen({super.key});
 
   SavedMessagesController get controller {
     if (!Get.isRegistered<MessageService>()) {
-      Get.put<MessageService>(
-        MockMessageService(),
-        permanent: true,
-      );
+      Get.put<MessageService>(MockMessageService(), permanent: true);
     }
 
     if (!Get.isRegistered<SavedMessageService>()) {
       Get.put<SavedMessageService>(
-        MockSavedMessageService(
-          messageService:
-          Get.find<MessageService>(),
-        ),
+        MockSavedMessageService(messageService: Get.find<MessageService>()),
         permanent: true,
       );
     }
 
-    if (Get.isRegistered<
-        SavedMessagesController>()) {
-      return Get.find<
-          SavedMessagesController>();
+    if (Get.isRegistered<SavedMessagesController>()) {
+      return Get.find<SavedMessagesController>();
     }
 
     return Get.put<SavedMessagesController>(
-      SavedMessagesController(
-        savedMessageService:
-        Get.find<SavedMessageService>(),
-      ),
+      SavedMessagesController(savedMessageService: Get.find<SavedMessageService>()),
       permanent: true,
     );
   }
 
-  String _formatTime(
-      DateTime dateTime,
-      ) {
-    int hour = dateTime.hour;
-
-    String period =
-    hour >= 12 ? 'PM' : 'AM';
-
-    int formattedHour = hour % 12;
-
-    if (formattedHour == 0) {
-      formattedHour = 12;
-    }
-
-    String minute = dateTime.minute
-        .toString()
-        .padLeft(2, '0');
-
-    return '$formattedHour:$minute $period';
-  }
-
-  SystemUiOverlayStyle _overlayStyle(
-      ThemeData theme,
-      bool isDark,
-      ) {
+  SystemUiOverlayStyle _overlayStyle(ThemeData theme, bool isDark) {
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
-
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   void _closeScreen() {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
+    FocusManager.instance.primaryFocus?.unfocus();
     Get.back();
   }
 
-  void _showDeleteSheet(
-      BuildContext context,
-      SavedMessageModel message,
-      ) {
+  void _showDeleteSheet(BuildContext context, SavedMessageModel message) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
+    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
-
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
     Color cancelColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.07,
-    )
-        : Color(0xFFF2F4F7);
+        ? Colors.white.withValues(alpha: 0.07)
+        : const Color(0xFFF2F4F7);
 
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(
-        alpha: 0.42,
-      ),
-      builder: (
-          BuildContext sheetContext,
-          ) {
+      barrierColor: Colors.black.withValues(alpha: 0.42),
+      builder: (BuildContext sheetContext) {
         return Material(
           color: cardColor,
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(28),
-            ),
-            side: BorderSide(
-              color: borderColor,
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            side: BorderSide(color: borderColor),
           ),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(
-              16,
-              12,
-              16,
-              20,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -176,18 +101,11 @@ class SavedMessagesScreen extends StatelessWidget {
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: colorScheme
-                        .onSurfaceVariant
-                        .withValues(
-                      alpha: 0.25,
-                    ),
-                    borderRadius:
-                    BorderRadius.circular(20),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-
-                SizedBox(height: 20),
-
+                const SizedBox(height: 20),
                 Row(
                   children: [
                     Container(
@@ -195,49 +113,29 @@ class SavedMessagesScreen extends StatelessWidget {
                       height: 50,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: colorScheme.error
-                            .withValues(
-                          alpha: 0.11,
-                        ),
-                        borderRadius:
-                        BorderRadius.circular(15),
+                        color: colorScheme.error.withValues(alpha: 0.11),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Icon(
-                        Icons.delete_outline_rounded,
-                        color: colorScheme.error,
-                        size: 24,
-                      ),
+                      child: Icon(Icons.delete_outline_rounded, color: colorScheme.error, size: 24),
                     ),
-
-                    SizedBox(width: 12),
-
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Delete message?',
-                            style: theme
-                                .textTheme.titleMedium
-                                ?.copyWith(
-                              color:
-                              colorScheme.onSurface,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
                               fontSize: 17,
-                              fontWeight:
-                              FontWeight.w700,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-
-                          SizedBox(height: 4),
-
+                          const SizedBox(height: 4),
                           Text(
                             'This message will be permanently removed.',
-                            style: theme
-                                .textTheme.bodySmall
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                               fontSize: 12,
                             ),
                           ),
@@ -246,42 +144,27 @@ class SavedMessagesScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                SizedBox(height: 20),
-
-                Divider(
-                  height: 1,
-                  color: borderColor,
-                ),
-
-                SizedBox(height: 16),
-
+                const SizedBox(height: 20),
+                Divider(height: 1, color: borderColor),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: Material(
                         color: cancelColor,
-                        borderRadius:
-                        BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16),
                         child: InkWell(
-                          onTap: () {
-                            Navigator.of(
-                              sheetContext,
-                            ).pop();
-                          },
-                          borderRadius:
-                          BorderRadius.circular(16),
+                          onTap: () => Navigator.of(sheetContext).pop(),
+                          borderRadius: BorderRadius.circular(16),
                           child: SizedBox(
                             height: 52,
                             child: Center(
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: colorScheme
-                                      .onSurface,
+                                  color: colorScheme.onSurface,
                                   fontSize: 14,
-                                  fontWeight:
-                                  FontWeight.w700,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -289,51 +172,30 @@ class SavedMessagesScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    SizedBox(width: 12),
-
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Material(
                         color: colorScheme.error,
-                        borderRadius:
-                        BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16),
                         child: InkWell(
                           onTap: () {
-                            Navigator.of(
-                              sheetContext,
-                            ).pop();
-
-                            controller.deleteMessage(
-                              message.id,
-                            );
+                            Navigator.of(sheetContext).pop();
+                            controller.deleteMessage(message.id);
                           },
-                          borderRadius:
-                          BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16),
                           child: SizedBox(
                             height: 52,
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment
-                                  .center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons
-                                      .delete_outline_rounded,
-                                  color:
-                                  colorScheme.onError,
-                                  size: 20,
-                                ),
-
-                                SizedBox(width: 7),
-
+                                Icon(Icons.delete_outline_rounded, color: colorScheme.onError, size: 20),
+                                const SizedBox(width: 7),
                                 Text(
                                   'Delete',
                                   style: TextStyle(
-                                    color:
-                                    colorScheme.onError,
+                                    color: colorScheme.onError,
                                     fontSize: 14,
-                                    fontWeight:
-                                    FontWeight.w700,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ],
@@ -352,37 +214,20 @@ class SavedMessagesScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context,
-      ) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
-
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.94)
+        : Colors.white.withValues(alpha: 0.98);
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
-
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
     Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+        ? Colors.white.withValues(alpha: 0.08)
+        : const Color(0xFFF2F4F7);
 
     return AppBar(
       toolbarHeight: 68,
@@ -396,45 +241,26 @@ class SavedMessagesScreen extends StatelessWidget {
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       leadingWidth: 58,
-      systemOverlayStyle: _overlayStyle(
-        theme,
-        isDark,
-      ),
+      systemOverlayStyle: _overlayStyle(theme, isDark),
       flexibleSpace: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 18,
-            sigmaY: 18,
-          ),
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
             decoration: BoxDecoration(
               color: appBarColor,
-              border: Border(
-                bottom: BorderSide(
-                  color: borderColor,
-                  width: 1,
-                ),
-              ),
+              border: Border(bottom: BorderSide(color: borderColor, width: 1)),
             ),
           ),
         ),
       ),
       leading: Padding(
-        padding: EdgeInsets.fromLTRB(
-          8,
-          12,
-          6,
-          12,
-        ),
+        padding: const EdgeInsets.fromLTRB(8, 12, 6, 12),
         child: ChatDetailAppBarButton(
           tooltip: 'Back',
-          icon:
-          Icons.arrow_back_ios_new_rounded,
+          icon: Icons.arrow_back_ios_new_rounded,
           iconSize: 18,
-          backgroundColor:
-          actionBackground,
-          foregroundColor:
-          colorScheme.onSurface,
+          backgroundColor: actionBackground,
+          foregroundColor: colorScheme.onSurface,
           onPressed: _closeScreen,
         ),
       ),
@@ -445,66 +271,41 @@ class SavedMessagesScreen extends StatelessWidget {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: isDark ? 0.16 : 0.11,
-              ),
+              color: colorScheme.primary.withValues(alpha: isDark ? 0.16 : 0.11),
               shape: BoxShape.circle,
               border: Border.all(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: isDark ? 0.24 : 0.16,
-                ),
+                color: colorScheme.primary.withValues(alpha: isDark ? 0.24 : 0.16),
               ),
             ),
-            child: Icon(
-              Icons.bookmark_rounded,
-              color: colorScheme.primary,
-              size: 21,
-            ),
+            child: Icon(Icons.bookmark_rounded, color: colorScheme.primary, size: 21),
           ),
-
-          SizedBox(width: 11),
-
+          const SizedBox(width: 11),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Saved Messages',
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.titleMedium
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 16,
                     height: 1.1,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-
-                SizedBox(height: 4),
-
+                const SizedBox(height: 4),
                 Text(
                   'Your private notes',
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 11,
                     height: 1,
-                    fontWeight:
-                    FontWeight.w500,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -515,56 +316,32 @@ class SavedMessagesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(
-      BuildContext context,
-      ) {
+  Widget _buildEmptyState(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
+    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Center(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(28),
+        padding: const EdgeInsets.all(28),
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(
-            maxWidth: 340,
-          ),
-          padding: EdgeInsets.fromLTRB(
-            24,
-            30,
-            24,
-            28,
-          ),
+          constraints: const BoxConstraints(maxWidth: 340),
+          padding: const EdgeInsets.fromLTRB(24, 30, 24, 28),
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius:
-            BorderRadius.circular(26),
-            border: Border.all(
-              color: borderColor,
-            ),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: borderColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: isDark ? 0.18 : 0.06,
-                ),
+                color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.06),
                 blurRadius: 24,
-                offset: Offset(0, 10),
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -576,159 +353,30 @@ class SavedMessagesScreen extends StatelessWidget {
                 height: 82,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
-                    alpha: 0.11,
-                  ),
+                  color: colorScheme.primary.withValues(alpha: 0.11),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colorScheme.primary
-                        .withValues(
-                      alpha: 0.14,
-                    ),
-                  ),
+                  border: Border.all(color: colorScheme.primary.withValues(alpha: 0.14)),
                 ),
-                child: Icon(
-                  Icons.bookmark_border_rounded,
-                  color: colorScheme.primary,
-                  size: 37,
-                ),
+                child: Icon(Icons.bookmark_border_rounded, color: colorScheme.primary, size: 37),
               ),
-
-              SizedBox(height: 20),
-
+              const SizedBox(height: 20),
               Text(
                 'No saved messages',
                 textAlign: TextAlign.center,
-                style: theme
-                    .textTheme.titleMedium
-                    ?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: 17,
-                  fontWeight:
-                  FontWeight.w700,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-
-              SizedBox(height: 8),
-
+              const SizedBox(height: 8),
               Text(
-                'Send yourself a note or forward important messages here.',
+                'Send yourself a note, photo, voice message, file, or location — it\'ll stay here.',
                 textAlign: TextAlign.center,
-                style: theme
-                    .textTheme.bodyMedium
-                    ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 13,
                   height: 1.45,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessageBubble(
-      BuildContext context,
-      SavedMessageModel message,
-      ) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    double maximumWidth =
-        MediaQuery.sizeOf(context).width *
-            0.78;
-
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onLongPress: () {
-          _showDeleteSheet(
-            context,
-            message,
-          );
-        },
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: maximumWidth,
-          ),
-          margin: EdgeInsets.only(
-            left: 52,
-            top: 4,
-            bottom: 4,
-          ),
-          padding: EdgeInsets.fromLTRB(
-            13,
-            9,
-            10,
-            7,
-          ),
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(18),
-              topRight: Radius.circular(18),
-              bottomLeft:
-              Radius.circular(18),
-              bottomRight:
-              Radius.circular(5),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.17,
-                ),
-                blurRadius: 12,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Wrap(
-            alignment: WrapAlignment.end,
-            crossAxisAlignment:
-            WrapCrossAlignment.end,
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              Text(
-                message.text,
-                style: theme
-                    .textTheme.bodyLarge
-                    ?.copyWith(
-                  color:
-                  colorScheme.onPrimary,
-                  fontSize: 14.5,
-                  height: 1.35,
-                  fontWeight:
-                  FontWeight.w400,
-                ),
-              ),
-
-              Padding(
-                padding: EdgeInsets.only(
-                  bottom: 1,
-                ),
-                child: Text(
-                  _formatTime(
-                    message.dateTime,
-                  ),
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color: colorScheme.onPrimary
-                        .withValues(
-                      alpha: 0.72,
-                    ),
-                    fontSize: 10.5,
-                    height: 1,
-                    fontWeight:
-                    FontWeight.w500,
-                  ),
                 ),
               ),
             ],
@@ -741,78 +389,92 @@ class SavedMessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color pageColor = isDark
-        ? theme.scaffoldBackgroundColor
-        : Color(0xFFF6F7F9);
+    Color pageColor = isDark ? theme.scaffoldBackgroundColor : const Color(0xFFF6F7F9);
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: () {
-        FocusManager.instance.primaryFocus
-            ?.unfocus();
-      },
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: pageColor,
         appBar: _buildAppBar(context),
-        body: Column(
-          children: [
-            Expanded(
-              child: Obx(
-                    () {
-                  List<SavedMessageModel> messages =
-                  controller.messages.toList();
+        body: Obx(() {
+          // controller.messages is List<SavedMessageModel>; ChatMessageList
+          // renders ChatMessageModel, so convert at the boundary via the
+          // model's own toChatMessage(). A Map keeps saved-id -> original
+          // SavedMessageModel so long-press delete still works with the
+          // real saved id, not just the underlying chat message id.
+          List<SavedMessageModel> savedMessages = controller.messages.toList();
+          List<ChatMessageModel> messages =
+          savedMessages.map((SavedMessageModel item) => item.toChatMessage()).toList();
 
-                  if (messages.isEmpty) {
-                    return _buildEmptyState(
-                      context,
-                    );
-                  }
+          Map<String, SavedMessageModel> savedById = {
+            for (SavedMessageModel item in savedMessages) item.id: item,
+          };
 
-                  return ListView.builder(
-                    controller:
-                    controller.scrollController,
-                    physics:
-                    BouncingScrollPhysics(),
-                    keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior
-                        .onDrag,
-                    padding: EdgeInsets.fromLTRB(
-                      14,
-                      14,
-                      14,
-                      18,
-                    ),
-                    itemCount: messages.length,
-                    itemBuilder: (
-                        BuildContext context,
-                        int index,
-                        ) {
-                      SavedMessageModel message =
-                      messages[index];
-
-                      return _buildMessageBubble(
-                        context,
-                        message,
-                      );
+          return Stack(
+            children: [
+              Positioned.fill(
+                bottom: 76,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  child: messages.isEmpty
+                      ? KeyedSubtree(
+                    key: const ValueKey('empty'),
+                    child: _buildEmptyState(context),
+                  )
+                      : ChatMessageList(
+                    key: const ValueKey('message-list'),
+                    messages: messages,
+                    appBarSpace: 0,
+                    scrollController: controller.scrollController,
+                    onMessageLongPress: (ChatMessageModel message) {
+                      SavedMessageModel? saved = savedById[message.id];
+                      if (saved != null) {
+                        _showDeleteSheet(context, saved);
+                      }
                     },
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-
-            MessageInputBar(
-              textController:
-              controller.textController,
-              hintText: 'Message',
-              onSend: controller.sendMessage,
-            ),
-          ],
-        ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: ChatInputBar(
+                  controller: controller.textController,
+                  focusNode: controller.messageFocusNode,
+                  onSend: controller.sendMessage,
+                  onAttachment: () {
+                    showChatAttachmentSheet(
+                      context: context,
+                      onCamera: controller.openCamera,
+                      onGallery: controller.openGallery,
+                      onFile: controller.openFilePicker,
+                      onLocation: controller.openLocationPicker,
+                    );
+                  },
+                  onCamera: controller.openCamera,
+                  isRecording: controller.isRecordingVoice.value,
+                  isHoldRecording:
+                  controller.isRecordingVoice.value && !controller.isTapRecordingMode.value,
+                  voiceDragDx: controller.voiceDragDx.value,
+                  cancelThreshold: SavedMessagesController.cancelDragThreshold,
+                  onVoiceTap: controller.onVoiceTap,
+                  onVoiceStart: controller.onVoiceStart,
+                  onVoiceDrag: controller.onVoiceDrag,
+                  onVoiceEnd: controller.onVoiceEnd,
+                  onVoiceCancel: controller.cancelVoiceRecording,
+                  onVoiceSend: controller.sendVoiceRecording,
+                ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

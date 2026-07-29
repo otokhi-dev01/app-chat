@@ -16,7 +16,7 @@ class ChatDetailAppBar extends StatelessWidget
   final ValueChanged<String>? onMenuSelected;
   final VoidCallback? onProfileTap;
 
-  ChatDetailAppBar({
+  const ChatDetailAppBar({
     super.key,
     required this.chat,
     this.onAudioCall,
@@ -514,7 +514,7 @@ class _CallOptionTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  _CallOptionTile({
+  const _CallOptionTile({
     required this.icon,
     required this.title,
     required this.subtitle,

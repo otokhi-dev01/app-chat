@@ -9,6 +9,11 @@ abstract class SavedMessageService {
       String text,
       );
 
+  Future<SavedMessageModel>
+  sendSavedMedia(
+      SavedMessageModel draft,
+      );
+
   Future<void> deleteSavedMessage(
       String messageId,
       );

@@ -8,7 +8,7 @@ class AddGroupSelectedMembers
   final ValueChanged<ContactModel>
   onRemoveMember;
 
-  AddGroupSelectedMembers({
+  const AddGroupSelectedMembers({
     super.key,
     required this.members,
     required this.onRemoveMember,

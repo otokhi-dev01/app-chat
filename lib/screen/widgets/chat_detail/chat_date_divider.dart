@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChatDateDivider extends StatelessWidget {
   final String label;
 
-  ChatDateDivider({
+  const ChatDateDivider({
     super.key,
     required this.label,
   });

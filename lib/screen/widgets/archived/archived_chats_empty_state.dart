@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ArchivedChatsEmptyState
     extends StatelessWidget {
-  ArchivedChatsEmptyState({
+ const ArchivedChatsEmptyState({
     super.key,
   });
 

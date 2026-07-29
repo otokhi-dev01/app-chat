@@ -16,6 +16,8 @@ class SavedMessageModel {
         ChatMessageStatus.read,
     bool isRead = true,
     String? mediaPath,
+    double? latitude,
+    double? longitude,
   }) : data = ChatMessageModel(
     id: id,
     conversationId: conversationId,
@@ -27,6 +29,8 @@ class SavedMessageModel {
     type: type,
     status: status,
     mediaPath: mediaPath,
+    latitude: latitude,
+    longitude: longitude,
   );
 
   SavedMessageModel.fromMessage(
@@ -69,6 +73,14 @@ class SavedMessageModel {
     return data.mediaPath;
   }
 
+  double? get latitude {
+    return data.latitude;
+  }
+
+  double? get longitude {
+    return data.longitude;
+  }
+
   ChatMessageModel toChatMessage() {
     return data;
   }
@@ -83,6 +95,8 @@ class SavedMessageModel {
     ChatMessageStatus? status,
     bool? isRead,
     String? mediaPath,
+    double? latitude,
+    double? longitude,
   }) {
     return SavedMessageModel.fromMessage(
       data.copyWith(
@@ -95,6 +109,8 @@ class SavedMessageModel {
         status: status,
         isRead: isRead,
         mediaPath: mediaPath,
+        latitude: latitude,
+        longitude: longitude,
       ),
     );
   }

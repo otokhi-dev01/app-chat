@@ -118,7 +118,7 @@ class MessageActionTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDanger;
 
-  MessageActionTile({
+  const MessageActionTile({
     super.key,
     required this.icon,
     required this.title,

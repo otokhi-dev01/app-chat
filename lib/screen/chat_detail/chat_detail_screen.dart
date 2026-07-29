@@ -9,7 +9,6 @@ import '../../route/app_route.dart';
 import '../../services/chat_camera_services.dart';
 import '../../services/chat_voice_recorder_service.dart';
 import '../widgets/chat_detail/chat_attachment_sheet.dart';
-import '../widgets/chat_detail/chat_voice_message.dart';
 import 'call/call_screen.dart';
 import 'chat_detail_app_bar.dart';
 import '../widgets/chat_detail/chat_detail_content.dart';

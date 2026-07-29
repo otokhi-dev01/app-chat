@@ -11,7 +11,7 @@ class VerifyOtpForm extends StatefulWidget {
   final Future<void> Function()? onResend;
   final VoidCallback? onVerified;
 
-  VerifyOtpForm({
+ const VerifyOtpForm({
     super.key,
     required this.destination,
     this.onVerify,

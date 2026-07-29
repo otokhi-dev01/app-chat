@@ -14,6 +14,7 @@ abstract class AppRoutes {
   static const String archivedChats = '/archived-chats';
   static const String searchChats = '/search-chats';
   static const String savedMessages = '/saved-messages';
+  static const String chatDetail = '/chat-detail';
   // profile
   static const String editProfile = '/edit-profile';
   static const String profileDetail = '/profile-detail';

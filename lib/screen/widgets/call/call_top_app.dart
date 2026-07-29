@@ -11,7 +11,7 @@ class CallTopBar extends StatelessWidget
   final bool isConnecting;
   final VoidCallback onBack;
 
-  CallTopBar({
+  const CallTopBar({
     super.key,
     required this.name,
     required this.avatarUrl,
@@ -370,7 +370,7 @@ class _CallAppBarButton extends StatelessWidget {
   final Color foregroundColor;
   final VoidCallback onPressed;
 
-  _CallAppBarButton({
+  const _CallAppBarButton({
     required this.tooltip,
     required this.icon,
     required this.iconSize,

@@ -7,7 +7,7 @@ class ChatAttachmentItem extends StatelessWidget {
   final double imageSize;
   final Color? imageColor;
 
-  ChatAttachmentItem({
+  const ChatAttachmentItem({
     super.key,
     required this.imagePath,
     required this.label,

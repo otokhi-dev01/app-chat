@@ -9,7 +9,7 @@ import '../../../models/chat_folder_model.dart';
 class HomeChatEmptyView extends StatelessWidget {
   final ChatFolderType folderType;
 
-  HomeChatEmptyView({
+  const HomeChatEmptyView({
     super.key,
     required this.folderType,
   });
@@ -98,7 +98,7 @@ class HomeChatEmptyView extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class HomeChatLoadingView extends StatelessWidget {
-  HomeChatLoadingView({super.key});
+  const HomeChatLoadingView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +119,7 @@ class HomeChatErrorView extends StatelessWidget {
   final String message;
   final Future<void> Function() onRetry;
 
-  HomeChatErrorView({
+  const HomeChatErrorView({
     super.key,
     required this.message,
     required this.onRetry,

@@ -13,7 +13,7 @@ class AuthTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool obscureText;
 
-  AuthTextField({
+  const AuthTextField({
     super.key,
     required this.controller,
     required this.focusNode,

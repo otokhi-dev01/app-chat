@@ -6,7 +6,7 @@ import 'auth_text_field.dart';
 class ResetPasswordForm extends StatefulWidget {
   final Future<void> Function(String password)? onSubmit;
 
-  ResetPasswordForm({
+  const ResetPasswordForm({
     super.key,
     this.onSubmit,
   });

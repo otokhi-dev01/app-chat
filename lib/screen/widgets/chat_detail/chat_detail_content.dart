@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/chat_message_model.dart';
-import 'chat_date_divider.dart';
 import 'chat_empty_conversation.dart';
 import 'chat_input_bar.dart';
-import 'chat_message_bubble.dart';
+import 'chat_message_list.dart';
 
 class ChatDetailContent extends StatelessWidget {
   final String chatName;
@@ -20,8 +19,7 @@ class ChatDetailContent extends StatelessWidget {
   final VoidCallback onAttachment;
   final VoidCallback onCamera;
 
-  final ValueChanged<ChatMessageModel>
-  onMessageLongPress;
+  final ValueChanged<ChatMessageModel> onMessageLongPress;
 
   final bool isRecording;
   final bool isHoldRecording;
@@ -36,7 +34,7 @@ class ChatDetailContent extends StatelessWidget {
   final VoidCallback onVoiceCancel;
   final ValueChanged<Duration> onVoiceSend;
 
-  ChatDetailContent({
+  const ChatDetailContent({
     super.key,
     required this.chatName,
     required this.messages,
@@ -66,14 +64,18 @@ class ChatDetailContent extends StatelessWidget {
       children: [
         Positioned.fill(
           child: AnimatedSwitcher(
-            duration: Duration(
-              milliseconds: 250,
-            ),
+            duration: const Duration(milliseconds: 250),
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
             child: messages.isEmpty
                 ? _buildEmptyConversation()
-                : _buildMessageList(),
+                : ChatMessageList(
+              key: const ValueKey('message-list-wrapper'),
+              messages: messages,
+              appBarSpace: appBarSpace,
+              scrollController: scrollController,
+              onMessageLongPress: onMessageLongPress,
+            ),
           ),
         ),
         Positioned(
@@ -81,7 +83,7 @@ class ChatDetailContent extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: ChatInputBar(
-            key: ValueKey('chat-input-bar'),
+            key: const ValueKey('chat-input-bar'),
             controller: messageController,
             focusNode: messageFocusNode,
             onSend: onSend,
@@ -105,58 +107,11 @@ class ChatDetailContent extends StatelessWidget {
 
   Widget _buildEmptyConversation() {
     return KeyedSubtree(
-      key: ValueKey('empty-conversation'),
+      key: const ValueKey('empty-conversation'),
       child: Padding(
-        padding: EdgeInsets.only(
-          top: appBarSpace,
-          bottom: 100,
-        ),
-        child: ChatEmptyConversation(
-          name: chatName,
-        ),
+        padding: EdgeInsets.only(top: appBarSpace, bottom: 100),
+        child: ChatEmptyConversation(name: chatName),
       ),
-    );
-  }
-
-  Widget _buildMessageList() {
-    return ListView.builder(
-      key: ValueKey('message-list'),
-      controller: scrollController,
-      keyboardDismissBehavior:
-      ScrollViewKeyboardDismissBehavior.onDrag,
-      physics: BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
-      ),
-      padding: EdgeInsets.fromLTRB(
-        0,
-        appBarSpace + 8,
-        0,
-        108,
-      ),
-      itemCount: messages.length + 1,
-      itemBuilder: (
-          BuildContext context,
-          int index,
-          ) {
-        if (index == 0) {
-          return ChatDateDivider(
-            label: 'Today',
-          );
-        }
-
-        ChatMessageModel message =
-        messages[index - 1];
-
-        return KeyedSubtree(
-          key: ValueKey(message.id),
-          child: ChatMessageBubble(
-            message: message,
-            onLongPress: () {
-              onMessageLongPress(message);
-            },
-          ),
-        );
-      },
     );
   }
 }

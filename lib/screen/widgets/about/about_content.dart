@@ -5,7 +5,7 @@ import 'about_header.dart';
 import 'about_menu_card.dart';
 
 class AboutContent extends StatelessWidget {
-  AboutContent({
+  const AboutContent({
     super.key,
   });
 

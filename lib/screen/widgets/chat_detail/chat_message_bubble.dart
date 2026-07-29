@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -149,9 +150,10 @@ class ChatMessageBubble extends StatelessWidget {
     }
 
     if (_isFileMessage) {
-      return _buildFileMessage(
-        context,
-        receivedTextColor,
+      return ChatFileMessage(
+        message: message,
+        receivedTextColor: receivedTextColor,
+        timeStatus: _buildTimeStatus(),
       );
     }
 
@@ -168,7 +170,7 @@ class ChatMessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          SelectableText(
             message.text,
             style: TextStyle(
               color: message.isMe ? Colors.white : receivedTextColor,
@@ -193,6 +195,7 @@ class ChatMessageBubble extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
+            HapticFeedback.selectionClick();
             _openFullImage(context);
           },
           child: Hero(
@@ -204,6 +207,43 @@ class ChatMessageBubble extends StatelessWidget {
                 width: 240,
                 height: 280,
                 fit: BoxFit.cover,
+                // Fades the image in smoothly once the frame is decoded
+                // instead of popping in abruptly on first paint.
+                frameBuilder: (
+                    BuildContext context,
+                    Widget child,
+                    int? frame,
+                    bool wasSynchronouslyLoaded,
+                    ) {
+                  if (wasSynchronouslyLoaded) {
+                    return child;
+                  }
+                  return AnimatedOpacity(
+                    opacity: frame == null ? 0 : 1,
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    child: frame == null
+                        ? Container(
+                      width: 240,
+                      height: 280,
+                      color: message.isMe
+                          ? Colors.white.withValues(alpha: 0.10)
+                          : Colors.grey.withValues(alpha: 0.12),
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: message.isMe
+                              ? Colors.white
+                              : Colors.grey.shade500,
+                        ),
+                      ),
+                    )
+                        : child,
+                  );
+                },
                 errorBuilder: (
                     BuildContext context,
                     Object error,
@@ -263,93 +303,6 @@ class ChatMessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildFileMessage(
-      BuildContext context,
-      Color receivedTextColor,
-      ) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    String fileName = message.text.trim();
-
-    if (fileName.isEmpty && message.mediaPath != null) {
-      fileName = message.mediaPath!.split(Platform.pathSeparator).last;
-    }
-
-    if (fileName.isEmpty) {
-      fileName = 'File';
-    }
-
-    Color iconBackground = message.isMe
-        ? Colors.white.withValues(alpha: 0.16)
-        : colorScheme.primary.withValues(
-      alpha: 0.12,
-    );
-
-    Color iconColor = message.isMe ? Colors.white : colorScheme.primary;
-
-    Color titleColor = message.isMe ? Colors.white : receivedTextColor;
-
-    Color subtitleColor = message.isMe
-        ? Colors.white.withValues(alpha: 0.72)
-        : colorScheme.onSurfaceVariant;
-
-    return SizedBox(
-      width: 240,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: iconBackground,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.insert_drive_file_rounded,
-                  color: iconColor,
-                  size: 25,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      fileName,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: titleColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Document',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: subtitleColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          _buildTimeStatus(),
-        ],
-      ),
-    );
-  }
-
   Widget _buildLocationMessage(
       BuildContext context,
       Color receivedTextColor,
@@ -385,6 +338,7 @@ class ChatMessageBubble extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
+                HapticFeedback.selectionClick();
                 _openLocation(context);
               },
               borderRadius: BorderRadius.circular(14),
@@ -552,7 +506,7 @@ class ChatMessageBubble extends StatelessWidget {
     }
   }
 
-  void _showSnackBar(
+  static void _showSnackBar(
       BuildContext context,
       String text,
       ) {
@@ -656,6 +610,15 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
   bool _isLoading = true;
   bool _hasError = false;
 
+  // Cycles 1x -> 1.5x -> 2x -> 1x, Telegram-style
+  static const List<double> _speeds = [1.0, 1.5, 2.0];
+  int _speedIndex = 0;
+
+  // Tracks whether the user is actively dragging the slider so incoming
+  // position updates from the stream don't fight the drag and cause jitter.
+  bool _isSeeking = false;
+  double _seekPreviewValue = 0;
+
   @override
   void initState() {
     super.initState();
@@ -730,6 +693,8 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
       return;
     }
 
+    HapticFeedback.selectionClick();
+
     try {
       if (_audioPlayer.processingState == ProcessingState.completed) {
         await _audioPlayer.seek(
@@ -749,6 +714,24 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
       setState(() {
         _hasError = true;
       });
+    }
+  }
+
+  Future<void> _cycleSpeed() async {
+    if (_isLoading || _hasError) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+
+    setState(() {
+      _speedIndex = (_speedIndex + 1) % _speeds.length;
+    });
+
+    try {
+      await _audioPlayer.setSpeed(_speeds[_speedIndex]);
+    } catch (_) {
+      // Non-fatal — playback continues at the previous speed.
     }
   }
 
@@ -877,7 +860,12 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
                   ? durationMilliseconds.toDouble()
                   : 1;
 
-              double value = position.inMilliseconds
+              // While the user is dragging, trust the local preview value
+              // instead of the (slightly lagging) stream position — this
+              // is what keeps the thumb from stuttering mid-drag.
+              double value = _isSeeking
+                  ? _seekPreviewValue
+                  : position.inMilliseconds
                   .clamp(
                 0,
                 durationMilliseconds > 0 ? durationMilliseconds : 0,
@@ -961,10 +949,31 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
                               child: Slider(
                                 min: 0,
                                 max: maximum,
-                                value: value,
+                                value: value.clamp(0, maximum),
+                                onChangeStart: _isLoading || durationMilliseconds <= 0
+                                    ? null
+                                    : (double start) {
+                                  HapticFeedback.selectionClick();
+                                  setState(() {
+                                    _isSeeking = true;
+                                    _seekPreviewValue = start;
+                                  });
+                                },
                                 onChanged: _isLoading || durationMilliseconds <= 0
                                     ? null
-                                    : _seek,
+                                    : (double dragging) {
+                                  setState(() {
+                                    _seekPreviewValue = dragging;
+                                  });
+                                },
+                                onChangeEnd: _isLoading || durationMilliseconds <= 0
+                                    ? null
+                                    : (double end) {
+                                  setState(() {
+                                    _isSeeking = false;
+                                  });
+                                  _seek(end);
+                                },
                               ),
                             ),
                             Padding(
@@ -976,7 +985,11 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
                                 children: [
                                   Text(
                                     _formatDuration(
-                                      position,
+                                      _isSeeking
+                                          ? Duration(
+                                        milliseconds: _seekPreviewValue.round(),
+                                      )
+                                          : position,
                                     ),
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: secondaryTextColor,
@@ -984,14 +997,22 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  Text(
-                                    _formatDuration(
-                                      _duration,
-                                    ),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: secondaryTextColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
+                                  // Speed toggle replaces the static total
+                                  // duration once playback starts, mirroring
+                                  // Telegram's 1x/1.5x/2x control. Shows the
+                                  // total duration up front so the user still
+                                  // knows the clip length before playing.
+                                  GestureDetector(
+                                    onTap: _cycleSpeed,
+                                    child: Text(
+                                      isPlaying || _speedIndex != 0
+                                          ? '${_speeds[_speedIndex] == _speeds[_speedIndex].roundToDouble() ? _speeds[_speedIndex].round() : _speeds[_speedIndex]}x'
+                                          : _formatDuration(_duration),
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: secondaryTextColor,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1009,6 +1030,234 @@ class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Tap-to-open file bubble with per-extension icon, an open-in-progress
+/// state, and graceful failure handling — previously this was a static
+/// row with no way to actually open the file.
+class ChatFileMessage extends StatefulWidget {
+  final ChatMessageModel message;
+  final Color receivedTextColor;
+  final Widget timeStatus;
+
+  const ChatFileMessage({
+    super.key,
+    required this.message,
+    required this.receivedTextColor,
+    required this.timeStatus,
+  });
+
+  @override
+  State<ChatFileMessage> createState() => _ChatFileMessageState();
+}
+
+class _ChatFileMessageState extends State<ChatFileMessage> {
+  bool _isOpening = false;
+
+  String get _fileName {
+    String name = widget.message.text.trim();
+
+    if (name.isEmpty && widget.message.mediaPath != null) {
+      name = widget.message.mediaPath!.split(Platform.pathSeparator).last;
+    }
+
+    return name.isEmpty ? 'File' : name;
+  }
+
+  String get _extension {
+    int dotIndex = _fileName.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == _fileName.length - 1) {
+      return '';
+    }
+    return _fileName.substring(dotIndex + 1).toLowerCase();
+  }
+
+  IconData get _iconForType {
+    switch (_extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf_rounded;
+      case 'doc':
+      case 'docx':
+        return Icons.description_rounded;
+      case 'xls':
+      case 'xlsx':
+      case 'csv':
+        return Icons.table_chart_rounded;
+      case 'ppt':
+      case 'pptx':
+        return Icons.slideshow_rounded;
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return Icons.folder_zip_rounded;
+      case 'mp3':
+      case 'wav':
+      case 'm4a':
+        return Icons.audiotrack_rounded;
+      case 'mp4':
+      case 'mov':
+      case 'avi':
+        return Icons.movie_rounded;
+      default:
+        return Icons.insert_drive_file_rounded;
+    }
+  }
+
+  String get _subtitleLabel {
+    if (_isOpening) {
+      return 'Opening…';
+    }
+    return _extension.isEmpty ? 'Document' : _extension.toUpperCase();
+  }
+
+  Future<void> _openFile() async {
+    String? path = widget.message.mediaPath;
+
+    if (path == null || path.trim().isEmpty || _isOpening) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+
+    setState(() {
+      _isOpening = true;
+    });
+
+    try {
+      bool didOpen = await launchUrl(
+        Uri.file(path),
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!didOpen && mounted) {
+        _showUnavailable();
+      }
+    } catch (_) {
+      if (mounted) {
+        _showUnavailable();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isOpening = false;
+        });
+      }
+    }
+  }
+
+  void _showUnavailable() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text('Could not open this file.'),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
+    bool isMe = widget.message.isMe;
+
+    Color iconBackground = isMe
+        ? Colors.white.withValues(alpha: 0.16)
+        : colorScheme.primary.withValues(alpha: 0.12);
+
+    Color iconColor = isMe ? Colors.white : colorScheme.primary;
+
+    Color titleColor = isMe ? Colors.white : widget.receivedTextColor;
+
+    Color subtitleColor = isMe
+        ? Colors.white.withValues(alpha: 0.72)
+        : colorScheme.onSurfaceVariant;
+
+    return SizedBox(
+      width: 240,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _openFile,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: iconBackground,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 160),
+                        child: _isOpening
+                            ? SizedBox(
+                          key: const ValueKey('opening'),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: iconColor,
+                          ),
+                        )
+                            : Icon(
+                          _iconForType,
+                          key: const ValueKey('icon'),
+                          color: iconColor,
+                          size: 25,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _fileName,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: titleColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            _subtitleLabel,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: subtitleColor,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 7),
+          widget.timeStatus,
+        ],
       ),
     );
   }
@@ -1061,7 +1310,7 @@ class _LocationPatternPainter extends CustomPainter {
   }
 }
 
-// 4. Lightweight private stateful gesture handler to keep the main widget stateless
+// Lightweight private stateful gesture handler to keep the main widget stateless
 class _BouncyPressEffect extends StatefulWidget {
   final Widget child;
   final VoidCallback? onLongPress;
@@ -1081,7 +1330,14 @@ class _BouncyPressEffectState extends State<_BouncyPressEffect> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: widget.onLongPress,
+      onLongPress: widget.onLongPress == null
+          ? null
+          : () {
+        // A firm, distinct pulse for long-press so it reads clearly as
+        // "context menu opened" rather than a regular tap.
+        HapticFeedback.mediumImpact();
+        widget.onLongPress!();
+      },
       onTapDown: (_) {
         setState(() {
           _isPressed = true;

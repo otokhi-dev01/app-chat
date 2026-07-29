@@ -9,7 +9,7 @@ class AddGroupHeader extends StatelessWidget {
   final VoidCallback onPhotoTap;
   final VoidCallback onRemovePhoto;
 
-  AddGroupHeader({
+  const AddGroupHeader({
     super.key,
     required this.nameController,
     required this.groupImagePath,
@@ -171,7 +171,7 @@ class _GroupPhoto extends StatelessWidget {
   final bool isAssetImage;
   final VoidCallback onPhotoTap;
 
-  _GroupPhoto({
+ const _GroupPhoto({
     required this.groupImagePath,
     required this.hasImage,
     required this.isNetworkImage,
@@ -280,7 +280,7 @@ class _GroupImage extends StatelessWidget {
   final bool isNetworkImage;
   final bool isAssetImage;
 
-  _GroupImage({
+  const _GroupImage({
     required this.groupImagePath,
     required this.isNetworkImage,
     required this.isAssetImage,
@@ -348,7 +348,7 @@ class _GroupImage extends StatelessWidget {
 class _ImageError extends StatelessWidget {
   final ColorScheme colorScheme;
 
-  _ImageError({
+  const _ImageError({
     required this.colorScheme,
   });
 

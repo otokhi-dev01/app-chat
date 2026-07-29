@@ -11,7 +11,7 @@ class HomeChatActionsSheet extends StatelessWidget {
   final VoidCallback onMarkRead;
   final VoidCallback onDelete;
 
-  HomeChatActionsSheet({
+  const HomeChatActionsSheet({
     super.key,
     required this.chat,
     required this.onPin,
@@ -239,7 +239,7 @@ class _ActionTile extends StatelessWidget {
   final Color? titleColor;
   final VoidCallback onTap;
 
-  _ActionTile({
+  const _ActionTile({
     required this.icon,
     required this.title,
     required this.subtitle,

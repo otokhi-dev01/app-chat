@@ -9,7 +9,7 @@ class AddPostCameraPreview
   final String errorMessage;
   final VoidCallback onRetry;
 
-  AddPostCameraPreview({
+  const AddPostCameraPreview({
     super.key,
     required this.controller,
     required this.loading,
@@ -59,7 +59,7 @@ class AddPostCameraPreview
 class _CameraFeed extends StatelessWidget {
   final CameraController controller;
 
-  _CameraFeed({
+  const _CameraFeed({
     required this.controller,
   });
 
@@ -100,7 +100,7 @@ class _CameraFeed extends StatelessWidget {
 }
 
 class _CameraGrid extends StatelessWidget {
-  _CameraGrid();
+  const _CameraGrid();
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +163,7 @@ class _CameraErrorView
   final String message;
   final VoidCallback onRetry;
 
-  _CameraErrorView({
+  const _CameraErrorView({
     required this.message,
     required this.onRetry,
   });

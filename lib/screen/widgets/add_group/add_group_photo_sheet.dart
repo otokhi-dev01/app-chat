@@ -252,7 +252,7 @@ class _GroupPhotoPreview
     extends StatelessWidget {
   final String imagePath;
 
-  _GroupPhotoPreview({
+  const _GroupPhotoPreview({
     required this.imagePath,
   });
 
@@ -332,7 +332,7 @@ class _GroupPhotoPreview
 
 class _PhotoSheetHandle
     extends StatelessWidget {
-  _PhotoSheetHandle();
+  const _PhotoSheetHandle();
 
   @override
   Widget build(BuildContext context) {
@@ -360,7 +360,7 @@ class _PhotoOption extends StatelessWidget {
   final bool isDanger;
   final VoidCallback onTap;
 
-  _PhotoOption({
+  const _PhotoOption({
     required this.icon,
     required this.label,
     required this.onTap,

@@ -147,6 +147,11 @@ final Map<String, String> enUS = {
 'bio': 'Bio',
 'user': 'User',
 
+  'add_group': 'Add Group',
+  'saved_messages': 'Saved Messages',
+  'archived_chats': 'Archived Chats',
+
+
   'reset_password': 'Reset Password',
   'create_new_password_description':
   'Create a new password for your account.',
@@ -209,7 +214,6 @@ final Map<String, String> enUS = {
 
 // Chat menu
 'mark_all_read': 'Mark all as read',
-'archived_chats': 'Archived chats',
 'chat_settings': 'Chat settings',
 
 'all_chats_marked_as_read':

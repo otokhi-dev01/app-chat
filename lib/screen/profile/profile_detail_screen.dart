@@ -94,16 +94,7 @@ class _ProfileDetailScreenState
   void _openMessage() {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    AppFeedback.showMessage(
-      title: 'open_conversation'.tr,
-      message:
-      'opening_conversation_with'.trParams(
-        {
-          'name': controller.name.value,
-        },
-      ),
-      icon: Icons.chat_bubble_outline_rounded,
-    );
+    Get.back();
   }
 
   void _startCall() {

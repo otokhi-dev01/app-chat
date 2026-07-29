@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AboutMenuCard extends StatelessWidget {
   final List<Widget> children;
 
-  AboutMenuCard({
+  const AboutMenuCard({
     super.key,
     required this.children,
   });
@@ -50,7 +50,7 @@ class AboutMenuTile extends StatelessWidget {
   final bool showArrow;
   final VoidCallback? onTap;
 
-  AboutMenuTile({
+  const AboutMenuTile({
     super.key,
     required this.icon,
     required this.title,
@@ -147,7 +147,7 @@ class AboutMenuTile extends StatelessWidget {
 }
 
 class AboutMenuDivider extends StatelessWidget {
-  AboutMenuDivider({
+  const AboutMenuDivider({
     super.key,
   });
 

@@ -8,7 +8,7 @@ class ArchivedChatTile extends StatelessWidget {
   final VoidCallback onLongPress;
   final VoidCallback onSwipeUnarchive;
 
-  ArchivedChatTile({
+  const ArchivedChatTile({
     super.key,
     required this.chat,
     required this.onTap,
@@ -50,18 +50,6 @@ class ArchivedChatTile extends StatelessWidget {
 
     bool isDark =
         theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
-    Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
 
     return Dismissible(
       key: ValueKey<String>(
@@ -272,79 +260,6 @@ class ArchivedChatTile extends StatelessWidget {
             color: colorScheme.outlineVariant.withValues(alpha: 0.35),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ArchivedChatAvatar extends StatelessWidget {
-  final String imageUrl;
-  final String initials;
-
-  _ArchivedChatAvatar({
-    required this.imageUrl,
-    required this.initials,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return Container(
-      width: 54,
-      height: 54,
-      padding: EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withValues(
-          alpha: 0.12,
-        ),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: colorScheme.primary.withValues(
-            alpha: 0.18,
-          ),
-          width: 1,
-        ),
-      ),
-      child: ClipOval(
-        child: imageUrl.trim().isEmpty
-            ? _buildFallback(context)
-            : Image.network(
-          imageUrl,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          errorBuilder: (
-              BuildContext context,
-              Object error,
-              StackTrace? stackTrace,
-              ) {
-            return _buildFallback(context);
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFallback(
-      BuildContext context,
-      ) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return Container(
-      alignment: Alignment.center,
-      color: colorScheme.primary.withValues(
-        alpha: 0.14,
-      ),
-      child: Text(
-        initials,
-        style: TextStyle(
-          color: colorScheme.primary,
-          fontSize: 16,
-          fontWeight: FontWeight.w800,
-        ),
       ),
     );
   }

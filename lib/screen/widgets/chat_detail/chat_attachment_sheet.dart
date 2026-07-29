@@ -255,7 +255,7 @@ void _closeAndRun(
 }
 
 class _SheetHandle extends StatelessWidget {
-  _SheetHandle();
+  const _SheetHandle();
 
   @override
   Widget build(BuildContext context) {
