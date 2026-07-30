@@ -7,7 +7,7 @@ class ChatFolderTile extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  ChatFolderTile({
+  const ChatFolderTile({
     super.key,
     required this.folder,
     required this.onEdit,
@@ -210,7 +210,7 @@ class _ChatFolderIcon extends StatelessWidget {
   final IconData icon;
   final bool custom;
 
-  _ChatFolderIcon({
+  const _ChatFolderIcon({
     required this.icon,
     required this.custom,
   });

@@ -28,6 +28,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late ChatController controller;
   late ChatFolderController folderController;
+  late PageController pageController;
 
   int selectedIndex = 0;
 
@@ -41,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    pageController = PageController(initialPage: selectedIndex);
 
     if (!Get.isRegistered<ChatListService>()) {
       Get.put<ChatListService>(
@@ -80,7 +83,30 @@ class _HomeScreenState extends State<HomeScreen> {
     folderController = Get.find<ChatFolderController>();
   }
 
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  /// Called when the bottom nav is tapped — animates the PageView,
+  /// which in turn triggers onPageSwiped to update selectedIndex.
   void changePage(int index) {
+    if (index == selectedIndex) {
+      return;
+    }
+
+    pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  /// Called by PageView itself — covers both swipe gestures and the
+  /// animateToPage() call above, so this is the single source of truth
+  /// for selectedIndex instead of setState living in two places.
+  void _onPageSwiped(int index) {
     if (index == selectedIndex) {
       return;
     }
@@ -111,8 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: controller,
         onOpenSettings: () {},
       ),
-      body: IndexedStack(
-        index: selectedIndex,
+      body: PageView(
+        controller: pageController,
+        physics: const BouncingScrollPhysics(),
+        onPageChanged: _onPageSwiped,
         children: screens,
       ),
       bottomNavigationBar: MainBottomNavigation(

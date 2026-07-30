@@ -4,7 +4,7 @@ class ContactEmptyState
     extends StatelessWidget {
   final bool hasSearchQuery;
 
-  ContactEmptyState({
+  const ContactEmptyState({
     super.key,
     required this.hasSearchQuery,
   });

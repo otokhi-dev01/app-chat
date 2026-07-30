@@ -6,7 +6,7 @@ class MediaQualitySheet extends StatelessWidget {
   final String selectedValue;
   final List<String> options;
 
-  MediaQualitySheet({
+ const MediaQualitySheet({
     super.key,
     required this.title,
     required this.selectedValue,

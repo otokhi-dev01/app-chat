@@ -7,7 +7,7 @@ class DataStorageNavigationTile extends StatelessWidget {
   final String? trailingText;
   final VoidCallback onTap;
 
-  DataStorageNavigationTile({
+  const DataStorageNavigationTile({
     super.key,
     required this.icon,
     required this.title,

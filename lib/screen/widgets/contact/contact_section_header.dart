@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ContactSectionHeader extends StatelessWidget {
   final String letter;
 
-  ContactSectionHeader({
+  const ContactSectionHeader({
     super.key,
     required this.letter,
   });

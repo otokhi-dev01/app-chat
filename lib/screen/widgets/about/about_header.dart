@@ -85,7 +85,7 @@ class AboutHeader extends StatelessWidget {
           SizedBox(height: 16),
 
           Text(
-            'PiisiitChat',
+            'Piisiit Chat',
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               color: colorScheme.onSurface,
@@ -127,7 +127,7 @@ class AboutHeader extends StatelessWidget {
 class AboutSectionTitle extends StatelessWidget {
   final String title;
 
-  AboutSectionTitle({
+  const AboutSectionTitle({
     super.key,
     required this.title,
   });
@@ -154,7 +154,7 @@ class AboutSectionTitle extends StatelessWidget {
 }
 
 class AboutFooter extends StatelessWidget {
-  AboutFooter({
+  const AboutFooter({
     super.key,
   });
 

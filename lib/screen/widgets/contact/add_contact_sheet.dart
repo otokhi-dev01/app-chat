@@ -6,7 +6,7 @@ class AddContactData {
   final String lastName;
   final String phoneNumber;
 
-  AddContactData({
+  const AddContactData({
     required this.firstName,
     required this.lastName,
     required this.phoneNumber,
@@ -22,7 +22,7 @@ class AddContactSheet extends StatefulWidget {
   final ValueChanged<AddContactData> onAdd;
   final VoidCallback? onAddViaQrCode;
 
-  AddContactSheet({
+  const AddContactSheet({
     super.key,
     this.initialPhoneNumber = '',
     required this.onAdd,
@@ -490,7 +490,7 @@ class _AddViaQrCodeButton
     extends StatelessWidget {
   final VoidCallback onTap;
 
-  _AddViaQrCodeButton({
+  const _AddViaQrCodeButton({
     required this.onTap,
   });
 
@@ -609,7 +609,7 @@ class _AddContactTextField
   final String? Function(String?)? validator;
   final ValueChanged<String>? onSubmitted;
 
-  _AddContactTextField({
+ const _AddContactTextField({
     required this.controller,
     required this.label,
     required this.hint,

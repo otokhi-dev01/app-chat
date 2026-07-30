@@ -6,7 +6,7 @@ class ContactTile extends StatelessWidget {
   final ContactModel contact;
   final VoidCallback? onTap;
 
-  ContactTile({
+  const ContactTile({
     super.key,
     required this.contact,
     this.onTap,

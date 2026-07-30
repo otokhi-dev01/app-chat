@@ -90,4 +90,18 @@ Map<String, String> zhCN = {
   'reset_failed': '重置失败',
   'unable_to_reset_password':
   '无法重置您的密码，请重试。',
+
+  'about': '关于',
+  'app_version': '应用版本',
+  'tap_to_copy': '点击复制',
+  'terms_of_service': '服务条款',
+  'read_our_terms': '阅读我们的服务条款',
+  'privacy_policy': '隐私政策',
+  'read_our_policy': '阅读我们的隐私政策',
+  'rate_app': '评价应用',
+  'leave_a_review': '留下评价',
+  'help_support': '帮助与支持',
+  'contact_support': '联系支持团队',
+  'could_not_open_link': '无法打开链接。',
+  'version_copied': '版本已复制',
 };

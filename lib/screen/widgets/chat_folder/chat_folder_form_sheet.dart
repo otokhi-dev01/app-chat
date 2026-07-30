@@ -20,7 +20,7 @@ class ChatFolderFormSheet extends StatefulWidget {
   final String initialValue;
   final List<String> initialSelectedMemberIds;
 
-  ChatFolderFormSheet({
+  const ChatFolderFormSheet({
     super.key,
     required this.title,
     required this.confirmText,

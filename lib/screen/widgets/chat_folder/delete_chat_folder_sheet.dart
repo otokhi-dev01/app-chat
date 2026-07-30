@@ -4,7 +4,7 @@ class DeleteChatFolderSheet
     extends StatelessWidget {
   final String folderName;
 
-  DeleteChatFolderSheet({
+  const DeleteChatFolderSheet({
     super.key,
     required this.folderName,
   });

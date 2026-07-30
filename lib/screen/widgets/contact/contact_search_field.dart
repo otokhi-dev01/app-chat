@@ -6,7 +6,7 @@ class ContactSearchField
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
 
-  ContactSearchField({
+  const ContactSearchField({
     super.key,
     required this.controller,
     required this.onChanged,

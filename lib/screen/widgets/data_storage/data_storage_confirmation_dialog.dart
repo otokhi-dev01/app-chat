@@ -8,7 +8,7 @@ class AppConfirmationDialog extends StatelessWidget {
   final IconData icon;
   final bool isDanger;
 
-  AppConfirmationDialog({
+  const AppConfirmationDialog({
     super.key,
     required this.title,
     required this.message,

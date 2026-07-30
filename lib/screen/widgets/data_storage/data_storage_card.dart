@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class DataStorageCard extends StatelessWidget {
   final List<Widget> children;
 
-  DataStorageCard({
+  const DataStorageCard({
     super.key,
     required this.children,
   });

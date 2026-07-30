@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ContactAddGroupButton extends StatelessWidget {
   final VoidCallback? onTap;
 
-  ContactAddGroupButton({
+  const ContactAddGroupButton({
     super.key,
     required this.onTap,
   });

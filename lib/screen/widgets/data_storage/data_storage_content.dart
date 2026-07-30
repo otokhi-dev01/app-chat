@@ -31,7 +31,7 @@ class DataStorageContent extends StatelessWidget {
   final VoidCallback onClearCacheTap;
   final VoidCallback onResetNetworkTap;
 
-  DataStorageContent({
+  const DataStorageContent({
     super.key,
     required this.cacheSize,
     required this.networkUsage,

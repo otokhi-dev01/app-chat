@@ -20,6 +20,20 @@ final Map<String, String> kmKH = {
   'មិនទាន់មានគណនីមែនទេ?',
   'create_account': 'បង្កើតគណនី',
 
+  'about': 'អំពីកម្មវិធី',
+  'app_version': 'កំណែកម្មវិធី',
+  'tap_to_copy': 'ចុចដើម្បីចម្លង',
+  'terms_of_service': 'លក្ខខណ្ឌនៃការប្រើប្រាស់',
+  'read_our_terms': 'អានលក្ខខណ្ឌរបស់យើង',
+  'privacy_policy': 'គោលការណ៍ឯកជនភាព',
+  'read_our_policy': 'អានគោលការណ៍ឯកជនភាពរបស់យើង',
+  'rate_app': 'វាយតម្លៃកម្មវិធី',
+  'leave_a_review': 'សរសេរការវាយតម្លៃ',
+  'help_support': 'ជំនួយ និងការគាំទ្រ',
+  'contact_support': 'ទាក់ទងក្រុមគាំទ្រ',
+  'could_not_open_link': 'មិនអាចបើកតំណបានទេ។',
+  'version_copied': 'បានចម្លងកំណែ',
+
 
 // General
 'general': 'ទូទៅ',
@@ -48,7 +62,6 @@ final Map<String, String> kmKH = {
 'manage_backup_sync':
 'រក្សាការជជែករបស់អ្នកឱ្យមានសុវត្ថិភាព និងធ្វើសមកាលកម្មតាមឧបករណ៍',
 
-'help_support': 'ជំនួយ និងការគាំទ្រ',
 'get_help_support':
 'ស្វែងរកចម្លើយ ផ្ញើមតិយោបល់ ឬទាក់ទងក្រុមជំនួយ',
 
@@ -235,12 +248,9 @@ final Map<String, String> kmKH = {
 'check_for_updates': 'ពិនិត្យរកកំណែថ្មី',
 'latest_version_message':
 'អ្នកកំពុងប្រើកំណែចុងក្រោយបំផុត',
-
-'terms_of_service': 'លក្ខខណ្ឌប្រើប្រាស់',
 'terms_of_service_description':
 'អានលក្ខខណ្ឌ និងបទប្បញ្ញត្តិរបស់យើង',
 
-'privacy_policy': 'គោលការណ៍ឯកជនភាព',
 'privacy_policy_description':
 'ស្វែងយល់ពីរបៀបដែលយើងការពារទិន្នន័យរបស់អ្នក',
 
@@ -249,8 +259,6 @@ final Map<String, String> kmKH = {
 'help_center': 'មជ្ឈមណ្ឌលជំនួយ',
 'help_center_description':
 'ស្វែងរកជំនួយក្នុងការប្រើប្រាស់កម្មវិធី',
-
-'contact_support': 'ទាក់ទងក្រុមជំនួយ',
 'contact_support_description':
 'ផ្ញើសារទៅកាន់ក្រុមជំនួយរបស់យើង',
 
@@ -258,8 +266,16 @@ final Map<String, String> kmKH = {
 'rate_application_description':
 'ចែករំលែកបទពិសោធន៍របស់អ្នកជាមួយយើង',
 
+  'unable_to_open_link': 'មិនអាចបើកតំណបាន',
+
+  'sync_contacts': 'ធ្វើសមកាលកម្មទំនាក់ទំនង',
+  'sync_contacts_description':
+  'ស្វែងរកមនុស្សដែលអ្នកស្គាល់ពីបញ្ជីទំនាក់ទំនងក្នុងទូរសព្ទ',
+  'sync_now': 'ធ្វើសមកាលកម្មឥឡូវនេះ',
+  'blocked_contacts': 'ទំនាក់ទំនងដែលបានទប់ស្កាត់',
+  'manage_blocked': 'គ្រប់គ្រងទំនាក់ទំនងដែលបានទប់ស្កាត់',
+
 // About header
-'app_version': 'កំណែ @version',
 'about_app_description':
 'កម្មវិធីផ្ញើសារដែលសាមញ្ញ លឿន និងមានសុវត្ថិភាព សម្រាប់រក្សាទំនាក់ទំនងជាមួយមិត្តភក្តិ និងក្រុមគ្រួសារ។',
 'made_with_care': 'បង្កើតឡើងដោយយកចិត្តទុកដាក់',
@@ -583,10 +599,6 @@ final Map<String, String> kmKH = {
   'contact_added_successfully': 'បានបន្ថែមទំនាក់ទំនងដោយជោគជ័យ',
   'unable_to_add_contact': 'មិនអាចបន្ថែមទំនាក់ទំនងបានទេ',
 
-  'sync_contacts': 'ធ្វើសមកាលកម្មទំនាក់ទំនង',
-  'sync_contacts_description':
-  'ស្វែងរកមិត្តភក្តិពីទំនាក់ទំនងក្នុងទូរស័ព្ទរបស់អ្នកដែលប្រើ AppChat។',
-  'sync_now': 'ធ្វើសមកាលកម្ម',
   'sync_completed': 'បានធ្វើសមកាលកម្ម',
   'contacts_synced_successfully':
   'ទំនាក់ទំនងក្នុងទូរស័ព្ទរបស់អ្នកត្រូវបានធ្វើសមកាលកម្មដោយជោគជ័យ។',

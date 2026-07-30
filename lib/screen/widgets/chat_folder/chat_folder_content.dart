@@ -15,7 +15,7 @@ class ChatFolderContent
   final ValueChanged<ChatFolderModel>
   onDeleteFolder;
 
-  ChatFolderContent({
+  const ChatFolderContent({
     super.key,
     required this.folders,
     required this.onAddFolder,
@@ -171,7 +171,7 @@ class _EmptyCustomFoldersCard
     extends StatelessWidget {
   final VoidCallback onCreateFolder;
 
-  _EmptyCustomFoldersCard({
+ const _EmptyCustomFoldersCard({
     required this.onCreateFolder,
   });
 

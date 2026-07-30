@@ -20,6 +20,20 @@ final Map<String, String> enUS = {
   "Don't have an account?",
   'create_account': 'Create Account',
 
+  'about': 'About',
+  'app_version': 'App Version',
+  'tap_to_copy': 'Tap to copy',
+  'terms_of_service': 'Terms of Service',
+  'read_our_terms': 'Read our terms',
+  'privacy_policy': 'Privacy Policy',
+  'read_our_policy': 'Read our privacy policy',
+  'rate_app': 'Rate App',
+  'leave_a_review': 'Leave a review',
+  'help_support': 'Help & Support',
+  'contact_support': 'Contact support',
+  'could_not_open_link': 'Could not open the link.',
+  'version_copied': 'Version copied',
+
 // General
 'general': 'General',
 
@@ -47,7 +61,6 @@ final Map<String, String> enUS = {
 'manage_backup_sync':
 'Keep your chats safe and synced across your devices',
 
-'help_support': 'Help and Support',
 'get_help_support':
 'Find answers, send feedback, or contact support',
 
@@ -231,13 +244,19 @@ final Map<String, String> enUS = {
 'latest_version_message':
 'You are using the latest version',
 
-'terms_of_service': 'Terms of Service',
 'terms_of_service_description':
 'Read our terms and conditions',
-
-'privacy_policy': 'Privacy Policy',
 'privacy_policy_description':
 'Learn how we protect your data',
+
+  'unable_to_open_link': 'Unable to open link',
+
+  'sync_contacts': 'Sync Contacts',
+  'sync_contacts_description':
+  'Find people you know from your phone contacts',
+  'sync_now': 'Sync Now',
+  'blocked_contacts': 'Blocked Contacts',
+  'manage_blocked': 'Manage blocked contacts',
 
 'support': 'Support',
 
@@ -245,7 +264,6 @@ final Map<String, String> enUS = {
 'help_center_description':
 'Find help with using the application',
 
-'contact_support': 'Contact Support',
 'contact_support_description':
 'Send a message to our support team',
 
@@ -254,7 +272,6 @@ final Map<String, String> enUS = {
 'Share your experience with us',
 
 // About header
-'app_version': 'Version @version',
 'about_app_description':
 'A simple, fast, and secure messaging app for staying connected with friends and family.',
 'made_with_care': 'Made with care',
@@ -563,11 +580,6 @@ final Map<String, String> enUS = {
   'saving_contact': 'Saving contact...',
   'contact_added_successfully': 'Contact added successfully',
   'unable_to_add_contact': 'Unable to add contact',
-
-  'sync_contacts': 'Sync Contacts',
-  'sync_contacts_description':
-  'Find friends from your phone contacts who use AppChat.',
-  'sync_now': 'Sync Now',
   'sync_completed': 'Sync Completed',
   'contacts_synced_successfully':
   'Your phone contacts were synced successfully.',

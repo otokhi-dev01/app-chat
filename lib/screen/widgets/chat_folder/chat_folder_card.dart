@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChatFolderCard extends StatelessWidget {
   final List<Widget> children;
 
-  ChatFolderCard({
+ const ChatFolderCard({
     super.key,
     required this.children,
   });
@@ -46,7 +46,7 @@ class ChatFolderCard extends StatelessWidget {
 }
 
 class ChatFolderDivider extends StatelessWidget {
-  ChatFolderDivider({
+  const ChatFolderDivider({
     super.key,
   });
 
@@ -81,7 +81,7 @@ class ChatFolderSectionTitle
     extends StatelessWidget {
   final String title;
 
-  ChatFolderSectionTitle({
+  const ChatFolderSectionTitle({
     super.key,
     required this.title,
   });
@@ -112,7 +112,7 @@ class ChatFolderHeaderCard
     extends StatelessWidget {
   final int folderCount;
 
-  ChatFolderHeaderCard({
+  const ChatFolderHeaderCard({
     super.key,
     required this.folderCount,
   });
@@ -213,7 +213,7 @@ class ChatFolderHeaderCard
 
 class ChatFolderInformationCard
     extends StatelessWidget {
-  ChatFolderInformationCard({
+  const ChatFolderInformationCard({
     super.key,
   });
 

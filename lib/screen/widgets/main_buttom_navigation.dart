@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/navigation/main_navigation_controller.dart';
+import 'navigation/nav_drag_state.dart';
+import 'navigation/navigation_item.dart';
 
 class MainBottomNavigation extends StatefulWidget {
   final int currentIndex;
@@ -19,79 +21,92 @@ class MainBottomNavigation extends StatefulWidget {
   });
 
   @override
-  State<MainBottomNavigation> createState() {
-    return _MainBottomNavigationState();
-  }
+  State<MainBottomNavigation> createState() => _MainBottomNavigationState();
 }
 
-class _MainBottomNavigationState
-    extends State<MainBottomNavigation> {
+class _MainBottomNavigationState extends State<MainBottomNavigation> {
   final GlobalKey _stackKey = GlobalKey();
-
-  final List<GlobalKey> _itemKeys = List.generate(
-    4,
-        (_) => GlobalKey(),
-  );
+  final List<GlobalKey> _itemKeys = List.generate(4, (_) => GlobalKey());
 
   Rect? _indicatorRect;
+  NavDragState _drag = NavDragState.idle;
 
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _measure();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
   }
 
   @override
-  void didUpdateWidget(
-      MainBottomNavigation oldWidget,
-      ) {
+  void didUpdateWidget(MainBottomNavigation oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _measure();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
   }
 
   void _measure() {
-    if (!mounted) {
-      return;
-    }
+    if (!mounted || _drag.isDragging) return;
 
-    GlobalKey activeKey =
-    _itemKeys[widget.currentIndex];
+    BuildContext? stackContext = _stackKey.currentContext;
+    BuildContext? activeContext = _itemKeys[widget.currentIndex].currentContext;
 
-    BuildContext? stackContext =
-        _stackKey.currentContext;
+    if (stackContext == null || activeContext == null) return;
 
-    BuildContext? activeContext =
-        activeKey.currentContext;
+    RenderBox stackBox = stackContext.findRenderObject() as RenderBox;
+    RenderBox activeBox = activeContext.findRenderObject() as RenderBox;
 
-    if (stackContext == null ||
-        activeContext == null) {
-      return;
-    }
-
-    RenderBox stackBox =
-    stackContext.findRenderObject() as RenderBox;
-
-    RenderBox activeBox =
-    activeContext.findRenderObject() as RenderBox;
-
-    Offset offset = activeBox.localToGlobal(
-      Offset.zero,
-      ancestor: stackBox,
-    );
-
+    Offset offset = activeBox.localToGlobal(Offset.zero, ancestor: stackBox);
     Rect rect = offset & activeBox.size;
 
     if (rect != _indicatorRect) {
-      setState(() {
-        _indicatorRect = rect;
-      });
+      setState(() => _indicatorRect = rect);
     }
+  }
+
+  void _handleDragStart(LongPressStartDetails details) {
+    if (_indicatorRect == null) return;
+
+    HapticFeedback.selectionClick();
+    setState(() {
+      _drag = _drag.start(
+        startLeft: _indicatorRect!.left,
+        startIndex: widget.currentIndex,
+      );
+    });
+  }
+
+  void _handleDragUpdate(LongPressMoveUpdateDetails details, double totalWidth) {
+    if (!_drag.isDragging || _indicatorRect == null) return;
+
+    NavDragState next = _drag.update(
+      details: details,
+      totalWidth: totalWidth,
+      indicatorWidth: _indicatorRect!.width,
+      itemCount: _itemKeys.length,
+    );
+
+    if (next.hoveredIndex != _drag.hoveredIndex) {
+      HapticFeedback.selectionClick();
+    }
+
+    setState(() => _drag = next);
+  }
+
+  void _handleDragEnd(LongPressEndDetails details) {
+    if (!_drag.isDragging) return;
+
+    int? finalIndex = _drag.hoveredIndex;
+    setState(() => _drag = NavDragState.idle);
+
+    if (finalIndex != null && finalIndex != widget.currentIndex) {
+      widget.onTap(finalIndex);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+    }
+  }
+
+  void _handleDragCancel() {
+    if (!_drag.isDragging) return;
+    setState(() => _drag = NavDragState.idle);
   }
 
   @override
@@ -100,15 +115,15 @@ class _MainBottomNavigationState
     final bool isDark = theme.brightness == Brightness.dark;
     final ColorScheme colorScheme = theme.colorScheme;
 
-    final Color backgroundColor =
-    isDark ? const Color(0xFF1B1D22) : Colors.white;
-
+    final Color backgroundColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
+    final Color activeBackground = colorScheme.primary.withValues(alpha: 0.11);
 
-    final Color activeBackground =
-    colorScheme.primary.withValues(alpha: 0.11);
+    int displayIndex = _drag.isDragging
+        ? (_drag.hoveredIndex ?? widget.currentIndex)
+        : widget.currentIndex;
 
     return SafeArea(
       top: false,
@@ -122,307 +137,129 @@ class _MainBottomNavigationState
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(26),
-            border: Border.all(
-              color: borderColor,
-            ),
+            border: Border.all(color: borderColor),
           ),
-          child: Stack(
-            key: _stackKey,
-            children: [
-              if (_indicatorRect != null)
-                AnimatedPositioned(
-                  duration: const Duration(
-                    milliseconds: 260,
-                  ),
-                  curve: Curves.easeOutCubic,
-                  left: _indicatorRect!.left,
-                  top: _indicatorRect!.top,
-                  width: _indicatorRect!.width,
-                  height: _indicatorRect!.height,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: activeBackground,
-                      borderRadius:
-                      BorderRadius.circular(22),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              double totalWidth = constraints.maxWidth;
+
+              return GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onLongPressStart: _handleDragStart,
+                onLongPressMoveUpdate: (details) =>
+                    _handleDragUpdate(details, totalWidth),
+                onLongPressEnd: _handleDragEnd,
+                onLongPressCancel: _handleDragCancel,
+                child: Stack(
+                  key: _stackKey,
+                  children: [
+                    _buildIndicator(activeBackground),
+                    Row(
+                      children: [
+                        _buildItem(
+                          index: MainTab.chats.index,
+                          displayIndex: displayIndex,
+                          icon: Icons.chat_bubble_outline_rounded,
+                          activeIcon: Icons.chat_bubble_rounded,
+                          label: 'chats'.tr,
+                          badgeCount: widget.unreadCount,
+                          backgroundColor: backgroundColor,
+                        ),
+                        _buildItem(
+                          index: MainTab.contacts.index,
+                          displayIndex: displayIndex,
+                          icon: Icons.people_outline_rounded,
+                          activeIcon: Icons.people_rounded,
+                          label: 'contacts'.tr,
+                          backgroundColor: backgroundColor,
+                        ),
+                        _buildItem(
+                          index: MainTab.settings.index,
+                          displayIndex: displayIndex,
+                          icon: Icons.settings_outlined,
+                          activeIcon: Icons.settings_rounded,
+                          label: 'settings'.tr,
+                          backgroundColor: backgroundColor,
+                        ),
+                        _buildItem(
+                          index: MainTab.profile.index,
+                          displayIndex: displayIndex,
+                          icon: Icons.person_outline_rounded,
+                          activeIcon: Icons.person_rounded,
+                          label: 'profile'.tr,
+                          profileImage: widget.profileImage,
+                          backgroundColor: backgroundColor,
+                        ),
+                      ],
                     ),
-                  ),
+                  ],
                 ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _NavigationItem(
-                      key: _itemKeys[MainTab.chats.index],
-                      index: MainTab.chats.index,
-                      currentIndex: widget.currentIndex,
-                      icon: Icons.chat_bubble_outline_rounded,
-                      activeIcon: Icons.chat_bubble_rounded,
-                      label: 'chats'.tr,
-                      badgeCount: widget.unreadCount,
-                      navigationBackground: backgroundColor,
-                      onTap: widget.onTap,
-                    ),
-                  ),
-                  Expanded(
-                    child: _NavigationItem(
-                      key: _itemKeys[MainTab.contacts.index],
-                      index: MainTab.contacts.index,
-                      currentIndex: widget.currentIndex,
-                      icon: Icons.people_outline_rounded,
-                      activeIcon: Icons.people_rounded,
-                      label: 'contacts'.tr,
-                      navigationBackground: backgroundColor,
-                      onTap: widget.onTap,
-                    ),
-                  ),
-                  Expanded(
-                    child: _NavigationItem(
-                      key: _itemKeys[MainTab.settings.index],
-                      index: MainTab.settings.index,
-                      currentIndex: widget.currentIndex,
-                      icon: Icons.settings_outlined,
-                      activeIcon: Icons.settings_rounded,
-                      label: 'settings'.tr,
-                      navigationBackground: backgroundColor,
-                      onTap: widget.onTap,
-                    ),
-                  ),
-                  Expanded(
-                    child: _NavigationItem(
-                      key: _itemKeys[MainTab.profile.index],
-                      index: MainTab.profile.index,
-                      currentIndex: widget.currentIndex,
-                      icon: Icons.person_outline_rounded,
-                      activeIcon: Icons.person_rounded,
-                      label: 'profile'.tr,
-                      profileImage: widget.profileImage,
-                      navigationBackground: backgroundColor,
-                      onTap: widget.onTap,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
-}
 
-class _NavigationItem extends StatelessWidget {
-  final int index;
-  final int currentIndex;
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final ValueChanged<int> onTap;
-  final int badgeCount;
-  final ImageProvider? profileImage;
-  final Color navigationBackground;
+  Widget _buildIndicator(Color activeBackground) {
+    if (_indicatorRect == null) return const SizedBox.shrink();
 
-  const _NavigationItem({
-    super.key,
-    required this.index,
-    required this.currentIndex,
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.navigationBackground,
-    required this.onTap,
-    this.badgeCount = 0,
-    this.profileImage,
-  });
-
-  bool get isSelected => index == currentIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
-
-    final Color primary = colorScheme.primary;
-    final Color inactiveColor = colorScheme.onSurfaceVariant;
-
-    // Background highlight is now handled by the shared sliding
-    // indicator in MainBottomNavigation, so this item only renders
-    // its own content (icon + label), no background of its own.
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: label,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          highlightColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          splashFactory: NoSplash.splashFactory,
-          onTap: () {
-            if (isSelected) {
-              return;
-            }
-            onTap(index);
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 1),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _NavigationIcon(
-                  selected: isSelected,
-                  icon: icon,
-                  activeIcon: activeIcon,
-                  primary: primary,
-                  inactiveColor: inactiveColor,
-                  badgeCount: badgeCount,
-                  profileImage: profileImage,
-                  navigationBackground: navigationBackground,
-                ),
-                const SizedBox(height: 3),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOutCubic,
-                  style: TextStyle(
-                    color: isSelected ? primary : inactiveColor,
-                    fontSize: 10.5,
-                    height: 1,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
+    if (_drag.isDragging && _drag.indicatorLeft != null) {
+      // No animation while dragging — tracks the finger 1:1.
+      return Positioned(
+        left: _drag.indicatorLeft!,
+        top: _indicatorRect!.top,
+        width: _indicatorRect!.width,
+        height: _indicatorRect!.height,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: activeBackground,
+            borderRadius: BorderRadius.circular(22),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavigationIcon extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
-  final IconData activeIcon;
-  final Color primary;
-  final Color inactiveColor;
-  final int badgeCount;
-  final ImageProvider? profileImage;
-  final Color navigationBackground;
-
-  const _NavigationIcon({
-    required this.selected,
-    required this.icon,
-    required this.activeIcon,
-    required this.primary,
-    required this.inactiveColor,
-    required this.badgeCount,
-    required this.navigationBackground,
-    this.profileImage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    Widget iconWidget;
-
-    if (profileImage != null) {
-      iconWidget = AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        width: 29,
-        height: 29,
-        padding: const EdgeInsets.all(1.5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? primary : Colors.transparent,
-            width: 1.5,
-          ),
-        ),
-        child: CircleAvatar(
-          backgroundImage: profileImage,
-          backgroundColor: colorScheme.surfaceContainerHighest,
-        ),
-      );
-    } else {
-      iconWidget = SizedBox(
-        width: 38,
-        height: 29,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
-              switchInCurve: Curves.easeOutBack,
-              switchOutCurve: Curves.easeIn,
-              transitionBuilder: (
-                  Widget child,
-                  Animation<double> animation,
-                  ) {
-                return ScaleTransition(
-                  scale: animation,
-                  child: FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                );
-              },
-              child: Icon(
-                selected ? activeIcon : icon,
-                key: ValueKey<bool>(selected),
-                size: 26,
-                color: selected ? primary : inactiveColor,
-              ),
-            ),
-            if (badgeCount > 0)
-              Positioned(
-                top: -5,
-                right: -3,
-                child: Container(
-                  constraints: const BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                  ),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: primary,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: navigationBackground,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Text(
-                    badgeCount > 99 ? '99+' : badgeCount.toString(),
-                    style: TextStyle(
-                      color: colorScheme.onPrimary,
-                      fontSize: 9,
-                      height: 1,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-          ],
         ),
       );
     }
 
-    return AnimatedScale(
-      scale: selected ? 1.08 : 1.0,
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOutBack,
-      child: iconWidget,
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      left: _indicatorRect!.left,
+      top: _indicatorRect!.top,
+      width: _indicatorRect!.width,
+      height: _indicatorRect!.height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: activeBackground,
+          borderRadius: BorderRadius.circular(22),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItem({
+    required int index,
+    required int displayIndex,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required Color backgroundColor,
+    int badgeCount = 0,
+    ImageProvider? profileImage,
+  }) {
+    return Expanded(
+      child: NavigationItem(
+        key: _itemKeys[index],
+        index: index,
+        currentIndex: displayIndex,
+        icon: icon,
+        activeIcon: activeIcon,
+        label: label,
+        badgeCount: badgeCount,
+        profileImage: profileImage,
+        navigationBackground: backgroundColor,
+        onTap: widget.onTap,
+      ),
     );
   }
 }
