@@ -104,7 +104,7 @@ class ChatCameraService {
       _isPickingFile = true;
 
       FilePickerResult? result =
-      await FilePicker.platform.pickFiles(
+      await FilePicker.pickFiles(
         type: FileType.any,
         withData: false,
       );

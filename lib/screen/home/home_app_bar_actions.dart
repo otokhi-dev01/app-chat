@@ -1,12 +1,10 @@
 import 'package:appchat/screen/profile/profile_edit_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
-import '../../controllers/contact/contact_controller.dart';
-import '../../controllers/settings/settings_search_controller.dart';
 import '../../route/app_route.dart';
-import '../settings/settings_search_screen.dart';
 import 'home_app_bar_button.dart';
 import 'home_chat_menu.dart';
 
@@ -35,12 +33,12 @@ class HomeAppBarActions extends StatelessWidget {
           children: [
             HomeAppBarActionButton(
               tooltip: 'search_chats'.tr,
-              icon: Icons.search_rounded,
+              icon: CupertinoIcons.search, // Native iOS Search Icon
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
               onPressed: controller.openSearchScreen,
             ),
-            SizedBox(width: 5),
+            const SizedBox(width: 8),
             HomeChatMenu(
               onSelected: onChatMenuSelected,
             ),
@@ -53,7 +51,7 @@ class HomeAppBarActions extends StatelessWidget {
       case 2:
         return HomeAppBarActionButton(
           tooltip: 'search_settings'.tr,
-          icon: Icons.search_rounded,
+          icon: CupertinoIcons.search, // Native iOS Search Icon
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () async {
@@ -78,7 +76,7 @@ class HomeAppBarActions extends StatelessWidget {
       case 3:
         return HomeAppBarActionButton(
           tooltip: 'edit_profile'.tr,
-          icon: Icons.edit_rounded,
+          icon: CupertinoIcons.pencil, // Native iOS Edit Icon
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () {
@@ -86,7 +84,7 @@ class HomeAppBarActions extends StatelessWidget {
                   () => ProfileEditScreen(),
               transition: Transition.rightToLeft,
               duration: const Duration(milliseconds: 280),
-              opaque: false, // <-- CRITICAL: Allows you to see the previous screen in the background
+              opaque: false, // Allows background screen to be visible
             );
           },
         );
