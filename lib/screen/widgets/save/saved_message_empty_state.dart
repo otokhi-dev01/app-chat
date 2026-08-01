@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class SavedMessagesEmptyState
     extends StatelessWidget {
-  SavedMessagesEmptyState({
+  const SavedMessagesEmptyState({
     super.key,
   });
 

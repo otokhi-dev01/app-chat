@@ -8,7 +8,7 @@ class SavedMessagesAppBar
     implements PreferredSizeWidget {
   final VoidCallback onBack;
 
-  SavedMessagesAppBar({
+ const SavedMessagesAppBar({
     super.key,
     required this.onBack,
   });

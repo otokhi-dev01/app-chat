@@ -5,7 +5,7 @@ class MessageInputBar extends StatelessWidget {
   final VoidCallback onSend;
   final String hintText;
 
-  MessageInputBar({
+  const MessageInputBar({
     super.key,
     required this.textController,
     required this.onSend,

@@ -7,7 +7,7 @@ class SavedMessageBubble
   final SavedMessageModel message;
   final VoidCallback onLongPress;
 
-  SavedMessageBubble({
+  const SavedMessageBubble({
     super.key,
     required this.message,
     required this.onLongPress,
