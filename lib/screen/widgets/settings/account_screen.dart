@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -30,20 +31,13 @@ class AccountSettingsSection extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color dividerColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,53 +48,67 @@ class AccountSettingsSection extends StatelessWidget {
             right: 6,
             bottom: 8,
           ),
-          child: Text(
-            'account'.tr,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.person_crop_circle,
+                color: colorScheme.primary,
+                size: 18,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'account'.tr,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
-
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: dividerColor,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Obx(
                 () {
               return Column(
                 children: [
                   _AccountTile(
-                    icon: Icons.person_outline_rounded,
+                    icon: CupertinoIcons.person,
                     label: 'name'.tr,
                     value: controller.userName.value,
                     onTap: _openProfileDetails,
                   ),
-
                   _AccountDivider(
                     color: dividerColor,
                   ),
-
                   _AccountTile(
-                    icon: Icons.phone_outlined,
+                    icon: CupertinoIcons.phone,
                     label: 'phone'.tr,
                     value: controller.userPhone.value,
                     onTap: _openProfileDetails,
                   ),
-
                   _AccountDivider(
                     color: dividerColor,
                   ),
-
                   _AccountTile(
-                    icon: Icons.email_outlined,
+                    icon: CupertinoIcons.mail,
                     label: 'email'.tr,
                     value: controller.userEmail.value,
                     onTap: _openProfileDetails,
@@ -135,9 +143,7 @@ class _AccountTile extends StatelessWidget {
 
     Color primary = colorScheme.primary;
 
-    String displayValue = value.trim().isEmpty
-        ? 'not_set'.tr
-        : value;
+    String displayValue = value.trim().isEmpty ? 'not_set'.tr : value;
 
     return _BouncyTileEffect(
       onTap: onTap,
@@ -156,42 +162,34 @@ class _AccountTile extends StatelessWidget {
                 color: primary.withValues(
                   alpha: 0.11,
                 ),
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 icon,
-                size: 22,
+                size: 20,
                 color: primary,
               ),
             ),
-
             SizedBox(width: 13),
-
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style:
-                    theme.textTheme.bodySmall?.copyWith(
-                      color:
-                      colorScheme.onSurfaceVariant,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-
                   SizedBox(height: 3),
-
                   Text(
                     displayValue,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style:
-                    theme.textTheme.bodyLarge?.copyWith(
+                    style: theme.textTheme.bodyLarge?.copyWith(
                       color: value.trim().isEmpty
                           ? colorScheme.onSurfaceVariant
                           : colorScheme.onSurface,
@@ -201,14 +199,11 @@ class _AccountTile extends StatelessWidget {
                 ],
               ),
             ),
-
             SizedBox(width: 8),
-
             Icon(
-              Icons.chevron_right_rounded,
-              size: 22,
-              color: colorScheme.onSurfaceVariant
-                  .withValues(
+              CupertinoIcons.chevron_right,
+              size: 18,
+              color: colorScheme.onSurfaceVariant.withValues(
                 alpha: 0.55,
               ),
             ),
@@ -252,8 +247,7 @@ class _BouncyTileEffect extends StatefulWidget {
   }
 }
 
-class _BouncyTileEffectState
-    extends State<_BouncyTileEffect> {
+class _BouncyTileEffectState extends State<_BouncyTileEffect> {
   bool _isPressed = false;
 
   void _resetPressedState() {

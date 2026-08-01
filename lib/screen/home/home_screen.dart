@@ -1,7 +1,6 @@
 import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/settings/chat_folder_controller.dart';
 import '../../services/chat_folder_service.dart';
 import '../../services/chat_list_service.dart';
@@ -10,12 +9,12 @@ import '../../services/mock/mock_chat_list_service.dart';
 import '../contact/contact_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/setting_screen.dart';
-import '../widgets/main_buttom_navigation.dart';
+import '../widgets/main_bottom_navigation.dart';
 import 'home_app_bar.dart';
 import 'home_chat_list.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({
+  const HomeScreen({
     super.key,
   });
 

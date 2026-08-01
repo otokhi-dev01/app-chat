@@ -24,7 +24,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   double get bottomHeight {
-    return selectedIndex == 0 ? 74 : 0;
+    return selectedIndex == 0 ? 56 : 0;
   }
 
   String _getTranslatedTitle(int index) {
@@ -73,36 +73,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
   }
 
-  void _showMessage(
-      BuildContext context,
-      String message,
-      ) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: TextStyle(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: colorScheme.primary,
-          margin: const EdgeInsets.all(14),
-          duration: const Duration(
-            milliseconds: 1800,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
-  }
-
   SystemUiOverlayStyle _overlayStyle(
       ThemeData theme,
       bool isDark,
@@ -128,23 +98,21 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark = theme.brightness == Brightness.dark;
-
-    // Adjusted alpha levels to make it transparent enough to see scroll progress
-    Color appBarColor = isDark
+    final Color appBarColor = isDark
         ? const Color(0xFF1B1D22).withValues(alpha: 0.65)
         : Colors.white.withValues(alpha: 0.70);
 
-    Color borderColor = isDark
+    final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
-        : const Color(0xFFE7E9ED);
+        : Colors.black.withValues(alpha: 0.06);
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : const Color(0xFFF2F4F7);
+    final Color actionBackground = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
 
     return AppBar(
       elevation: 0,
@@ -240,7 +208,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       bottom: selectedIndex == 0
           ? PreferredSize(
-        preferredSize: const Size.fromHeight(74),
+        preferredSize: Size.fromHeight(bottomHeight),
         child: HomeCategoryFilter(
           controller: controller,
         ),

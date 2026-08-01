@@ -46,7 +46,7 @@ class DataStorageCard extends StatelessWidget {
 }
 
 class DataStorageDivider extends StatelessWidget {
-  DataStorageDivider({
+  const DataStorageDivider({
     super.key,
   });
 
@@ -79,7 +79,7 @@ class DataStorageDivider extends StatelessWidget {
 class DataStorageSectionTitle extends StatelessWidget {
   final String title;
 
-  DataStorageSectionTitle({
+  const DataStorageSectionTitle({
     super.key,
     required this.title,
   });
@@ -108,7 +108,7 @@ class DataStorageSummaryCard extends StatelessWidget {
   final String cacheSize;
   final String networkUsage;
 
-  DataStorageSummaryCard({
+  const DataStorageSummaryCard({
     super.key,
     required this.cacheSize,
     required this.networkUsage,
@@ -201,7 +201,7 @@ class _SummaryValue extends StatelessWidget {
   final String label;
   final String value;
 
-  _SummaryValue({
+  const _SummaryValue({
     required this.label,
     required this.value,
   });
@@ -238,7 +238,7 @@ class _SummaryValue extends StatelessWidget {
 }
 
 class DataStorageInformationCard extends StatelessWidget {
-  DataStorageInformationCard({
+  const DataStorageInformationCard({
     super.key,
   });
 

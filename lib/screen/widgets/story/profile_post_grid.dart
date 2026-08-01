@@ -1,24 +1,22 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/profile_story_post_model.dart';
 
-class ProfilePostGrid
-    extends StatelessWidget {
+class ProfilePostGrid extends StatelessWidget {
   final List<ProfilePostItem> posts;
   final bool showArchived;
-  final ValueChanged<ProfilePostItem>?
-  onPostTap;
+  final ValueChanged<ProfilePostItem>? onPostTap;
 
-  ProfilePostGrid({
+  const ProfilePostGrid({
     super.key,
     required this.posts,
     required this.showArchived,
     this.onPostTap,
   });
 
-  int _columnCount(
-      double width,
-      ) {
+  int _columnCount(double width) {
     if (width >= 900) {
       return 5;
     }
@@ -46,25 +44,20 @@ class ProfilePostGrid
         return GridView.builder(
           shrinkWrap: true,
           primary: false,
-          physics:
-          NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.all(3),
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.all(6),
           itemCount: posts.length,
-          gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _columnCount(
-              constraints.maxWidth,
-            ),
-            mainAxisSpacing: 3,
-            crossAxisSpacing: 3,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _columnCount(constraints.maxWidth),
+            mainAxisSpacing: 6,
+            crossAxisSpacing: 6,
             childAspectRatio: 1,
           ),
           itemBuilder: (
               BuildContext context,
               int index,
               ) {
-            ProfilePostItem post =
-            posts[index];
+            ProfilePostItem post = posts[index];
 
             return _PostItem(
               post: post,
@@ -83,7 +76,7 @@ class _PostItem extends StatelessWidget {
   final ProfilePostItem post;
   final VoidCallback onTap;
 
-  _PostItem({
+ const _PostItem({
     required this.post,
     required this.onTap,
   });
@@ -92,30 +85,26 @@ class _PostItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
+        highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            ClipRRect(
-              borderRadius:
-              BorderRadius.circular(3),
-              child: _PostImage(
-                imageUrl: post.imageUrl,
-              ),
+            _PostImage(
+              imageUrl: post.imageUrl,
             ),
             if (post.isArchived)
               Positioned(
                 top: 6,
                 right: 6,
                 child: _OverlayBadge(
-                  icon:
-                  Icons.archive_rounded,
+                  icon: CupertinoIcons.archivebox_fill,
                 ),
               ),
             if (post.viewCount > 0)
@@ -136,7 +125,7 @@ class _PostItem extends StatelessWidget {
 class _OverlayBadge extends StatelessWidget {
   final IconData icon;
 
-  _OverlayBadge({
+ const _OverlayBadge({
     required this.icon,
   });
 
@@ -148,14 +137,14 @@ class _OverlayBadge extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.black.withValues(
-          alpha: 0.48,
+          alpha: 0.50,
         ),
         shape: BoxShape.circle,
       ),
       child: Icon(
         icon,
         color: Colors.white,
-        size: 15,
+        size: 14,
       ),
     );
   }
@@ -164,7 +153,7 @@ class _OverlayBadge extends StatelessWidget {
 class _ViewBadge extends StatelessWidget {
   final int count;
 
-  _ViewBadge({
+ const _ViewBadge({
     required this.count,
   });
 
@@ -172,31 +161,30 @@ class _ViewBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: 6,
+        horizontal: 7,
         vertical: 3,
       ),
       decoration: BoxDecoration(
         color: Colors.black.withValues(
-          alpha: 0.48,
+          alpha: 0.50,
         ),
-        borderRadius: BorderRadius.circular(
-          12,
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.visibility_outlined,
+            CupertinoIcons.eye_fill,
             color: Colors.white,
-            size: 12,
+            size: 11,
           ),
-          SizedBox(width: 3),
+          SizedBox(width: 4),
           Text(
             '$count',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 9,
+              fontSize: 10,
+              height: 1,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -206,62 +194,53 @@ class _ViewBadge extends StatelessWidget {
   }
 }
 
-class _EmptyPostState
-    extends StatelessWidget {
+class _EmptyPostState extends StatelessWidget {
   final bool showArchived;
 
-  _EmptyPostState({
+  const _EmptyPostState({
     required this.showArchived,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    String title = showArchived
-        ? 'No archived posts'
-        : 'No posts yet';
+    String title = showArchived ? 'no_archived_posts'.tr : 'no_posts_yet'.tr;
 
-    String subtitle = showArchived
-        ? 'Posts you archive will appear here.'
-        : 'Your new posts will appear here.';
+    String subtitle =
+    showArchived ? 'archived_posts_hint'.tr : 'new_posts_hint'.tr;
 
-    IconData icon = showArchived
-        ? Icons.archive_outlined
-        : Icons.photo_library_outlined;
+    IconData icon =
+    showArchived ? CupertinoIcons.archivebox : CupertinoIcons.photo;
 
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 24,
-        vertical: 34,
+        vertical: 36,
       ),
       child: Column(
         children: [
           Container(
-            width: 62,
-            height: 62,
+            width: 64,
+            height: 64,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: 0.10,
+              color: colorScheme.primary.withValues(
+                alpha: 0.11,
               ),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
               color: colorScheme.primary,
-              size: 29,
+              size: 28,
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 14),
           Text(
             title,
-            style: theme
-                .textTheme.titleMedium
-                ?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w700,
             ),
@@ -270,12 +249,9 @@ class _EmptyPostState
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.bodySmall
-                ?.copyWith(
-              color: colorScheme
-                  .onSurfaceVariant,
-              fontSize: 11,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 12,
             ),
           ),
         ],
@@ -287,24 +263,21 @@ class _EmptyPostState
 class _PostImage extends StatelessWidget {
   final String imageUrl;
 
-  _PostImage({
+  const _PostImage({
     required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     Widget fallback = Container(
       alignment: Alignment.center,
-      color: colorScheme
-          .surfaceContainerHighest,
+      color: colorScheme.surfaceContainerHighest,
       child: Icon(
-        Icons.image_outlined,
-        color:
-        colorScheme.onSurfaceVariant,
-        size: 27,
+        CupertinoIcons.photo,
+        color: colorScheme.onSurfaceVariant,
+        size: 26,
       ),
     );
 
@@ -317,8 +290,7 @@ class _PostImage extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       fit: BoxFit.cover,
-      filterQuality:
-      FilterQuality.medium,
+      filterQuality: FilterQuality.medium,
       errorBuilder: (
           BuildContext context,
           Object error,

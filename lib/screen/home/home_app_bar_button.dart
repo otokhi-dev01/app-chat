@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,54 +19,51 @@ class HomeAppBarActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Fallback glass colors based on current theme
-    final glassColor = backgroundColor ??
-        (isDark
-            ? Colors.white.withOpacity(0.12)
-            : Colors.white.withOpacity(0.45));
+    // Follows the active code surface colors: Color(0xFF1B1D22) for Dark, Colors.white for Light
+    final Color buttonBgColor = backgroundColor ??
+        (isDark ? const Color(0xFF1B1D22) : Colors.white);
 
-    final glassBorderColor = isDark
-        ? Colors.white.withOpacity(0.18)
-        : Colors.white.withOpacity(0.6);
+    // Follows the active code border colors
+    final Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
-    final iconClr = foregroundColor ??
+    // Follows the active code icon/text color defaults
+    final Color iconColor = foregroundColor ??
         (isDark ? Colors.white : const Color(0xFF1C1C1E));
 
     return Tooltip(
       message: tooltip,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20), // Rounded iOS aesthetic
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0), // Frosted glass blur
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: glassColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: glassBorderColor,
-                width: 1.0,
+      child: Container(
+        width: 40,
+        height: 40,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: buttonBgColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: borderColor,
+            width: 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.15 : 0.04,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: onPressed,
-              child: Icon(
-                icon,
-                color: iconClr,
-                size: 20,
-              ),
-            ),
+          ],
+        ),
+        child: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: onPressed,
+          child: Icon(
+            icon,
+            color: iconColor,
+            size: 20,
           ),
         ),
       ),

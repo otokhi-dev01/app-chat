@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -51,8 +52,11 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
 
     if (stackContext == null || activeContext == null) return;
 
-    RenderBox stackBox = stackContext.findRenderObject() as RenderBox;
-    RenderBox activeBox = activeContext.findRenderObject() as RenderBox;
+    RenderBox? stackBox = stackContext.findRenderObject() as RenderBox?;
+    RenderBox? activeBox = activeContext.findRenderObject() as RenderBox?;
+
+    if (stackBox == null || activeBox == null) return;
+    if (!stackBox.hasSize || !activeBox.hasSize) return;
 
     Offset offset = activeBox.localToGlobal(Offset.zero, ancestor: stackBox);
     Rect rect = offset & activeBox.size;
@@ -159,8 +163,8 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                         _buildItem(
                           index: MainTab.chats.index,
                           displayIndex: displayIndex,
-                          icon: Icons.chat_bubble_outline_rounded,
-                          activeIcon: Icons.chat_bubble_rounded,
+                          icon: CupertinoIcons.chat_bubble_2,
+                          activeIcon: CupertinoIcons.chat_bubble_2_fill,
                           label: 'chats'.tr,
                           badgeCount: widget.unreadCount,
                           backgroundColor: backgroundColor,
@@ -168,24 +172,24 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                         _buildItem(
                           index: MainTab.contacts.index,
                           displayIndex: displayIndex,
-                          icon: Icons.people_outline_rounded,
-                          activeIcon: Icons.people_rounded,
+                          icon: CupertinoIcons.person_2,
+                          activeIcon: CupertinoIcons.person_2_fill,
                           label: 'contacts'.tr,
                           backgroundColor: backgroundColor,
                         ),
                         _buildItem(
                           index: MainTab.settings.index,
                           displayIndex: displayIndex,
-                          icon: Icons.settings_outlined,
-                          activeIcon: Icons.settings_rounded,
+                          icon: CupertinoIcons.gear_alt,
+                          activeIcon: CupertinoIcons.gear_alt_fill,
                           label: 'settings'.tr,
                           backgroundColor: backgroundColor,
                         ),
                         _buildItem(
                           index: MainTab.profile.index,
                           displayIndex: displayIndex,
-                          icon: Icons.person_outline_rounded,
-                          activeIcon: Icons.person_rounded,
+                          icon: CupertinoIcons.person,
+                          activeIcon: CupertinoIcons.person_fill,
                           label: 'profile'.tr,
                           profileImage: widget.profileImage,
                           backgroundColor: backgroundColor,
@@ -206,7 +210,7 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
     if (_indicatorRect == null) return const SizedBox.shrink();
 
     if (_drag.isDragging && _drag.indicatorLeft != null) {
-      // No animation while dragging — tracks the finger 1:1.
+      // No animation while dragging — tracks finger 1:1
       return Positioned(
         left: _drag.indicatorLeft!,
         top: _indicatorRect!.top,

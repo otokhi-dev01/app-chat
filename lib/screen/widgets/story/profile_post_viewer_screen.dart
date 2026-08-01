@@ -6,7 +6,7 @@ import '../../../models/profile_story_post_model.dart';
 class ProfilePostViewerScreen extends StatelessWidget {
   final ProfilePostItem post;
 
-  ProfilePostViewerScreen({
+  const ProfilePostViewerScreen({
     super.key,
     required this.post,
   });
@@ -183,7 +183,7 @@ class _PostInformation
     extends StatelessWidget {
   final ProfilePostItem post;
 
-  _PostInformation({
+  const _PostInformation({
     required this.post,
   });
 
@@ -277,7 +277,7 @@ class _ViewerButton
   final IconData icon;
   final VoidCallback onTap;
 
-  _ViewerButton({
+  const _ViewerButton({
     required this.icon,
     required this.onTap,
   });
@@ -315,7 +315,7 @@ class _OptionTile extends StatelessWidget {
   final Color? color;
   final VoidCallback onTap;
 
-  _OptionTile({
+  const _OptionTile({
     required this.icon,
     required this.title,
     required this.onTap,
@@ -374,7 +374,7 @@ class _OptionTile extends StatelessWidget {
 
 class _ImageErrorState
     extends StatelessWidget {
-  _ImageErrorState();
+  const _ImageErrorState();
 
   @override
   Widget build(BuildContext context) {

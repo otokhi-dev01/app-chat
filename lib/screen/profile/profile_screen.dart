@@ -1,5 +1,6 @@
 import 'package:appchat/screen/profile/post/add_post_camera_screen.dart';
 import 'package:appchat/screen/profile/qr_code/profile_qr_code_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,25 +17,18 @@ import '../widgets/story/profile_post_viewer_screen.dart';
 import '../widgets/story/profile_story_post_section.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
-  ProfileScreen({
+  const ProfileScreen({
     super.key,
   });
 
-  String _firstLetter(
-      String name,
-      ) {
+  String _firstLetter(String name) {
     String value = name.trim();
 
     if (value.isEmpty) {
       return '?';
     }
 
-    return value
-        .substring(
-      0,
-      1,
-    )
-        .toUpperCase();
+    return value.substring(0, 1).toUpperCase();
   }
 
   void _openEditProfile() {
@@ -45,31 +39,27 @@ class ProfileScreen extends GetView<ProfileController> {
     );
   }
 
-  void _copyUsername(
-      String username,
-      ) {
+  void _copyUsername(String username) {
     String value = username.trim();
 
     if (value.isEmpty) {
       _showMessage(
         title: 'username_unavailable_title'.tr,
         message: 'username_unavailable_message'.tr,
-        icon: Icons.error_outline_rounded,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
 
       return;
     }
 
     Clipboard.setData(
-      ClipboardData(
-        text: value,
-      ),
+      ClipboardData(text: value),
     );
 
     _showMessage(
       title: 'username_copied'.tr,
       message: 'username_copied_to_clipboard'.tr,
-      icon: Icons.check_circle_outline_rounded,
+      icon: CupertinoIcons.checkmark_circle,
     );
   }
 
@@ -86,15 +76,10 @@ class ProfileScreen extends GetView<ProfileController> {
       snackPosition: SnackPosition.BOTTOM,
       margin: EdgeInsets.all(16),
       borderRadius: 16,
-      icon: Icon(
-        icon,
-      ),
-      duration: Duration(
-        seconds: 3,
-      ),
+      icon: Icon(icon),
+      duration: Duration(seconds: 3),
       isDismissible: true,
-      dismissDirection:
-      DismissDirection.horizontal,
+      dismissDirection: DismissDirection.horizontal,
     );
   }
 
@@ -110,33 +95,24 @@ class ProfileScreen extends GetView<ProfileController> {
         username: username,
       ),
       transition: Transition.rightToLeft,
-      duration: Duration(
-        milliseconds: 280,
-      ),
+      duration: Duration(milliseconds: 280),
     );
   }
 
-  void _openPost(
-      ProfilePostItem post,
-      ) {
+  void _openPost(ProfilePostItem post) {
     FocusManager.instance.primaryFocus?.unfocus();
 
     Get.to(
-          () => ProfilePostViewerScreen(
-        post: post,
-      ),
+          () => ProfilePostViewerScreen(post: post),
       transition: Transition.fadeIn,
-      duration: Duration(
-        milliseconds: 220,
-      ),
+      duration: Duration(milliseconds: 220),
     );
   }
 
   Future<void> _addNewPost() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    AddPostCaptureResult? result =
-    await Get.to<AddPostCaptureResult>(
+    AddPostCaptureResult? result = await Get.to<AddPostCaptureResult>(
           () => AddPostCameraScreen(),
       binding: BindingsBuilder(
             () {
@@ -146,51 +122,29 @@ class ProfileScreen extends GetView<ProfileController> {
         },
       ),
       transition: Transition.fadeIn,
-      duration: Duration(
-        milliseconds: 220,
-      ),
+      duration: Duration(milliseconds: 220),
     );
 
     if (result == null) {
       return;
     }
 
-    debugPrint(
-      'Post path: ${result.path}',
-    );
-
-    debugPrint(
-      'Post type: ${result.type.name}',
-    );
-
-    debugPrint(
-      'From gallery: ${result.fromGallery}',
-    );
-
-    // Open your caption/publish screen here.
+    debugPrint('Post path: ${result.path}');
+    debugPrint('Post type: ${result.type.name}');
+    debugPrint('From gallery: ${result.fromGallery}');
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color pageColor =
-        theme.scaffoldBackgroundColor;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color pageColor = theme.scaffoldBackgroundColor;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return ColoredBox(
       color: pageColor,
@@ -199,42 +153,26 @@ class ProfileScreen extends GetView<ProfileController> {
           Positioned.fill(
             child: Obx(
                   () {
-                String name =
-                controller.userName.value.trim();
-
-                String email =
-                controller.userEmail.value.trim();
-
-                String username =
-                controller.userUsername.value
-                    .trim();
+                String name = controller.userName.value.trim();
+                String email = controller.userEmail.value.trim();
+                String username = controller.userUsername.value.trim();
 
                 return ListView(
                   keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior
-                      .onDrag,
+                  ScrollViewKeyboardDismissBehavior.onDrag,
                   physics: BouncingScrollPhysics(
-                    parent:
-                    AlwaysScrollableScrollPhysics(),
+                    parent: AlwaysScrollableScrollPhysics(),
                   ),
-                  padding: EdgeInsets.fromLTRB(
-                    14,
-                    16,
-                    14,
-                    180,
-                  ),
+                  padding: EdgeInsets.fromLTRB(14, 16, 14, 180),
                   children: [
                     _ProfileHeaderCard(
                       name: name,
                       email: email,
-                      firstLetter:
-                      _firstLetter(name),
+                      firstLetter: _firstLetter(name),
                       cardColor: cardColor,
                       borderColor: borderColor,
                       onEdit: _openEditProfile,
-                      onCopyUsername: () {
-                        _copyUsername(username);
-                      },
+                      onCopyUsername: () => _copyUsername(username),
                       onQrCode: () {
                         _openQrCode(
                           name: name,
@@ -242,22 +180,14 @@ class ProfileScreen extends GetView<ProfileController> {
                         );
                       },
                     ),
-
                     SizedBox(height: 22),
-
                     AccountSettingsSection(
                       controller: controller,
                     ),
-
                     SizedBox(height: 22),
-
                     ProfileStoryPostSection(
-                      posts:
-                      MockProfileStoryPostData
-                          .posts,
-                      onPostTap: (
-                          ProfilePostItem post,
-                          ) {
+                      posts: MockProfileStoryPostData.posts,
+                      onPostTap: (ProfilePostItem post) {
                         _openPost(post);
                       },
                     ),
@@ -266,7 +196,6 @@ class ProfileScreen extends GetView<ProfileController> {
               },
             ),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -286,8 +215,7 @@ class ProfileScreen extends GetView<ProfileController> {
   }
 }
 
-class _ProfileHeaderCard
-    extends StatelessWidget {
+class _ProfileHeaderCard extends StatelessWidget {
   final String name;
   final String email;
   final String firstLetter;
@@ -297,7 +225,7 @@ class _ProfileHeaderCard
   final VoidCallback onCopyUsername;
   final VoidCallback onQrCode;
 
-  _ProfileHeaderCard({
+ const _ProfileHeaderCard({
     required this.name,
     required this.email,
     required this.firstLetter,
@@ -311,25 +239,15 @@ class _ProfileHeaderCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        18,
-        24,
-        18,
-        20,
-      ),
+      padding: EdgeInsets.fromLTRB(18, 24, 18, 20),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: borderColor,
         ),
@@ -339,10 +257,7 @@ class _ProfileHeaderCard
               alpha: isDark ? 0.18 : 0.05,
             ),
             blurRadius: 20,
-            offset: Offset(
-              0,
-              8,
-            ),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -356,31 +271,22 @@ class _ProfileHeaderCard
                 height: 104,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
-                    alpha: 0.14,
-                  ),
+                  color: colorScheme.primary.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: colorScheme.primary
-                        .withValues(
-                      alpha: 0.24,
-                    ),
+                    color: colorScheme.primary.withValues(alpha: 0.24),
                     width: 2,
                   ),
                 ),
                 child: Text(
                   firstLetter,
                   style: TextStyle(
-                    color:
-                    colorScheme.primary,
+                    color: colorScheme.primary,
                     fontSize: 38,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-
               Positioned(
                 right: -2,
                 bottom: 2,
@@ -390,96 +296,67 @@ class _ProfileHeaderCard
                   child: Container(
                     width: 34,
                     height: 34,
-                    alignment:
-                    Alignment.center,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color:
-                      colorScheme.primary,
+                      color: colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.camera_alt_rounded,
-                      color:
-                      colorScheme.onPrimary,
-                      size: 18,
+                      CupertinoIcons.camera_fill,
+                      color: colorScheme.onPrimary,
+                      size: 17,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-
           SizedBox(height: 16),
-
           Text(
-            name.isEmpty
-                ? 'your_name'.tr
-                : name,
+            name.isEmpty ? 'your_name'.tr : name,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.titleLarge
-                ?.copyWith(
-              color:
-              colorScheme.onSurface,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontSize: 23,
-              fontWeight:
-              FontWeight.w800,
+              fontWeight: FontWeight.w800,
             ),
           ),
-
           SizedBox(height: 5),
-
           Text(
-            email.isEmpty
-                ? 'no_email_address'.tr
-                : email,
+            email.isEmpty ? 'no_email_address'.tr : email,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.bodyMedium
-                ?.copyWith(
-              color: colorScheme
-                  .onSurfaceVariant,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
               fontSize: 13,
-              fontWeight:
-              FontWeight.w500,
+              fontWeight: FontWeight.w500,
             ),
           ),
-
           SizedBox(height: 22),
-
           Row(
             children: [
               Expanded(
                 child: _ProfileActionButton(
-                  icon: Icons.edit_rounded,
+                  icon: CupertinoIcons.pencil,
                   label: 'edit'.tr,
                   onTap: onEdit,
                 ),
               ),
-
               SizedBox(width: 10),
-
               Expanded(
                 child: _ProfileActionButton(
-                  icon: Icons
-                      .alternate_email_rounded,
+                  icon: CupertinoIcons.at,
                   label: 'username'.tr,
                   onTap: onCopyUsername,
                 ),
               ),
-
               SizedBox(width: 10),
-
               Expanded(
                 child: _ProfileActionButton(
-                  icon:
-                  Icons.qr_code_rounded,
+                  icon: CupertinoIcons.qrcode,
                   label: 'qr_code'.tr,
                   onTap: onQrCode,
                 ),
@@ -492,13 +369,12 @@ class _ProfileHeaderCard
   }
 }
 
-class _ProfileActionButton
-    extends StatelessWidget {
+class _ProfileActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  _ProfileActionButton({
+  const _ProfileActionButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -507,28 +383,16 @@ class _ProfileActionButton
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color backgroundColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.07,
-    )
-        : colorScheme.primary.withValues(
-      alpha: 0.08,
-    );
+        ? Colors.white.withValues(alpha: 0.07)
+        : colorScheme.primary.withValues(alpha: 0.08);
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.06,
-    )
-        : colorScheme.primary.withValues(
-      alpha: 0.08,
-    );
+        ? Colors.white.withValues(alpha: 0.06)
+        : colorScheme.primary.withValues(alpha: 0.08);
 
     return _ProfileTapButton(
       onTap: onTap,
@@ -540,8 +404,7 @@ class _ProfileActionButton
         ),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius:
-          BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: borderColor,
           ),
@@ -552,25 +415,18 @@ class _ProfileActionButton
             Icon(
               icon,
               color: colorScheme.primary,
-              size: 22,
+              size: 20,
             ),
-
             SizedBox(height: 7),
-
             Text(
               label,
               maxLines: 1,
-              overflow:
-              TextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodySmall
-                  ?.copyWith(
-                color:
-                colorScheme.primary,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
                 fontSize: 11,
-                fontWeight:
-                FontWeight.w700,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
@@ -580,13 +436,12 @@ class _ProfileActionButton
   }
 }
 
-class _ProfileTapButton
-    extends StatelessWidget {
+class _ProfileTapButton extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;
   final bool circular;
 
-  _ProfileTapButton({
+  const _ProfileTapButton({
     required this.child,
     required this.onTap,
     this.circular = false,
@@ -596,20 +451,13 @@ class _ProfileTapButton
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      shape: circular
-          ? CircleBorder()
-          : null,
+      shape: circular ? CircleBorder() : null,
       child: InkWell(
         onTap: onTap,
-        customBorder: circular
-            ? CircleBorder()
-            : null,
-        borderRadius: circular
-            ? null
-            : BorderRadius.circular(16),
+        customBorder: circular ? CircleBorder() : null,
+        borderRadius: circular ? null : BorderRadius.circular(18),
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
+        highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: child,

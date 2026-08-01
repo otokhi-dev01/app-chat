@@ -1,23 +1,23 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/chat/chat_controller.dart';
 
-class SearchAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ChatController controller;
 
-  SearchAppBar({
+  const SearchAppBar({
     super.key,
     required this.controller,
   });
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(68);
+    return const Size.fromHeight(68);
   }
 
   void _closeSearch(BuildContext context) {
@@ -42,13 +42,10 @@ class SearchAppBar extends StatelessWidget
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
@@ -56,40 +53,32 @@ class SearchAppBar extends StatelessWidget
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    final Color headerColor = isDark
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.70);
 
-    Color headerColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.95,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
+    final Color actionBackground = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
 
-    Color searchBackground = isDark
+    final Color searchBackground = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
+
+    final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFF2F4F7);
-
-    Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFE7E9ED);
-
-    Color actionBackground = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFF2F4F7);
+        : Colors.black.withValues(alpha: 0.06);
 
     return AppBar(
       toolbarHeight: 68,
@@ -127,136 +116,126 @@ class SearchAppBar extends StatelessWidget
         ),
       ),
       leading: Padding(
-        padding: EdgeInsets.fromLTRB(
-          8,
-          12,
-          6,
-          12,
-        ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: Tooltip(
-            message: 'Back',
-            child: InkWell(
-              onTap: () {
-                _closeSearch(context);
-              },
-              customBorder: CircleBorder(),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
-                  color: colorScheme.onSurface,
+        padding: const EdgeInsets.fromLTRB(12, 14, 6, 14),
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(40, 40), // Updated to minimumSize
+              onPressed: () => _closeSearch(context),
+              child: Icon(
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
         ),
       ),
       title: Padding(
-        padding: EdgeInsets.only(
-          right: 10,
-        ),
+        padding: const EdgeInsets.only(right: 12),
         child: Container(
-          height: 46,
+          height: 44,
           decoration: BoxDecoration(
             color: searchBackground,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: borderColor,
+              width: 1.0,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
-              SizedBox(width: 13),
-
+              const SizedBox(width: 12),
               Icon(
-                Icons.search_rounded,
-                size: 21,
+                CupertinoIcons.search,
+                size: 18,
                 color: colorScheme.primary,
               ),
-
-              SizedBox(width: 9),
-
+              const SizedBox(width: 8),
               Expanded(
                 child: TextField(
-                  controller:
-                  controller.searchTextController,
+                  controller: controller.searchTextController,
                   autofocus: true,
                   onChanged: controller.updateSearch,
-                  textInputAction:
-                  TextInputAction.search,
+                  textInputAction: TextInputAction.search,
                   keyboardType: TextInputType.text,
                   enableSuggestions: true,
                   autocorrect: true,
                   cursorColor: colorScheme.primary,
-                  style:
-                  theme.textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurface,
                     fontSize: 15,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Search chats',
-                    hintStyle: theme
-                        .textTheme.bodyLarge
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant,
+                    hintText: 'search_chats'.tr,
+                    hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : Colors.black.withValues(alpha: 0.4),
                       fontSize: 15,
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     isDense: true,
-                    contentPadding:
-                    EdgeInsets.symmetric(
-                      vertical: 13,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 11,
                     ),
                   ),
-                  onTapOutside: (
-                      PointerDownEvent event,
-                      ) {
-                    FocusManager.instance.primaryFocus
-                        ?.unfocus();
+                  onTapOutside: (PointerDownEvent event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
                   },
                 ),
               ),
-
               Obx(
                     () {
-                  if (controller
-                      .searchQuery.value.isEmpty) {
-                    return SizedBox(width: 8);
+                  if (controller.searchQuery.value.isEmpty) {
+                    return const SizedBox(width: 12);
                   }
 
                   return Padding(
-                    padding: EdgeInsets.only(
-                      right: 4,
-                    ),
-                    child: Material(
-                      color: colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.10),
-                      shape: CircleBorder(),
-                      child: Tooltip(
-                        message: 'Clear search',
-                        child: InkWell(
-                          onTap: _clearSearch,
-                          customBorder: CircleBorder(),
-                          child: SizedBox(
-                            width: 32,
-                            height: 32,
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 18,
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ),
+                    padding: const EdgeInsets.only(right: 6),
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(32, 32), // Updated to minimumSize
+                      onPressed: _clearSearch,
+                      child: Icon(
+                        CupertinoIcons.xmark_circle_fill,
+                        size: 18,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.4)
+                            : Colors.black.withValues(alpha: 0.4),
                       ),
                     ),
                   );

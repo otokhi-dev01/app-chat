@@ -1,6 +1,5 @@
 import 'package:appchat/screen/profile/profile_edit_screen.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
@@ -33,17 +32,19 @@ class HomeAppBarActions extends StatelessWidget {
           children: [
             HomeAppBarActionButton(
               tooltip: 'search_chats'.tr,
-              icon: CupertinoIcons.search, // Native iOS Search Icon
+              icon: CupertinoIcons.search,
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
               onPressed: controller.openSearchScreen,
             ),
             const SizedBox(width: 8),
             HomeChatMenu(
+              backgroundColor: backgroundColor, // Pass active bg color
+              iconColor: iconColor,             // Pass active icon color
               onSelected: onChatMenuSelected,
             ),
           ],
-        );
+        );;
 
       case 1:
         return const SizedBox.shrink();
@@ -51,7 +52,7 @@ class HomeAppBarActions extends StatelessWidget {
       case 2:
         return HomeAppBarActionButton(
           tooltip: 'search_settings'.tr,
-          icon: CupertinoIcons.search, // Native iOS Search Icon
+          icon: CupertinoIcons.search,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () async {
@@ -63,20 +64,16 @@ class HomeAppBarActions extends StatelessWidget {
 
             String? selectedSetting = result is String ? result : null;
 
-            if (selectedSetting == null) {
-              return;
-            }
+            if (selectedSetting == null) return;
 
-            debugPrint(
-              'Selected setting: $selectedSetting',
-            );
+            debugPrint('Selected setting: $selectedSetting');
           },
         );
 
       case 3:
         return HomeAppBarActionButton(
           tooltip: 'edit_profile'.tr,
-          icon: CupertinoIcons.pencil, // Native iOS Edit Icon
+          icon: CupertinoIcons.pencil,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () {
@@ -84,7 +81,7 @@ class HomeAppBarActions extends StatelessWidget {
                   () => ProfileEditScreen(),
               transition: Transition.rightToLeft,
               duration: const Duration(milliseconds: 280),
-              opaque: false, // Allows background screen to be visible
+              opaque: false,
             );
           },
         );

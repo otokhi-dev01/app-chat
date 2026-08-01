@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,152 +5,199 @@ import '../../../controllers/chat/chat_controller.dart';
 import '../../../controllers/settings/chat_folder_controller.dart';
 import '../../../models/chat_folder_model.dart';
 
-class HomeCategoryFilter extends StatelessWidget {
+class HomeCategoryFilter extends StatefulWidget {
   final ChatController controller;
 
-  HomeCategoryFilter({
+  const HomeCategoryFilter({
     super.key,
     required this.controller,
   });
 
-  ChatFolderController get folderController {
-    return Get.find<ChatFolderController>();
+  @override
+  State<HomeCategoryFilter> createState() => _HomeCategoryFilterState();
+}
+
+class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
+  final GlobalKey _stackKey = GlobalKey();
+  final Map<String, GlobalKey> _itemKeys = {};
+  final ScrollController _scrollController = ScrollController();
+
+  Rect? _indicatorRect;
+
+  ChatFolderController get folderController => Get.find<ChatFolderController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _measure();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _measure() {
+    if (!mounted) return;
+
+    // Safely wait for frame layout to finish before accessing RenderBox.size
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      String activeFolderId = widget.controller.selectedFolderId.value;
+      GlobalKey? activeKey = _itemKeys[activeFolderId];
+
+      BuildContext? stackContext = _stackKey.currentContext;
+      BuildContext? activeContext = activeKey?.currentContext;
+
+      if (stackContext == null || activeContext == null) return;
+
+      final RenderBox? stackBox = stackContext.findRenderObject() as RenderBox?;
+      final RenderBox? activeBox = activeContext.findRenderObject() as RenderBox?;
+
+      if (stackBox == null || activeBox == null) return;
+      if (!stackBox.hasSize || !activeBox.hasSize) return;
+
+      final Offset offset = activeBox.localToGlobal(Offset.zero, ancestor: stackBox);
+      final Rect rect = offset & activeBox.size;
+
+      if (rect != _indicatorRect) {
+        setState(() {
+          _indicatorRect = rect;
+        });
+      }
+    });
+  }
+
+  void _scrollToActive(BuildContext itemContext) {
+    Scrollable.ensureVisible(
+      itemContext,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      alignment: 0.5,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    final ThemeData theme = Theme.of(context);
+    final bool isDark = theme.brightness == Brightness.dark;
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    final Color backgroundColor =
+    isDark ? const Color(0xFF1B1D22) : Colors.white;
+    final Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
+    final Color activeBackground = colorScheme.primary.withValues(alpha: 0.11);
 
     return Obx(
           () {
-        List<ChatFolderModel> folders =
-        folderController.folders.toList();
+        List<ChatFolderModel> folders = folderController.folders.toList();
+        String activeFolderId = widget.controller.selectedFolderId.value;
 
-        String activeFolderId =
-            controller.selectedFolderId.value;
+        _measure();
 
-        if (folderController.isLoading.value &&
-            folders.isEmpty) {
+        if (folderController.isLoading.value && folders.isEmpty) {
           return _FolderFilterLoading(
-            isDark: isDark,
+            backgroundColor: backgroundColor,
+            borderColor: borderColor,
           );
         }
 
         if (folders.isEmpty) {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
+        }
+
+        for (var folder in folders) {
+          _itemKeys.putIfAbsent(folder.id, () => GlobalKey());
         }
 
         return Padding(
-          padding: EdgeInsets.fromLTRB(
-            12,
-            2,
-            12,
-            4,
-          ),
-          child: ClipRRect(
-            borderRadius:
-            BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 18,
-                sigmaY: 18,
-              ),
-              child: Container(
-                height: 48,
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Color(0xFF17212B)
-                      .withValues(
-                    alpha: 0.45,
-                  )
-                      : Colors.white.withValues(
-                    alpha: 0.50,
-                  ),
-                  borderRadius:
-                  BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(
-                      alpha: 0.08,
-                    )
-                        : Colors.black.withValues(
-                      alpha: 0.05,
-                    ),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha:
-                        isDark ? 0.15 : 0.04,
-                      ),
-                      blurRadius: 12,
-                      offset: Offset(
-                        0,
-                        4,
-                      ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.all(4),
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: borderColor),
+            ),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                _measure();
+                return false;
+              },
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                keyboardDismissBehavior:
+                ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Stack(
+                  key: _stackKey,
+                  children: [
+                    _buildIndicator(activeBackground),
+                    Row(
+                      children: List.generate(folders.length, (index) {
+                        ChatFolderModel folder = folders[index];
+                        bool isActive = activeFolderId == folder.id;
+                        int count = widget.controller.getFolderCount(folder);
+                        GlobalKey itemKey = _itemKeys[folder.id]!;
+
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            right: index == folders.length - 1 ? 0 : 4,
+                          ),
+                          child: _CategoryItem(
+                            key: itemKey,
+                            label: folder.name,
+                            count: count,
+                            isActive: isActive,
+                            isDark: isDark,
+                            isCustom: !folder.isSystem,
+                            primaryColor: colorScheme.primary,
+                            onTap: () {
+                              if (isActive) return;
+                              widget.controller.selectFolder(folder);
+
+                              BuildContext? ctx = itemKey.currentContext;
+                              if (ctx != null) {
+                                _scrollToActive(ctx);
+                              }
+                            },
+                          ),
+                        );
+                      }),
                     ),
                   ],
-                ),
-                child: ListView.separated(
-                  scrollDirection:
-                  Axis.horizontal,
-                  physics:
-                  BouncingScrollPhysics(),
-                  keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior
-                      .onDrag,
-                  padding: EdgeInsets.zero,
-                  itemCount: folders.length,
-                  separatorBuilder: (
-                      BuildContext context,
-                      int index,
-                      ) {
-                    return SizedBox(width: 4);
-                  },
-                  itemBuilder: (
-                      BuildContext context,
-                      int index,
-                      ) {
-                    ChatFolderModel folder =
-                    folders[index];
-
-                    bool isActive =
-                        activeFolderId ==
-                            folder.id;
-
-                    int count =
-                    controller.getFolderCount(
-                      folder,
-                    );
-
-                    return _CategoryItem(
-                      label: folder.name,
-                      count: count,
-                      isActive: isActive,
-                      isDark: isDark,
-                      isCustom:
-                      !folder.isSystem,
-                      onTap: () {
-                        if (isActive) {
-                          return;
-                        }
-
-                        controller.selectFolder(
-                          folder,
-                        );
-                      },
-                    );
-                  },
                 ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildIndicator(Color activeBackground) {
+    if (_indicatorRect == null) return const SizedBox.shrink();
+
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      left: _indicatorRect!.left,
+      top: _indicatorRect!.top,
+      width: _indicatorRect!.width,
+      height: _indicatorRect!.height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: activeBackground,
+          borderRadius: BorderRadius.circular(18),
+        ),
+      ),
     );
   }
 }
@@ -163,148 +208,97 @@ class _CategoryItem extends StatelessWidget {
   final bool isActive;
   final bool isDark;
   final bool isCustom;
+  final Color primaryColor;
   final VoidCallback onTap;
 
-  _CategoryItem({
+  const _CategoryItem({
+    super.key,
     required this.label,
     required this.count,
     required this.isActive,
     required this.isDark,
     required this.isCustom,
+    required this.primaryColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    final Color inactiveTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.60)
+        : Colors.black.withValues(alpha: 0.60);
 
-    Color primaryColor =
-        colorScheme.primary;
-
-    Color inactiveTextColor = isDark
-        ? Colors.grey.shade400
-        : Colors.grey.shade600;
-
-    Color textColor = isActive
-        ? primaryColor
-        : inactiveTextColor;
-
-    Color itemBackground = isActive
-        ? primaryColor.withValues(
-      alpha: isDark ? 0.18 : 0.12,
-    )
-        : isDark
-        ? Colors.white.withValues(
-      alpha: 0.06,
-    )
-        : Colors.grey.shade100;
+    final Color textColor = isActive ? primaryColor : inactiveTextColor;
 
     return Material(
-      color: itemBackground,
-      borderRadius:
-      BorderRadius.circular(16),
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(16),
-        splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
-        hoverColor:
-        Colors.transparent,
-        focusColor:
-        Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        splashColor: primaryColor.withValues(alpha: 0.12),
+        highlightColor: primaryColor.withValues(alpha: 0.06),
         child: Container(
-          constraints: BoxConstraints(
-            minWidth: 82,
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
+          constraints: const BoxConstraints(minWidth: 76),
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius:
-            BorderRadius.circular(16),
-            border: Border.all(
-              color: isActive
-                  ? primaryColor.withValues(
-                alpha: 0.18,
-              )
-                  : Colors.transparent,
-            ),
-          ),
           child: Row(
-            mainAxisSize:
-            MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (isCustom) ...[
-                Icon(
-                  Icons.folder_outlined,
-                  size: 14,
-                  color: textColor,
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    Icons.folder_outlined,
+                    size: 14,
+                    color: textColor,
+                  ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
               ],
               Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 12,
+                    fontSize: 13,
                     height: 1,
-                    fontWeight: isActive
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
               if (count > 0) ...[
-                SizedBox(width: 5),
-                Container(
-                  constraints: BoxConstraints(
-                    minWidth: 20,
-                  ),
-                  height: 20,
-                  padding:
-                  EdgeInsets.symmetric(
-                    horizontal: count > 99
-                        ? 5
-                        : 4,
+                const SizedBox(width: 6),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  constraints: const BoxConstraints(minWidth: 18),
+                  height: 18,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: count > 99 ? 5 : 4,
                   ),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    borderRadius:
-                    BorderRadius.circular(
-                      10,
-                    ),
+                    borderRadius: BorderRadius.circular(9),
                     color: isActive
-                        ? primaryColor.withValues(
-                      alpha: 0.18,
-                    )
+                        ? primaryColor.withValues(alpha: 0.18)
                         : isDark
-                        ? Colors.white
-                        .withValues(
-                      alpha: 0.10,
-                    )
-                        : Colors
-                        .grey.shade200,
+                        ? Colors.white.withValues(alpha: 0.10)
+                        : Colors.black.withValues(alpha: 0.06),
                   ),
                   child: Text(
-                    count > 99
-                        ? '99+'
-                        : '$count',
+                    count > 99 ? '99+' : '$count',
                     style: TextStyle(
                       color: textColor,
-                      fontSize:
-                      count > 99 ? 8 : 9,
+                      fontSize: count > 99 ? 8 : 9,
                       height: 1,
-                      fontWeight:
-                      FontWeight.w700,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -317,46 +311,33 @@ class _CategoryItem extends StatelessWidget {
   }
 }
 
-class _FolderFilterLoading
-    extends StatelessWidget {
-  final bool isDark;
+class _FolderFilterLoading extends StatelessWidget {
+  final Color backgroundColor;
+  final Color borderColor;
 
-  _FolderFilterLoading({
-    required this.isDark,
+  const _FolderFilterLoading({
+    required this.backgroundColor,
+    required this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        12,
-        2,
-        12,
-        4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: isDark
-              ? Color(0xFF17212B).withValues(
-            alpha: 0.45,
-          )
-              : Colors.white.withValues(
-            alpha: 0.50,
-          ),
-          borderRadius:
-          BorderRadius.circular(20),
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: borderColor),
         ),
         child: Center(
           child: SizedBox(
             width: 18,
             height: 18,
-            child:
-            CircularProgressIndicator(
+            child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: Theme.of(context)
-                  .colorScheme
-                  .primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -11,148 +12,104 @@ import '../../chat_detail/chat_detail_screen.dart';
 class SearchScreen extends StatelessWidget {
   final ChatController controller;
 
-  SearchScreen({
+  const SearchScreen({
     super.key,
     required this.controller,
   });
 
-  void _closeSearch(
-      BuildContext context,
-      ) {
+  void _closeSearch(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
+      return;
     }
+
+    Get.back();
   }
 
   void _clearSearch() {
     controller.clearSearch();
   }
 
-  Future<void> _openChat(
-      ChatModel chat,
-      ) async {
+  Future<void> _openChat(ChatModel chat) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (chat.unread > 0) {
-      await controller.markAsRead(
-        chat.id,
-      );
+      await controller.markAsRead(chat.id);
     }
 
     await Get.to(
-          () => ChatDetailScreen(
-        chat: chat,
-      ),
+          () => ChatDetailScreen(chat: chat),
       transition: Transition.cupertino,
-      duration: Duration(
-        milliseconds: 280,
-      ),
+      duration: const Duration(milliseconds: 280),
     );
   }
 
-  SystemUiOverlayStyle _overlayStyle(
-      ThemeData theme,
-      bool isDark,
-      ) {
+  SystemUiOverlayStyle _overlayStyle(ThemeData theme, bool isDark) {
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    final Color headerColor = isDark
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.70);
 
-    Color headerColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.95,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
+    final Color actionBackground = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
 
-    Color searchBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    final Color searchBackground = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
 
-    Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFE7E9ED);
-
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    final Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return PopScope(
-      onPopInvokedWithResult: (
-          bool didPop,
-          Object? result,
-          ) {
+      onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) {
-          FocusManager.instance.primaryFocus
-              ?.unfocus();
+          FocusManager.instance.primaryFocus?.unfocus();
         }
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor:
-        theme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           toolbarHeight: 68,
           automaticallyImplyLeading: false,
           elevation: 0,
           scrolledUnderElevation: 0,
-          backgroundColor:
-          Colors.transparent,
-          foregroundColor:
-          colorScheme.onSurface,
-          surfaceTintColor:
-          Colors.transparent,
-          shadowColor:
-          Colors.transparent,
+          backgroundColor: Colors.transparent,
+          foregroundColor: colorScheme.onSurface,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           forceMaterialTransparency: true,
           titleSpacing: 0,
           leadingWidth: 58,
-          systemOverlayStyle:
-          _overlayStyle(
-            theme,
-            isDark,
-          ),
+          systemOverlayStyle: _overlayStyle(theme, isDark),
           flexibleSpace: ClipRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(
@@ -173,178 +130,131 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
           leading: Padding(
-            padding: EdgeInsets.fromLTRB(
-              8,
-              12,
-              6,
-              12,
-            ),
-            child: Material(
-              color: actionBackground,
-              shape: CircleBorder(),
-              child: Tooltip(
-                message: 'Back',
-                child: InkWell(
-                  onTap: () {
-                    _closeSearch(
-                      context,
-                    );
-                  },
-                  customBorder:
-                  CircleBorder(),
-                  splashColor:
-                  Colors.transparent,
-                  highlightColor:
-                  Colors.transparent,
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Icon(
-                      Icons
-                          .arrow_back_ios_new_rounded,
-                      size: 18,
-                      color: colorScheme
-                          .onSurface,
+            padding: const EdgeInsets.fromLTRB(12, 14, 6, 14),
+            child: Tooltip(
+              message: 'back'.tr,
+              child: Container(
+                width: 40,
+                height: 40,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: actionBackground,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: borderColor,
+                    width: 1.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.15 : 0.04,
+                      ),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(40, 40),
+                  onPressed: () => _closeSearch(context),
+                  child: Icon(
+                    CupertinoIcons.chevron_left,
+                    size: 20,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
             ),
           ),
           title: Padding(
-            padding: EdgeInsets.only(
-              right: 10,
-            ),
+            padding: const EdgeInsets.only(right: 12),
             child: Container(
-              height: 46,
+              height: 44,
               decoration: BoxDecoration(
                 color: searchBackground,
-                borderRadius:
-                BorderRadius.circular(
-                  16,
-                ),
+                borderRadius: BorderRadius.circular(22),
                 border: Border.all(
                   color: borderColor,
+                  width: 1.0,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.15 : 0.04,
+                    ),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  SizedBox(width: 13),
+                  const SizedBox(width: 12),
                   Icon(
-                    Icons.search_rounded,
-                    size: 21,
-                    color:
-                    colorScheme.primary,
+                    CupertinoIcons.search,
+                    size: 18,
+                    color: colorScheme.primary,
                   ),
-                  SizedBox(width: 9),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
-                      controller: controller
-                          .searchTextController,
+                      controller: controller.searchTextController,
                       autofocus: true,
-                      onChanged:
-                      controller.updateSearch,
-                      textInputAction:
-                      TextInputAction.search,
-                      keyboardType:
-                      TextInputType.text,
+                      onChanged: controller.updateSearch,
+                      textInputAction: TextInputAction.search,
+                      keyboardType: TextInputType.text,
                       enableSuggestions: true,
                       autocorrect: true,
-                      cursorColor:
-                      colorScheme.primary,
-                      style: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurface,
+                      cursorColor: colorScheme.primary,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurface,
                         fontSize: 15,
                       ),
-                      decoration:
-                      InputDecoration(
-                        hintText:
-                        'Search chats',
-                        hintStyle: theme
-                            .textTheme.bodyLarge
-                            ?.copyWith(
-                          color: colorScheme
-                              .onSurfaceVariant,
+                      decoration: InputDecoration(
+                        hintText: 'search_chats'.tr,
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.4)
+                              : Colors.black.withValues(alpha: 0.4),
                           fontSize: 15,
                         ),
-                        border:
-                        InputBorder.none,
-                        enabledBorder:
-                        InputBorder.none,
-                        focusedBorder:
-                        InputBorder.none,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                         isDense: true,
-                        contentPadding:
-                        EdgeInsets.symmetric(
-                          vertical: 13,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 11,
                         ),
                       ),
-                      onTapOutside: (
-                          PointerDownEvent event,
-                          ) {
-                        FocusManager.instance
-                            .primaryFocus
-                            ?.unfocus();
+                      onTapOutside: (PointerDownEvent event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
                       },
                     ),
                   ),
-                  ValueListenableBuilder<
-                      TextEditingValue>(
-                    valueListenable: controller
-                        .searchTextController,
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: controller.searchTextController,
                     builder: (
                         BuildContext context,
                         TextEditingValue value,
                         Widget? child,
                         ) {
                       if (value.text.isEmpty) {
-                        return SizedBox(
-                          width: 8,
-                        );
+                        return const SizedBox(width: 12);
                       }
 
                       return Padding(
-                        padding:
-                        EdgeInsets.only(
-                          right: 4,
-                        ),
-                        child: Material(
-                          color: colorScheme
-                              .onSurfaceVariant
-                              .withValues(
-                            alpha: 0.10,
-                          ),
-                          shape:
-                          CircleBorder(),
-                          child: Tooltip(
-                            message:
-                            'Clear search',
-                            child: InkWell(
-                              onTap:
-                              _clearSearch,
-                              customBorder:
-                              CircleBorder(),
-                              splashColor:
-                              Colors
-                                  .transparent,
-                              highlightColor:
-                              Colors
-                                  .transparent,
-                              child: SizedBox(
-                                width: 32,
-                                height: 32,
-                                child: Icon(
-                                  Icons
-                                      .close_rounded,
-                                  size: 18,
-                                  color: colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                            ),
+                        padding: const EdgeInsets.only(right: 6),
+                        child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(32, 32),
+                          onPressed: _clearSearch,
+                          child: Icon(
+                            CupertinoIcons.xmark_circle_fill,
+                            size: 18,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.4)
+                                : Colors.black.withValues(alpha: 0.4),
                           ),
                         ),
                       );
@@ -357,67 +267,41 @@ class SearchScreen extends StatelessWidget {
         ),
         body: Obx(
               () {
-            String query = controller
-                .searchQuery.value
-                .trim();
-
-            List<ChatModel> results =
-                controller.searchResults;
+            String query = controller.searchQuery.value.trim();
+            List<ChatModel> results = controller.searchResults;
 
             if (query.isEmpty) {
-              return _SearchInitialView();
+              return const _SearchInitialView();
             }
 
             if (results.isEmpty) {
-              return _SearchEmptyView(
-                query: query,
-              );
+              return _SearchEmptyView(query: query);
             }
 
             return ListView.separated(
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior
-                  .onDrag,
-              physics:
-              BouncingScrollPhysics(
-                parent:
-                AlwaysScrollableScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
               ),
-              padding: EdgeInsets.fromLTRB(
-                0,
-                6,
-                0,
-                30,
-              ),
+              padding: const EdgeInsets.fromLTRB(0, 6, 0, 30),
               itemCount: results.length,
-              separatorBuilder: (
-                  BuildContext context,
-                  int index,
-                  ) {
+              separatorBuilder: (BuildContext context, int index) {
                 return Divider(
                   height: 1,
                   thickness: 1,
                   indent: 82,
                   endIndent: 14,
-                  color: colorScheme
-                      .outlineVariant
-                      .withValues(
+                  color: colorScheme.outlineVariant.withValues(
                     alpha: 0.35,
                   ),
                 );
               },
-              itemBuilder: (
-                  BuildContext context,
-                  int index,
-                  ) {
-                ChatModel chat =
-                results[index];
+              itemBuilder: (BuildContext context, int index) {
+                ChatModel chat = results[index];
 
                 return _SearchChatTile(
                   chat: chat,
-                  onTap: () {
-                    _openChat(chat);
-                  },
+                  onTap: () => _openChat(chat),
                 );
               },
             );
@@ -432,54 +316,31 @@ class _SearchChatTile extends StatelessWidget {
   final ChatModel chat;
   final VoidCallback onTap;
 
-  _SearchChatTile({
+  const _SearchChatTile({
     required this.chat,
     required this.onTap,
   });
 
-  String _formatTime(
-      DateTime dateTime,
-      ) {
+  String _formatTime(DateTime dateTime) {
     DateTime now = DateTime.now();
 
-    bool isToday =
-        now.year == dateTime.year &&
-            now.month == dateTime.month &&
-            now.day == dateTime.day;
+    bool isToday = now.year == dateTime.year &&
+        now.month == dateTime.month &&
+        now.day == dateTime.day;
 
     if (isToday) {
-      String hour =
-      dateTime.hour.toString().padLeft(
-        2,
-        '0',
-      );
-
-      String minute =
-      dateTime.minute.toString().padLeft(
-        2,
-        '0',
-      );
-
+      String hour = dateTime.hour.toString().padLeft(2, '0');
+      String minute = dateTime.minute.toString().padLeft(2, '0');
       return '$hour:$minute';
     }
 
-    DateTime today = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    );
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime messageDay = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-    DateTime messageDay = DateTime(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-    );
-
-    int difference =
-        today.difference(messageDay).inDays;
+    int difference = today.difference(messageDay).inDays;
 
     if (difference == 1) {
-      return 'Yesterday';
+      return 'yesterday'.tr;
     }
 
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
@@ -487,56 +348,37 @@ class _SearchChatTile extends StatelessWidget {
 
   IconData get fallbackIcon {
     if (chat.type == 'group') {
-      return Icons.groups_rounded;
+      return CupertinoIcons.person_3_fill;
     }
-
-    return Icons.person_rounded;
+    return CupertinoIcons.person_fill;
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final bool hasImage = chat.image.trim().isNotEmpty;
 
-    bool hasImage =
-        chat.image.trim().isNotEmpty;
-
-    Color pressedColor =
-    theme.brightness == Brightness.dark
-        ? Colors.white.withValues(
-      alpha: 0.04,
-    )
-        : Colors.black.withValues(
-      alpha: 0.025,
-    );
+    final Color pressedColor = theme.brightness == Brightness.dark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.025);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
-        overlayColor:
-        WidgetStateProperty.resolveWith(
+        highlightColor: Colors.transparent,
+        overlayColor: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
-            if (states.contains(
-              WidgetState.pressed,
-            )) {
+            if (states.contains(WidgetState.pressed)) {
               return pressedColor;
             }
-
             return Colors.transparent;
           },
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            14,
-            10,
-            14,
-            10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
               Stack(
@@ -544,38 +386,28 @@ class _SearchChatTile extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: colorScheme
-                        .surfaceContainerHighest,
-                    backgroundImage: hasImage
-                        ? NetworkImage(
-                      chat.image,
-                    )
-                        : null,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    backgroundImage: hasImage ? NetworkImage(chat.image) : null,
                     child: hasImage
                         ? null
                         : Icon(
                       fallbackIcon,
-                      color: colorScheme
-                          .onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                       size: 26,
                     ),
                   ),
-                  if (chat.isOnline &&
-                      chat.type == 'personal')
+                  if (chat.isOnline && chat.type == 'personal')
                     Positioned(
                       right: 0,
                       bottom: 1,
                       child: Container(
                         width: 14,
                         height: 14,
-                        decoration:
-                        BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Colors.green,
-                          shape:
-                          BoxShape.circle,
+                          shape: BoxShape.circle,
                           border: Border.all(
-                            color: theme
-                                .scaffoldBackgroundColor,
+                            color: theme.scaffoldBackgroundColor,
                             width: 2,
                           ),
                         ),
@@ -583,11 +415,10 @@ class _SearchChatTile extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -595,76 +426,48 @@ class _SearchChatTile extends StatelessWidget {
                           child: Text(
                             chat.name,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow
-                                .ellipsis,
-                            style: theme
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurface,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface,
                               fontSize: 15,
-                              fontWeight:
-                              chat.unread >
-                                  0
-                                  ? FontWeight
-                                  .w700
-                                  : FontWeight
-                                  .w600,
+                              fontWeight: chat.unread > 0
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
                             ),
                           ),
                         ),
                         if (chat.isPinned)
                           Padding(
-                            padding:
-                            EdgeInsets.only(
-                              left: 5,
-                            ),
+                            padding: const EdgeInsets.only(left: 5),
                             child: Icon(
-                              Icons
-                                  .push_pin_rounded,
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                              size: 15,
+                              CupertinoIcons.pin_fill,
+                              color: colorScheme.onSurfaceVariant,
+                              size: 14,
                             ),
                           ),
                       ],
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       children: [
                         if (chat.isMuted)
                           Padding(
-                            padding:
-                            EdgeInsets.only(
-                              right: 5,
-                            ),
+                            padding: const EdgeInsets.only(right: 5),
                             child: Icon(
-                              Icons
-                                  .volume_off_rounded,
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                              size: 15,
+                              CupertinoIcons.bell_slash_fill,
+                              color: colorScheme.onSurfaceVariant,
+                              size: 14,
                             ),
                           ),
                         Expanded(
                           child: Text(
                             chat.message,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow
-                                .ellipsis,
-                            style: theme
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                              color: chat.unread >
-                                  0
-                                  ? colorScheme
-                                  .onSurface
-                                  : colorScheme
-                                  .onSurfaceVariant,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: chat.unread > 0
+                                  ? colorScheme.onSurface
+                                  : colorScheme.onSurfaceVariant,
                               fontSize: 13,
                             ),
                           ),
@@ -674,74 +477,49 @@ class _SearchChatTile extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Column(
-                mainAxisSize:
-                MainAxisSize.min,
-                crossAxisAlignment:
-                CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    _formatTime(
-                      chat.dateTime,
-                    ),
-                    style: theme
-                        .textTheme.bodySmall
-                        ?.copyWith(
+                    _formatTime(chat.dateTime),
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: chat.unread > 0
                           ? colorScheme.primary
-                          : colorScheme
-                          .onSurfaceVariant,
+                          : colorScheme.onSurfaceVariant,
                       fontSize: 11,
                       fontWeight:
-                      chat.unread > 0
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+                      chat.unread > 0 ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
-                  SizedBox(height: 7),
+                  const SizedBox(height: 7),
                   if (chat.unread > 0)
                     Container(
-                      constraints:
-                      BoxConstraints(
+                      constraints: const BoxConstraints(
                         minWidth: 21,
                         minHeight: 21,
                       ),
-                      padding:
-                      EdgeInsets.symmetric(
-                        horizontal: 6,
-                      ),
-                      alignment:
-                      Alignment.center,
-                      decoration:
-                      BoxDecoration(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
                         color: chat.isMuted
-                            ? colorScheme
-                            .onSurfaceVariant
-                            : colorScheme
-                            .primary,
-                        borderRadius:
-                        BorderRadius.circular(
-                          12,
-                        ),
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        chat.unread > 99
-                            ? '99+'
-                            : chat.unread
-                            .toString(),
+                        chat.unread > 99 ? '99+' : chat.unread.toString(),
                         style: TextStyle(
-                          color: colorScheme
-                              .onPrimary,
+                          color: colorScheme.onPrimary,
                           fontSize: 9,
                           height: 1,
-                          fontWeight:
-                          FontWeight.w700,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     )
                   else
-                    SizedBox(
+                    const SizedBox(
                       width: 21,
                       height: 21,
                     ),
@@ -755,68 +533,49 @@ class _SearchChatTile extends StatelessWidget {
   }
 }
 
-class _SearchInitialView
-    extends StatelessWidget {
-  _SearchInitialView();
+class _SearchInitialView extends StatelessWidget {
+  const _SearchInitialView();
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          28,
-          80,
-          28,
-          40,
-        ),
+        padding: const EdgeInsets.fromLTRB(28, 80, 28, 40),
         child: Column(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 72,
               height: 72,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.10,
-                ),
+                color: colorScheme.primary.withValues(alpha: 0.11),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.search_rounded,
-                color:
-                colorScheme.primary,
+                CupertinoIcons.search,
+                color: colorScheme.primary,
                 size: 34,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'Search chats',
+              'search_chats'.tr,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.titleMedium
-                  ?.copyWith(
-                color:
-                colorScheme.onSurface,
-                fontWeight:
-                FontWeight.w700,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'Search by contact name or message.',
+              'search_hint_description'.tr,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),
@@ -827,71 +586,53 @@ class _SearchInitialView
   }
 }
 
-class _SearchEmptyView
-    extends StatelessWidget {
+class _SearchEmptyView extends StatelessWidget {
   final String query;
 
-  _SearchEmptyView({
+  const _SearchEmptyView({
     required this.query,
   });
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          28,
-          80,
-          28,
-          40,
-        ),
+        padding: const EdgeInsets.fromLTRB(28, 80, 28, 40),
         child: Column(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 72,
               height: 72,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme
-                    .surfaceContainerHighest,
+                color: colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons
-                    .search_off_rounded,
-                color: colorScheme
-                    .onSurfaceVariant,
+                CupertinoIcons.search,
+                color: colorScheme.onSurfaceVariant,
                 size: 34,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'No results found',
+              'no_results_found'.tr,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.titleMedium
-                  ?.copyWith(
-                color:
-                colorScheme.onSurface,
-                fontWeight:
-                FontWeight.w700,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'No chats match “$query”.',
+              'no_chats_match'.trParams({'query': query}),
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),

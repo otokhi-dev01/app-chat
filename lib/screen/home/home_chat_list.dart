@@ -13,7 +13,7 @@ import '../widgets/home/home_chat_tile.dart';
 class HomeChatList extends StatefulWidget {
   final ChatController controller;
 
-  HomeChatList({
+  const HomeChatList({
     super.key,
     required this.controller,
   });

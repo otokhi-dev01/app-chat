@@ -1,12 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeChatMenu extends StatelessWidget {
   final ValueChanged<String> onSelected;
+  final Color? backgroundColor;
+  final Color? iconColor;
 
   const HomeChatMenu({
     super.key,
     required this.onSelected,
+    this.backgroundColor,
+    this.iconColor,
   });
 
   @override
@@ -14,20 +19,20 @@ class HomeChatMenu extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color menuColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color menuColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
 
-    Color buttonColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFF2F4F7);
+    // Follows the active surface background color
+    Color buttonColor = backgroundColor ??
+        (isDark ? const Color(0xFF1B1D22) : Colors.white);
 
+    // Follows the active border color
     Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
-        : Color(0xFFE7E9ED);
+        : Colors.black.withValues(alpha: 0.06);
+
+    Color icnColor = iconColor ?? colorScheme.onSurface;
 
     return PopupMenuButton<String>(
       tooltip: 'More',
@@ -36,8 +41,8 @@ class HomeChatMenu extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       elevation: 10,
       position: PopupMenuPosition.under,
-      offset: Offset(14, 6),
-      constraints: BoxConstraints(
+      offset: const Offset(14, 6),
+      constraints: const BoxConstraints(
         minWidth: 220,
         maxWidth: 245,
       ),
@@ -48,6 +53,7 @@ class HomeChatMenu extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
           color: borderColor,
+          width: 1,
         ),
       ),
       onSelected: onSelected,
@@ -57,37 +63,48 @@ class HomeChatMenu extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: buttonColor,
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: borderColor,
+            width: 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.15 : 0.04,
+              ),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Icon(
-          Icons.more_vert_rounded,
-          color: colorScheme.onSurface,
-          size: 22,
+          CupertinoIcons.ellipsis, // Native iOS 3-dots icon
+          color: icnColor,
+          size: 20,
         ),
       ),
-      itemBuilder: (
-          BuildContext context,
-          ) {
+      itemBuilder: (BuildContext context) {
         return [
           PopupMenuItem<String>(
             value: 'add_group',
             child: _HomeChatMenuItem(
-              icon: Icons.group_add_outlined,
+              icon: CupertinoIcons.person_2,
               title: 'add_group'.tr,
             ),
           ),
           PopupMenuItem<String>(
             value: 'saved_messages',
             child: _HomeChatMenuItem(
-              icon: Icons.bookmark_border_rounded,
-              title: 'Saved messages',
+              icon: CupertinoIcons.bookmark,
+              title: 'saved_messages'.tr,
             ),
           ),
           PopupMenuItem<String>(
             value: 'archived_chats',
             child: _HomeChatMenuItem(
-              icon: Icons.archive_outlined,
-              title: 'Archived chats',
+              icon: CupertinoIcons.archivebox,
+              title: 'archived_chats'.tr,
             ),
           ),
         ];
@@ -125,12 +142,10 @@ class _HomeChatMenuItem extends StatelessWidget {
           child: Icon(
             icon,
             color: colorScheme.primary,
-            size: 20,
+            size: 18,
           ),
         ),
-
-        SizedBox(width: 12),
-
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
             title,
