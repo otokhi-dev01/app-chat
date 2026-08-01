@@ -26,15 +26,15 @@ class ProfileField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final bool isDark = theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    final Color fieldColor = isDark
+    Color fieldColor = isDark
         ? Colors.white.withValues(alpha: 0.04)
         : Colors.black.withValues(alpha: 0.025);
 
-    final Color borderColor = isDark
+    Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
@@ -43,7 +43,7 @@ class ProfileField extends StatelessWidget {
       double width = 1,
     }) {
       return OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(
           color: color,
           width: width,
@@ -59,14 +59,19 @@ class ProfileField extends StatelessWidget {
       maxLines: maxLines,
       maxLength: maxLength,
       cursorColor: colorScheme.primary,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colorScheme.onSurface,
+        fontSize: 15,
+      ),
       decoration: InputDecoration(
         labelText: label,
         prefixText: prefixText,
         prefixIcon: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
           child: Container(
             width: 38,
             height: 38,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colorScheme.primary.withValues(
                 alpha: 0.11,
@@ -80,7 +85,7 @@ class ProfileField extends StatelessWidget {
             ),
           ),
         ),
-        prefixIconConstraints: const BoxConstraints(
+        prefixIconConstraints: BoxConstraints(
           minWidth: 58,
           minHeight: 58,
         ),
@@ -96,7 +101,7 @@ class ProfileField extends StatelessWidget {
           color: colorScheme.primary,
           fontWeight: FontWeight.w600,
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 15,
         ),

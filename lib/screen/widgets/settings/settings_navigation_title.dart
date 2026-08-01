@@ -1,7 +1,7 @@
 import 'package:appchat/screen/widgets/settings/settings_smooth_title.dart';
 import 'package:appchat/screen/widgets/settings/settings_title_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'settings_icon.dart';
 
 class SettingsNavigationTile extends StatelessWidget {
@@ -28,11 +28,11 @@ class SettingsNavigationTile extends StatelessWidget {
     return SettingsSmoothTile(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
             SettingsIcon(icon: icon),
-            const SizedBox(width: 13),
+            SizedBox(width: 13),
             Expanded(
               child: SettingsTileText(title: title, subtitle: subtitle),
             ),
@@ -46,12 +46,12 @@ class SettingsNavigationTile extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
             ],
             Icon(
-              Icons.chevron_right_rounded,
-              color: colorScheme.onSurfaceVariant,
-              size: 23,
+              CupertinoIcons.chevron_right, // Native iOS chevron icon
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
+              size: 18,
             ),
           ],
         ),

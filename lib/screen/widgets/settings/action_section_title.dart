@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'settings_icon.dart';
+
 class ActionSettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -8,7 +10,7 @@ class ActionSettingsTile extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
 
-  ActionSettingsTile({
+  const ActionSettingsTile({
     super.key,
     required this.icon,
     required this.title,
@@ -30,19 +32,9 @@ class ActionSettingsTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(
-              icon,
-              size: 22,
-              color: colorScheme.onSurfaceVariant,
-            ),
+          SettingsIcon(
+            icon: icon,
+            active: true, // Matches primary color badge of Account section
           ),
           SizedBox(width: 13),
           Expanded(
@@ -73,7 +65,7 @@ class ActionSettingsTile extends StatelessWidget {
           ),
           SizedBox(width: 10),
           SizedBox(
-            height: 38,
+            height: 36,
             child: FilledButton(
               onPressed: isLoading ? null : onPressed,
               style: FilledButton.styleFrom(
@@ -81,25 +73,40 @@ class ActionSettingsTile extends StatelessWidget {
                 padding: EdgeInsets.symmetric(
                   horizontal: 14,
                 ),
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                disabledBackgroundColor: colorScheme.primary.withValues(
+                  alpha: 0.55,
+                ),
+                disabledForegroundColor: colorScheme.onPrimary.withValues(
+                  alpha: 0.75,
+                ),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: isLoading
-                  ? SizedBox(
-                width: 17,
-                height: 17,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.onPrimary,
-                ),
-              )
-                  : Text(
-                buttonText,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 180),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: isLoading
+                    ? SizedBox(
+                  key: ValueKey('action-loading'),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.onPrimary,
+                  ),
+                )
+                    : Text(
+                  buttonText,
+                  key: ValueKey('action-title'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),

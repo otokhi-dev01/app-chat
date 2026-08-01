@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../controllers/user/user_controller.dart';
+import '../../../../controllers/user/user_controller.dart';
 import 'profile_add_contact_button.dart';
 import 'profile_content_filter.dart';
 import 'profile_content_view.dart';

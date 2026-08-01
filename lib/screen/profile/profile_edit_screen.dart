@@ -9,10 +9,10 @@ import 'package:get/get.dart';
 import '../../controllers/profile/edit_profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../../services/chat_camera_services.dart';
-import '../widgets/profile/full_profile_image_viewer.dart';
-import '../widgets/profile/profile_avatar_section.dart';
-import '../widgets/profile/profile_field.dart';
-import '../widgets/profile/profile_photo_sheet.dart';
+import '../widgets/profile/edit/full_profile_image_viewer.dart';
+import '../widgets/profile/edit/profile_avatar_section.dart';
+import '../widgets/profile/edit/profile_field.dart';
+import '../widgets/profile/edit/profile_photo_sheet.dart';
 
 class ProfileEditScreen extends StatelessWidget {
   ProfileEditScreen({

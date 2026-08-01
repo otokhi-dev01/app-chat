@@ -225,7 +225,7 @@ class _ProfileHeaderCard extends StatelessWidget {
   final VoidCallback onCopyUsername;
   final VoidCallback onQrCode;
 
- const _ProfileHeaderCard({
+  const _ProfileHeaderCard({
     required this.name,
     required this.email,
     required this.firstLetter,

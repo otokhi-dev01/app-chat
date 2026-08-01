@@ -1,14 +1,14 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/settings/settings_search_controller.dart';
 
-class SettingsSearchScreen
-    extends GetView<SettingsSearchController> {
-  SettingsSearchScreen({
+class SettingsSearchScreen extends GetView<SettingsSearchController> {
+  const SettingsSearchScreen({
     super.key,
   });
 
@@ -19,54 +19,40 @@ class SettingsSearchScreen
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageColor = isDark
-        ? theme.scaffoldBackgroundColor
-        : Color(0xFFF6F7F9);
+    Color pageColor = theme.scaffoldBackgroundColor;
 
     Color appBarColor = isDark
         ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
+      alpha: 0.65,
     )
         : Colors.white.withValues(
-      alpha: 0.98,
+      alpha: 0.70,
     );
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -76,14 +62,9 @@ class SettingsSearchScreen
       alpha: 0.06,
     );
 
-    Color inputColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.07,
-    )
-        : Color(0xFFF2F4F7);
+    Color inputColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
-    return AnnotatedRegion<
-        SystemUiOverlayStyle>(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _overlayStyle(
         theme,
         isDark,
@@ -94,17 +75,13 @@ class SettingsSearchScreen
           toolbarHeight: 72,
           elevation: 0,
           scrolledUnderElevation: 0,
-          backgroundColor:
-          Colors.transparent,
-          surfaceTintColor:
-          Colors.transparent,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           forceMaterialTransparency: true,
-          automaticallyImplyLeading:
-          false,
+          automaticallyImplyLeading: false,
           titleSpacing: 0,
-          systemOverlayStyle:
-          _overlayStyle(
+          systemOverlayStyle: _overlayStyle(
             theme,
             isDark,
           ),
@@ -137,96 +114,72 @@ class SettingsSearchScreen
               children: [
                 Expanded(
                   child: Container(
-                    height: 48,
+                    height: 44,
                     decoration: BoxDecoration(
                       color: inputColor,
-                      borderRadius:
-                      BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(
                         color: borderColor,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.15 : 0.04,
+                          ),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Obx(
                           () {
                         bool hasText =
-                            controller
-                                .searchQuery
-                                .value
-                                .isNotEmpty;
+                            controller.searchQuery.value.isNotEmpty;
 
                         return TextField(
-                          controller:
-                          controller
-                              .searchController,
-                          focusNode:
-                          controller
-                              .searchFocusNode,
-                          textInputAction:
-                          TextInputAction
-                              .search,
-                          keyboardType:
-                          TextInputType.text,
-                          onChanged:
-                          controller
-                              .updateSearch,
-                          style: theme
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                            color: colorScheme
-                                .onSurface,
-                            fontSize: 14,
-                            fontWeight:
-                            FontWeight.w500,
+                          controller: controller.searchController,
+                          focusNode: controller.searchFocusNode,
+                          textInputAction: TextInputAction.search,
+                          keyboardType: TextInputType.text,
+                          onChanged: controller.updateSearch,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
                           ),
-                          decoration:
-                          InputDecoration(
-                            hintText:
-                            'Search settings',
-                            hintStyle: theme
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant
-                                  .withValues(
-                                alpha: 0.72,
-                              ),
-                              fontSize: 14,
+                          decoration: InputDecoration(
+                            hintText: 'search_settings'.tr,
+                            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.4)
+                                  : Colors.black.withValues(alpha: 0.4),
+                              fontSize: 15,
                             ),
                             prefixIcon: Icon(
-                              Icons
-                                  .search_rounded,
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                              size: 22,
+                              CupertinoIcons.search,
+                              color: colorScheme.primary,
+                              size: 18,
                             ),
                             suffixIcon: hasText
-                                ? IconButton(
-                              tooltip:
-                              'Clear',
-                              onPressed:
-                              controller
-                                  .clearSearch,
-                              icon: Icon(
-                                Icons
-                                    .close_rounded,
-                                color: colorScheme
-                                    .onSurfaceVariant,
-                                size: 20,
+                                ? CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size(32, 32),
+                              onPressed: controller.clearSearch,
+                              child: Icon(
+                                CupertinoIcons.xmark_circle_fill,
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.4)
+                                    : Colors.black.withValues(alpha: 0.4),
+                                size: 18,
                               ),
                             )
                                 : null,
-                            border:
-                            InputBorder.none,
-                            enabledBorder:
-                            InputBorder.none,
-                            focusedBorder:
-                            InputBorder.none,
-                            contentPadding:
-                            EdgeInsets
-                                .symmetric(
-                              vertical: 14,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 12,
                             ),
                           ),
                         );
@@ -234,34 +187,26 @@ class SettingsSearchScreen
                     ),
                   ),
                 ),
-
                 SizedBox(width: 8),
-
                 TextButton(
-                  onPressed:
-                  controller.closeSearch,
+                  onPressed: controller.closeSearch,
                   style: TextButton.styleFrom(
-                    foregroundColor:
-                    colorScheme.primary,
-                    padding:
-                    EdgeInsets.symmetric(
+                    foregroundColor: colorScheme.primary,
+                    padding: EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 12,
                     ),
-                    shape:
-                    RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
                         12,
                       ),
                     ),
                   ),
                   child: Text(
-                    'Cancel',
+                    'cancel'.tr,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight:
-                      FontWeight.w700,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -270,20 +215,16 @@ class SettingsSearchScreen
           ),
         ),
         body: GestureDetector(
-          behavior:
-          HitTestBehavior.translucent,
+          behavior: HitTestBehavior.translucent,
           onTap: () {
-            FocusManager.instance.primaryFocus
-                ?.unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           child: Obx(
                 () {
-              List<SettingsSearchItem>
-              filteredItems =
+              List<SettingsSearchItem> filteredItems =
                   controller.filteredItems;
 
-              String query =
-                  controller.searchQuery.value;
+              String query = controller.searchQuery.value;
 
               if (filteredItems.isEmpty) {
                 return _SettingsSearchEmpty(
@@ -291,20 +232,15 @@ class SettingsSearchScreen
                 );
               }
 
-              Map<String,
-                  List<SettingsSearchItem>>
-              groupedItems =
+              Map<String, List<SettingsSearchItem>> groupedItems =
                   controller.groupedItems;
 
-              List<String> sections =
-              groupedItems.keys.toList();
+              List<String> sections = groupedItems.keys.toList();
 
               return ListView.builder(
-                physics:
-                BouncingScrollPhysics(),
+                physics: BouncingScrollPhysics(),
                 keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior
-                    .onDrag,
+                ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
                   14,
                   18,
@@ -316,70 +252,60 @@ class SettingsSearchScreen
                     BuildContext context,
                     int sectionIndex,
                     ) {
-                  String section =
-                  sections[sectionIndex];
+                  String section = sections[sectionIndex];
 
-                  List<SettingsSearchItem>
-                  items =
-                      groupedItems[section] ??
-                          <SettingsSearchItem>[];
+                  List<SettingsSearchItem> items =
+                      groupedItems[section] ?? <SettingsSearchItem>[];
 
                   return Padding(
                     padding: EdgeInsets.only(
                       bottom: 20,
                     ),
                     child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding:
-                          EdgeInsets.fromLTRB(
+                          padding: EdgeInsets.fromLTRB(
                             6,
                             0,
                             6,
                             8,
                           ),
                           child: Text(
-                            section.toUpperCase(),
-                            style: theme
-                                .textTheme
-                                .labelMedium
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                              fontSize: 11,
-                              fontWeight:
-                              FontWeight.w700,
-                              letterSpacing: 0.7,
+                            section.tr,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-
                         Container(
+                          clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius:
-                            BorderRadius.circular(
-                              20,
+                            borderRadius: BorderRadius.circular(
+                              22,
                             ),
                             border: Border.all(
                               color: borderColor,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(
+                                  alpha: isDark ? 0.15 : 0.04,
+                                ),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Column(
-                            children:
-                            List<Widget>.generate(
+                            children: List<Widget>.generate(
                               items.length,
                                   (int index) {
-                                SettingsSearchItem
-                                item =
-                                items[index];
+                                SettingsSearchItem item = items[index];
 
-                                bool showDivider =
-                                    index <
-                                        items.length -
-                                            1;
+                                bool showDivider = index < items.length - 1;
 
                                 return Column(
                                   children: [
@@ -387,22 +313,20 @@ class SettingsSearchScreen
                                       item: item,
                                       query: query,
                                       onTap: () {
-                                        controller
-                                            .selectSetting(
+                                        controller.selectSetting(
                                           item,
                                         );
                                       },
                                     ),
                                     if (showDivider)
                                       Padding(
-                                        padding:
-                                        EdgeInsets.only(
-                                          left: 72,
+                                        padding: EdgeInsets.only(
+                                          left: 68,
                                         ),
                                         child: Divider(
                                           height: 1,
-                                          color:
-                                          borderColor,
+                                          thickness: 1,
+                                          color: borderColor,
                                         ),
                                       ),
                                   ],
@@ -424,13 +348,12 @@ class SettingsSearchScreen
   }
 }
 
-class _SettingsSearchTile
-    extends StatelessWidget {
+class _SettingsSearchTile extends StatelessWidget {
   final SettingsSearchItem item;
   final String query;
   final VoidCallback onTap;
 
-  _SettingsSearchTile({
+  const _SettingsSearchTile({
     required this.item,
     required this.query,
     required this.onTap,
@@ -439,15 +362,13 @@ class _SettingsSearchTile
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             14,
@@ -458,66 +379,47 @@ class _SettingsSearchTile
           child: Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 42,
+                height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
+                  color: colorScheme.primary.withValues(
                     alpha: 0.11,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   item.icon,
                   color: colorScheme.primary,
-                  size: 22,
+                  size: 20,
                 ),
               ),
-
               SizedBox(width: 12),
-
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _HighlightedText(
                       text: item.title,
                       query: query,
-                      normalStyle: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
-                        color:
-                        colorScheme.onSurface,
+                      normalStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurface,
                         fontSize: 14,
-                        fontWeight:
-                        FontWeight.w700,
+                        fontWeight: FontWeight.w700,
                       ),
-                      highlightedStyle: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
-                        color:
-                        colorScheme.primary,
+                      highlightedStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.primary,
                         fontSize: 14,
-                        fontWeight:
-                        FontWeight.w800,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-
-                    SizedBox(height: 4),
-
+                    SizedBox(height: 3),
                     Text(
                       item.subtitle,
                       maxLines: 2,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme
-                          .textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
                         height: 1.3,
                       ),
@@ -525,17 +427,13 @@ class _SettingsSearchTile
                   ],
                 ),
               ),
-
               SizedBox(width: 8),
-
               Icon(
-                Icons.chevron_right_rounded,
-                color: colorScheme
-                    .onSurfaceVariant
-                    .withValues(
-                  alpha: 0.65,
+                CupertinoIcons.chevron_right,
+                color: colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.55,
                 ),
-                size: 23,
+                size: 18,
               ),
             ],
           ),
@@ -545,14 +443,13 @@ class _SettingsSearchTile
   }
 }
 
-class _HighlightedText
-    extends StatelessWidget {
+class _HighlightedText extends StatelessWidget {
   final String text;
   final String query;
   final TextStyle? normalStyle;
   final TextStyle? highlightedStyle;
 
-  _HighlightedText({
+  const _HighlightedText({
     required this.text,
     required this.query,
     required this.normalStyle,
@@ -561,8 +458,7 @@ class _HighlightedText
 
   @override
   Widget build(BuildContext context) {
-    String cleanQuery =
-    query.trim().toLowerCase();
+    String cleanQuery = query.trim().toLowerCase();
 
     if (cleanQuery.isEmpty) {
       return Text(
@@ -573,8 +469,7 @@ class _HighlightedText
 
     String lowerText = text.toLowerCase();
 
-    int startIndex =
-    lowerText.indexOf(cleanQuery);
+    int startIndex = lowerText.indexOf(cleanQuery);
 
     if (startIndex < 0) {
       return Text(
@@ -583,8 +478,7 @@ class _HighlightedText
       );
     }
 
-    int endIndex =
-        startIndex + cleanQuery.length;
+    int endIndex = startIndex + cleanQuery.length;
 
     return Text.rich(
       TextSpan(
@@ -617,72 +511,58 @@ class _HighlightedText
   }
 }
 
-class _SettingsSearchEmpty
-    extends StatelessWidget {
+class _SettingsSearchEmpty extends StatelessWidget {
   final String query;
 
-  _SettingsSearchEmpty({
+  const _SettingsSearchEmpty({
     required this.query,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Center(
       child: SingleChildScrollView(
         padding: EdgeInsets.all(28),
         child: Column(
-          mainAxisAlignment:
-          MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 82,
-              height: 82,
+              width: 72,
+              height: 72,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.10,
+                color: colorScheme.primary.withValues(
+                  alpha: 0.11,
                 ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.search_off_rounded,
+                CupertinoIcons.search,
                 color: colorScheme.primary,
-                size: 36,
+                size: 32,
               ),
             ),
-
-            SizedBox(height: 18),
-
+            SizedBox(height: 16),
             Text(
-              'No settings found',
+              'no_results_found'.tr,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.titleMedium
-                  ?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontSize: 17,
-                fontWeight:
-                FontWeight.w700,
+                fontWeight: FontWeight.w700,
               ),
             ),
-
-            SizedBox(height: 7),
-
+            SizedBox(height: 6),
             Text(
               query.trim().isEmpty
-                  ? 'Search for a setting'
-                  : 'No result found for "$query"',
+                  ? 'search_settings_hint'.tr
+                  : 'no_results_for'.trParams({'query': query}),
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 fontSize: 13,
               ),
             ),

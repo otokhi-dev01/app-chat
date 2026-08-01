@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,17 +16,17 @@ class ProfileAvatarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final bool isDark = theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    final Color borderColor = isDark
+    Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
     ImageProvider? imageProvider;
     if (profileImagePath.trim().isNotEmpty) {
-      final trimmed = profileImagePath.trim();
+      String trimmed = profileImagePath.trim();
       if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
         imageProvider = NetworkImage(trimmed);
       } else if (trimmed.startsWith('assets/')) {
@@ -43,15 +44,22 @@ class ProfileAvatarSection extends StatelessWidget {
             Container(
               width: 116,
               height: 116,
-              padding: const EdgeInsets.all(4),
+              padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDark
-                    ? const Color(0xFF1B1D22)
-                    : Colors.white,
+                color: isDark ? Color(0xFF1B1D22) : Colors.white,
                 border: Border.all(
                   color: borderColor,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.18 : 0.05,
+                    ),
+                    blurRadius: 16,
+                    offset: Offset(0, 6),
+                  ),
+                ],
               ),
               child: CircleAvatar(
                 backgroundColor: colorScheme.primary.withValues(
@@ -60,29 +68,30 @@ class ProfileAvatarSection extends StatelessWidget {
                 backgroundImage: imageProvider,
                 child: imageProvider == null
                     ? Icon(
-                        Icons.person_rounded,
-                        color: colorScheme.primary,
-                        size: 68,
-                      )
+                  CupertinoIcons.person_fill,
+                  color: colorScheme.primary,
+                  size: 64,
+                )
                     : null,
               ),
             ),
-
             Positioned(
               right: -1,
               bottom: 4,
               child: Material(
                 color: colorScheme.primary,
-                shape: const CircleBorder(),
+                shape: CircleBorder(),
                 child: InkWell(
-                  customBorder: const CircleBorder(),
+                  customBorder: CircleBorder(),
                   onTap: onChangePhoto,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
                     child: Icon(
-                      Icons.camera_alt_rounded,
+                      CupertinoIcons.camera_fill,
                       color: colorScheme.onPrimary,
-                      size: 20,
+                      size: 18,
                     ),
                   ),
                 ),
@@ -90,21 +99,20 @@ class ProfileAvatarSection extends StatelessWidget {
             ),
           ],
         ),
-
-        const SizedBox(height: 12),
-
+        SizedBox(height: 12),
         TextButton.icon(
           onPressed: onChangePhoto,
-          icon: const Icon(
-            Icons.photo_camera_outlined,
-            size: 19,
+          icon: Icon(
+            CupertinoIcons.camera,
+            size: 18,
           ),
           label: Text(
             'change_profile_photo'.tr,
           ),
           style: TextButton.styleFrom(
             foregroundColor: colorScheme.primary,
-            textStyle: const TextStyle(
+            textStyle: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
           ),

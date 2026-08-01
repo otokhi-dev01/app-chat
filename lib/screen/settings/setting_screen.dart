@@ -2,6 +2,7 @@ import 'package:appchat/screen/widgets/logout_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
 import '../../controllers/contact/contact_controller.dart';
 import '../../controllers/notification/notification_controller.dart';
 import '../../controllers/profile/profile_controller.dart';
@@ -23,17 +24,10 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SettingsController settingsController =
-    Get.find<SettingsController>();
-
-    ProfileController profileController =
-    Get.find<ProfileController>();
-
-    NotificationController notificationController =
-    Get.find<NotificationController>();
-
-    ContactController contactController =
-    Get.find<ContactController>();
+    SettingsController settingsController = Get.find<SettingsController>();
+    ProfileController profileController = Get.find<ProfileController>();
+    NotificationController notificationController = Get.find<NotificationController>();
+    ContactController contactController = Get.find<ContactController>();
 
     return FutureBuilder<PackageInfo>(
       future: PackageInfo.fromPlatform(),
@@ -43,8 +37,7 @@ class SettingScreen extends StatelessWidget {
 
         return ListView(
           physics: BouncingScrollPhysics(),
-          keyboardDismissBehavior:
-          ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: EdgeInsets.fromLTRB(
             16,
             showTopPadding ? 18 : 12,
@@ -60,15 +53,14 @@ class SettingScreen extends StatelessWidget {
 
             GeneralSettingsSection(
               settingsController: settingsController,
-              notificationController:
-              notificationController,
+              notificationController: notificationController,
             ),
 
             SizedBox(height: 24),
 
             ContactSettingsSection(
-                contactController:
-                contactController),
+              contactController: contactController,
+            ),
 
             SizedBox(height: 24),
 

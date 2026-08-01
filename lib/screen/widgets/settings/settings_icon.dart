@@ -7,29 +7,34 @@ class SettingsIcon extends StatelessWidget {
   const SettingsIcon({
     super.key,
     required this.icon,
-    this.active = false,
+    this.active = true, // Defaults to true so all icons match Account section
   });
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    Color primary = colorScheme.primary;
+
+    Color bgColor = active
+        ? primary.withValues(alpha: 0.11)
+        : colorScheme.surfaceContainerHighest;
+
+    Color iconColor = active ? primary : colorScheme.onSurfaceVariant;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      duration: Duration(milliseconds: 180),
       curve: Curves.easeOutCubic,
       width: 42,
       height: 42,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active
-            ? colorScheme.primary.withValues(alpha: 0.16)
-            : colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(13),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
         icon,
-        size: 22,
-        color: active ? colorScheme.primary : colorScheme.onSurfaceVariant,
+        size: 20,
+        color: iconColor,
       ),
     );
   }

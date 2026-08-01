@@ -26,7 +26,7 @@ class SettingsTileText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 180),
+          duration: Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           style: theme.textTheme.bodyLarge?.copyWith(
             color: active ? colorScheme.primary : colorScheme.onSurface,
@@ -39,7 +39,7 @@ class SettingsTileText extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 3),
+        SizedBox(height: 3),
         Text(
           subtitle,
           maxLines: 1,

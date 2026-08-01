@@ -8,7 +8,7 @@ import '../../../route/app_route.dart';
 class AccountSettingsSection extends StatelessWidget {
   final ProfileController controller;
 
-  AccountSettingsSection({
+  const AccountSettingsSection({
     super.key,
     required this.controller,
   });
@@ -129,7 +129,7 @@ class _AccountTile extends StatelessWidget {
   final String value;
   final VoidCallback onTap;
 
-  _AccountTile({
+  const _AccountTile({
     required this.icon,
     required this.label,
     required this.value,
@@ -217,7 +217,7 @@ class _AccountTile extends StatelessWidget {
 class _AccountDivider extends StatelessWidget {
   final Color color;
 
-  _AccountDivider({
+  const _AccountDivider({
     required this.color,
   });
 
@@ -236,7 +236,7 @@ class _BouncyTileEffect extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  _BouncyTileEffect({
+  const _BouncyTileEffect({
     required this.child,
     required this.onTap,
   });

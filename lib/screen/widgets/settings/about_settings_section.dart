@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,7 @@ class AboutSettingsSection extends StatelessWidget {
     AppFeedback.showMessage(
       title: 'unable_to_open_link'.tr,
       message: 'could_not_open_link'.tr,
-      icon: Icons.error_outline_rounded,
+      icon: CupertinoIcons.exclamationmark_circle,
     );
   }
 
@@ -58,21 +59,18 @@ class AboutSettingsSection extends StatelessWidget {
     AppFeedback.showMessage(
       title: 'app_version'.tr,
       message: 'version_copied'.tr,
-      icon: Icons.content_copy_rounded,
+      icon: CupertinoIcons.doc_on_doc,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final bool isDark =
-        theme.brightness == Brightness.dark;
+    ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
 
-    final Color cardColor = isDark
-        ? const Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
-    final Color dividerColor = isDark
+    Color dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
@@ -81,22 +79,32 @@ class AboutSettingsSection extends StatelessWidget {
       children: [
         SettingsSectionTitle(
           title: 'about'.tr,
+          icon: CupertinoIcons.info,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: dividerColor,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             children: [
               SettingsNavigationTile(
-                icon: Icons.info_outline_rounded,
+                icon: CupertinoIcons.info,
                 title: 'app_version'.tr,
                 subtitle: 'tap_to_copy'.tr,
                 trailingText: appVersion,
@@ -106,12 +114,12 @@ class AboutSettingsSection extends StatelessWidget {
                 color: dividerColor,
               ),
               SettingsNavigationTile(
-                icon: Icons.description_outlined,
+                icon: CupertinoIcons.doc_text,
                 title: 'terms_of_service'.tr,
                 subtitle: 'read_our_terms'.tr,
                 onTap: () {
                   _openUrl(
-                    'https://example.com/terms',
+                    'https://otokhi.com/',
                   );
                 },
               ),
@@ -119,12 +127,12 @@ class AboutSettingsSection extends StatelessWidget {
                 color: dividerColor,
               ),
               SettingsNavigationTile(
-                icon: Icons.privacy_tip_outlined,
+                icon: CupertinoIcons.shield,
                 title: 'privacy_policy'.tr,
                 subtitle: 'read_our_policy'.tr,
                 onTap: () {
                   _openUrl(
-                    'https://example.com/privacy',
+                    'https://otokhi.com/',
                   );
                 },
               ),
@@ -132,7 +140,7 @@ class AboutSettingsSection extends StatelessWidget {
                 color: dividerColor,
               ),
               SettingsNavigationTile(
-                icon: Icons.star_outline_rounded,
+                icon: CupertinoIcons.star,
                 title: 'rate_app'.tr,
                 subtitle: 'leave_a_review'.tr,
                 onTap: () {
@@ -145,12 +153,12 @@ class AboutSettingsSection extends StatelessWidget {
                 color: dividerColor,
               ),
               SettingsNavigationTile(
-                icon: Icons.help_outline_rounded,
+                icon: CupertinoIcons.question_circle,
                 title: 'help_support'.tr,
                 subtitle: 'contact_support'.tr,
                 onTap: () {
                   _openUrl(
-                    'mailto:support@example.com',
+                    'mailto:kimlifting@gmail.com',
                   );
                 },
               ),

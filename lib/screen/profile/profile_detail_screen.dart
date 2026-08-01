@@ -6,10 +6,10 @@ import '../../controllers/user/user_controller.dart';
 import '../../route/app_route.dart';
 import '../contact/add_contact/add_contact_screen.dart';
 import '../widgets/common/app_feedback.dart';
-import '../widgets/profile_detail/profile_content_filter.dart';
-import '../widgets/profile_detail/profile_detail_app_bar.dart';
-import '../widgets/profile_detail/profile_detail_content.dart';
-import '../widgets/profile_detail/profile_more_option_sheet.dart';
+import '../widgets/profile/profile_detail/profile_content_filter.dart';
+import '../widgets/profile/profile_detail/profile_detail_app_bar.dart';
+import '../widgets/profile/profile_detail/profile_detail_content.dart';
+import '../widgets/profile/profile_detail/profile_more_option_sheet.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   final UserController controller;

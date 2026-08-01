@@ -1,12 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
+import 'settings_divider.dart';
+import 'settings_icon.dart';
+import 'settings_section_title.dart';
 
 class DisplaySettingsSection extends StatelessWidget {
   final SettingsController controller;
 
-  DisplaySettingsSection({
+  const DisplaySettingsSection({
     super.key,
     required this.controller,
   });
@@ -14,78 +18,58 @@ class DisplaySettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    ColorScheme _ = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: 14,
-            bottom: 8,
-          ),
-          child: Text(
-            'display'.tr.toUpperCase(),
-            style: theme.textTheme.bodySmall
-                ?.copyWith(
-              color:
-              colorScheme.onSurfaceVariant,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
-          ),
+        SettingsSectionTitle(
+          title: 'display'.tr,
+          icon: CupertinoIcons.brightness,
         ),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius:
-            BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: borderColor,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Obx(
                 () {
-              ThemeMode selectedMode =
-                  controller.themeMode.value;
+              ThemeMode selectedMode = controller.themeMode.value;
 
-              bool isAutomatic =
-                  selectedMode ==
-                      ThemeMode.system;
+              bool isAutomatic = selectedMode == ThemeMode.system;
 
-              bool showLightSelected =
-                  selectedMode ==
-                      ThemeMode.light ||
-                      (isAutomatic && !isDark);
+              bool showLightSelected = selectedMode == ThemeMode.light ||
+                  (isAutomatic && !isDark);
 
               bool showDarkSelected =
-                  selectedMode ==
-                      ThemeMode.dark ||
-                      (isAutomatic && isDark);
+                  selectedMode == ThemeMode.dark || (isAutomatic && isDark);
 
               return Column(
                 children: [
                   Padding(
-                    padding:
-                    EdgeInsets.fromLTRB(
+                    padding: EdgeInsets.fromLTRB(
                       16,
                       20,
                       16,
@@ -94,31 +78,25 @@ class DisplaySettingsSection extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          _IosAppearanceCard(
+                          child: _IosAppearanceCard(
                             title: 'light'.tr,
                             isDarkMockup: false,
-                            selected:
-                            showLightSelected,
+                            selected: showLightSelected,
                             onTap: () {
-                              controller
-                                  .changeTheme(
+                              controller.changeTheme(
                                 ThemeMode.light,
                               );
                             },
                           ),
                         ),
-                        SizedBox(width: 24),
+                        SizedBox(width: 20),
                         Expanded(
-                          child:
-                          _IosAppearanceCard(
+                          child: _IosAppearanceCard(
                             title: 'dark'.tr,
                             isDarkMockup: true,
-                            selected:
-                            showDarkSelected,
+                            selected: showDarkSelected,
                             onTap: () {
-                              controller
-                                  .changeTheme(
+                              controller.changeTheme(
                                 ThemeMode.dark,
                               );
                             },
@@ -127,26 +105,21 @@ class DisplaySettingsSection extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _SettingsDivider(
+                  SettingsDivider(
                     color: borderColor,
                   ),
                   _IosAutomaticRow(
                     isAutomatic: isAutomatic,
-                    onChanged: (
-                        bool value,
-                        ) {
+                    onChanged: (bool value) {
                       if (value) {
                         controller.changeTheme(
                           ThemeMode.system,
                         );
-
                         return;
                       }
 
                       controller.changeTheme(
-                        isDark
-                            ? ThemeMode.dark
-                            : ThemeMode.light,
+                        isDark ? ThemeMode.dark : ThemeMode.light,
                       );
                     },
                   ),
@@ -160,14 +133,13 @@ class DisplaySettingsSection extends StatelessWidget {
   }
 }
 
-class _IosAppearanceCard
-    extends StatelessWidget {
+class _IosAppearanceCard extends StatelessWidget {
   final String title;
   final bool isDarkMockup;
   final bool selected;
   final VoidCallback onTap;
 
-  _IosAppearanceCard({
+  const _IosAppearanceCard({
     required this.title,
     required this.isDarkMockup,
     required this.selected,
@@ -177,32 +149,20 @@ class _IosAppearanceCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     Color mockupBackground =
-    isDarkMockup
-        ? Color(0xFF0E1621)
-        : Color(0xFFF5F6F8);
+    isDarkMockup ? Color(0xFF0E1621) : Color(0xFFF5F6F8);
 
     Color myBubbleColor =
-    isDarkMockup
-        ? Color(0xFF24A1DE)
-        : Color(0xFFC4AA29);
+    isDarkMockup ? Color(0xFF24A1DE) : Color(0xFFC4AA29);
 
     Color otherBubbleColor =
-    isDarkMockup
-        ? Color(0xFF17212B)
-        : Colors.white;
+    isDarkMockup ? Color(0xFF17212B) : Colors.white;
 
-    Color placeholderColor =
-    isDarkMockup
-        ? Colors.white.withValues(
-      alpha: 0.15,
-    )
-        : Colors.black.withValues(
-      alpha: 0.10,
-    );
+    Color placeholderColor = isDarkMockup
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.10);
 
     return _TapArea(
       onTap: onTap,
@@ -210,18 +170,15 @@ class _IosAppearanceCard
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 120,
+            height: 110,
             width: double.infinity,
             decoration: BoxDecoration(
               color: mockupBackground,
-              borderRadius:
-              BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: selected
                     ? colorScheme.primary
-                    : colorScheme
-                    .outlineVariant
-                    .withValues(
+                    : colorScheme.outlineVariant.withValues(
                   alpha: 0.30,
                 ),
                 width: selected ? 2.2 : 1,
@@ -233,90 +190,52 @@ class _IosAppearanceCard
                 vertical: 8,
               ),
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
                         width: 24,
                         height: 5,
-                        decoration:
-                        BoxDecoration(
-                          color:
-                          placeholderColor,
-                          borderRadius:
-                          BorderRadius
-                              .circular(
-                            3,
-                          ),
+                        decoration: BoxDecoration(
+                          color: placeholderColor,
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                       Container(
                         width: 14,
                         height: 5,
-                        decoration:
-                        BoxDecoration(
-                          color:
-                          placeholderColor,
-                          borderRadius:
-                          BorderRadius
-                              .circular(
-                            3,
-                          ),
+                        decoration: BoxDecoration(
+                          color: placeholderColor,
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     ],
                   ),
                   Spacer(),
                   Align(
-                    alignment:
-                    Alignment.centerLeft,
+                    alignment: Alignment.centerLeft,
                     child: Container(
                       width: 54,
                       height: 14,
-                      decoration:
-                      BoxDecoration(
-                        color:
-                        otherBubbleColor,
-                        borderRadius:
-                        BorderRadius.only(
-                          topLeft:
-                          Radius.circular(
-                            6,
-                          ),
-                          topRight:
-                          Radius.circular(
-                            6,
-                          ),
-                          bottomRight:
-                          Radius.circular(
-                            6,
-                          ),
-                          bottomLeft:
-                          Radius.circular(
-                            2,
-                          ),
+                      decoration: BoxDecoration(
+                        color: otherBubbleColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(6),
+                          topRight: Radius.circular(6),
+                          bottomRight: Radius.circular(6),
+                          bottomLeft: Radius.circular(2),
                         ),
                         boxShadow: isDarkMockup
                             ? null
                             : [
                           BoxShadow(
-                            color: Colors
-                                .black
-                                .withValues(
-                              alpha:
-                              0.04,
+                            color: Colors.black.withValues(
+                              alpha: 0.04,
                             ),
                             blurRadius: 2,
-                            offset:
-                            Offset(
-                              0,
-                              1,
-                            ),
+                            offset: Offset(0, 1),
                           ),
                         ],
                       ),
@@ -324,33 +243,17 @@ class _IosAppearanceCard
                   ),
                   SizedBox(height: 6),
                   Align(
-                    alignment:
-                    Alignment.centerRight,
+                    alignment: Alignment.centerRight,
                     child: Container(
                       width: 44,
                       height: 14,
-                      decoration:
-                      BoxDecoration(
-                        color:
-                        myBubbleColor,
-                        borderRadius:
-                        BorderRadius.only(
-                          topLeft:
-                          Radius.circular(
-                            6,
-                          ),
-                          topRight:
-                          Radius.circular(
-                            6,
-                          ),
-                          bottomLeft:
-                          Radius.circular(
-                            6,
-                          ),
-                          bottomRight:
-                          Radius.circular(
-                            2,
-                          ),
+                      decoration: BoxDecoration(
+                        color: myBubbleColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(6),
+                          topRight: Radius.circular(6),
+                          bottomLeft: Radius.circular(6),
+                          bottomRight: Radius.circular(2),
                         ),
                       ),
                     ),
@@ -363,14 +266,9 @@ class _IosAppearanceCard
           SizedBox(height: 10),
           Text(
             title,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurface,
-              fontWeight: selected
-                  ? FontWeight.w700
-                  : FontWeight.w500,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: selected ? colorScheme.primary : colorScheme.onSurface,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               fontSize: 13,
             ),
           ),
@@ -381,23 +279,17 @@ class _IosAppearanceCard
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: selected
-                  ? colorScheme.primary
-                  : Colors.transparent,
+              color: selected ? colorScheme.primary : Colors.transparent,
               border: Border.all(
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme
-                    .outlineVariant,
+                color: selected ? colorScheme.primary : colorScheme.outlineVariant,
                 width: 1.5,
               ),
             ),
             child: selected
                 ? Icon(
-              Icons.check_rounded,
-              color:
-              colorScheme.onPrimary,
-              size: 13,
+              CupertinoIcons.checkmark,
+              color: colorScheme.onPrimary,
+              size: 12,
             )
                 : null,
           ),
@@ -407,12 +299,11 @@ class _IosAppearanceCard
   }
 }
 
-class _IosAutomaticRow
-    extends StatelessWidget {
+class _IosAutomaticRow extends StatelessWidget {
   final bool isAutomatic;
   final ValueChanged<bool> onChanged;
 
-  _IosAutomaticRow({
+  const _IosAutomaticRow({
     required this.isAutomatic,
     required this.onChanged,
   });
@@ -420,8 +311,7 @@ class _IosAutomaticRow
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return _TapArea(
       onTap: () {
@@ -429,55 +319,35 @@ class _IosAutomaticRow
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: 16,
+          horizontal: 14,
           vertical: 12,
         ),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.11,
-                ),
-                borderRadius:
-                BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.schedule_rounded,
-                color: colorScheme.primary,
-                size: 18,
-              ),
+            SettingsIcon(
+              icon: CupertinoIcons.sun_max,
+              active: isAutomatic,
             ),
-            SizedBox(width: 12),
+            SizedBox(width: 13),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'system_default'.tr,
-                    style: theme
-                        .textTheme.bodyLarge
-                        ?.copyWith(
-                      color:
-                      colorScheme.onSurface,
-                      fontWeight:
-                      FontWeight.w600,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: isAutomatic
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
+                      fontWeight: isAutomatic ? FontWeight.w700 : FontWeight.w600,
                       fontSize: 14,
                     ),
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Follow your device appearance',
-                    style: theme
-                        .textTheme.bodySmall
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant,
+                    'follow_device_appearance'.tr,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: 11,
                     ),
                   ),
@@ -485,41 +355,13 @@ class _IosAutomaticRow
               ),
             ),
             SizedBox(width: 10),
-            IgnorePointer(
-              child: Switch.adaptive(
-                value: isAutomatic,
-                onChanged: (
-                    bool value,
-                    ) {
-                  onChanged(value);
-                },
-              ),
+            CupertinoSwitch(
+              value: isAutomatic,
+              activeTrackColor: colorScheme.primary,
+              onChanged: onChanged,
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SettingsDivider
-    extends StatelessWidget {
-  final Color color;
-
-  _SettingsDivider({
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-      ),
-      child: Divider(
-        height: 1,
-        thickness: 1,
-        color: color,
       ),
     );
   }
@@ -529,7 +371,7 @@ class _TapArea extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;
 
-  _TapArea({
+  const _TapArea({
     required this.child,
     required this.onTap,
   });

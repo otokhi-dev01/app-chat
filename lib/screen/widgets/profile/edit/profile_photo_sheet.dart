@@ -1,8 +1,10 @@
 import 'dart:io';
 
-import 'package:appchat/screen/widgets/profile/photo_option_title.dart';
+import 'package:appchat/screen/widgets/profile/edit/photo_option_title.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 Future<void> showProfilePhotoSheet({
   required BuildContext context,
   String? profileImagePath,
@@ -11,13 +13,11 @@ Future<void> showProfilePhotoSheet({
   required VoidCallback onChooseGallery,
   required VoidCallback onRemovePhoto,
 }) {
-  final theme = Theme.of(context);
-  final colorScheme = theme.colorScheme;
-  final bool isDark = theme.brightness == Brightness.dark;
+  ThemeData theme = Theme.of(context);
+  ColorScheme colorScheme = theme.colorScheme;
+  bool isDark = theme.brightness == Brightness.dark;
 
-  final Color sheetColor = isDark
-      ? const Color(0xFF1B1D22)
-      : Colors.white;
+  Color sheetColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
   return showModalBottomSheet<void>(
     context: context,
@@ -29,14 +29,14 @@ Future<void> showProfilePhotoSheet({
       return Container(
         decoration: BoxDecoration(
           color: sheetColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(26),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(28),
           ),
         ),
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               16,
               12,
               16,
@@ -55,9 +55,7 @@ Future<void> showProfilePhotoSheet({
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-
-                const SizedBox(height: 18),
-
+                SizedBox(height: 18),
                 Row(
                   children: [
                     Container(
@@ -71,51 +69,51 @@ Future<void> showProfilePhotoSheet({
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: profileImagePath != null &&
-                              profileImagePath.trim().isNotEmpty
+                          profileImagePath.trim().isNotEmpty
                           ? (profileImagePath.startsWith('http://') ||
-                                  profileImagePath.startsWith('https://')
-                              ? Image.network(
-                                  profileImagePath.trim(),
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(
-                                    Icons.image_not_supported_outlined,
-                                    color: colorScheme.primary,
-                                  ),
-                                )
-                              : profileImagePath.startsWith('assets/')
-                                  ? Image.asset(
-                                      profileImagePath.trim(),
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: colorScheme.primary,
-                                      ),
-                                    )
-                                  : Image.file(
-                                      File(profileImagePath.trim()),
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: colorScheme.primary,
-                                      ),
-                                    ))
-                          : Icon(
-                              Icons.photo_camera_outlined,
+                          profileImagePath.startsWith('https://')
+                          ? Image.network(
+                        profileImagePath.trim(),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(
+                              CupertinoIcons.photo,
                               color: colorScheme.primary,
                             ),
+                      )
+                          : profileImagePath.startsWith('assets/')
+                          ? Image.asset(
+                        profileImagePath.trim(),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) =>
+                            Icon(
+                              CupertinoIcons.photo,
+                              color: colorScheme.primary,
+                            ),
+                      )
+                          : Image.file(
+                        File(profileImagePath.trim()),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) =>
+                            Icon(
+                              CupertinoIcons.photo,
+                              color: colorScheme.primary,
+                            ),
+                      ))
+                          : Icon(
+                        CupertinoIcons.camera,
+                        color: colorScheme.primary,
+                      ),
                     ),
-
-                    const SizedBox(width: 12),
-
+                    SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'profile_photo'.tr,
@@ -124,60 +122,57 @@ Future<void> showProfilePhotoSheet({
                         ),
                       ),
                     ),
-
-                    IconButton(
-                      tooltip: 'close'.tr,
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size(32, 32),
                       onPressed: () {
                         Navigator.pop(sheetContext);
                       },
-                      icon: const Icon(
-                        Icons.close_rounded,
+                      child: Icon(
+                        CupertinoIcons.xmark_circle_fill,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.4)
+                            : Colors.black.withValues(alpha: 0.4),
+                        size: 20,
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 14),
-
+                SizedBox(height: 14),
                 if (profileImagePath != null &&
                     profileImagePath.trim().isNotEmpty) ...[
                   PhotoOptionTile(
-                    icon: Icons.visibility_outlined,
+                    icon: CupertinoIcons.eye,
                     title: 'view_photo'.tr,
                     onTap: () {
                       Navigator.pop(sheetContext);
                       onViewPhoto();
                     },
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                 ],
-
                 PhotoOptionTile(
-                  icon: Icons.camera_alt_outlined,
+                  icon: CupertinoIcons.camera,
                   title: 'take_photo'.tr,
                   onTap: () {
                     Navigator.pop(sheetContext);
                     onTakePhoto();
                   },
                 ),
-
-                const SizedBox(height: 8),
-
+                SizedBox(height: 8),
                 PhotoOptionTile(
-                  icon: Icons.photo_library_outlined,
+                  icon: CupertinoIcons.photo,
                   title: 'choose_from_gallery'.tr,
                   onTap: () {
                     Navigator.pop(sheetContext);
                     onChooseGallery();
                   },
                 ),
-
                 if (profileImagePath != null &&
                     profileImagePath.trim().isNotEmpty) ...[
-                  const SizedBox(height: 8),
-
+                  SizedBox(height: 8),
                   PhotoOptionTile(
-                    icon: Icons.delete_outline_rounded,
+                    icon: CupertinoIcons.trash,
                     title: 'remove_photo'.tr,
                     isDanger: true,
                     onTap: () {

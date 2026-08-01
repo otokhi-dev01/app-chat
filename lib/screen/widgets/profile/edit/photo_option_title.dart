@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PhotoOptionTile extends StatelessWidget {
@@ -16,45 +17,42 @@ class PhotoOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
-    final Color itemColor = isDanger
-        ? colorScheme.error
-        : colorScheme.primary;
+    Color itemColor = isDanger ? colorScheme.error : colorScheme.primary;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         child: Container(
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 11,
           ),
           decoration: BoxDecoration(
             color: itemColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Row(
             children: [
               Container(
                 width: 40,
                 height: 40,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: itemColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(13),
                 ),
                 child: Icon(
                   icon,
                   color: itemColor,
-                  size: 21,
+                  size: 20,
                 ),
               ),
-
-              const SizedBox(width: 13),
-
+              SizedBox(width: 13),
               Expanded(
                 child: Text(
                   title,
@@ -66,12 +64,12 @@ class PhotoOptionTile extends StatelessWidget {
                   ),
                 ),
               ),
-
               Icon(
-                Icons.chevron_right_rounded,
+                CupertinoIcons.chevron_right,
+                size: 18,
                 color: isDanger
                     ? colorScheme.error
-                    : colorScheme.onSurfaceVariant,
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
               ),
             ],
           ),

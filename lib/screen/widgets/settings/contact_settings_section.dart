@@ -1,4 +1,5 @@
 import 'package:appchat/screen/widgets/settings/settings_navigation_title.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,18 +16,18 @@ class ContactSettingsSection extends StatelessWidget {
     required this.contactController,
   });
 
-  void _openRoute(String route) {
-    FocusManager.instance.primaryFocus?.unfocus();
-    if (Get.currentRoute == route) return;
-    Get.toNamed(route, preventDuplicates: true);
-  }
+  // void _openRoute(String route) {
+  //   FocusManager.instance.primaryFocus?.unfocus();
+  //   if (Get.currentRoute == route) return;
+  //   Get.toNamed(route, preventDuplicates: true);
+  // }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
     Color dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
@@ -34,21 +35,33 @@ class ContactSettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SettingsSectionTitle(title: 'contacts'.tr),
-        const SizedBox(height: 8),
+        SettingsSectionTitle(
+          title: 'contacts'.tr,
+          icon: CupertinoIcons.person_2,
+        ),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(color: dividerColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             children: [
               Obx(() {
                 return ActionSettingsTile(
-                  icon: Icons.contacts_outlined,
+                  icon: CupertinoIcons.person_crop_circle_badge_checkmark,
                   title: 'sync_contacts'.tr,
                   subtitle: 'sync_contacts_description'.tr,
                   buttonText: 'sync_now'.tr,
@@ -56,14 +69,9 @@ class ContactSettingsSection extends StatelessWidget {
                   onPressed: contactController.syncPhoneContacts,
                 );
               }),
-
-              // Placeholder rows for other contact-related settings —
-              // wire real routes/controller values in, or remove if
-              // you don't have these yet.
               SettingsDivider(color: dividerColor),
-
               SettingsNavigationTile(
-                icon: Icons.block_outlined,
+                icon: CupertinoIcons.slash_circle,
                 title: 'blocked_contacts'.tr,
                 subtitle: 'manage_blocked'.tr,
                 onTap: () {

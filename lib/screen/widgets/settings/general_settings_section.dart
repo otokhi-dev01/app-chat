@@ -1,8 +1,8 @@
 import 'package:appchat/screen/widgets/settings/settings_navigation_title.dart';
 import 'package:appchat/screen/widgets/settings/settings_switch_title.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../controllers/notification/notification_controller.dart';
 import '../../../controllers/settings/settings_controller.dart';
 import '../../../route/app_route.dart';
@@ -27,31 +27,31 @@ class GeneralSettingsSection extends StatelessWidget {
 
   List<_NavRowData> get _navRows => [
     _NavRowData(
-      icon: Icons.lock_outline_rounded,
+      icon: CupertinoIcons.lock,
       title: 'privacy_security'.tr,
       subtitle: 'manage_privacy'.tr,
       route: AppRoutes.privacySecurity,
     ),
     _NavRowData(
-      icon: Icons.folder_open_outlined,
+      icon: CupertinoIcons.folder,
       title: 'chat_folders'.tr,
       subtitle: 'manage_folders'.tr,
       route: AppRoutes.chatFolders,
     ),
     _NavRowData(
-      icon: Icons.devices_outlined,
+      icon: CupertinoIcons.device_phone_portrait,
       title: 'devices'.tr,
       subtitle: 'manage_devices'.tr,
       route: AppRoutes.devices,
     ),
     _NavRowData(
-      icon: Icons.storage_outlined,
+      icon: CupertinoIcons.tray_arrow_up,
       title: 'data_storage'.tr,
       subtitle: 'manage_storage'.tr,
       route: AppRoutes.dataStorage,
     ),
     _NavRowData(
-      icon: Icons.info_outline_rounded,
+      icon: CupertinoIcons.info,
       title: 'about_app'.tr,
       subtitle: 'version_information'.tr,
       route: AppRoutes.about,
@@ -63,7 +63,7 @@ class GeneralSettingsSection extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
     Color dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
@@ -71,21 +71,33 @@ class GeneralSettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SettingsSectionTitle(title: 'general'.tr),
-        const SizedBox(height: 8),
+        SettingsSectionTitle(
+          title: 'general'.tr,
+          icon: CupertinoIcons.gear_alt,
+        ),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(color: dividerColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             children: [
               Obx(() {
                 return SettingsSwitchTile(
-                  icon: Icons.notifications_outlined,
+                  icon: CupertinoIcons.bell,
                   title: 'notifications'.tr,
                   subtitle: notificationController.isUpdatingNotifications.value
                       ? 'updating'.tr
@@ -94,7 +106,6 @@ class GeneralSettingsSection extends StatelessWidget {
                   onChanged: notificationController.toggleNotifications,
                 );
               }),
-
               for (final row in _navRows) ...[
                 SettingsDivider(color: dividerColor),
                 SettingsNavigationTile(
@@ -118,7 +129,7 @@ class _NavRowData {
   final String subtitle;
   final String route;
 
-  const _NavRowData({
+  _NavRowData({
     required this.icon,
     required this.title,
     required this.subtitle,
