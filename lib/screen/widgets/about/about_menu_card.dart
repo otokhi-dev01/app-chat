@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AboutMenuCard extends StatelessWidget {
@@ -12,12 +13,9 @@ class AboutMenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -31,10 +29,19 @@ class AboutMenuCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: children,
@@ -83,30 +90,26 @@ class AboutMenuTile extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withValues(
-                    alpha: 0.10,
+                    alpha: 0.11,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   icon,
                   color: colorScheme.primary,
-                  size: 21,
+                  size: 20,
                 ),
               ),
               SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
                       maxLines: 1,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyLarge
-                          ?.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -116,12 +119,9 @@ class AboutMenuTile extends StatelessWidget {
                     Text(
                       subtitle,
                       maxLines: 2,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
                         height: 1.3,
                       ),
@@ -132,10 +132,11 @@ class AboutMenuTile extends StatelessWidget {
               if (showArrow) ...[
                 SizedBox(width: 8),
                 Icon(
-                  Icons.chevron_right_rounded,
-                  color:
-                  colorScheme.onSurfaceVariant,
-                  size: 22,
+                  CupertinoIcons.chevron_right,
+                  color: colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.55,
+                  ),
+                  size: 18,
                 ),
               ],
             ],
@@ -155,15 +156,14 @@ class AboutMenuDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color dividerColor = isDark
         ? Colors.white.withValues(
-      alpha: 0.07,
+      alpha: 0.08,
     )
         : Colors.black.withValues(
-      alpha: 0.05,
+      alpha: 0.06,
     );
 
     return Divider(

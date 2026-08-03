@@ -1,14 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/data_storage_controller.dart';
-import '../../widgets/data_storage/data_storage_confirmation_dialog.dart';
+import '../../widgets/common/app_feedback.dart';
 import '../../widgets/data_storage/data_storage_content.dart';
 import '../../widgets/data_storage/media_quality_sheet.dart';
 import 'data_storage_app_bar.dart';
 
 class DataStorageScreen extends StatelessWidget {
-  DataStorageScreen({
+  const DataStorageScreen({
     super.key,
   });
 
@@ -45,12 +46,9 @@ class DataStorageScreen extends StatelessWidget {
       'Forever': 'forever'.tr,
     };
 
-    String currentValue =
-        controller.keepMediaDuration.value;
+    String currentValue = controller.keepMediaDuration.value;
 
-    String selectedLabel =
-        optionLabels[currentValue] ??
-            currentValue;
+    String selectedLabel = optionLabels[currentValue] ?? currentValue;
 
     String? result = await MediaQualitySheet.open(
       context: context,
@@ -87,19 +85,40 @@ class DataStorageScreen extends StatelessWidget {
       ) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    bool confirmed =
-    await AppConfirmationDialog.show(
+    // Native iOS Cupertino Dialog
+    bool? confirmed = await showCupertinoDialog<bool>(
       context: context,
-      title: 'clear_cache_title'.tr,
-      message: 'clear_cache_confirmation'.trParams({
-        'size': controller.formattedCacheSize,
-      }),
-      confirmText: 'clear_cache'.tr,
-      icon: Icons.cleaning_services_rounded,
-      isDanger: true,
+      builder: (dialogContext) {
+        return CupertinoAlertDialog(
+          title: Text('clear_cache_title'.tr),
+          content: Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              'clear_cache_confirmation'.trParams({
+                'size': controller.formattedCacheSize,
+              }),
+            ),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: Text('cancel'.tr),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: Text('clear_cache'.tr),
+            ),
+          ],
+        );
+      },
     );
 
-    if (!confirmed) {
+    if (confirmed != true) {
       return;
     }
 
@@ -113,7 +132,7 @@ class DataStorageScreen extends StatelessWidget {
       _showMessage(
         title: 'cache_cleared'.tr,
         message: 'cache_cleared_successfully'.tr,
-        icon: Icons.check_circle_outline_rounded,
+        icon: CupertinoIcons.checkmark_circle,
       );
     } catch (error) {
       if (!context.mounted) {
@@ -123,7 +142,7 @@ class DataStorageScreen extends StatelessWidget {
       _showMessage(
         title: 'unable_to_clear_cache'.tr,
         message: _cleanErrorMessage(error),
-        icon: Icons.error_outline_rounded,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     }
   }
@@ -142,9 +161,8 @@ class DataStorageScreen extends StatelessWidget {
 
       _showMessage(
         title: 'network_usage_reset'.tr,
-        message:
-        'network_usage_reset_successfully'.tr,
-        icon: Icons.restart_alt_rounded,
+        message: 'network_usage_reset_successfully'.tr,
+        icon: CupertinoIcons.arrow_clockwise,
       );
     } catch (error) {
       if (!context.mounted) {
@@ -152,10 +170,9 @@ class DataStorageScreen extends StatelessWidget {
       }
 
       _showMessage(
-        title:
-        'unable_to_reset_network_usage'.tr,
+        title: 'unable_to_reset_network_usage'.tr,
         message: _cleanErrorMessage(error),
-        icon: Icons.error_outline_rounded,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     }
   }
@@ -165,23 +182,10 @@ class DataStorageScreen extends StatelessWidget {
     required String message,
     required IconData icon,
   }) {
-    Get.closeAllSnackbars();
-
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      margin: EdgeInsets.all(16),
-      borderRadius: 16,
-      icon: Icon(
-        icon,
-      ),
-      duration: Duration(
-        seconds: 3,
-      ),
-      isDismissible: true,
-      dismissDirection:
-      DismissDirection.horizontal,
+    AppFeedback.showMessage(
+      title: title,
+      message: message,
+      icon: icon,
     );
   }
 
@@ -205,53 +209,30 @@ class DataStorageScreen extends StatelessWidget {
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor:
-      theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: DataStorageAppBar(),
       body: Obx(
             () {
           return DataStorageContent(
-            cacheSize:
-            controller.formattedCacheSize,
-            networkUsage:
-            controller.formattedNetworkUsage,
-            mediaQuality:
-            controller.mediaQuality.value,
-            keepMediaDuration:
-            controller.keepMediaDuration.value,
+            cacheSize: controller.formattedCacheSize,
+            networkUsage: controller.formattedNetworkUsage,
+            mediaQuality: controller.mediaQuality.value,
+            keepMediaDuration: controller.keepMediaDuration.value,
             autoDownloadMobileData:
-            controller
-                .autoDownloadMobileData.value,
-            autoDownloadWifi:
-            controller.autoDownloadWifi.value,
-            autoDownloadRoaming:
-            controller
-                .autoDownloadRoaming.value,
-            saveToGallery:
-            controller.saveToGallery.value,
-            streamVideos:
-            controller.streamVideos.value,
-            dataSaverEnabled:
-            controller.dataSaverEnabled.value,
-            isClearingCache:
-            controller.isClearingCache.value,
-            isResettingNetwork:
-            controller
-                .isResettingNetwork.value,
-            onMobileDataChanged:
-            controller
-                .toggleMobileDataDownload,
-            onWifiChanged:
-            controller.toggleWifiDownload,
-            onRoamingChanged:
-            controller
-                .toggleRoamingDownload,
-            onSaveToGalleryChanged:
-            controller.toggleSaveToGallery,
-            onStreamVideosChanged:
-            controller.toggleStreamVideos,
-            onDataSaverChanged:
-            controller.toggleDataSaver,
+            controller.autoDownloadMobileData.value,
+            autoDownloadWifi: controller.autoDownloadWifi.value,
+            autoDownloadRoaming: controller.autoDownloadRoaming.value,
+            saveToGallery: controller.saveToGallery.value,
+            streamVideos: controller.streamVideos.value,
+            dataSaverEnabled: controller.dataSaverEnabled.value,
+            isClearingCache: controller.isClearingCache.value,
+            isResettingNetwork: controller.isResettingNetwork.value,
+            onMobileDataChanged: controller.toggleMobileDataDownload,
+            onWifiChanged: controller.toggleWifiDownload,
+            onRoamingChanged: controller.toggleRoamingDownload,
+            onSaveToGalleryChanged: controller.toggleSaveToGallery,
+            onStreamVideosChanged: controller.toggleStreamVideos,
+            onDataSaverChanged: controller.toggleDataSaver,
             onMediaQualityTap: () {
               _openMediaQuality(context);
             },

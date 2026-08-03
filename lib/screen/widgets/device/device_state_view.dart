@@ -1,15 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DevicesLoadingView extends StatelessWidget {
-  DevicesLoadingView({
+  const DevicesLoadingView({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Center(
       child: CircularProgressIndicator(
@@ -24,7 +24,7 @@ class DevicesErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  DevicesErrorView({
+  const DevicesErrorView({
     super.key,
     required this.message,
     required this.onRetry,
@@ -35,12 +35,9 @@ class DevicesErrorView extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -62,6 +59,15 @@ class DevicesErrorView extends StatelessWidget {
             border: Border.all(
               color: borderColor,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -77,14 +83,12 @@ class DevicesErrorView extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.error_outline_rounded,
+                  CupertinoIcons.exclamationmark_circle,
                   color: colorScheme.error,
                   size: 31,
                 ),
               ),
-
               SizedBox(height: 14),
-
               Text(
                 'unable_to_load_devices'.tr,
                 textAlign: TextAlign.center,
@@ -94,9 +98,7 @@ class DevicesErrorView extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-
               SizedBox(height: 7),
-
               Text(
                 message,
                 textAlign: TextAlign.center,
@@ -106,14 +108,12 @@ class DevicesErrorView extends StatelessWidget {
                   height: 1.4,
                 ),
               ),
-
               SizedBox(height: 18),
-
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: Icon(
-                  Icons.refresh_rounded,
-                  size: 19,
+                  CupertinoIcons.arrow_clockwise,
+                  size: 18,
                 ),
                 label: Text(
                   'try_again'.tr,
@@ -126,7 +126,7 @@ class DevicesErrorView extends StatelessWidget {
                     48,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),

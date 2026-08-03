@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/contact/contact_controller.dart';
 import '../../../models/contact_model.dart';
+import '../../controllers/contact/contact_controller.dart';
 import '../widgets/contact/contact_empty_state.dart';
 import '../widgets/contact/contact_section_header.dart';
 import '../widgets/contact/contact_title.dart';
@@ -10,7 +10,7 @@ import '../widgets/contact/contact_title.dart';
 class ContactList extends StatelessWidget {
   final ContactController controller;
 
-  ContactList({
+  const ContactList({
     super.key,
     required this.controller,
   });
@@ -22,8 +22,7 @@ class ContactList extends StatelessWidget {
         Map<String, List<ContactModel>> grouped =
             controller.groupedContacts;
 
-        List<String> letters =
-        grouped.keys.toList();
+        List<String> letters = grouped.keys.toList();
 
         letters.sort(
               (
@@ -38,22 +37,15 @@ class ContactList extends StatelessWidget {
 
         if (letters.isEmpty) {
           return ContactEmptyState(
-            hasSearchQuery: controller
-                .searchQuery.value
-                .trim()
-                .isNotEmpty,
+            hasSearchQuery: controller.searchQuery.value.trim().isNotEmpty,
           );
         }
 
         return ListView.builder(
-          controller:
-          controller.scrollController,
-          keyboardDismissBehavior:
-          ScrollViewKeyboardDismissBehavior
-              .onDrag,
+          controller: controller.scrollController,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: BouncingScrollPhysics(
-            parent:
-            AlwaysScrollableScrollPhysics(),
+            parent: AlwaysScrollableScrollPhysics(),
           ),
           padding: EdgeInsets.only(
             top: 4,
@@ -67,12 +59,10 @@ class ContactList extends StatelessWidget {
             String letter = letters[index];
 
             List<ContactModel> contacts =
-                grouped[letter] ??
-                    <ContactModel>[];
+                grouped[letter] ?? <ContactModel>[];
 
             return Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ContactSectionHeader(
                   letter: letter,

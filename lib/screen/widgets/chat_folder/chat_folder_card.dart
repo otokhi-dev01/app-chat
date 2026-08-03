@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ChatFolderCard extends StatelessWidget {
   final List<Widget> children;
 
- const ChatFolderCard({
+  const ChatFolderCard({
     super.key,
     required this.children,
   });
@@ -11,32 +13,32 @@ class ChatFolderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       width: double.infinity,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: children,
@@ -52,22 +54,14 @@ class ChatFolderDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color dividerColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.07,
-    )
-        : Colors.black.withValues(
-      alpha: 0.05,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: 69,
-      ),
+      padding: EdgeInsets.only(left: 69),
       child: Divider(
         height: 1,
         thickness: 1,
@@ -77,8 +71,7 @@ class ChatFolderDivider extends StatelessWidget {
   }
 }
 
-class ChatFolderSectionTitle
-    extends StatelessWidget {
+class ChatFolderSectionTitle extends StatelessWidget {
   final String title;
 
   const ChatFolderSectionTitle({
@@ -91,15 +84,11 @@ class ChatFolderSectionTitle
     ThemeData theme = Theme.of(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 5,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 5),
       child: Text(
         title,
-        style: theme.textTheme.titleSmall
-            ?.copyWith(
-          color:
-          theme.colorScheme.primary,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.primary,
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
@@ -108,8 +97,7 @@ class ChatFolderSectionTitle
   }
 }
 
-class ChatFolderHeaderCard
-    extends StatelessWidget {
+class ChatFolderHeaderCard extends StatelessWidget {
   final int folderCount;
 
   const ChatFolderHeaderCard({
@@ -120,34 +108,33 @@ class ChatFolderHeaderCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -156,15 +143,11 @@ class ChatFolderHeaderCard
             height: 56,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: 0.12,
-              ),
-              borderRadius:
-              BorderRadius.circular(18),
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(
-              Icons.folder_copy_outlined,
+              CupertinoIcons.folder_badge_plus,
               color: colorScheme.primary,
               size: 28,
             ),
@@ -172,32 +155,23 @@ class ChatFolderHeaderCard
           SizedBox(width: 14),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$folderCount folders',
-                  style: theme
-                      .textTheme.titleMedium
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  'folders_count'.trParams({'count': '$folderCount'}),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 16,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Create folders to quickly find personal chats, groups, work conversations and more.',
+                  'folder_header_description'.tr,
                   maxLines: 3,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -211,8 +185,7 @@ class ChatFolderHeaderCard
   }
 }
 
-class ChatFolderInformationCard
-    extends StatelessWidget {
+class ChatFolderInformationCard extends StatelessWidget {
   const ChatFolderInformationCard({
     super.key,
   });
@@ -220,42 +193,45 @@ class ChatFolderInformationCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.primary
-            .withValues(
-          alpha: 0.07,
+        color: colorScheme.primary.withValues(
+          alpha: isDark ? 0.12 : 0.08,
         ),
-        borderRadius:
-        BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: colorScheme.primary
-              .withValues(
-            alpha: 0.14,
+          color: colorScheme.primary.withValues(
+            alpha: isDark ? 0.22 : 0.15,
           ),
         ),
       ),
       child: Row(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: colorScheme.primary,
-            size: 20,
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              CupertinoIcons.info_circle,
+              color: colorScheme.primary,
+              size: 18,
+            ),
           ),
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Default folders cannot be renamed or removed. Custom folders can be edited at any time.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              'folder_info_description'.tr,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface,
                 fontSize: 11,
                 height: 1.45,
               ),

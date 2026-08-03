@@ -1,11 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../models/device_session_model.dart';
 import '../../settings/device/device_session_title.dart';
-import 'session_comfirmation_dialog.dart';
 import 'device_action.dart';
 import 'device_section.dart';
+import 'session_comfirmation_dialog.dart';
 
 class DevicesContent extends StatelessWidget {
   final DeviceSessionModel? currentSession;
@@ -20,7 +21,7 @@ class DevicesContent extends StatelessWidget {
 
   final Future<void> Function() onTerminateAll;
 
-  DevicesContent({
+  const DevicesContent({
     super.key,
     required this.currentSession,
     required this.otherSessions,
@@ -34,8 +35,9 @@ class DevicesContent extends StatelessWidget {
       BuildContext context,
       DeviceSessionModel session,
       ) async {
-    bool confirmed =
-    await SessionConfirmationDialog.showTerminateSession(
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    bool confirmed = await SessionConfirmationDialog.showTerminateSession(
       context: context,
       deviceName: session.deviceName,
     );
@@ -50,8 +52,9 @@ class DevicesContent extends StatelessWidget {
   Future<void> _terminateAllSessions(
       BuildContext context,
       ) async {
-    bool confirmed =
-    await SessionConfirmationDialog.showTerminateAllSessions(
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    bool confirmed = await SessionConfirmationDialog.showTerminateAllSessions(
       context: context,
     );
 
@@ -67,14 +70,11 @@ class DevicesContent extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return RefreshIndicator(
       color: colorScheme.primary,
-      backgroundColor: isDark
-          ? Color(0xFF1B1D22)
-          : Colors.white,
+      backgroundColor: isDark ? Color(0xFF1B1D22) : Colors.white,
       onRefresh: onRefresh,
       child: ListView(
         physics: AlwaysScrollableScrollPhysics(
@@ -88,41 +88,31 @@ class DevicesContent extends StatelessWidget {
         ),
         children: [
           DevicesSecurityHeader(),
-
           SizedBox(height: 24),
-
           DevicesSectionHeader(
             title: 'this_device'.tr,
-            icon: Icons.smartphone_rounded,
+            icon: CupertinoIcons.device_phone_portrait,
           ),
-
           SizedBox(height: 10),
-
           if (currentSession != null)
             DeviceSessionTile(
               session: currentSession!,
             )
           else
             EmptyCurrentDeviceCard(),
-
           SizedBox(height: 26),
-
           DevicesSectionHeader(
             title: 'active_sessions'.tr,
-            icon: Icons.devices_rounded,
+            icon: CupertinoIcons.desktopcomputer,
             count: otherSessions.length,
           ),
-
           SizedBox(height: 10),
-
           if (otherSessions.isEmpty)
             NoOtherSessionsCard()
           else
             ..._buildOtherSessions(context),
-
           if (otherSessions.isNotEmpty) ...[
             SizedBox(height: 8),
-
             TerminateAllSessionsButton(
               isLoading: isTerminatingAll,
               onPressed: () {
@@ -130,9 +120,7 @@ class DevicesContent extends StatelessWidget {
               },
             ),
           ],
-
           SizedBox(height: 22),
-
           DevicesSecurityNote(),
         ],
       ),

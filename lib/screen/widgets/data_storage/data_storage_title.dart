@@ -93,7 +93,7 @@ class DataStorageSwitchTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  DataStorageSwitchTile({
+  const DataStorageSwitchTile({
     super.key,
     required this.icon,
     required this.title,
@@ -163,7 +163,7 @@ class DataStorageActionTile extends StatelessWidget {
   final bool loading;
   final VoidCallback onTap;
 
-  DataStorageActionTile({
+  const DataStorageActionTile({
     super.key,
     required this.icon,
     required this.title,
@@ -233,7 +233,7 @@ class DataStorageIcon extends StatelessWidget {
   final IconData icon;
   final bool active;
 
-  DataStorageIcon({
+  const DataStorageIcon({
     super.key,
     required this.icon,
     this.active = false,
@@ -272,7 +272,7 @@ class DataStorageTileText extends StatelessWidget {
   final String subtitle;
   final bool active;
 
-  DataStorageTileText({
+  const DataStorageTileText({
     super.key,
     required this.title,
     required this.subtitle,

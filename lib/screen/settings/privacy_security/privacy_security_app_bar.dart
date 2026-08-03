@@ -1,19 +1,19 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class PrivacySecurityAppBar
-    extends StatelessWidget
+class PrivacySecurityAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  PrivacySecurityAppBar({
+  const PrivacySecurityAppBar({
     super.key,
   });
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(64);
+    return Size.fromHeight(60);
   }
 
   SystemUiOverlayStyle _overlayStyle({
@@ -21,85 +21,53 @@ class PrivacySecurityAppBar
     required bool isDark,
   }) {
     if (isDark) {
-      return SystemUiOverlayStyle.light
-          .copyWith(
-        statusBarColor:
-        Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+      return SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
-    return SystemUiOverlayStyle.dark
-        .copyWith(
-      statusBarColor:
-      Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+    return SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
+        ? Color(0xFF1B1D22).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.70);
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return AppBar(
-      toolbarHeight: 64,
+      toolbarHeight: 60,
       automaticallyImplyLeading: false,
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor:
-      Colors.transparent,
-      foregroundColor:
-      colorScheme.onSurface,
-      surfaceTintColor:
-      Colors.transparent,
-      shadowColor:
-      Colors.transparent,
+      backgroundColor: Colors.transparent,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
       titleSpacing: 0,
       leadingWidth: 58,
-      systemOverlayStyle:
-      _overlayStyle(
+      systemOverlayStyle: _overlayStyle(
         theme: theme,
         isDark: isDark,
       ),
@@ -115,6 +83,7 @@ class PrivacySecurityAppBar
               border: Border(
                 bottom: BorderSide(
                   color: borderColor,
+                  width: 1,
                 ),
               ),
             ),
@@ -122,74 +91,69 @@ class PrivacySecurityAppBar
         ),
       ),
       leading: Padding(
-        padding: EdgeInsets.fromLTRB(
-          9,
-          13,
-          7,
-          13,
-        ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: InkWell(
-            onTap: () {
-              FocusManager
-                  .instance.primaryFocus
-                  ?.unfocus();
-
-              Get.back();
-            },
-            customBorder:
-            CircleBorder(),
-            child: SizedBox(
-              width: 38,
-              height: 38,
+        padding: EdgeInsets.fromLTRB(12, 10, 6, 10),
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(40, 40),
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                Get.back();
+              },
               child: Icon(
-                Icons
-                    .arrow_back_ios_new_rounded,
-                color:
-                colorScheme.onSurface,
-                size: 17,
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
         ),
       ),
       title: Column(
-        mainAxisSize:
-        MainAxisSize.min,
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Privacy and Security',
+            'privacy_security'.tr,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
-            style: theme
-                .textTheme.titleMedium
-                ?.copyWith(
-              color:
-              colorScheme.onSurface,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontSize: 17,
-              fontWeight:
-              FontWeight.w700,
+              fontWeight: FontWeight.w700,
             ),
           ),
           SizedBox(height: 2),
           Text(
-            'Control your privacy and account security',
+            'control_privacy_security'.tr,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
-            style: theme
-                .textTheme.bodySmall
-                ?.copyWith(
-              color: colorScheme
-                  .onSurfaceVariant,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
               fontSize: 11,
-              fontWeight:
-              FontWeight.w500,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

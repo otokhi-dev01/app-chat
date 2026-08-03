@@ -1,19 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../../models/chat_folder_model.dart';
 import 'chat_folder_card.dart';
 import 'chat_folder_title.dart';
 
-class ChatFolderContent
-    extends StatelessWidget {
+class ChatFolderContent extends StatelessWidget {
   final List<ChatFolderModel> folders;
   final VoidCallback onAddFolder;
-
-  final ValueChanged<ChatFolderModel>
-  onEditFolder;
-
-  final ValueChanged<ChatFolderModel>
-  onDeleteFolder;
+  final ValueChanged<ChatFolderModel> onEditFolder;
+  final ValueChanged<ChatFolderModel> onDeleteFolder;
 
   const ChatFolderContent({
     super.key,
@@ -23,41 +20,27 @@ class ChatFolderContent
     required this.onDeleteFolder,
   });
 
-  List<ChatFolderModel>
-  get defaultFolders {
-    return folders
-        .where(
-          (ChatFolderModel folder) {
-        return folder.isSystem;
-      },
-    )
-        .toList();
+  List<ChatFolderModel> get defaultFolders {
+    return folders.where((ChatFolderModel folder) {
+      return folder.isSystem;
+    }).toList();
   }
 
-  List<ChatFolderModel>
-  get customFolders {
-    return folders
-        .where(
-          (ChatFolderModel folder) {
-        return !folder.isSystem;
-      },
-    )
-        .toList();
+  List<ChatFolderModel> get customFolders {
+    return folders.where((ChatFolderModel folder) {
+      return !folder.isSystem;
+    }).toList();
   }
 
   List<Widget> _buildFolderItems({
-    required List<ChatFolderModel>
-    folderList,
-    required ValueChanged<ChatFolderModel>
-    onEdit,
-    required ValueChanged<ChatFolderModel>
-    onDelete,
+    required List<ChatFolderModel> folderList,
+    required ValueChanged<ChatFolderModel> onEdit,
+    required ValueChanged<ChatFolderModel> onDelete,
   }) {
     return List<Widget>.generate(
       folderList.length,
           (int index) {
-        ChatFolderModel folder =
-        folderList[index];
+        ChatFolderModel folder = folderList[index];
 
         return Column(
           children: [
@@ -70,9 +53,7 @@ class ChatFolderContent
                 onDelete(folder);
               },
             ),
-            if (index <
-                folderList.length - 1)
-              ChatFolderDivider(),
+            if (index < folderList.length - 1) ChatFolderDivider(),
           ],
         );
       },
@@ -81,33 +62,24 @@ class ChatFolderContent
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
     return ListView(
-      keyboardDismissBehavior:
-      ScrollViewKeyboardDismissBehavior
-          .onDrag,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: BouncingScrollPhysics(
-        parent:
-        AlwaysScrollableScrollPhysics(),
+        parent: AlwaysScrollableScrollPhysics(),
       ),
-      padding: EdgeInsets.fromLTRB(
-        16,
-        18,
-        16,
-        34,
-      ),
+      padding: EdgeInsets.fromLTRB(16, 18, 16, 34),
       children: [
         ChatFolderHeaderCard(
           folderCount: folders.length,
         ),
-
         SizedBox(height: 24),
-
         ChatFolderSectionTitle(
-          title: 'Default Folders',
+          title: 'default_folders'.tr,
         ),
-
         SizedBox(height: 9),
-
         ChatFolderCard(
           children: _buildFolderItems(
             folderList: defaultFolders,
@@ -115,15 +87,11 @@ class ChatFolderContent
             onDelete: onDeleteFolder,
           ),
         ),
-
         SizedBox(height: 24),
-
         ChatFolderSectionTitle(
-          title: 'Custom Folders',
+          title: 'custom_folders'.tr,
         ),
-
         SizedBox(height: 9),
-
         if (customFolders.isNotEmpty)
           ChatFolderCard(
             children: _buildFolderItems(
@@ -136,121 +104,102 @@ class ChatFolderContent
           _EmptyCustomFoldersCard(
             onCreateFolder: onAddFolder,
           ),
-
         SizedBox(height: 16),
-
         OutlinedButton.icon(
           onPressed: onAddFolder,
           icon: Icon(
-            Icons.create_new_folder_outlined,
+            CupertinoIcons.folder_badge_plus,
+            size: 20,
           ),
           label: Text(
-            'Create New Folder',
+            'create_new_folder'.tr,
           ),
           style: OutlinedButton.styleFrom(
-            minimumSize: Size(
-              double.infinity,
-              52,
+            minimumSize: Size(double.infinity, 52),
+            foregroundColor: colorScheme.primary,
+            side: BorderSide(
+              color: colorScheme.primary.withValues(alpha: 0.35),
             ),
             shape: RoundedRectangleBorder(
-              borderRadius:
-              BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
-
         SizedBox(height: 18),
-
         ChatFolderInformationCard(),
       ],
     );
   }
 }
 
-class _EmptyCustomFoldersCard
-    extends StatelessWidget {
+class _EmptyCustomFoldersCard extends StatelessWidget {
   final VoidCallback onCreateFolder;
 
- const _EmptyCustomFoldersCard({
+  const _EmptyCustomFoldersCard({
     required this.onCreateFolder,
   });
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness ==
-            Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Container(
-            width: 54,
-            height: 54,
+            width: 56,
+            height: 56,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: 0.10,
-              ),
-              borderRadius:
-              BorderRadius.circular(18),
+              color: colorScheme.primary.withValues(alpha: 0.11),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(
-              Icons.folder_open_outlined,
+              CupertinoIcons.folder,
               color: colorScheme.primary,
-              size: 27,
+              size: 28,
             ),
           ),
           SizedBox(height: 12),
           Text(
-            'No custom folders',
-            style: theme
-                .textTheme.titleMedium
-                ?.copyWith(
-              color:
-              colorScheme.onSurface,
-              fontWeight:
-              FontWeight.w700,
+            'no_custom_folders'.tr,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
             ),
           ),
           SizedBox(height: 5),
           Text(
-            'Create a folder to organize work, family, school or other conversations.',
+            'no_custom_folders_desc'.tr,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.bodySmall
-                ?.copyWith(
-              color: colorScheme
-                  .onSurfaceVariant,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
               height: 1.4,
             ),
           ),
@@ -258,23 +207,18 @@ class _EmptyCustomFoldersCard
           FilledButton.icon(
             onPressed: onCreateFolder,
             icon: Icon(
-              Icons.add_rounded,
-              size: 19,
+              CupertinoIcons.plus,
+              size: 18,
             ),
             label: Text(
-              'Create Folder',
+              'create_folder'.tr,
             ),
             style: FilledButton.styleFrom(
-              minimumSize: Size(
-                180,
-                46,
-              ),
-              shape:
-              RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(
-                  14,
-                ),
+              minimumSize: Size(180, 46),
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),

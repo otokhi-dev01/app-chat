@@ -13,22 +13,17 @@ class ContactSectionHeader extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color backgroundColor =
-    colorScheme.primary.withValues(
+    Color backgroundColor = colorScheme.primary.withValues(
       alpha: isDark ? 0.16 : 0.10,
     );
 
-    Color borderColor =
-    colorScheme.primary.withValues(
+    Color borderColor = colorScheme.primary.withValues(
       alpha: isDark ? 0.22 : 0.16,
     );
 
-    String title = letter.trim().isEmpty
-        ? '#'
-        : letter.trim();
+    String title = letter.trim().isEmpty ? '#' : letter.trim();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -42,9 +37,7 @@ class ContactSectionHeader extends StatelessWidget {
         child: Container(
           constraints: BoxConstraints(
             minWidth: 30,
-            maxWidth:
-            MediaQuery.sizeOf(context).width *
-                0.65,
+            maxWidth: MediaQuery.sizeOf(context).width * 0.65,
           ),
           padding: EdgeInsets.symmetric(
             horizontal: 10,
@@ -64,8 +57,7 @@ class ContactSectionHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: theme.textTheme.labelMedium
-                ?.copyWith(
+            style: theme.textTheme.labelMedium?.copyWith(
               color: colorScheme.primary,
               fontSize: 12,
               fontWeight: FontWeight.w700,

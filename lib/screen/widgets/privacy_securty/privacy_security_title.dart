@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PrivacyNavigationTile extends StatelessWidget {
@@ -7,7 +8,7 @@ class PrivacyNavigationTile extends StatelessWidget {
   final String? trailingText;
   final VoidCallback onTap;
 
-  PrivacyNavigationTile({
+  const PrivacyNavigationTile({
     super.key,
     required this.icon,
     required this.title,
@@ -19,10 +20,7 @@ class PrivacyNavigationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color pressedColor = isDark
         ? Colors.white.withValues(
@@ -40,8 +38,7 @@ class PrivacyNavigationTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
-        overlayColor:
-        WidgetStateProperty.resolveWith(
+        overlayColor: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
             if (states.contains(
               WidgetState.pressed,
@@ -60,8 +57,7 @@ class PrivacyNavigationTile extends StatelessWidget {
             12,
           ),
           child: Row(
-            crossAxisAlignment:
-            CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               PrivacySecurityIcon(
                 icon: icon,
@@ -85,11 +81,10 @@ class PrivacyNavigationTile extends StatelessWidget {
   }
 }
 
-class _PrivacyNavigationTrailing
-    extends StatelessWidget {
+class _PrivacyNavigationTrailing extends StatelessWidget {
   final String? trailingText;
 
-  _PrivacyNavigationTrailing({
+  const _PrivacyNavigationTrailing({
     required this.trailingText,
   });
 
@@ -102,8 +97,7 @@ class _PrivacyNavigationTrailing
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (trailingText != null &&
-            trailingText!.trim().isNotEmpty)
+        if (trailingText != null && trailingText!.trim().isNotEmpty)
           ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: 88,
@@ -114,8 +108,7 @@ class _PrivacyNavigationTrailing
               softWrap: true,
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(
+              style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.primary,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -123,8 +116,7 @@ class _PrivacyNavigationTrailing
               ),
             ),
           ),
-        if (trailingText != null &&
-            trailingText!.trim().isNotEmpty)
+        if (trailingText != null && trailingText!.trim().isNotEmpty)
           SizedBox(width: 3),
         SizedBox(
           width: 28,
@@ -132,10 +124,9 @@ class _PrivacyNavigationTrailing
           child: Align(
             alignment: Alignment.centerRight,
             child: Icon(
-              Icons.chevron_right_rounded,
-              color:
-              colorScheme.onSurfaceVariant,
-              size: 24,
+              CupertinoIcons.chevron_right,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
+              size: 18,
             ),
           ),
         ),
@@ -151,7 +142,7 @@ class PrivacySwitchTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  PrivacySwitchTile({
+  const PrivacySwitchTile({
     super.key,
     required this.icon,
     required this.title,
@@ -165,8 +156,7 @@ class PrivacySwitchTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color pressedColor = isDark
         ? Colors.white.withValues(
@@ -176,14 +166,8 @@ class PrivacySwitchTile extends StatelessWidget {
       alpha: 0.035,
     );
 
-    Color backgroundColor = value
-        ? colorScheme.primary.withValues(
-      alpha: 0.05,
-    )
-        : Colors.transparent;
-
     return Material(
-      color: backgroundColor,
+      color: Colors.transparent,
       child: InkWell(
         onTap: () {
           onChanged(!value);
@@ -192,8 +176,7 @@ class PrivacySwitchTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
-        overlayColor:
-        WidgetStateProperty.resolveWith(
+        overlayColor: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
             if (states.contains(
               WidgetState.pressed,
@@ -212,8 +195,7 @@ class PrivacySwitchTile extends StatelessWidget {
             12,
           ),
           child: Row(
-            crossAxisAlignment:
-            CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               PrivacySecurityIcon(
                 icon: icon,
@@ -228,11 +210,10 @@ class PrivacySwitchTile extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
-              IgnorePointer(
-                child: Switch.adaptive(
-                  value: value,
-                  onChanged: onChanged,
-                ),
+              CupertinoSwitch(
+                value: value,
+                activeTrackColor: colorScheme.primary,
+                onChanged: onChanged,
               ),
             ],
           ),
@@ -248,7 +229,7 @@ class PrivacyActionTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  PrivacyActionTile({
+  const PrivacyActionTile({
     super.key,
     required this.icon,
     required this.title,
@@ -261,8 +242,7 @@ class PrivacyActionTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color pressedColor = isDark
         ? colorScheme.error.withValues(
@@ -280,8 +260,7 @@ class PrivacyActionTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
-        overlayColor:
-        WidgetStateProperty.resolveWith(
+        overlayColor: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
             if (states.contains(
               WidgetState.pressed,
@@ -300,48 +279,39 @@ class PrivacyActionTile extends StatelessWidget {
             12,
           ),
           child: Row(
-            crossAxisAlignment:
-            CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 42,
                 height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.error
-                      .withValues(
+                  color: colorScheme.error.withValues(
                     alpha: 0.09,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(
-                    13,
+                  borderRadius: BorderRadius.circular(
+                    14,
                   ),
                 ),
                 child: Icon(
                   icon,
                   color: colorScheme.error,
-                  size: 21,
+                  size: 20,
                 ),
               ),
               SizedBox(width: 13),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
                       maxLines: 2,
                       softWrap: true,
-                      overflow:
-                      TextOverflow.visible,
-                      style: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
-                        color:
-                        colorScheme.error,
-                        fontWeight:
-                        FontWeight.w600,
+                      overflow: TextOverflow.visible,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.w600,
                         height: 1.25,
                       ),
                     ),
@@ -350,13 +320,9 @@ class PrivacyActionTile extends StatelessWidget {
                       subtitle,
                       maxLines: 2,
                       softWrap: true,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme
-                          .textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
                         height: 1.35,
                       ),
@@ -369,13 +335,11 @@ class PrivacyActionTile extends StatelessWidget {
                 width: 28,
                 height: 42,
                 child: Align(
-                  alignment:
-                  Alignment.centerRight,
+                  alignment: Alignment.centerRight,
                   child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: colorScheme
-                        .onSurfaceVariant,
-                    size: 24,
+                    CupertinoIcons.chevron_right,
+                    color: colorScheme.error,
+                    size: 18,
                   ),
                 ),
               ),
@@ -387,55 +351,52 @@ class PrivacyActionTile extends StatelessWidget {
   }
 }
 
-class PrivacySecurityIcon
-    extends StatelessWidget {
+class PrivacySecurityIcon extends StatelessWidget {
   final IconData icon;
   final bool active;
 
-  PrivacySecurityIcon({
+  const PrivacySecurityIcon({
     super.key,
     required this.icon,
-    this.active = false,
+    this.active = true, // Defaults to true to match Account Section primary badge style
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    Color primary = colorScheme.primary;
 
-    return Container(
+    Color bgColor = active
+        ? primary.withValues(alpha: 0.11)
+        : colorScheme.surfaceContainerHighest;
+
+    Color iconColor = active ? primary : colorScheme.onSurfaceVariant;
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
       width: 42,
       height: 42,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active
-            ? colorScheme.primary.withValues(
-          alpha: 0.16,
-        )
-            : colorScheme
-            .surfaceContainerHighest,
-        borderRadius:
-        BorderRadius.circular(13),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
         icon,
-        color: active
-            ? colorScheme.primary
-            : colorScheme
-            .onSurfaceVariant,
-        size: 21,
+        size: 20,
+        color: iconColor,
       ),
     );
   }
 }
 
-class PrivacySecurityTileText
-    extends StatelessWidget {
+class PrivacySecurityTileText extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool active;
 
-  PrivacySecurityTileText({
+  const PrivacySecurityTileText({
     super.key,
     required this.title,
     required this.subtitle,
@@ -445,27 +406,28 @@ class PrivacySecurityTileText
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          maxLines: 2,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-          style: theme.textTheme.bodyLarge
-              ?.copyWith(
-            color: active
-                ? colorScheme.primary
-                : colorScheme.onSurface,
-            fontWeight: active
-                ? FontWeight.w700
-                : FontWeight.w600,
+        AnimatedDefaultTextStyle(
+          duration: Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: active ? colorScheme.primary : colorScheme.onSurface,
+            fontWeight: active ? FontWeight.w700 : FontWeight.w600,
             height: 1.25,
+          ) ??
+              TextStyle(
+                color: active ? colorScheme.primary : colorScheme.onSurface,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+              ),
+          child: Text(
+            title,
+            maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.visible,
           ),
         ),
         SizedBox(height: 3),
@@ -474,10 +436,8 @@ class PrivacySecurityTileText
           maxLines: 2,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall
-              ?.copyWith(
-            color:
-            colorScheme.onSurfaceVariant,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
             fontSize: 11,
             height: 1.35,
           ),

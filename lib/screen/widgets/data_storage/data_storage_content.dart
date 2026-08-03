@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -31,7 +32,7 @@ class DataStorageContent extends StatelessWidget {
   final VoidCallback onClearCacheTap;
   final VoidCallback onResetNetworkTap;
 
-  const DataStorageContent({
+  DataStorageContent({
     super.key,
     required this.cacheSize,
     required this.networkUsage,
@@ -107,8 +108,7 @@ class DataStorageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      keyboardDismissBehavior:
-      ScrollViewKeyboardDismissBehavior.onDrag,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
@@ -135,7 +135,7 @@ class DataStorageContent extends StatelessWidget {
         DataStorageCard(
           children: [
             DataStorageActionTile(
-              icon: Icons.cleaning_services_outlined,
+              icon: CupertinoIcons.trash,
               title: 'clear_cache'.tr,
               subtitle: 'clear_cache_description'.tr,
               trailingText: cacheSize,
@@ -146,7 +146,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageNavigationTile(
-              icon: Icons.access_time_rounded,
+              icon: CupertinoIcons.time,
               title: 'keep_media'.tr,
               subtitle: 'keep_media_description'.tr,
               trailingText: _translatedKeepMediaDuration(
@@ -168,7 +168,7 @@ class DataStorageContent extends StatelessWidget {
         DataStorageCard(
           children: [
             DataStorageSwitchTile(
-              icon: Icons.signal_cellular_alt_rounded,
+              icon: CupertinoIcons.antenna_radiowaves_left_right,
               title: 'using_mobile_data'.tr,
               subtitle: 'mobile_data_download_description'.tr,
               value: autoDownloadMobileData,
@@ -178,7 +178,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageSwitchTile(
-              icon: Icons.wifi_rounded,
+              icon: CupertinoIcons.wifi,
               title: 'connected_to_wifi'.tr,
               subtitle: 'wifi_download_description'.tr,
               value: autoDownloadWifi,
@@ -188,7 +188,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageSwitchTile(
-              icon: Icons.public_rounded,
+              icon: CupertinoIcons.globe,
               title: 'while_roaming'.tr,
               subtitle: 'roaming_download_description'.tr,
               value: autoDownloadRoaming,
@@ -208,7 +208,7 @@ class DataStorageContent extends StatelessWidget {
         DataStorageCard(
           children: [
             DataStorageNavigationTile(
-              icon: Icons.high_quality_outlined,
+              icon: CupertinoIcons.slider_horizontal_3,
               title: 'media_quality'.tr,
               subtitle: 'media_quality_description'.tr,
               trailingText: _translatedMediaQuality(
@@ -220,7 +220,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageSwitchTile(
-              icon: Icons.play_circle_outline_rounded,
+              icon: CupertinoIcons.play_circle,
               title: 'stream_videos'.tr,
               subtitle: 'stream_videos_description'.tr,
               value: streamVideos,
@@ -230,7 +230,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageSwitchTile(
-              icon: Icons.photo_library_outlined,
+              icon: CupertinoIcons.photo,
               title: 'save_to_gallery'.tr,
               subtitle: 'save_to_gallery_description'.tr,
               value: saveToGallery,
@@ -250,7 +250,7 @@ class DataStorageContent extends StatelessWidget {
         DataStorageCard(
           children: [
             DataStorageSwitchTile(
-              icon: Icons.data_saver_on_rounded,
+              icon: CupertinoIcons.chart_pie,
               title: 'data_saver'.tr,
               subtitle: 'data_saver_description'.tr,
               value: dataSaverEnabled,
@@ -260,7 +260,7 @@ class DataStorageContent extends StatelessWidget {
             DataStorageDivider(),
 
             DataStorageActionTile(
-              icon: Icons.restart_alt_rounded,
+              icon: CupertinoIcons.arrow_clockwise,
               title: 'reset_network_usage'.tr,
               subtitle: 'reset_network_usage_description'.tr,
               trailingText: networkUsage,

@@ -33,6 +33,7 @@ abstract class AppRoutes {
   static const String qrScanner = '/qr-scanner';
   static const String addGroup = '/add-group';
   static const String addContact = '/add-contact';
+  static const String blockedContacts = '/blocked-contacts';
 
 
 

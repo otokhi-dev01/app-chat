@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,12 +12,9 @@ class AboutHeader extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -76,7 +74,7 @@ class AboutHeader extends StatelessWidget {
               ],
             ),
             child: Icon(
-              Icons.chat_bubble_rounded,
+              CupertinoIcons.chat_bubble_2_fill,
               color: colorScheme.onPrimary,
               size: 40,
             ),
@@ -144,7 +142,7 @@ class AboutSectionTitle extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleSmall?.copyWith(
-          color: colorScheme.onSurface,
+          color: colorScheme.primary,
           fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
@@ -166,7 +164,7 @@ class AboutFooter extends StatelessWidget {
     return Column(
       children: [
         Icon(
-          Icons.favorite_rounded,
+          CupertinoIcons.heart_fill,
           color: colorScheme.primary,
           size: 22,
         ),

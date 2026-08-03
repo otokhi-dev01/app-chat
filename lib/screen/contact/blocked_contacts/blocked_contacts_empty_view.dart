@@ -2,12 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ContactEmptyState extends StatelessWidget {
-  final bool hasSearchQuery;
-
-  const ContactEmptyState({
+class BlockedContactsEmptyView extends StatelessWidget {
+  const BlockedContactsEmptyView({
     super.key,
-    this.hasSearchQuery = false,
   });
 
   @override
@@ -17,7 +14,10 @@ class ContactEmptyState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        padding: EdgeInsets.symmetric(
+          vertical: 40,
+          horizontal: 20,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -26,20 +26,20 @@ class ContactEmptyState extends StatelessWidget {
               height: 72,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.11),
+                color: colorScheme.primary.withValues(
+                  alpha: 0.11,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                hasSearchQuery
-                    ? CupertinoIcons.search
-                    : CupertinoIcons.person_2,
+                CupertinoIcons.slash_circle,
                 color: colorScheme.primary,
                 size: 34,
               ),
             ),
             SizedBox(height: 16),
             Text(
-              hasSearchQuery ? 'no_results_found'.tr : 'no_contacts_yet'.tr,
+              'no_blocked_contacts'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
@@ -49,9 +49,7 @@ class ContactEmptyState extends StatelessWidget {
             ),
             SizedBox(height: 6),
             Text(
-              hasSearchQuery
-                  ? 'no_contacts_match_search'.tr
-                  : 'add_contacts_to_start'.tr,
+              'no_blocked_contacts_desc'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,

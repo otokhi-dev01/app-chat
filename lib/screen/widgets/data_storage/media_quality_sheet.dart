@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,7 +7,7 @@ class MediaQualitySheet extends StatelessWidget {
   final String selectedValue;
   final List<String> options;
 
- const MediaQualitySheet({
+  const MediaQualitySheet({
     super.key,
     required this.title,
     required this.selectedValue,
@@ -21,7 +22,7 @@ class MediaQualitySheet extends StatelessWidget {
   }) {
     return showModalBottomSheet<String>(
       context: context,
-      useSafeArea: true,
+      useSafeArea: false,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(
@@ -88,144 +89,161 @@ class MediaQualitySheet extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color sheetColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color sheetColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        10,
-        16,
-        20,
+    Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
+
+    Color actionBackground = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Color(0xFFF2F4F7);
+
+    return Material(
+      color: sheetColor,
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(28),
       ),
-      decoration: BoxDecoration(
-        color: sheetColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(26),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 42,
-            height: 4,
-            decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withValues(
-                alpha: 0.28,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        top: false,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(
+            18,
+            12,
+            18,
+            20,
           ),
-
-          SizedBox(height: 18),
-
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: Text(
-                  _translatedTitle(title),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w700,
+              Center(
+                child: Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.28,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
 
-              Tooltip(
-                message: 'close'.tr,
-                child: Material(
-                  color: colorScheme.surfaceContainerHighest,
-                  shape: CircleBorder(),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    customBorder: CircleBorder(),
-                    child: SizedBox(
-                      width: 36,
-                      height: 36,
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: colorScheme.onSurfaceVariant,
+              SizedBox(height: 18),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _translatedTitle(title),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                ),
+
+                  // Unit Close Button UI
+                  Container(
+                    width: 36,
+                    height: 36,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: actionBackground,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: borderColor,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size(36, 36),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Icon(
+                        CupertinoIcons.xmark,
+                        size: 18,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16),
+
+              ...options.map(
+                    (String option) {
+                  bool selected = option == selectedValue;
+
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: 8,
+                    ),
+                    child: Material(
+                      color: selected
+                          ? colorScheme.primary.withValues(
+                        alpha: 0.11,
+                      )
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop(option);
+                        },
+                        borderRadius: BorderRadius.circular(18),
+                        splashColor: colorScheme.primary.withValues(alpha: 0.12),
+                        highlightColor: colorScheme.primary.withValues(alpha: 0.06),
+                        child: Container(
+                          width: double.infinity,
+                          constraints: BoxConstraints(
+                            minHeight: 52,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 13,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _translatedOption(option),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: selected
+                                        ? colorScheme.primary
+                                        : colorScheme.onSurface,
+                                    fontWeight: selected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+
+                              if (selected)
+                                Icon(
+                                  CupertinoIcons.checkmark,
+                                  color: colorScheme.primary,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
-
-          SizedBox(height: 12),
-
-          ...options.map(
-                (String option) {
-              bool selected =
-                  option == selectedValue;
-
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: 7,
-                ),
-                child: Material(
-                  color: selected
-                      ? colorScheme.primary.withValues(
-                    alpha: 0.10,
-                  )
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop(
-                        option,
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: double.infinity,
-                      constraints: BoxConstraints(
-                        minHeight: 52,
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _translatedOption(option),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: selected
-                                    ? colorScheme.primary
-                                    : colorScheme.onSurface,
-                                fontWeight: selected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-
-                          if (selected)
-                            Icon(
-                              Icons.check_circle_rounded,
-                              color: colorScheme.primary,
-                              size: 22,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

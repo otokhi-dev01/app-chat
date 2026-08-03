@@ -1,14 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/contact_controller.dart';
 import '../../contact/qr_scan/qr_contact_scanner_binding.dart';
+import '../common/app_feedback.dart';
 import 'show_add_contact_sheet.dart';
 
 class ContactAddButton extends StatelessWidget {
   final ContactController controller;
 
-  const ContactAddButton({
+  ContactAddButton({
     super.key,
     required this.controller,
   });
@@ -37,14 +39,12 @@ class ContactAddButton extends StatelessWidget {
   Future<void> _openQrScanner(
       BuildContext context,
       ) async {
-    // 1. Await the dynamic result of the binding's route (removing <String> to avoid GetX cast error)
     final dynamic scannedValueResult = await QrContactScannerBinding.open();
 
     if (scannedValueResult == null || !context.mounted) {
       return;
     }
 
-    // 2. Perform a safe runtime type-check on the returned value
     if (scannedValueResult is String) {
       final String scannedValue = scannedValueResult;
 
@@ -95,23 +95,11 @@ class ContactAddButton extends StatelessWidget {
   void _showInvalidQrMessage(
       BuildContext context,
       ) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text(
-            'This QR code does not contain a phone number',
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: colorScheme.error,
-          margin: const EdgeInsets.all(14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    AppFeedback.showMessage(
+      title: 'invalid_qr_code'.tr,
+      message: 'qr_no_phone_number'.tr,
+      icon: CupertinoIcons.exclamationmark_circle,
+    );
   }
 
   @override
@@ -139,13 +127,13 @@ class ContactAddButton extends StatelessWidget {
           return IgnorePointer(
             ignoring: !isVisible,
             child: AnimatedSlide(
-              duration: const Duration(
+              duration: Duration(
                 milliseconds: 220,
               ),
               curve: Curves.easeOutCubic,
-              offset: isVisible ? Offset.zero : const Offset(0, 2),
+              offset: isVisible ? Offset.zero : Offset(0, 2),
               child: AnimatedOpacity(
-                duration: const Duration(
+                duration: Duration(
                   milliseconds: 180,
                 ),
                 curve: Curves.easeOutCubic,
@@ -157,12 +145,12 @@ class ContactAddButton extends StatelessWidget {
                       BoxShadow(
                         color: shadowColor,
                         blurRadius: 18,
-                        offset: const Offset(0, 8),
+                        offset: Offset(0, 8),
                       ),
                     ],
                   ),
                   child: Tooltip(
-                    message: 'Add contact',
+                    message: 'add_contact'.tr,
                     child: FloatingActionButton(
                       heroTag: 'add_contact_fab',
                       elevation: 0,
@@ -174,10 +162,10 @@ class ContactAddButton extends StatelessWidget {
                           context,
                         );
                       },
-                      shape: const CircleBorder(),
-                      child: const Icon(
-                        Icons.person_add_alt_1_rounded,
-                        size: 23,
+                      shape: CircleBorder(),
+                      child: Icon(
+                        CupertinoIcons.person_badge_plus,
+                        size: 22,
                       ),
                     ),
                   ),

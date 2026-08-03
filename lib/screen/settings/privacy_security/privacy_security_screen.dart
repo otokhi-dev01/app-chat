@@ -6,7 +6,7 @@ import '../../widgets/privacy_securty/privacy_security_content.dart';
 import 'privacy_security_app_bar.dart';
 
 class PrivacySecurityScreen extends StatelessWidget {
-  PrivacySecurityScreen({
+  const PrivacySecurityScreen({
     super.key,
   });
 
@@ -30,8 +30,7 @@ class PrivacySecurityScreen extends StatelessWidget {
       options: options,
     );
 
-    if (result == null ||
-        result == selectedValue) {
+    if (result == null || result == selectedValue) {
       return;
     }
 
@@ -62,9 +61,8 @@ class PrivacySecurityScreen extends StatelessWidget {
       ) {
     return _openOptions(
       context: context,
-      title: 'Two-Step Verification',
-      selectedValue: controller
-          .twoStepVerificationStatus.value,
+      title: 'two_step_verification'.tr,
+      selectedValue: controller.twoStepVerificationStatus.value,
       options: [
         'On',
         'Off',
@@ -82,17 +80,15 @@ class PrivacySecurityScreen extends StatelessWidget {
       ) {
     return _openOptions(
       context: context,
-      title: 'Delete Account If Away For',
-      selectedValue:
-      controller.accountDeletePeriod.value,
+      title: 'delete_account_if_away_for'.tr,
+      selectedValue: controller.accountDeletePeriod.value,
       options: [
         '1 month',
         '3 months',
         '6 months',
         '1 year',
       ],
-      onSelected:
-      controller.updateDeletePeriod,
+      onSelected: controller.updateDeletePeriod,
     );
   }
 
@@ -101,94 +97,62 @@ class PrivacySecurityScreen extends StatelessWidget {
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor:
-      theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: PrivacySecurityAppBar(),
       body: Obx(
             () {
           return PrivacySecurityContent(
-            appLockEnabled:
-            controller.appLockEnabled.value,
-            screenSecurityEnabled:
-            controller
-                .screenSecurityEnabled.value,
-            syncContactsEnabled:
-            controller
-                .syncContactsEnabled.value,
-            phoneNumberPrivacy:
-            controller
-                .phoneNumberPrivacy.value,
-            lastSeenPrivacy:
-            controller
-                .lastSeenPrivacy.value,
-            profilePhotoPrivacy:
-            controller
-                .profilePhotoPrivacy.value,
-            callsPrivacy:
-            controller.callsPrivacy.value,
-            groupsPrivacy:
-            controller.groupsPrivacy.value,
-            twoStepStatus:
-            controller
-                .twoStepVerificationStatus
-                .value,
-            accountDeletePeriod:
-            controller
-                .accountDeletePeriod.value,
-            onAppLockChanged:
-            controller.toggleAppLock,
-            onScreenSecurityChanged:
-            controller.toggleScreenSecurity,
-            onSyncContactsChanged:
-            controller.toggleSyncContacts,
+            appLockEnabled: controller.appLockEnabled.value,
+            screenSecurityEnabled: controller.screenSecurityEnabled.value,
+            syncContactsEnabled: controller.syncContactsEnabled.value,
+            phoneNumberPrivacy: controller.phoneNumberPrivacy.value,
+            lastSeenPrivacy: controller.lastSeenPrivacy.value,
+            profilePhotoPrivacy: controller.profilePhotoPrivacy.value,
+            callsPrivacy: controller.callsPrivacy.value,
+            groupsPrivacy: controller.groupsPrivacy.value,
+            twoStepStatus: controller.twoStepVerificationStatus.value,
+            accountDeletePeriod: controller.accountDeletePeriod.value,
+            onAppLockChanged: controller.toggleAppLock,
+            onScreenSecurityChanged: controller.toggleScreenSecurity,
+            onSyncContactsChanged: controller.toggleSyncContacts,
             onPhoneNumberTap: () {
               _openPrivacyOptions(
                 context: context,
-                title: 'Phone Number',
-                selectedValue: controller
-                    .phoneNumberPrivacy.value,
-                onSelected: controller
-                    .updatePhoneNumberPrivacy,
+                title: 'phone_number'.tr,
+                selectedValue: controller.phoneNumberPrivacy.value,
+                onSelected: controller.updatePhoneNumberPrivacy,
               );
             },
             onLastSeenTap: () {
               _openPrivacyOptions(
                 context: context,
-                title: 'Last Seen & Online',
-                selectedValue: controller
-                    .lastSeenPrivacy.value,
-                onSelected: controller
-                    .updateLastSeenPrivacy,
+                title: 'last_seen_and_online'.tr,
+                selectedValue: controller.lastSeenPrivacy.value,
+                onSelected: controller.updateLastSeenPrivacy,
               );
             },
             onProfilePhotoTap: () {
               _openPrivacyOptions(
                 context: context,
-                title: 'Profile Photos',
-                selectedValue: controller
-                    .profilePhotoPrivacy.value,
-                onSelected: controller
-                    .updateProfilePhotoPrivacy,
+                title: 'profile_photos'.tr,
+                selectedValue: controller.profilePhotoPrivacy.value,
+                onSelected: controller.updateProfilePhotoPrivacy,
               );
             },
             onCallsTap: () {
               _openPrivacyOptions(
                 context: context,
-                title: 'Calls',
-                selectedValue:
-                controller.callsPrivacy.value,
-                onSelected:
-                controller.updateCallsPrivacy,
+                title: 'calls'.tr,
+                selectedValue: controller.callsPrivacy.value,
+                onSelected: controller.updateCallsPrivacy,
               );
             },
             onGroupsTap: () {
               _openPrivacyOptions(
                 context: context,
-                title: 'Groups & Channels',
-                selectedValue:
-                controller.groupsPrivacy.value,
-                onSelected:
-                controller.updateGroupsPrivacy,
+                title: 'groups_and_channels'.tr,
+                selectedValue: controller.groupsPrivacy.value,
+                onSelected: controller.updateGroupsPrivacy,
               );
             },
             onTwoStepTap: () {

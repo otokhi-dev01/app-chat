@@ -5,6 +5,21 @@ final Map<String, String> enUS = {
 'contacts': 'Contacts',
 'settings': 'Settings',
 'profile': 'Profile',
+  'create_folder': 'Create Folder',
+  'edit_folder': 'Edit Folder',
+  'delete_folder': 'Deleted Folder',
+  'folder_header_description': 'Manage your chat folders',
+  'folder_count': 'Folder Count',
+  'default_folders': 'Default Folders',
+  'custom_folder': 'Custom Folders',
+  'custom_folders': 'Custom Folders',
+  'organize_conversations': 'Organize Conversations',
+  'create_new_folder': 'Create New Folder',
+  'folder_info_description': 'Folder Information',
+  'folder_name_example': 'Example Folder Name',
+  'add_members': 'Add Members',
+  'folder_name': 'Folder Name',
+
 
   'welcome_back': 'Welcome Back',
   'login_continue_chatting':

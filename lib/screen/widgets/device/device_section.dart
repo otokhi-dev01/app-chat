@@ -1,8 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DevicesSecurityHeader extends StatelessWidget {
-  DevicesSecurityHeader({
+  const DevicesSecurityHeader({
     super.key,
   });
 
@@ -11,12 +12,9 @@ class DevicesSecurityHeader extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -38,13 +36,10 @@ class DevicesSecurityHeader extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(
-              alpha: isDark ? 0.18 : 0.05,
+              alpha: isDark ? 0.15 : 0.04,
             ),
-            blurRadius: 20,
-            offset: Offset(
-              0,
-              8,
-            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -66,18 +61,15 @@ class DevicesSecurityHeader extends StatelessWidget {
               ),
             ),
             child: Icon(
-              Icons.security_rounded,
+              CupertinoIcons.shield_fill,
               color: colorScheme.primary,
-              size: 27,
+              size: 26,
             ),
           ),
-
           SizedBox(width: 14),
-
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'manage_your_devices'.tr,
@@ -87,9 +79,7 @@ class DevicesSecurityHeader extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-
                 SizedBox(height: 5),
-
                 Text(
                   'manage_devices'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -112,7 +102,7 @@ class DevicesSectionHeader extends StatelessWidget {
   final IconData icon;
   final int? count;
 
-  DevicesSectionHeader({
+  const DevicesSectionHeader({
     super.key,
     required this.title,
     required this.icon,
@@ -135,9 +125,7 @@ class DevicesSectionHeader extends StatelessWidget {
             color: colorScheme.primary,
             size: 19,
           ),
-
           SizedBox(width: 8),
-
           Expanded(
             child: Text(
               title,
@@ -148,7 +136,6 @@ class DevicesSectionHeader extends StatelessWidget {
               ),
             ),
           ),
-
           if (count != null)
             Container(
               constraints: BoxConstraints(
@@ -182,7 +169,7 @@ class DevicesSectionHeader extends StatelessWidget {
 }
 
 class NoOtherSessionsCard extends StatelessWidget {
-  NoOtherSessionsCard({
+  const NoOtherSessionsCard({
     super.key,
   });
 
@@ -191,12 +178,9 @@ class NoOtherSessionsCard extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -214,10 +198,19 @@ class NoOtherSessionsCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -227,19 +220,17 @@ class NoOtherSessionsCard extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colorScheme.primary.withValues(
-                alpha: 0.10,
+                alpha: 0.11,
               ),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.verified_user_rounded,
+              CupertinoIcons.checkmark_shield_fill,
               color: colorScheme.primary,
-              size: 29,
+              size: 28,
             ),
           ),
-
           SizedBox(height: 13),
-
           Text(
             'no_other_active_sessions'.tr,
             textAlign: TextAlign.center,
@@ -249,9 +240,7 @@ class NoOtherSessionsCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-
           SizedBox(height: 5),
-
           Text(
             'account_only_signed_in_here'.tr,
             textAlign: TextAlign.center,
@@ -268,7 +257,7 @@ class NoOtherSessionsCard extends StatelessWidget {
 }
 
 class EmptyCurrentDeviceCard extends StatelessWidget {
-  EmptyCurrentDeviceCard({
+  const EmptyCurrentDeviceCard({
     super.key,
   });
 
@@ -277,12 +266,9 @@ class EmptyCurrentDeviceCard extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -297,21 +283,37 @@ class EmptyCurrentDeviceCard extends StatelessWidget {
       padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.device_unknown_rounded,
-            color: colorScheme.onSurfaceVariant,
-            size: 25,
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.11),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              CupertinoIcons.device_phone_portrait,
+              color: colorScheme.primary,
+              size: 20,
+            ),
           ),
-
           SizedBox(width: 12),
-
           Expanded(
             child: Text(
               'current_device_unavailable'.tr,

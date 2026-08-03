@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,31 +13,32 @@ class DataStorageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       width: double.infinity,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: children,
@@ -52,16 +54,11 @@ class DataStorageDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark =
-        Theme.of(context).brightness == Brightness.dark;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color dividerColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.07,
-    )
-        : Colors.black.withValues(
-      alpha: 0.05,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -119,20 +116,13 @@ class DataStorageSummaryCard extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       padding: EdgeInsets.all(16),
@@ -142,6 +132,15 @@ class DataStorageSummaryCard extends StatelessWidget {
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -156,14 +155,12 @@ class DataStorageSummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(
-              Icons.storage_rounded,
+              CupertinoIcons.tray_arrow_up,
               color: colorScheme.primary,
               size: 28,
             ),
           ),
-
           SizedBox(width: 14),
-
           Expanded(
             child: Row(
               children: [
@@ -173,15 +170,12 @@ class DataStorageSummaryCard extends StatelessWidget {
                     value: cacheSize,
                   ),
                 ),
-
                 Container(
                   width: 1,
                   height: 38,
                   color: borderColor,
                 ),
-
                 SizedBox(width: 14),
-
                 Expanded(
                   child: _SummaryValue(
                     label: 'network'.tr,
@@ -201,7 +195,7 @@ class _SummaryValue extends StatelessWidget {
   final String label;
   final String value;
 
-  const _SummaryValue({
+ const _SummaryValue({
     required this.label,
     required this.value,
   });
@@ -223,9 +217,7 @@ class _SummaryValue extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-
         SizedBox(height: 3),
-
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -246,36 +238,44 @@ class DataStorageInformationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: colorScheme.primary.withValues(
-          alpha: 0.07,
+          alpha: isDark ? 0.12 : 0.08,
         ),
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: colorScheme.primary.withValues(
-            alpha: 0.14,
+            alpha: isDark ? 0.22 : 0.15,
           ),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: colorScheme.primary,
-            size: 20,
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              CupertinoIcons.info_circle,
+              color: colorScheme.primary,
+              size: 18,
+            ),
           ),
-
           SizedBox(width: 10),
-
           Expanded(
             child: Text(
               'clear_cache_information'.tr,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: colorScheme.onSurface,
                 fontSize: 11,
                 height: 1.45,
               ),

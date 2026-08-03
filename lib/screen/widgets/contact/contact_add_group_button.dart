@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ContactAddGroupButton extends StatelessWidget {
   final VoidCallback? onTap;
@@ -13,12 +15,9 @@ class ContactAddGroupButton extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -28,8 +27,7 @@ class ContactAddGroupButton extends StatelessWidget {
       alpha: 0.06,
     );
 
-    Color iconBackground =
-    colorScheme.primary.withValues(
+    Color iconBackground = colorScheme.primary.withValues(
       alpha: 0.11,
     );
 
@@ -61,12 +59,22 @@ class ContactAddGroupButton extends StatelessWidget {
               vertical: 8,
             ),
             decoration: BoxDecoration(
+              color: cardColor,
               borderRadius: BorderRadius.circular(
                 15,
               ),
               border: Border.all(
                 color: borderColor,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -76,13 +84,12 @@ class ContactAddGroupButton extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: iconBackground,
-                    borderRadius:
-                    BorderRadius.circular(
+                    borderRadius: BorderRadius.circular(
                       12,
                     ),
                   ),
                   child: Icon(
-                    Icons.group_add_outlined,
+                    CupertinoIcons.person_3,
                     color: colorScheme.primary,
                     size: 20,
                   ),
@@ -91,38 +98,27 @@ class ContactAddGroupButton extends StatelessWidget {
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Create New Group',
+                        'create_new_group'.tr,
                         maxLines: 1,
-                        overflow:
-                        TextOverflow.ellipsis,
-                        style: theme
-                            .textTheme.bodyMedium
-                            ?.copyWith(
-                          color:
-                          colorScheme.onSurface,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
                           fontSize: 13,
-                          fontWeight:
-                          FontWeight.w700,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Choose contacts and start a group',
+                        'create_group_description'.tr,
                         maxLines: 1,
-                        overflow:
-                        TextOverflow.ellipsis,
-                        style: theme
-                            .textTheme.bodySmall
-                            ?.copyWith(
-                          color: colorScheme
-                              .onSurfaceVariant,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 10,
-                          fontWeight:
-                          FontWeight.w500,
+                          fontWeight: FontWeight.w500,
                           height: 1.2,
                         ),
                       ),
@@ -135,18 +131,15 @@ class ContactAddGroupButton extends StatelessWidget {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme
-                        .surfaceContainerHighest
-                        .withValues(
+                    color: colorScheme.surfaceContainerHighest.withValues(
                       alpha: isDark ? 0.55 : 0.70,
                     ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: colorScheme
-                        .onSurfaceVariant,
-                    size: 18,
+                    CupertinoIcons.chevron_right,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 16,
                   ),
                 ),
               ],

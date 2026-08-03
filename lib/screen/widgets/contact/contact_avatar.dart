@@ -14,7 +14,7 @@ class ContactAvatar extends StatelessWidget {
 
   // Telegram-style deterministic color per contact based on name
   Color _colorForName(String name) {
-    const List<Color> palette = [
+    List<Color> palette = [
       Color(0xFFE17076),
       Color(0xFFFAA774),
       Color(0xFFA695E7),
@@ -24,22 +24,31 @@ class ContactAvatar extends StatelessWidget {
       Color(0xFFEE7AAE),
     ];
 
-    final int index = name.codeUnitAt(0) % palette.length;
+    if (name.trim().isEmpty) {
+      return palette[0];
+    }
+
+    int index = name.codeUnitAt(0) % palette.length;
     return palette[index];
   }
 
   String get _initials {
-    final List<String> parts = name.trim().split(' ');
+    List<String> parts = name.trim().split(' ');
 
-    if (parts.length >= 2) {
+    if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
 
-    return name.isNotEmpty ? name[0].toUpperCase() : '?';
+    return name.trim().isNotEmpty ? name.trim()[0].toUpperCase() : '?';
   }
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    bool isDark = theme.brightness == Brightness.dark;
+
+    Color badgeBorderColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -69,9 +78,9 @@ class ContactAvatar extends StatelessWidget {
               height: size * 0.28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF4CD964),
+                color: Color(0xFF32C766),
                 border: Border.all(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: badgeBorderColor,
                   width: 2,
                 ),
               ),

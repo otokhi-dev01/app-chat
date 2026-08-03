@@ -1,4 +1,3 @@
-
 import 'package:appchat/screen/settings/setting_screen.dart';
 import 'package:get/get.dart';
 import '../controllers/chat/chat_controller.dart';
@@ -12,6 +11,8 @@ import '../screen/auth/verity_otp_screen.dart';
 import '../screen/contact/add_contact/add_contact_screen.dart';
 import '../screen/contact/add_group/add_group_binding.dart';
 import '../screen/contact/add_group/add_group_screen.dart';
+import '../screen/contact/blocked_contacts/blocked_contact_binding.dart';
+import '../screen/contact/blocked_contacts/blocked_contact_screen.dart';
 import '../screen/contact/contact_binding.dart';
 import '../screen/contact/contact_screen.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_binding.dart';
@@ -134,6 +135,18 @@ class AppPages {
         milliseconds: 200, // Reduced to 200ms
       ),
     ),
+
+    GetPage(
+      name: AppRoutes.blockedContacts,
+      page: () => BlockedContactsScreen(),
+      binding: BlockedContactBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      ),
+    ),
+
+
 
 
     // ── Settings ────────────────────────────────────────────

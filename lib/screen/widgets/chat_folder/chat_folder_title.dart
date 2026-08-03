@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../../models/chat_folder_model.dart';
 
@@ -17,73 +19,55 @@ class ChatFolderTile extends StatelessWidget {
   IconData get folderIcon {
     switch (folder.type) {
       case ChatFolderType.all:
-        return Icons.chat_bubble_outline_rounded;
-
+        return CupertinoIcons.chat_bubble_2;
       case ChatFolderType.personal:
-        return Icons.person_outline_rounded;
-
+        return CupertinoIcons.person;
       case ChatFolderType.custom:
-        return Icons.folder_outlined;
+        return CupertinoIcons.folder;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Material(
       color: Colors.transparent,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          14,
-          12,
-          8,
-          12,
-        ),
+        padding: EdgeInsets.fromLTRB(14, 12, 8, 12),
         child: Row(
           children: [
             _ChatFolderIcon(
               icon: folderIcon,
-              custom:
-              !folder.isSystem,
+              custom: !folder.isSystem,
             ),
             SizedBox(width: 13),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     folder.name,
                     maxLines: 2,
                     softWrap: true,
-                    overflow:
-                    TextOverflow.visible,
-                    style: theme
-                        .textTheme.bodyLarge
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurface,
-                      fontWeight:
-                      FontWeight.w600,
+                    overflow: TextOverflow.visible,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
                       height: 1.25,
                     ),
                   ),
                   SizedBox(height: 3),
                   Text(
                     folder.isSystem
-                        ? 'Default folder'
-                        : 'Custom folder',
+                        ? 'default_folder'.tr
+                        : 'custom_folder'.tr,
                     maxLines: 1,
-                    overflow:
-                    TextOverflow.ellipsis,
-                    style: theme
-                        .textTheme.bodySmall
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: 11,
                     ),
                   ),
@@ -92,32 +76,19 @@ class ChatFolderTile extends StatelessWidget {
             ),
             SizedBox(width: 8),
             Container(
-              constraints: BoxConstraints(
-                minWidth: 30,
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 5,
-              ),
+              constraints: BoxConstraints(minWidth: 30),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(
-                  alpha: 0.09,
-                ),
-                borderRadius:
-                BorderRadius.circular(20),
+                color: colorScheme.primary.withValues(alpha: 0.11),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 folder.chatCount.toString(),
                 textAlign: TextAlign.center,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color:
-                  colorScheme.primary,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primary,
                   fontSize: 11,
-                  fontWeight:
-                  FontWeight.w700,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -127,51 +98,55 @@ class ChatFolderTile extends StatelessWidget {
                 width: 38,
                 height: 38,
                 child: Icon(
-                  Icons.lock_outline_rounded,
-                  color: colorScheme
-                      .onSurfaceVariant,
+                  CupertinoIcons.lock,
+                  color: colorScheme.onSurfaceVariant,
                   size: 18,
                 ),
               )
             else
               PopupMenuButton<String>(
-                tooltip: 'Folder options',
+                tooltip: 'folder_options'.tr,
                 padding: EdgeInsets.zero,
+                color: isDark ? Color(0xFF24272E) : Colors.white,
+                elevation: 10,
+                shadowColor: Colors.black.withValues(
+                  alpha: isDark ? 0.35 : 0.12,
+                ),
                 icon: Icon(
-                  Icons.more_vert_rounded,
-                  color: colorScheme
-                      .onSurfaceVariant,
-                  size: 21,
+                  CupertinoIcons.ellipsis,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.06),
+                  ),
                 ),
-                onSelected: (
-                    String value,
-                    ) {
+                onSelected: (String value) {
                   if (value == 'edit') {
                     onEdit();
                     return;
                   }
-
                   if (value == 'delete') {
                     onDelete();
                   }
                 },
-                itemBuilder:
-                    (BuildContext context) {
+                itemBuilder: (BuildContext context) {
                   return [
                     PopupMenuItem<String>(
                       value: 'edit',
                       child: Row(
                         children: [
                           Icon(
-                            Icons.edit_outlined,
-                            size: 20,
+                            CupertinoIcons.pencil,
+                            size: 18,
+                            color: colorScheme.onSurface,
                           ),
                           SizedBox(width: 12),
-                          Text('Edit folder'),
+                          Text('edit_folder'.tr),
                         ],
                       ),
                     ),
@@ -180,17 +155,15 @@ class ChatFolderTile extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(
-                            Icons.delete_outline_rounded,
-                            color:
-                            colorScheme.error,
-                            size: 20,
+                            CupertinoIcons.trash,
+                            color: colorScheme.error,
+                            size: 18,
                           ),
                           SizedBox(width: 12),
                           Text(
-                            'Delete folder',
+                            'delete_folder'.tr,
                             style: TextStyle(
-                              color:
-                              colorScheme.error,
+                              color: colorScheme.error,
                             ),
                           ),
                         ],
@@ -217,31 +190,22 @@ class _ChatFolderIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: 42,
       height: 42,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: custom
-            ? colorScheme.primary
-            .withValues(
-          alpha: 0.14,
-        )
-            : colorScheme
-            .surfaceContainerHighest,
-        borderRadius:
-        BorderRadius.circular(13),
+        color: colorScheme.primary.withValues(
+          alpha: 0.11,
+        ),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
         icon,
-        color: custom
-            ? colorScheme.primary
-            : colorScheme
-            .onSurfaceVariant,
-        size: 21,
+        color: colorScheme.primary,
+        size: 20,
       ),
     );
   }

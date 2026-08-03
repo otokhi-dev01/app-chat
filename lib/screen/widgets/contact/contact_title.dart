@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/contact_model.dart';
 
@@ -25,19 +27,17 @@ class ContactTile extends StatelessWidget {
   String get statusText {
     switch (contact.status) {
       case ContactStatus.online:
-        return 'Online';
+        return 'online'.tr;
 
       case ContactStatus.recently:
-        return 'Recently active';
+        return 'recently_active'.tr;
 
       case ContactStatus.offline:
-        return 'Offline';
+        return 'offline'.tr;
     }
   }
 
-  Color _statusColor(
-      ColorScheme colorScheme,
-      ) {
+  Color _statusColor(ColorScheme colorScheme) {
     switch (contact.status) {
       case ContactStatus.online:
         return Color(0xFF32C766);
@@ -55,46 +55,55 @@ class ContactTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color tileColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color tileColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
       alpha: 0.08,
     )
-        : Color(0xFFE7E9ED);
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
-    Color statusColor =
-    _statusColor(colorScheme);
+    Color statusColor = _statusColor(colorScheme);
 
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 14,
-        vertical: 4,
+        vertical: 3, // Compact tile vertical margin
       ),
       child: Material(
         color: tileColor,
-        borderRadius:
-        BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
-          borderRadius:
-          BorderRadius.circular(17),
+          borderRadius: BorderRadius.circular(16),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: 13,
-              vertical: 11,
+              horizontal: 12,
+              vertical: 8, // Compact inner tile padding
             ),
             decoration: BoxDecoration(
-              borderRadius:
-              BorderRadius.circular(17),
+              color: tileColor,
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: borderColor,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -102,18 +111,16 @@ class ContactTile extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: 52,
-                      height: 52,
+                      width: 44, // Compact 44x44 avatar container
+                      height: 44,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary
-                            .withValues(
+                        color: colorScheme.primary.withValues(
                           alpha: 0.13,
                         ),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.primary
-                              .withValues(
+                          color: colorScheme.primary.withValues(
                             alpha: 0.20,
                           ),
                         ),
@@ -121,92 +128,69 @@ class ContactTile extends StatelessWidget {
                       child: Text(
                         firstLetter,
                         style: TextStyle(
-                          color:
-                          colorScheme.primary,
-                          fontSize: 18,
-                          fontWeight:
-                          FontWeight.w700,
+                          color: colorScheme.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-                    if (contact.status ==
-                        ContactStatus.online)
+                    if (contact.status == ContactStatus.online)
                       Positioned(
                         right: 0,
                         bottom: 0,
                         child: Container(
-                          width: 14,
-                          height: 14,
+                          width: 12,
+                          height: 12,
                           decoration: BoxDecoration(
-                            color:
-                            Color(0xFF32C766),
-                            shape:
-                            BoxShape.circle,
+                            color: Color(0xFF32C766),
+                            shape: BoxShape.circle,
                             border: Border.all(
                               color: tileColor,
-                              width: 2.2,
+                              width: 2,
                             ),
                           ),
                         ),
                       ),
                   ],
                 ),
-                SizedBox(width: 13),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         contact.name,
                         maxLines: 1,
-                        overflow:
-                        TextOverflow.ellipsis,
-                        style: theme
-                            .textTheme.bodyLarge
-                            ?.copyWith(
-                          color:
-                          colorScheme.onSurface,
-                          fontWeight:
-                          FontWeight.w600,
-                          fontSize: 15.5,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.5,
                         ),
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 3),
                       Row(
                         children: [
                           Container(
                             width: 6,
                             height: 6,
-                            decoration:
-                            BoxDecoration(
+                            decoration: BoxDecoration(
                               color: statusColor,
-                              shape:
-                              BoxShape.circle,
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 5),
                           Expanded(
                             child: Text(
                               statusText,
                               maxLines: 1,
-                              overflow:
-                              TextOverflow
-                                  .ellipsis,
-                              style: theme
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
                                 color: statusColor,
-                                fontSize: 12,
-                                fontWeight:
-                                contact.status ==
-                                    ContactStatus
-                                        .online
-                                    ? FontWeight
-                                    .w600
-                                    : FontWeight
-                                    .w500,
+                                fontSize: 11.5,
+                                fontWeight: contact.status == ContactStatus.online
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
                               ),
                             ),
                           ),
@@ -217,19 +201,19 @@ class ContactTile extends StatelessWidget {
                 ),
                 SizedBox(width: 8),
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 28,
+                  height: 28,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary
-                        .withValues(alpha: 0.09),
+                    color: colorScheme.primary.withValues(
+                      alpha: 0.09,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons
-                        .chevron_right_rounded,
+                    CupertinoIcons.chevron_right,
                     color: colorScheme.primary,
-                    size: 22,
+                    size: 14,
                   ),
                 ),
               ],

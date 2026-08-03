@@ -1,23 +1,23 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/device/device_controller.dart';
 
-class DevicesAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class DevicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final DeviceController controller;
 
-  DevicesAppBar({
+  const DevicesAppBar({
     super.key,
     required this.controller,
   });
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(64);
+    return Size.fromHeight(60);
   }
 
   SystemUiOverlayStyle _getOverlayStyle({
@@ -27,77 +27,51 @@ class DevicesAppBar extends StatelessWidget
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
-    )
-        : Colors.white.withValues(
-      alpha: 0.98,
-    );
+        ? Color(0xFF1B1D22).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.70);
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return AppBar(
-      toolbarHeight: 64,
+      toolbarHeight: 60,
       automaticallyImplyLeading: false,
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: Colors.transparent,
-      foregroundColor:
-      colorScheme.onSurface,
-      surfaceTintColor:
-      Colors.transparent,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
       titleSpacing: 0,
       leadingWidth: 58,
-      systemOverlayStyle:
-      _getOverlayStyle(
+      systemOverlayStyle: _getOverlayStyle(
         theme: theme,
         isDark: isDark,
       ),
@@ -121,37 +95,41 @@ class DevicesAppBar extends StatelessWidget
         ),
       ),
       leading: Padding(
-        padding: EdgeInsets.fromLTRB(
-          9,
-          13,
-          7,
-          13,
-        ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: Tooltip(
-            message: 'Back',
-            child: InkWell(
-              onTap: () {
-                FocusManager
-                    .instance.primaryFocus
-                    ?.unfocus();
-
+        padding: EdgeInsets.fromLTRB(12, 10, 6, 10),
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(40, 40),
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
                 Get.back();
               },
-              customBorder:
-              CircleBorder(),
-              child: SizedBox(
-                width: 38,
-                height: 38,
-                child: Icon(
-                  Icons
-                      .arrow_back_ios_new_rounded,
-                  color:
-                  colorScheme.onSurface,
-                  size: 17,
-                ),
+              child: Icon(
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -159,67 +137,48 @@ class DevicesAppBar extends StatelessWidget
       ),
       title: Obx(
             () {
-          int sessionCount =
-              controller.sessions.length;
-
-          int otherSessionCount =
-              controller.otherSessionCount;
+          int sessionCount = controller.sessions.length;
+          int otherSessionCount = controller.otherSessionCount;
 
           String subtitle;
 
-          if (controller.isLoading.value &&
-              controller.sessions.isEmpty) {
-            subtitle =
-            'Loading devices...';
+          if (controller.isLoading.value && controller.sessions.isEmpty) {
+            subtitle = 'loading_devices'.tr;
           } else if (sessionCount == 0) {
-            subtitle =
-            'No active devices';
+            subtitle = 'no_active_devices'.tr;
           } else if (otherSessionCount == 0) {
-            subtitle =
-            'Only this device';
+            subtitle = 'only_this_device'.tr;
           } else if (otherSessionCount == 1) {
-            subtitle =
-            '1 other active session';
+            subtitle = 'one_other_active_session'.tr;
           } else {
-            subtitle =
-            '$otherSessionCount other active sessions';
+            subtitle = 'other_active_sessions'.trParams({
+              'count': '$otherSessionCount',
+            });
           }
 
           return Column(
-            mainAxisSize:
-            MainAxisSize.min,
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'devices'.tr,
                 maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: theme
-                    .textTheme.titleMedium
-                    ?.copyWith(
-                  color:
-                  colorScheme.onSurface,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontSize: 17,
-                  fontWeight:
-                  FontWeight.w700,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(height: 2),
               Text(
                 subtitle,
                 maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
-                  fontWeight:
-                  FontWeight.w500,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -229,56 +188,54 @@ class DevicesAppBar extends StatelessWidget
       actions: [
         Obx(
               () {
-            bool isLoading =
-                controller.isLoading.value;
+            bool isLoading = controller.isLoading.value;
 
             return Padding(
-              padding: EdgeInsets.fromLTRB(
-                7,
-                13,
-                9,
-                13,
-              ),
-              child: Material(
-                color: actionBackground,
-                shape: CircleBorder(),
-                child: Tooltip(
-                  message: 'Refresh',
-                  child: InkWell(
-                    onTap: isLoading
+              padding: EdgeInsets.fromLTRB(6, 10, 12, 10),
+              child: Tooltip(
+                message: 'refresh'.tr,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: actionBackground,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: borderColor,
+                      width: 1.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.15 : 0.04,
+                        ),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size(40, 40),
+                    onPressed: isLoading
                         ? null
                         : () {
-                      controller
-                          .refreshSessions();
+                      controller.refreshSessions();
                     },
-                    customBorder:
-                    CircleBorder(),
-                    child: SizedBox(
-                      width: 38,
-                      height: 38,
-                      child: Center(
-                        child: isLoading
-                            ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child:
-                          CircularProgressIndicator(
-                            strokeWidth:
-                            2.2,
-                            color:
-                            colorScheme
-                                .primary,
-                          ),
-                        )
-                            : Icon(
-                          Icons
-                              .refresh_rounded,
-                          color:
-                          colorScheme
-                              .primary,
-                          size: 20,
-                        ),
+                    child: isLoading
+                        ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: colorScheme.primary,
                       ),
+                    )
+                        : Icon(
+                      CupertinoIcons.arrow_clockwise,
+                      color: colorScheme.primary,
+                      size: 18,
                     ),
                   ),
                 ),

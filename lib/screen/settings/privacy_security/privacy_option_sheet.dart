@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class PrivacyOptionsSheet extends StatelessWidget {
   final String title;
   final String selectedValue;
   final List<String> options;
 
-  PrivacyOptionsSheet({
+  const PrivacyOptionsSheet({
     super.key,
     required this.title,
     required this.selectedValue,
@@ -20,7 +22,7 @@ class PrivacyOptionsSheet extends StatelessWidget {
   }) {
     return showModalBottomSheet<String>(
       context: context,
-      useSafeArea: true,
+      useSafeArea: false,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(
@@ -39,14 +41,10 @@ class PrivacyOptionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
+    ColorScheme _ = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    Color sheetColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color sheetColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -56,80 +54,82 @@ class PrivacyOptionsSheet extends StatelessWidget {
       alpha: 0.06,
     );
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        10,
-        16,
-        20,
+    Color actionBackground = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Color(0xFFF2F4F7);
+
+    return Material(
+      color: sheetColor,
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(28),
       ),
-      decoration: BoxDecoration(
-        color: sheetColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(26),
-        ),
-        border: Border(
-          top: BorderSide(
-            color: borderColor,
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        top: false,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(
+            18,
+            12,
+            18,
+            20,
           ),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _SheetHandle(),
-          SizedBox(height: 18),
-          _SheetHeader(
-            title: title,
-          ),
-          SizedBox(height: 12),
-          Flexible(
-            child: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children: options.map(
-                      (String option) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: 7,
-                      ),
-                      child: _PrivacyOptionTile(
-                        title: option,
-                        selected:
-                        option == selectedValue,
-                        onTap: () {
-                          Navigator.of(context).pop(
-                            option,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ).toList(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _SheetHandle(),
+              SizedBox(height: 18),
+              _SheetHeader(
+                title: title,
+                actionBackground: actionBackground,
+                borderColor: borderColor,
               ),
-            ),
+              SizedBox(height: 14),
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Column(
+                    children: options.map(
+                          (String option) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom: 8,
+                          ),
+                          child: _PrivacyOptionTile(
+                            title: option,
+                            selected: option == selectedValue,
+                            onTap: () {
+                              Navigator.of(context).pop(
+                                option,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _SheetHandle extends StatelessWidget {
-  _SheetHandle();
+  const _SheetHandle();
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: 42,
       height: 4,
       decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant
-            .withValues(
+        color: colorScheme.onSurfaceVariant.withValues(
           alpha: 0.28,
         ),
         borderRadius: BorderRadius.circular(20),
@@ -140,16 +140,19 @@ class _SheetHandle extends StatelessWidget {
 
 class _SheetHeader extends StatelessWidget {
   final String title;
+  final Color actionBackground;
+  final Color borderColor;
 
-  _SheetHeader({
+  const _SheetHeader({
     required this.title,
+    required this.actionBackground,
+    required this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Row(
       children: [
@@ -166,22 +169,28 @@ class _SheetHeader extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10),
-        Material(
-          color: colorScheme.surfaceContainerHighest,
-          shape: CircleBorder(),
-          child: InkWell(
-            onTap: () {
+        Container(
+          width: 36,
+          height: 36,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: actionBackground,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: borderColor,
+              width: 1.0,
+            ),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(36, 36),
+            onPressed: () {
               Navigator.of(context).pop();
             },
-            customBorder: CircleBorder(),
-            child: SizedBox(
-              width: 36,
-              height: 36,
-              child: Icon(
-                Icons.close_rounded,
-                color: colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
+            child: Icon(
+              CupertinoIcons.xmark,
+              size: 18,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -195,11 +204,36 @@ class _PrivacyOptionTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  _PrivacyOptionTile({
+  const _PrivacyOptionTile({
     required this.title,
     required this.selected,
     required this.onTap,
   });
+
+  String _translatedOption(String value) {
+    switch (value.trim().toLowerCase()) {
+      case 'everybody':
+        return 'everybody'.tr;
+      case 'my contacts':
+        return 'my_contacts'.tr;
+      case 'nobody':
+        return 'nobody'.tr;
+      case 'on':
+        return 'on'.tr;
+      case 'off':
+        return 'off'.tr;
+      case '1 month':
+        return 'one_month'.tr;
+      case '3 months':
+        return 'three_months'.tr;
+      case '6 months':
+        return 'six_months'.tr;
+      case '1 year':
+        return 'one_year'.tr;
+      default:
+        return value;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,88 +242,48 @@ class _PrivacyOptionTile extends StatelessWidget {
 
     Color backgroundColor = selected
         ? colorScheme.primary.withValues(
-      alpha: 0.10,
-    )
-        : Colors.transparent;
-
-    Color borderColor = selected
-        ? colorScheme.primary.withValues(
-      alpha: 0.18,
+      alpha: 0.11,
     )
         : Colors.transparent;
 
     return Material(
       color: backgroundColor,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        overlayColor: WidgetStateProperty.resolveWith(
-              (Set<WidgetState> states) {
-            if (states.contains(
-              WidgetState.pressed,
-            )) {
-              return colorScheme.primary.withValues(
-                alpha: 0.07,
-              );
-            }
-
-            return Colors.transparent;
-          },
-        ),
+        borderRadius: BorderRadius.circular(18),
+        splashColor: colorScheme.primary.withValues(alpha: 0.12),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.06),
         child: Container(
           width: double.infinity,
           constraints: BoxConstraints(
             minHeight: 52,
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 12,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: borderColor,
-            ),
+            horizontal: 16,
+            vertical: 13,
           ),
           child: Row(
             children: [
               Expanded(
                 child: Text(
-                  title,
+                  _translatedOption(title),
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: selected
                         ? colorScheme.primary
                         : colorScheme.onSurface,
-                    fontSize: 14,
-                    fontWeight: selected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                    fontSize: 15,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
               ),
               SizedBox(width: 10),
-              AnimatedSwitcher(
-                duration: Duration(
-                  milliseconds: 180,
-                ),
-                child: selected
-                    ? Icon(
-                  Icons.check_circle_rounded,
-                  key: ValueKey<String>(
-                    'selected_$title',
-                  ),
+              if (selected)
+                Icon(
+                  CupertinoIcons.checkmark,
                   color: colorScheme.primary,
-                  size: 22,
-                )
-                    : SizedBox(
-                  key: ValueKey<String>(
-                    'unselected_$title',
-                  ),
-                  width: 22,
-                  height: 22,
+                  size: 20,
                 ),
-              ),
             ],
           ),
         ),

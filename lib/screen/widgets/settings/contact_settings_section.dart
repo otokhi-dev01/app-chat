@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/contact_controller.dart';
+import '../../../route/app_route.dart';
 import 'action_section_title.dart';
 import 'settings_divider.dart';
 import 'settings_section_title.dart';
@@ -16,11 +17,11 @@ class ContactSettingsSection extends StatelessWidget {
     required this.contactController,
   });
 
-  // void _openRoute(String route) {
-  //   FocusManager.instance.primaryFocus?.unfocus();
-  //   if (Get.currentRoute == route) return;
-  //   Get.toNamed(route, preventDuplicates: true);
-  // }
+  void _openRoute(String route) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (Get.currentRoute == route) return;
+    Get.toNamed(route, preventDuplicates: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,7 @@ class ContactSettingsSection extends StatelessWidget {
                 title: 'blocked_contacts'.tr,
                 subtitle: 'manage_blocked'.tr,
                 onTap: () {
-                  // _openRoute(AppRoutes.blockedContacts);
+                  _openRoute(AppRoutes.blockedContacts);
                 },
               ),
             ],

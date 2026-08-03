@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import 'about_header.dart';
@@ -35,7 +35,7 @@ class AboutContent extends StatelessWidget {
         AboutMenuCard(
           children: [
             AboutMenuTile(
-              icon: Icons.info_outline_rounded,
+              icon: CupertinoIcons.info,
               title: 'version'.tr,
               subtitle: '1.0.0',
               showArrow: false,
@@ -44,7 +44,7 @@ class AboutContent extends StatelessWidget {
             AboutMenuDivider(),
 
             AboutMenuTile(
-              icon: Icons.system_update_alt_rounded,
+              icon: CupertinoIcons.arrow_2_circlepath,
               title: 'check_for_updates'.tr,
               subtitle: 'latest_version_message'.tr,
               onTap: () {},
@@ -53,7 +53,7 @@ class AboutContent extends StatelessWidget {
             AboutMenuDivider(),
 
             AboutMenuTile(
-              icon: Icons.description_outlined,
+              icon: CupertinoIcons.doc_text,
               title: 'terms_of_service'.tr,
               subtitle: 'terms_of_service_description'.tr,
               onTap: () {},
@@ -62,7 +62,7 @@ class AboutContent extends StatelessWidget {
             AboutMenuDivider(),
 
             AboutMenuTile(
-              icon: Icons.privacy_tip_outlined,
+              icon: CupertinoIcons.shield,
               title: 'privacy_policy'.tr,
               subtitle: 'privacy_policy_description'.tr,
               onTap: () {},
@@ -81,7 +81,7 @@ class AboutContent extends StatelessWidget {
         AboutMenuCard(
           children: [
             AboutMenuTile(
-              icon: Icons.help_outline_rounded,
+              icon: CupertinoIcons.question_circle,
               title: 'help_center'.tr,
               subtitle: 'help_center_description'.tr,
               onTap: () {},
@@ -90,7 +90,7 @@ class AboutContent extends StatelessWidget {
             AboutMenuDivider(),
 
             AboutMenuTile(
-              icon: Icons.mail_outline_rounded,
+              icon: CupertinoIcons.mail,
               title: 'contact_support'.tr,
               subtitle: 'contact_support_description'.tr,
               onTap: () {},
@@ -99,7 +99,7 @@ class AboutContent extends StatelessWidget {
             AboutMenuDivider(),
 
             AboutMenuTile(
-              icon: Icons.star_outline_rounded,
+              icon: CupertinoIcons.star,
               title: 'rate_application'.tr,
               subtitle: 'rate_application_description'.tr,
               onTap: () {},

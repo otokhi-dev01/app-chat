@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,7 +8,7 @@ class DeviceSessionTile extends StatelessWidget {
   final DeviceSessionModel session;
   final VoidCallback? onTerminate;
 
-  DeviceSessionTile({
+  const DeviceSessionTile({
     super.key,
     required this.session,
     this.onTerminate,
@@ -18,12 +19,9 @@ class DeviceSessionTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -35,37 +33,43 @@ class DeviceSessionTile extends StatelessWidget {
 
     return Material(
       color: cardColor,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(22),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          color: cardColor,
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: session.isCurrent
                 ? colorScheme.primary.withValues(
-              alpha: 0.25,
+              alpha: 0.30,
             )
                 : borderColor,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.15 : 0.04,
+              ),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _DevicePlatformIcon(
               platform: session.platform,
               isCurrent: session.isCurrent,
             ),
-
             SizedBox(width: 13),
-
             Expanded(
               child: _DeviceSessionInformation(
                 session: session,
               ),
             ),
-
             if (!session.isCurrent)
               _DeviceSessionMenu(
                 onTerminate: onTerminate,
@@ -81,15 +85,14 @@ class _DevicePlatformIcon extends StatelessWidget {
   final DevicePlatform platform;
   final bool isCurrent;
 
-  _DevicePlatformIcon({
+  const _DevicePlatformIcon({
     required this.platform,
     required this.isCurrent,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: 50,
@@ -109,35 +112,33 @@ class _DevicePlatformIcon extends StatelessWidget {
       child: Icon(
         _platformIcon(platform),
         color: colorScheme.primary,
-        size: 25,
+        size: 24,
       ),
     );
   }
 
-  IconData _platformIcon(
-      DevicePlatform platform,
-      ) {
+  IconData _platformIcon(DevicePlatform platform) {
     switch (platform) {
       case DevicePlatform.ios:
-        return Icons.phone_iphone_rounded;
+        return CupertinoIcons.device_phone_portrait;
 
       case DevicePlatform.android:
-        return Icons.android_rounded;
+        return CupertinoIcons.device_phone_portrait;
 
       case DevicePlatform.macos:
-        return Icons.laptop_mac_rounded;
+        return CupertinoIcons.device_laptop; // Fixed: Official Cupertino laptop icon
 
       case DevicePlatform.windows:
-        return Icons.desktop_windows_rounded;
+        return CupertinoIcons.desktopcomputer; // Fixed: Official Cupertino desktop icon
 
       case DevicePlatform.linux:
-        return Icons.computer_rounded;
+        return CupertinoIcons.desktopcomputer;
 
       case DevicePlatform.web:
-        return Icons.language_rounded;
+        return CupertinoIcons.globe;
 
       case DevicePlatform.unknown:
-        return Icons.devices_other_rounded;
+        return CupertinoIcons.square_stack_3d_down_right;
     }
   }
 }
@@ -145,13 +146,11 @@ class _DevicePlatformIcon extends StatelessWidget {
 class _DeviceSessionInformation extends StatelessWidget {
   final DeviceSessionModel session;
 
-  _DeviceSessionInformation({
+  const _DeviceSessionInformation({
     required this.session,
   });
 
-  String _platformText(
-      DevicePlatform platform,
-      ) {
+  String _platformText(DevicePlatform platform) {
     switch (platform) {
       case DevicePlatform.ios:
         return 'platform_ios'.tr;
@@ -179,12 +178,10 @@ class _DeviceSessionInformation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -193,20 +190,15 @@ class _DeviceSessionInformation extends StatelessWidget {
                 session.deviceName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(
+                style: theme.textTheme.titleSmall?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-
             if (session.isCurrent) ...[
               SizedBox(width: 8),
-
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 8,
@@ -216,8 +208,7 @@ class _DeviceSessionInformation extends StatelessWidget {
                   color: colorScheme.primary.withValues(
                     alpha: 0.11,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   'current_device'.tr,
@@ -231,9 +222,7 @@ class _DeviceSessionInformation extends StatelessWidget {
             ],
           ],
         ),
-
         SizedBox(height: 5),
-
         Text(
           '${_platformText(session.platform)} • ${session.appVersion}',
           maxLines: 1,
@@ -244,69 +233,51 @@ class _DeviceSessionInformation extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-
         SizedBox(height: 8),
-
         Row(
           children: [
             Icon(
-              Icons.location_on_outlined,
+              CupertinoIcons.location_solid,
               color: colorScheme.onSurfaceVariant,
               size: 14,
             ),
-
             SizedBox(width: 5),
-
             Expanded(
               child: Text(
                 session.location,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                  color:
-                  colorScheme.onSurfaceVariant,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
             ),
           ],
         ),
-
         SizedBox(height: 5),
-
         Row(
           children: [
             Icon(
-              Icons.language_rounded,
+              CupertinoIcons.globe,
               color: colorScheme.onSurfaceVariant,
               size: 14,
             ),
-
             SizedBox(width: 5),
-
             Expanded(
               child: Text(
                 session.ipAddress,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                  color:
-                  colorScheme.onSurfaceVariant,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
             ),
           ],
         ),
-
         SizedBox(height: 8),
-
         _DeviceActivityStatus(
           session: session,
         ),
@@ -318,7 +289,7 @@ class _DeviceSessionInformation extends StatelessWidget {
 class _DeviceActivityStatus extends StatelessWidget {
   final DeviceSessionModel session;
 
-  _DeviceActivityStatus({
+  const _DeviceActivityStatus({
     required this.session,
   });
 
@@ -336,15 +307,12 @@ class _DeviceActivityStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    bool active =
-        session.isCurrent || session.isOnline;
+    bool active = session.isCurrent || session.isOnline;
 
-    Color statusColor = active
-        ? colorScheme.primary
-        : colorScheme.onSurfaceVariant;
+    Color statusColor =
+    active ? colorScheme.primary : colorScheme.onSurfaceVariant;
 
     return Row(
       children: [
@@ -356,9 +324,7 @@ class _DeviceActivityStatus extends StatelessWidget {
             shape: BoxShape.circle,
           ),
         ),
-
         SizedBox(width: 6),
-
         Text(
           _activityText(),
           style: TextStyle(
@@ -375,7 +341,7 @@ class _DeviceActivityStatus extends StatelessWidget {
 class _DeviceSessionMenu extends StatelessWidget {
   final VoidCallback? onTerminate;
 
-  _DeviceSessionMenu({
+  const _DeviceSessionMenu({
     this.onTerminate,
   });
 
@@ -383,21 +349,28 @@ class _DeviceSessionMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return PopupMenuButton<String>(
       tooltip: 'session_options'.tr,
       padding: EdgeInsets.zero,
-      color: theme.brightness == Brightness.dark
-          ? Color(0xFF1B1D22)
-          : Colors.white,
-      surfaceTintColor: Colors.transparent,
+      color: isDark ? Color(0xFF24272E) : Colors.white,
+      elevation: 10,
+      shadowColor: Colors.black.withValues(
+        alpha: isDark ? 0.35 : 0.12,
+      ),
       icon: Icon(
-        Icons.more_vert_rounded,
+        CupertinoIcons.ellipsis,
         color: colorScheme.onSurfaceVariant,
-        size: 21,
+        size: 20,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+        ),
       ),
       onSelected: (String value) {
         if (value == 'terminate') {
@@ -421,7 +394,7 @@ class _DeviceSessionMenu extends StatelessWidget {
                     borderRadius: BorderRadius.circular(11),
                   ),
                   child: Icon(
-                    Icons.logout_rounded,
+                    CupertinoIcons.square_arrow_right,
                     color: colorScheme.error,
                     size: 18,
                   ),

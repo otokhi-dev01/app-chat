@@ -1,15 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/chat_folder_controller.dart';
 import '../../../models/chat_folder_model.dart';
 import '../../widgets/chat_folder/chat_folder_content.dart';
-import '../../widgets/chat_folder/chat_folder_form_sheet.dart';
-import '../../widgets/chat_folder/delete_chat_folder_sheet.dart';
+import '../../widgets/common/app_feedback.dart';
 import 'chat_folder_app_bar.dart';
+import 'create_folder_screen.dart';
 
 class ChatFolderScreen extends StatelessWidget {
-  ChatFolderScreen({
+  const ChatFolderScreen({
     super.key,
   });
 
@@ -17,25 +18,24 @@ class ChatFolderScreen extends StatelessWidget {
     return Get.find<ChatFolderController>();
   }
 
-  Future<void> _createFolder(
-      BuildContext context,
-      ) async {
+  Future<void> _createFolder(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    ChatFolderFormResult? result =
-    await ChatFolderFormSheet.open(
-      context: context,
-      title: 'Create Folder',
-      confirmText: 'Create',
+    ChatFolderFormResult? result = await Get.to<ChatFolderFormResult>(
+          () => CreateFolderScreen(
+        title: 'create_folder'.tr,
+        confirmText: 'create'.tr,
+        initialValue: '',
+      ),
+      transition: Transition.rightToLeft,
+      duration: Duration(milliseconds: 280),
     );
 
-    if (result == null ||
-        result.name.trim().isEmpty) {
+    if (result == null || result.name.trim().isEmpty) {
       return;
     }
 
-    bool created =
-    await controller.addFolder(
+    bool created = await controller.addFolder(
       result.name,
       chatIds: result.selectedMemberIds,
     );
@@ -46,10 +46,8 @@ class ChatFolderScreen extends StatelessWidget {
 
     if (!created) {
       _showMessage(
-        context: context,
-        message:
-        controller.errorMessage.value.isEmpty
-            ? 'Unable to create folder.'
+        message: controller.errorMessage.value.isEmpty
+            ? 'unable_to_create_folder'.tr
             : controller.errorMessage.value,
         isError: true,
       );
@@ -58,9 +56,8 @@ class ChatFolderScreen extends StatelessWidget {
     }
 
     _showMessage(
-      context: context,
-      message:
-      'Folder created successfully.',
+      title: 'folder_created'.tr,
+      message: 'folder_created_successfully'.tr,
     );
   }
 
@@ -70,9 +67,7 @@ class ChatFolderScreen extends StatelessWidget {
   }) async {
     if (folder.isSystem) {
       _showMessage(
-        context: context,
-        message:
-        'Default folders cannot be edited.',
+        message: 'default_folders_cannot_be_edited'.tr,
         isError: true,
       );
 
@@ -81,17 +76,18 @@ class ChatFolderScreen extends StatelessWidget {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    ChatFolderFormResult? result =
-    await ChatFolderFormSheet.open(
-      context: context,
-      title: 'Edit Folder',
-      confirmText: 'Save',
-      initialValue: folder.name,
-      initialSelectedMemberIds: folder.chatIds,
+    ChatFolderFormResult? result = await Get.to<ChatFolderFormResult>(
+          () => CreateFolderScreen(
+        title: 'edit_folder'.tr,
+        confirmText: 'save'.tr,
+        initialValue: folder.name,
+        initialSelectedMemberIds: folder.chatIds,
+      ),
+      transition: Transition.rightToLeft,
+      duration: Duration(milliseconds: 280),
     );
 
-    if (result == null ||
-        result.name.trim().isEmpty) {
+    if (result == null || result.name.trim().isEmpty) {
       return;
     }
 
@@ -101,8 +97,7 @@ class ChatFolderScreen extends StatelessWidget {
       return;
     }
 
-    bool updated =
-    await controller.updateFolder(
+    bool updated = await controller.updateFolder(
       folderId: folder.id,
       name: newName,
     );
@@ -113,10 +108,8 @@ class ChatFolderScreen extends StatelessWidget {
 
     if (!updated) {
       _showMessage(
-        context: context,
-        message:
-        controller.errorMessage.value.isEmpty
-            ? 'Unable to update folder.'
+        message: controller.errorMessage.value.isEmpty
+            ? 'unable_to_update_folder'.tr
             : controller.errorMessage.value,
         isError: true,
       );
@@ -125,9 +118,8 @@ class ChatFolderScreen extends StatelessWidget {
     }
 
     _showMessage(
-      context: context,
-      message:
-      'Folder updated successfully.',
+      title: 'folder_updated'.tr,
+      message: 'folder_updated_successfully'.tr,
     );
   }
 
@@ -137,9 +129,7 @@ class ChatFolderScreen extends StatelessWidget {
   }) async {
     if (folder.isSystem) {
       _showMessage(
-        context: context,
-        message:
-        'Default folders cannot be deleted.',
+        message: 'default_folders_cannot_be_deleted'.tr,
         isError: true,
       );
 
@@ -148,18 +138,41 @@ class ChatFolderScreen extends StatelessWidget {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    bool? confirmed =
-    await DeleteChatFolderSheet.open(
+    bool? confirmed = await showCupertinoDialog<bool>(
       context: context,
-      folderName: folder.name,
+      builder: (dialogContext) {
+        return CupertinoAlertDialog(
+          title: Text('delete_folder_question'.tr),
+          content: Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              'delete_folder_desc'.trParams({'name': folder.name}),
+            ),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: Text('cancel'.tr),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: Text('delete'.tr),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed != true) {
       return;
     }
 
-    bool deleted =
-    await controller.deleteFolder(
+    bool deleted = await controller.deleteFolder(
       folder.id,
     );
 
@@ -169,10 +182,8 @@ class ChatFolderScreen extends StatelessWidget {
 
     if (!deleted) {
       _showMessage(
-        context: context,
-        message:
-        controller.errorMessage.value.isEmpty
-            ? 'Unable to delete folder.'
+        message: controller.errorMessage.value.isEmpty
+            ? 'unable_to_delete_folder'.tr
             : controller.errorMessage.value,
         isError: true,
       );
@@ -181,69 +192,23 @@ class ChatFolderScreen extends StatelessWidget {
     }
 
     _showMessage(
-      context: context,
-      message:
-      'Folder deleted successfully.',
+      title: 'folder_deleted'.tr,
+      message: 'folder_deleted_successfully'.tr,
     );
   }
 
   void _showMessage({
-    required BuildContext context,
     required String message,
+    String? title,
     bool isError = false,
   }) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    Color backgroundColor = isError
-        ? colorScheme.error
-        : colorScheme.inverseSurface;
-
-    Color foregroundColor = isError
-        ? colorScheme.onError
-        : colorScheme.onInverseSurface;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          backgroundColor:
-          backgroundColor,
-          behavior:
-          SnackBarBehavior.floating,
-          margin: EdgeInsets.all(14),
-          shape:
-          RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(14),
-          ),
-          content: Row(
-            children: [
-              Icon(
-                isError
-                    ? Icons
-                    .error_outline_rounded
-                    : Icons
-                    .check_circle_outline_rounded,
-                color: foregroundColor,
-                size: 21,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight:
-                    FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+    AppFeedback.showMessage(
+      title: title ?? (isError ? 'error'.tr : 'success'.tr),
+      message: message,
+      icon: isError
+          ? CupertinoIcons.exclamationmark_circle
+          : CupertinoIcons.checkmark_circle,
+    );
   }
 
   @override
@@ -251,8 +216,7 @@ class ChatFolderScreen extends StatelessWidget {
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor:
-      theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: ChatFolderAppBar(
         onAdd: () {
           _createFolder(context);
@@ -260,37 +224,30 @@ class ChatFolderScreen extends StatelessWidget {
       ),
       body: Obx(
             () {
-          if (controller.isLoading.value &&
-              controller.folders.isEmpty) {
+          if (controller.isLoading.value && controller.folders.isEmpty) {
             return _ChatFolderLoadingView();
           }
 
-          if (controller
-              .errorMessage.value.isNotEmpty &&
+          if (controller.errorMessage.value.isNotEmpty &&
               controller.folders.isEmpty) {
             return _ChatFolderErrorView(
-              message:
-              controller.errorMessage.value,
-              onRetry:
-              controller.loadFolders,
+              message: controller.errorMessage.value,
+              onRetry: controller.loadFolders,
             );
           }
 
           return ChatFolderContent(
-            folders:
-            controller.folders.toList(),
+            folders: controller.folders.toList(),
             onAddFolder: () {
               _createFolder(context);
             },
-            onEditFolder:
-                (ChatFolderModel folder) {
+            onEditFolder: (ChatFolderModel folder) {
               _editFolder(
                 context: context,
                 folder: folder,
               );
             },
-            onDeleteFolder:
-                (ChatFolderModel folder) {
+            onDeleteFolder: (ChatFolderModel folder) {
               _deleteFolder(
                 context: context,
                 folder: folder,
@@ -303,14 +260,12 @@ class ChatFolderScreen extends StatelessWidget {
   }
 }
 
-class _ChatFolderLoadingView
-    extends StatelessWidget {
-  _ChatFolderLoadingView();
+class _ChatFolderLoadingView extends StatelessWidget {
+  const _ChatFolderLoadingView();
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Center(
       child: CircularProgressIndicator(
@@ -321,12 +276,11 @@ class _ChatFolderLoadingView
   }
 }
 
-class _ChatFolderErrorView
-    extends StatelessWidget {
+class _ChatFolderErrorView extends StatelessWidget {
   final String message;
   final Future<void> Function() onRetry;
 
-  _ChatFolderErrorView({
+  const _ChatFolderErrorView({
     required this.message,
     required this.onRetry,
   });
@@ -334,8 +288,7 @@ class _ChatFolderErrorView
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Center(
       child: Padding(
@@ -348,40 +301,32 @@ class _ChatFolderErrorView
               height: 64,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.error
-                    .withValues(
+                color: colorScheme.error.withValues(
                   alpha: 0.10,
                 ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.error_outline_rounded,
+                CupertinoIcons.exclamationmark_circle,
                 color: colorScheme.error,
                 size: 31,
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'Unable to load folders',
+              'unable_to_load_folders'.tr,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.titleMedium
-                  ?.copyWith(
-                color:
-                colorScheme.onSurface,
-                fontWeight:
-                FontWeight.w700,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w700,
               ),
             ),
             SizedBox(height: 6),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),
@@ -391,20 +336,17 @@ class _ChatFolderErrorView
                 onRetry();
               },
               icon: Icon(
-                Icons.refresh_rounded,
+                CupertinoIcons.arrow_clockwise,
+                size: 18,
               ),
               label: Text(
-                'Try Again',
+                'try_again'.tr,
               ),
-              style:
-              FilledButton.styleFrom(
-                minimumSize:
-                Size(160, 48),
-                shape:
-                RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                    15,
+              style: FilledButton.styleFrom(
+                minimumSize: Size(160, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    16,
                   ),
                 ),
               ),

@@ -11,7 +11,7 @@ import 'add_group/add_group_screen.dart';
 import 'contact_list.dart';
 
 class ContactScreen extends StatelessWidget {
-  ContactScreen({
+  const ContactScreen({
     super.key,
   });
 
@@ -29,16 +29,14 @@ class ContactScreen extends StatelessWidget {
 
     return Get.put<ContactController>(
       ContactController(
-        contactService:
-        Get.find<ContactService>(),
+        contactService: Get.find<ContactService>(),
       ),
       permanent: true,
     );
   }
 
   Future<void> _openAddGroupScreen() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     await Get.to(
           () => AddGroupScreen(),
@@ -54,8 +52,7 @@ class ContactScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    ContactController contactController =
-        controller;
+    ContactController contactController = controller;
 
     return ColoredBox(
       color: theme.scaffoldBackgroundColor,
@@ -64,15 +61,9 @@ class ContactScreen extends StatelessWidget {
           Column(
             children: [
               ContactSearchField(
-                controller:
-                contactController
-                    .searchController,
-                onChanged:
-                contactController
-                    .updateSearch,
-                onClear:
-                contactController
-                    .clearSearch,
+                controller: contactController.searchController,
+                onChanged: contactController.updateSearch,
+                onClear: contactController.clearSearch,
               ),
 
               ContactAddGroupButton(
@@ -81,16 +72,14 @@ class ContactScreen extends StatelessWidget {
 
               Expanded(
                 child: ContactList(
-                  controller:
-                  contactController,
+                  controller: contactController,
                 ),
               ),
             ],
           ),
 
           ContactAddButton(
-            controller:
-            contactController,
+            controller: contactController,
           ),
         ],
       ),

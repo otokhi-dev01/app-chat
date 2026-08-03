@@ -1,10 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class PrivacySecurityCard
-    extends StatelessWidget {
+class PrivacySecurityCard extends StatelessWidget {
   final List<Widget> children;
 
-  PrivacySecurityCard({
+  const PrivacySecurityCard({
     super.key,
     required this.children,
   });
@@ -13,12 +14,9 @@ class PrivacySecurityCard
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -33,11 +31,19 @@ class PrivacySecurityCard
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: children,
@@ -46,24 +52,21 @@ class PrivacySecurityCard
   }
 }
 
-class PrivacySecurityDivider
-    extends StatelessWidget {
-  PrivacySecurityDivider({
+class PrivacySecurityDivider extends StatelessWidget {
+  const PrivacySecurityDivider({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    bool isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color dividerColor = isDark
         ? Colors.white.withValues(
-      alpha: 0.07,
+      alpha: 0.08,
     )
         : Colors.black.withValues(
-      alpha: 0.05,
+      alpha: 0.06,
     );
 
     return Padding(
@@ -79,11 +82,10 @@ class PrivacySecurityDivider
   }
 }
 
-class PrivacySecuritySectionTitle
-    extends StatelessWidget {
+class PrivacySecuritySectionTitle extends StatelessWidget {
   final String title;
 
-  PrivacySecuritySectionTitle({
+  const PrivacySecuritySectionTitle({
     super.key,
     required this.title,
   });
@@ -98,10 +100,8 @@ class PrivacySecuritySectionTitle
       ),
       child: Text(
         title,
-        style: theme.textTheme.titleSmall
-            ?.copyWith(
-          color:
-          theme.colorScheme.primary,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.primary,
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
@@ -110,24 +110,19 @@ class PrivacySecuritySectionTitle
   }
 }
 
-class PrivacySecurityHeader
-    extends StatelessWidget {
-  PrivacySecurityHeader({
+class PrivacySecurityHeader extends StatelessWidget {
+  const PrivacySecurityHeader({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -141,11 +136,19 @@ class PrivacySecurityHeader
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -154,17 +157,13 @@ class PrivacySecurityHeader
             height: 54,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
+              color: colorScheme.primary.withValues(
                 alpha: 0.12,
               ),
-              borderRadius:
-              BorderRadius.circular(
-                18,
-              ),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(
-              Icons.shield_outlined,
+              CupertinoIcons.shield_fill,
               color: colorScheme.primary,
               size: 28,
             ),
@@ -172,29 +171,21 @@ class PrivacySecurityHeader
           SizedBox(width: 14),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Protect your account',
-                  style: theme
-                      .textTheme.titleMedium
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  'protect_your_account'.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 16,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Manage who can see your information and how your account is protected.',
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  'privacy_header_description'.tr,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -208,52 +199,55 @@ class PrivacySecurityHeader
   }
 }
 
-class PrivacySecurityWarning
-    extends StatelessWidget {
-  PrivacySecurityWarning({
+class PrivacySecurityWarning extends StatelessWidget {
+  const PrivacySecurityWarning({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.error
-            .withValues(
-          alpha: 0.07,
+        color: colorScheme.error.withValues(
+          alpha: isDark ? 0.12 : 0.08,
         ),
-        borderRadius:
-        BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: colorScheme.error
-              .withValues(
-            alpha: 0.14,
+          color: colorScheme.error.withValues(
+            alpha: isDark ? 0.22 : 0.15,
           ),
         ),
       ),
       child: Row(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: colorScheme.error,
-            size: 20,
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colorScheme.error.withValues(
+                alpha: 0.14,
+              ),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              CupertinoIcons.info_circle,
+              color: colorScheme.error,
+              size: 18,
+            ),
           ),
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Review your active sessions regularly and terminate devices you do not recognize.',
-              style: theme
-                  .textTheme.bodySmall
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant,
+              'privacy_warning_description'.tr,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface,
                 fontSize: 11,
                 height: 1.45,
               ),

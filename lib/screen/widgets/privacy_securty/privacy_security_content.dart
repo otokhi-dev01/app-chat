@@ -1,12 +1,11 @@
 import 'package:appchat/screen/widgets/privacy_securty/privacy_security_title.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../../../route/app_route.dart';
 import 'privacy_security_card.dart';
 
-class PrivacySecurityContent
-    extends StatelessWidget {
+class PrivacySecurityContent extends StatelessWidget {
   final bool appLockEnabled;
   final bool screenSecurityEnabled;
   final bool syncContactsEnabled;
@@ -19,14 +18,11 @@ class PrivacySecurityContent
   final String twoStepStatus;
   final String accountDeletePeriod;
 
-  final ValueChanged<bool>
-  onAppLockChanged;
+  final ValueChanged<bool> onAppLockChanged;
 
-  final ValueChanged<bool>
-  onScreenSecurityChanged;
+  final ValueChanged<bool> onScreenSecurityChanged;
 
-  final ValueChanged<bool>
-  onSyncContactsChanged;
+  final ValueChanged<bool> onSyncContactsChanged;
 
   final VoidCallback onPhoneNumberTap;
   final VoidCallback onLastSeenTap;
@@ -36,7 +32,7 @@ class PrivacySecurityContent
   final VoidCallback onTwoStepTap;
   final VoidCallback onDeletePeriodTap;
 
-  PrivacySecurityContent({
+  const PrivacySecurityContent({
     super.key,
     required this.appLockEnabled,
     required this.screenSecurityEnabled,
@@ -63,12 +59,9 @@ class PrivacySecurityContent
   @override
   Widget build(BuildContext context) {
     return ListView(
-      keyboardDismissBehavior:
-      ScrollViewKeyboardDismissBehavior
-          .onDrag,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: BouncingScrollPhysics(
-        parent:
-        AlwaysScrollableScrollPhysics(),
+        parent: AlwaysScrollableScrollPhysics(),
       ),
       padding: EdgeInsets.fromLTRB(
         16,
@@ -81,77 +74,64 @@ class PrivacySecurityContent
         SizedBox(height: 24),
 
         PrivacySecuritySectionTitle(
-          title: 'Privacy',
+          title: 'privacy'.tr,
         ),
         SizedBox(height: 9),
 
         PrivacySecurityCard(
           children: [
             PrivacyNavigationTile(
-              icon:
-              Icons.phone_outlined,
-              title: 'Phone Number',
-              subtitle:
-              'Control who can see your phone number',
-              trailingText:
-              phoneNumberPrivacy,
+              icon: CupertinoIcons.phone,
+              title: 'phone_number'.tr,
+              subtitle: 'phone_number_privacy_desc'.tr,
+              trailingText: phoneNumberPrivacy,
               onTap: onPhoneNumberTap,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.schedule_rounded,
-              title:
-              'Last Seen & Online',
-              subtitle:
-              'Choose who can see your activity',
-              trailingText:
-              lastSeenPrivacy,
+              icon: CupertinoIcons.time,
+              title: 'last_seen_and_online'.tr,
+              subtitle: 'last_seen_privacy_desc'.tr,
+              trailingText: lastSeenPrivacy,
               onTap: onLastSeenTap,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.account_circle_outlined,
-              title: 'Profile Photos',
-              subtitle:
-              'Control who can see your photos',
-              trailingText:
-              profilePhotoPrivacy,
+              icon: CupertinoIcons.person_crop_circle,
+              title: 'profile_photos'.tr,
+              subtitle: 'profile_photo_privacy_desc'.tr,
+              trailingText: profilePhotoPrivacy,
               onTap: onProfilePhotoTap,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.call_outlined,
-              title: 'Calls',
-              subtitle:
-              'Choose who can call you',
-              trailingText:
-              callsPrivacy,
+              icon: CupertinoIcons.phone,
+              title: 'calls'.tr,
+              subtitle: 'calls_privacy_desc'.tr,
+              trailingText: callsPrivacy,
               onTap: onCallsTap,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.groups_outlined,
-              title:
-              'Groups & Channels',
-              subtitle:
-              'Choose who can add you',
-              trailingText:
-              groupsPrivacy,
+              icon: CupertinoIcons.person_3,
+              title: 'groups_and_channels'.tr,
+              subtitle: 'groups_privacy_desc'.tr,
+              trailingText: groupsPrivacy,
               onTap: onGroupsTap,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.block_rounded,
-              title: 'Blocked Users',
-              subtitle:
-              'Manage blocked accounts',
-              trailingText: '0',
-              onTap: () {},
+              icon: CupertinoIcons.slash_circle,
+              title: 'blocked_users'.tr,
+              subtitle: 'manage_blocked'.tr,
+              onTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+
+                Get.toNamed(
+                  AppRoutes.blockedContacts,
+                  preventDuplicates: true,
+                );
+              },
             ),
           ],
         ),
@@ -159,60 +139,42 @@ class PrivacySecurityContent
         SizedBox(height: 24),
 
         PrivacySecuritySectionTitle(
-          title: 'Security',
+          title: 'security'.tr,
         ),
         SizedBox(height: 9),
 
         PrivacySecurityCard(
           children: [
             PrivacyNavigationTile(
-              icon:
-              Icons.password_rounded,
-              title:
-              'Two-Step Verification',
-              subtitle:
-              'Add an extra password to your account',
-              trailingText:
-              twoStepStatus,
+              icon: CupertinoIcons.shield_lefthalf_fill,
+              title: 'two_step_verification'.tr,
+              subtitle: 'two_step_desc'.tr,
+              trailingText: twoStepStatus,
               onTap: onTwoStepTap,
             ),
             PrivacySecurityDivider(),
             PrivacySwitchTile(
-              icon:
-              Icons.lock_outline_rounded,
-              title: 'App Lock',
-              subtitle:
-              'Require authentication to open the app',
-              value:
-              appLockEnabled,
-              onChanged:
-              onAppLockChanged,
+              icon: CupertinoIcons.lock,
+              title: 'app_lock'.tr,
+              subtitle: 'app_lock_desc'.tr,
+              value: appLockEnabled,
+              onChanged: onAppLockChanged,
             ),
             PrivacySecurityDivider(),
             PrivacySwitchTile(
-              icon:
-              Icons.visibility_off_outlined,
-              title:
-              'Screen Security',
-              subtitle:
-              'Prevent screenshots in sensitive screens',
-              value:
-              screenSecurityEnabled,
-              onChanged:
-              onScreenSecurityChanged,
+              icon: CupertinoIcons.eye_slash,
+              title: 'screen_security'.tr,
+              subtitle: 'screen_security_desc'.tr,
+              value: screenSecurityEnabled,
+              onChanged: onScreenSecurityChanged,
             ),
             PrivacySecurityDivider(),
             PrivacyNavigationTile(
-              icon:
-              Icons.devices_outlined,
-              title:
-              'Active Sessions',
-              subtitle:
-              'Manage devices signed into your account',
+              icon: CupertinoIcons.desktopcomputer,
+              title: 'active_sessions'.tr,
+              subtitle: 'active_sessions_desc'.tr,
               onTap: () {
-                FocusManager
-                    .instance.primaryFocus
-                    ?.unfocus();
+                FocusManager.instance.primaryFocus?.unfocus();
 
                 Get.toNamed(
                   AppRoutes.devices,
@@ -226,32 +188,24 @@ class PrivacySecurityContent
         SizedBox(height: 24),
 
         PrivacySecuritySectionTitle(
-          title: 'Contacts',
+          title: 'contacts'.tr,
         ),
         SizedBox(height: 9),
 
         PrivacySecurityCard(
           children: [
             PrivacySwitchTile(
-              icon:
-              Icons.sync_rounded,
-              title:
-              'Sync Contacts',
-              subtitle:
-              'Keep your contacts updated automatically',
-              value:
-              syncContactsEnabled,
-              onChanged:
-              onSyncContactsChanged,
+              icon: CupertinoIcons.person_crop_circle_badge_checkmark,
+              title: 'sync_contacts'.tr,
+              subtitle: 'sync_contacts_description'.tr,
+              value: syncContactsEnabled,
+              onChanged: onSyncContactsChanged,
             ),
             PrivacySecurityDivider(),
             PrivacyActionTile(
-              icon:
-              Icons.delete_sweep_outlined,
-              title:
-              'Delete Synced Contacts',
-              subtitle:
-              'Remove contacts uploaded to the server',
+              icon: CupertinoIcons.trash,
+              title: 'delete_synced_contacts'.tr,
+              subtitle: 'delete_synced_contacts_desc'.tr,
               onTap: () {},
             ),
           ],
@@ -260,23 +214,18 @@ class PrivacySecurityContent
         SizedBox(height: 24),
 
         PrivacySecuritySectionTitle(
-          title: 'Delete My Account',
+          title: 'delete_my_account'.tr,
         ),
         SizedBox(height: 9),
 
         PrivacySecurityCard(
           children: [
             PrivacyNavigationTile(
-              icon:
-              Icons.timer_outlined,
-              title:
-              'If Away For',
-              subtitle:
-              'Automatically delete your account after inactivity',
-              trailingText:
-              accountDeletePeriod,
-              onTap:
-              onDeletePeriodTap,
+              icon: CupertinoIcons.timer,
+              title: 'if_away_for'.tr,
+              subtitle: 'delete_account_if_away_desc'.tr,
+              trailingText: accountDeletePeriod,
+              onTap: onDeletePeriodTap,
             ),
           ],
         ),
