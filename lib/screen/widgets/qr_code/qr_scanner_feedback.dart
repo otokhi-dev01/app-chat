@@ -1,25 +1,34 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../common/app_feedback.dart';
 
-class QrScannerMessage
-    extends StatelessWidget {
+class QrScannerMessage extends StatelessWidget {
   final String message;
   final VoidCallback onClose;
 
-  QrScannerMessage({
+  const QrScannerMessage({
     super.key,
     required this.message,
     required this.onClose,
   });
 
+  /// Helper method to trigger AppFeedback snackbar toast directly
+  static void showFeedback(String message) {
+    AppFeedback.showMessage(
+      title: 'error'.tr,
+      message: message,
+      icon: CupertinoIcons.exclamationmark_circle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Material(
       color: colorScheme.error,
-      borderRadius:
-      BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           14,
@@ -30,9 +39,8 @@ class QrScannerMessage
         child: Row(
           children: [
             Icon(
-              Icons.error_outline_rounded,
-              color:
-              colorScheme.onError,
+              CupertinoIcons.exclamationmark_circle,
+              color: colorScheme.onError,
               size: 21,
             ),
             SizedBox(width: 10),
@@ -40,25 +48,20 @@ class QrScannerMessage
               child: Text(
                 message,
                 style: TextStyle(
-                  color:
-                  colorScheme.onError,
+                  color: colorScheme.onError,
                   fontSize: 12,
-                  fontWeight:
-                  FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            IconButton(
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(32, 32),
               onPressed: onClose,
-              splashColor:
-              Colors.transparent,
-              highlightColor:
-              Colors.transparent,
-              icon: Icon(
-                Icons.close_rounded,
-                color:
-                colorScheme.onError,
-                size: 20,
+              child: Icon(
+                CupertinoIcons.xmark,
+                color: colorScheme.onError,
+                size: 18,
               ),
             ),
           ],
@@ -68,16 +71,14 @@ class QrScannerMessage
   }
 }
 
-class QrCameraLoadingView
-    extends StatelessWidget {
-  QrCameraLoadingView({
+class QrCameraLoadingView extends StatelessWidget {
+  const QrCameraLoadingView({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       color: Colors.black,
@@ -90,71 +91,58 @@ class QrCameraLoadingView
   }
 }
 
-class QrCameraErrorView
-    extends StatelessWidget {
+class QrCameraErrorView extends StatelessWidget {
   final VoidCallback onRetry;
 
-  QrCameraErrorView({
+  const QrCameraErrorView({
     super.key,
     required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
-
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
 
     return Container(
       color: Color(0xFF111216),
       alignment: Alignment.center,
       padding: EdgeInsets.all(24),
       child: Column(
-        mainAxisSize:
-        MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 74,
             height: 74,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.error
-                  .withValues(
+              color: colorScheme.error.withValues(
                 alpha: 0.14,
               ),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons
-                  .no_photography_outlined,
+              CupertinoIcons.camera,
               color: colorScheme.error,
               size: 34,
             ),
           ),
           SizedBox(height: 18),
           Text(
-            'Camera unavailable',
+            'camera_unavailable'.tr,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.titleMedium
-                ?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
               color: Colors.white,
               fontSize: 17,
-              fontWeight:
-              FontWeight.w700,
+              fontWeight: FontWeight.w700,
             ),
           ),
           SizedBox(height: 7),
           Text(
-            'Check camera permission and try again.',
+            'check_camera_permission'.tr,
             textAlign: TextAlign.center,
-            style: theme
-                .textTheme.bodyMedium
-                ?.copyWith(
-              color: Colors.white
-                  .withValues(
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(
                 alpha: 0.65,
               ),
               fontSize: 13,
@@ -163,34 +151,27 @@ class QrCameraErrorView
           SizedBox(height: 20),
           Material(
             color: colorScheme.primary,
-            borderRadius:
-            BorderRadius.circular(
+            borderRadius: BorderRadius.circular(
               16,
             ),
             child: InkWell(
               onTap: onRetry,
-              borderRadius:
-              BorderRadius.circular(
+              borderRadius: BorderRadius.circular(
                 16,
               ),
-              splashColor:
-              Colors.transparent,
-              highlightColor:
-              Colors.transparent,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
               child: Padding(
-                padding:
-                EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 13,
                 ),
                 child: Text(
-                  'Try again',
+                  'try_again'.tr,
                   style: TextStyle(
-                    color: colorScheme
-                        .onPrimary,
+                    color: colorScheme.onPrimary,
                     fontSize: 13,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -202,11 +183,10 @@ class QrCameraErrorView
   }
 }
 
-class QrScannerProcessingView
-    extends StatelessWidget {
+class QrScannerProcessingView extends StatelessWidget {
   final Color color;
 
-  QrScannerProcessingView({
+  const QrScannerProcessingView({
     super.key,
     required this.color,
   });
@@ -226,8 +206,7 @@ class QrScannerProcessingView
           color: Colors.black.withValues(
             alpha: 0.72,
           ),
-          borderRadius:
-          BorderRadius.circular(
+          borderRadius: BorderRadius.circular(
             22,
           ),
           border: Border.all(

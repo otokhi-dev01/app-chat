@@ -1,12 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/contact_model.dart';
 
-class AddGroupSelectedMembers
-    extends StatelessWidget {
+class AddGroupSelectedMembers extends StatelessWidget {
   final List<ContactModel> members;
-  final ValueChanged<ContactModel>
-  onRemoveMember;
+  final ValueChanged<ContactModel> onRemoveMember;
 
   const AddGroupSelectedMembers({
     super.key,
@@ -21,8 +20,10 @@ class AddGroupSelectedMembers
     }
 
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
+
+    Color badgeBorderColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     return SizedBox(
       height: 92,
@@ -43,13 +44,9 @@ class AddGroupSelectedMembers
             BuildContext context,
             int index,
             ) {
-          ContactModel contact =
-          members[index];
+          ContactModel contact = members[index];
 
-          bool hasImage =
-              contact.avatarUrl
-                  .trim()
-                  .isNotEmpty;
+          bool hasImage = contact.avatarUrl.trim().isNotEmpty;
 
           return SizedBox(
             width: 64,
@@ -60,36 +57,28 @@ class AddGroupSelectedMembers
                   children: [
                     CircleAvatar(
                       radius: 26,
-                      backgroundColor:
-                      colorScheme
-                          .surfaceContainerHighest,
-                      backgroundImage: hasImage
-                          ? NetworkImage(
-                        contact.avatarUrl,
-                      )
-                          : null,
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      backgroundImage:
+                      hasImage ? NetworkImage(contact.avatarUrl) : null,
                       child: hasImage
                           ? null
                           : Text(
-                        contact.name
-                            .substring(0, 1)
-                            .toUpperCase(),
+                        contact.name.trim().isNotEmpty
+                            ? contact.name.trim()[0].toUpperCase()
+                            : '?',
                         style: TextStyle(
-                          color:
-                          colorScheme
-                              .primary,
-                          fontWeight:
-                          FontWeight
-                              .w700,
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                     Positioned(
-                      top: -3,
-                      right: -3,
+                      top: -2,
+                      right: -2,
                       child: Material(
-                        color:
-                        colorScheme.error,
+                        color: colorScheme.error,
                         shape: CircleBorder(),
                         child: InkWell(
                           onTap: () {
@@ -97,20 +86,24 @@ class AddGroupSelectedMembers
                               contact,
                             );
                           },
-                          customBorder:
-                          CircleBorder(),
-                          splashColor:
-                          Colors.transparent,
-                          highlightColor:
-                          Colors.transparent,
-                          child: SizedBox(
-                            width: 21,
-                            height: 21,
+                          customBorder: CircleBorder(),
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: badgeBorderColor,
+                                width: 1.5,
+                              ),
+                            ),
                             child: Icon(
-                              Icons.close_rounded,
-                              color: colorScheme
-                                  .onError,
-                              size: 14,
+                              CupertinoIcons.xmark,
+                              color: colorScheme.onError,
+                              size: 11,
                             ),
                           ),
                         ),
@@ -122,18 +115,12 @@ class AddGroupSelectedMembers
                 Text(
                   contact.name,
                   maxLines: 1,
-                  textAlign:
-                  TextAlign.center,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.w600,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

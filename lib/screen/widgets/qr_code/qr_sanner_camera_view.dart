@@ -5,14 +5,11 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'qr_scanner_auto_zoom.dart';
 import 'qr_scanner_feedback.dart';
-import 'qr_scanner_geometry.dart'
-as scanner_geometry;
+import 'qr_scanner_geometry.dart' as scanner_geometry;
 import 'qr_scanner_overlay.dart';
 
-class QrScannerCameraView
-    extends StatefulWidget {
-  final MobileScannerController
-  scannerController;
+class QrScannerCameraView extends StatefulWidget {
+  final MobileScannerController scannerController;
 
   final void Function(
       BarcodeCapture capture,
@@ -20,7 +17,7 @@ class QrScannerCameraView
 
   final VoidCallback onRetry;
 
-  QrScannerCameraView({
+  const QrScannerCameraView({
     super.key,
     required this.scannerController,
     required this.onDetect,
@@ -33,10 +30,8 @@ class QrScannerCameraView
   }
 }
 
-class _QrScannerCameraViewState
-    extends State<QrScannerCameraView> {
-  late QrScannerAutoZoom
-  _autoZoomController;
+class _QrScannerCameraViewState extends State<QrScannerCameraView> {
+  late QrScannerAutoZoom _autoZoomController;
 
   bool _isHandlingCapture = false;
 
@@ -44,11 +39,9 @@ class _QrScannerCameraViewState
   void initState() {
     super.initState();
 
-    _autoZoomController =
-        QrScannerAutoZoom(
-          controller:
-          widget.scannerController,
-        );
+    _autoZoomController = QrScannerAutoZoom(
+      controller: widget.scannerController,
+    );
   }
 
   @override
@@ -57,13 +50,10 @@ class _QrScannerCameraViewState
       ) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.scannerController !=
-        widget.scannerController) {
-      _autoZoomController =
-          QrScannerAutoZoom(
-            controller:
-            widget.scannerController,
-          );
+    if (oldWidget.scannerController != widget.scannerController) {
+      _autoZoomController = QrScannerAutoZoom(
+        controller: widget.scannerController,
+      );
     }
   }
 
@@ -85,14 +75,11 @@ class _QrScannerCameraViewState
       BarcodeCapture capture,
       ) async {
     try {
-      bool shouldProcess =
-      await _autoZoomController
-          .prepareCapture(
+      bool shouldProcess = await _autoZoomController.prepareCapture(
         capture,
       );
 
-      if (!mounted ||
-          !shouldProcess) {
+      if (!mounted || !shouldProcess) {
         return;
       }
 
@@ -110,8 +97,7 @@ class _QrScannerCameraViewState
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return OrientationBuilder(
       builder: (
@@ -123,11 +109,9 @@ class _QrScannerCameraViewState
               BuildContext context,
               BoxConstraints constraints,
               ) {
-            double width =
-                constraints.maxWidth;
+            double width = constraints.maxWidth;
 
-            double height =
-                constraints.maxHeight;
+            double height = constraints.maxHeight;
 
             if (!width.isFinite ||
                 !height.isFinite ||
@@ -144,21 +128,16 @@ class _QrScannerCameraViewState
             // Pixel-space rect: used only for drawing the visible
             // overlay frame on screen.
             Rect scanWindowPixels =
-            scanner_geometry
-                .QrScannerGeometry
-                .buildScanWindowPixels(
+            scanner_geometry.QrScannerGeometry.buildScanWindowPixels(
               screenSize: layoutSize,
               orientation: orientation,
             );
 
             // Normalized (0.0-1.0) rect: this is what
             // mobile_scanner's scanWindow parameter actually
-            // requires. Passing pixel values here is what was
-            // causing MOBILE_SCANNER_BARCODE_ERROR.
+            // requires.
             Rect scanWindowNormalized =
-            scanner_geometry
-                .QrScannerGeometry
-                .buildScanWindow(
+            scanner_geometry.QrScannerGeometry.buildScanWindow(
               screenSize: layoutSize,
               orientation: orientation,
             );
@@ -173,19 +152,12 @@ class _QrScannerCameraViewState
             }());
 
             return MobileScanner(
-              controller:
-              widget.scannerController,
+              controller: widget.scannerController,
               fit: BoxFit.cover,
               tapToFocus: true,
-
               scanWindow: scanWindowNormalized,
-
-              // A small non-zero threshold avoids reconfiguring the
-              // native scan region on every micro-rebuild.
               scanWindowUpdateThreshold: 0.05,
-
               onDetect: _handleCapture,
-
               onDetectError: (
                   Object error,
                   StackTrace stackTrace,
@@ -195,13 +167,11 @@ class _QrScannerCameraViewState
                       '$error',
                 );
               },
-
               placeholderBuilder: (
                   BuildContext context,
                   ) {
                 return QrCameraLoadingView();
               },
-
               errorBuilder: (
                   BuildContext context,
                   MobileScannerException error,
@@ -215,18 +185,14 @@ class _QrScannerCameraViewState
                   onRetry: widget.onRetry,
                 );
               },
-
               overlayBuilder: (
                   BuildContext context,
                   BoxConstraints constraints,
                   ) {
                 return QrScannerOverlay(
                   scanWindow: scanWindowPixels,
-                  scannerController:
-                  widget
-                      .scannerController,
-                  frameColor:
-                  colorScheme.primary,
+                  scannerController: widget.scannerController,
+                  frameColor: colorScheme.primary,
                 );
               },
             );

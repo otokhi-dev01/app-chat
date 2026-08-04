@@ -40,8 +40,7 @@ class QrScannerGeometry {
       Rect pixelRect,
       Size screenSize,
       ) {
-    if (screenSize.width <= 0 ||
-        screenSize.height <= 0) {
+    if (screenSize.width <= 0 || screenSize.height <= 0) {
       return Rect.fromLTWH(
         0,
         0,
@@ -50,22 +49,13 @@ class QrScannerGeometry {
       );
     }
 
-    double left =
-        pixelRect.left / screenSize.width;
-
-    double top =
-        pixelRect.top / screenSize.height;
-
-    double right =
-        pixelRect.right / screenSize.width;
-
-    double bottom =
-        pixelRect.bottom / screenSize.height;
+    double left = pixelRect.left / screenSize.width;
+    double top = pixelRect.top / screenSize.height;
+    double right = pixelRect.right / screenSize.width;
+    double bottom = pixelRect.bottom / screenSize.height;
 
     // Clamp every edge into [0, 1] — mobile_scanner throws if the
-    // window falls even slightly outside the normalized bounds,
-    // which can otherwise happen near screen edges or during
-    // rotation transitions.
+    // window falls even slightly outside the normalized bounds.
     left = left.clamp(0.0, 1.0);
     top = top.clamp(0.0, 1.0);
     right = right.clamp(0.0, 1.0);
@@ -91,11 +81,8 @@ class QrScannerGeometry {
   static Rect _buildPortraitPixelWindow(
       Size screenSize,
       ) {
-    double availableWidth =
-        screenSize.width - 48;
-
-    double availableHeight =
-        screenSize.height * 0.40;
+    double availableWidth = screenSize.width - 48;
+    double availableHeight = screenSize.height * 0.40;
 
     double scannerSize = math.min(
       availableWidth,
@@ -122,11 +109,8 @@ class QrScannerGeometry {
   static Rect _buildLandscapePixelWindow(
       Size screenSize,
       ) {
-    double availableHeight =
-        screenSize.height - 150;
-
-    double availableWidth =
-        screenSize.width * 0.42;
+    double availableHeight = screenSize.height - 150;
+    double availableWidth = screenSize.width * 0.42;
 
     double scannerSize = math.min(
       availableHeight,

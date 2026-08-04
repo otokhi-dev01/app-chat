@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/contact_model.dart';
 
@@ -15,20 +17,19 @@ class AddGroupContactTile extends StatelessWidget {
   });
 
   bool get isOnline {
-    return contact.status ==
-        ContactStatus.online;
+    return contact.status == ContactStatus.online;
   }
 
   String get statusText {
     switch (contact.status) {
       case ContactStatus.online:
-        return 'Online';
+        return 'online'.tr;
 
       case ContactStatus.recently:
-        return 'Recently active';
+        return 'recently_active'.tr;
 
       case ContactStatus.offline:
-        return 'Offline';
+        return 'offline'.tr;
     }
   }
 
@@ -48,15 +49,14 @@ class AddGroupContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool hasImage =
-        contact.avatarUrl.trim().isNotEmpty;
+    bool hasImage = contact.avatarUrl.trim().isNotEmpty;
 
     Color backgroundColor = selected
         ? colorScheme.primary.withValues(
-      alpha: 0.06,
+      alpha: 0.08,
     )
         : Colors.transparent;
 
@@ -64,13 +64,14 @@ class AddGroupContactTile extends StatelessWidget {
         ? colorScheme.primary
         : colorScheme.onSurfaceVariant;
 
+    Color badgeBorderColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+
     return Material(
       color: backgroundColor,
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
+        highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: Padding(
@@ -84,9 +85,10 @@ class AddGroupContactTile extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   CircleAvatar(
-                    radius: 25,
-                    backgroundColor: colorScheme
-                        .surfaceContainerHighest,
+                    radius: 24,
+                    backgroundColor: colorScheme.primary.withValues(
+                      alpha: 0.12,
+                    ),
                     backgroundImage: hasImage
                         ? NetworkImage(
                       contact.avatarUrl,
@@ -97,27 +99,24 @@ class AddGroupContactTile extends StatelessWidget {
                         : Text(
                       firstLetter,
                       style: TextStyle(
-                        color:
-                        colorScheme.primary,
+                        color: colorScheme.primary,
                         fontSize: 16,
-                        fontWeight:
-                        FontWeight.w700,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   if (isOnline)
                     Positioned(
                       right: 0,
-                      bottom: 1,
+                      bottom: 0,
                       child: Container(
                         width: 13,
                         height: 13,
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: Color(0xFF32C766),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: theme
-                                .scaffoldBackgroundColor,
+                            color: badgeBorderColor,
                             width: 2,
                           ),
                         ),
@@ -128,23 +127,19 @@ class AddGroupContactTile extends StatelessWidget {
               SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       contact.name,
                       maxLines: 1,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme
-                          .textTheme.bodyLarge
-                          ?.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         color: selected
                             ? colorScheme.primary
                             : colorScheme.onSurface,
-                        fontSize: 14,
+                        fontSize: 14.5,
                         fontWeight:
-                        FontWeight.w600,
+                        selected ? FontWeight.w700 : FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: 3),
@@ -161,20 +156,14 @@ class AddGroupContactTile extends StatelessWidget {
                         SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            contact.username
-                                .trim()
-                                .isNotEmpty
+                            contact.username.trim().isNotEmpty
                                 ? '${contact.username} · $statusText'
                                 : '${contact.phoneNumber} · $statusText',
                             maxLines: 1,
-                            overflow:
-                            TextOverflow.ellipsis,
-                            style: theme
-                                .textTheme.bodySmall
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant,
-                              fontSize: 11,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.5,
                             ),
                           ),
                         ),
@@ -185,8 +174,8 @@ class AddGroupContactTile extends StatelessWidget {
               ),
               SizedBox(width: 10),
               Container(
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: selected
@@ -196,16 +185,15 @@ class AddGroupContactTile extends StatelessWidget {
                   border: Border.all(
                     color: selected
                         ? colorScheme.primary
-                        : colorScheme.outline,
+                        : colorScheme.outlineVariant,
                     width: 1.5,
                   ),
                 ),
                 child: selected
                     ? Icon(
-                  Icons.check_rounded,
-                  size: 16,
-                  color:
-                  colorScheme.onPrimary,
+                  CupertinoIcons.checkmark,
+                  size: 13,
+                  color: colorScheme.onPrimary,
                 )
                     : null,
               ),

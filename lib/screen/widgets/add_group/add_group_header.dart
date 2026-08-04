@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,15 +40,11 @@ class AddGroupHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -59,15 +56,22 @@ class AddGroupHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(
-          17,
-        ),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -78,22 +82,16 @@ class AddGroupHeader extends StatelessWidget {
             isAssetImage: isAssetImage,
             onPhotoTap: onPhotoTap,
           ),
-
           SizedBox(width: 12),
-
           Expanded(
             child: TextField(
               controller: nameController,
-              textCapitalization:
-              TextCapitalization.words,
-              textInputAction:
-              TextInputAction.done,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.done,
               maxLength: 50,
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
@@ -102,57 +100,37 @@ class AddGroupHeader extends StatelessWidget {
                 counterText: '',
                 isDense: true,
                 filled: true,
-                fillColor: colorScheme
-                    .surfaceContainerHighest
-                    .withValues(
-                  alpha: isDark ? 0.42 : 0.55,
-                ),
-                contentPadding:
-                EdgeInsets.symmetric(
+                fillColor: isDark
+                    ? Colors.white.withValues(alpha: 0.04)
+                    : Colors.black.withValues(alpha: 0.025),
+                contentPadding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 12,
                 ),
                 prefixIcon: Icon(
-                  Icons.groups_outlined,
-                  color: colorScheme
-                      .onSurfaceVariant,
-                  size: 20,
+                  CupertinoIcons.person_3,
+                  color: colorScheme.primary,
+                  size: 18,
                 ),
-                prefixIconConstraints:
-                BoxConstraints(
+                prefixIconConstraints: BoxConstraints(
                   minWidth: 42,
                   minHeight: 42,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                    13,
-                  ),
+                  borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
                 ),
-                enabledBorder:
-                OutlineInputBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                    13,
-                  ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(
-                    color: colorScheme
-                        .outlineVariant
-                        .withValues(
-                      alpha: 0.30,
-                    ),
+                    color: borderColor,
                   ),
                 ),
-                focusedBorder:
-                OutlineInputBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                    13,
-                  ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(
                     color: colorScheme.primary,
-                    width: 1.3,
+                    width: 1.5,
                   ),
                 ),
               ),
@@ -171,7 +149,7 @@ class _GroupPhoto extends StatelessWidget {
   final bool isAssetImage;
   final VoidCallback onPhotoTap;
 
- const _GroupPhoto({
+  const _GroupPhoto({
     required this.groupImagePath,
     required this.hasImage,
     required this.isNetworkImage,
@@ -181,13 +159,10 @@ class _GroupPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Tooltip(
-      message: hasImage
-          ? 'change_group_photo'.tr
-          : 'add_group_photo'.tr,
+      message: hasImage ? 'change_group_photo'.tr : 'add_group_photo'.tr,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -197,48 +172,39 @@ class _GroupPhoto extends StatelessWidget {
               onTap: onPhotoTap,
               customBorder: CircleBorder(),
               splashColor: Colors.transparent,
-              highlightColor:
-              Colors.transparent,
+              highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,
               focusColor: Colors.transparent,
               child: Container(
-                width: 56,
-                height: 56,
+                width: 58,
+                height: 58,
                 clipBehavior: Clip.antiAlias,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
+                  color: colorScheme.primary.withValues(
                     alpha: 0.11,
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: colorScheme.primary
-                        .withValues(
+                    color: colorScheme.primary.withValues(
                       alpha: 0.20,
                     ),
                   ),
                 ),
                 child: hasImage
                     ? _GroupImage(
-                  groupImagePath:
-                  groupImagePath,
-                  isNetworkImage:
-                  isNetworkImage,
-                  isAssetImage:
-                  isAssetImage,
+                  groupImagePath: groupImagePath,
+                  isNetworkImage: isNetworkImage,
+                  isAssetImage: isAssetImage,
                 )
                     : Icon(
-                  Icons
-                      .add_a_photo_outlined,
-                  color:
-                  colorScheme.primary,
-                  size: 23,
+                  CupertinoIcons.camera,
+                  color: colorScheme.primary,
+                  size: 22,
                 ),
               ),
             ),
           ),
-
           Positioned(
             right: -2,
             bottom: -2,
@@ -248,21 +214,16 @@ class _GroupPhoto extends StatelessWidget {
               child: InkWell(
                 onTap: onPhotoTap,
                 customBorder: CircleBorder(),
-                splashColor:
-                Colors.transparent,
-                highlightColor:
-                Colors.transparent,
-                hoverColor:
-                Colors.transparent,
-                focusColor:
-                Colors.transparent,
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
                 child: SizedBox(
                   width: 22,
                   height: 22,
                   child: Icon(
-                    Icons.camera_alt_rounded,
-                    color:
-                    colorScheme.onPrimary,
+                    CupertinoIcons.camera_fill,
+                    color: colorScheme.onPrimary,
                     size: 12,
                   ),
                 ),
@@ -288,8 +249,7 @@ class _GroupImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     if (isNetworkImage) {
       return Image.network(
@@ -362,7 +322,7 @@ class _ImageError extends StatelessWidget {
         alpha: 0.10,
       ),
       child: Icon(
-        Icons.image_not_supported_outlined,
+        CupertinoIcons.photo,
         color: colorScheme.primary,
         size: 22,
       ),

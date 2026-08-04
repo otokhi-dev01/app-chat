@@ -1,5 +1,7 @@
 import 'package:appchat/screen/widgets/qr_code/profile_qr_action_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'profile_qr_card.dart';
 import 'profile_qr_info_card.dart';
@@ -14,7 +16,7 @@ class ProfileQrContent extends StatelessWidget {
   final Future<void> Function() onDownload;
   final ScrollController? scrollController;
 
-  ProfileQrContent({
+  const ProfileQrContent({
     super.key,
     required this.name,
     required this.username,
@@ -30,12 +32,9 @@ class ProfileQrContent extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageColor = isDark
-        ? Color(0xFF131519)
-        : Color(0xFFF6F7F9);
+    Color pageColor = isDark ? Color(0xFF131519) : Color(0xFFF6F7F9);
 
     return ColoredBox(
       color: pageColor,
@@ -43,8 +42,7 @@ class ProfileQrContent extends StatelessWidget {
         controller: scrollController,
         primary: scrollController == null,
         shrinkWrap: scrollController == null,
-        keyboardDismissBehavior:
-        ScrollViewKeyboardDismissBehavior.onDrag,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         physics: BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
@@ -63,7 +61,8 @@ class ProfileQrContent extends StatelessWidget {
           ),
           SizedBox(height: 24),
           _QrSectionTitle(
-            title: 'Quick Actions',
+            title: 'quick_actions'.tr,
+            icon: CupertinoIcons.bolt_fill,
           ),
           SizedBox(height: 10),
           Row(
@@ -84,7 +83,8 @@ class ProfileQrContent extends StatelessWidget {
           ),
           SizedBox(height: 24),
           _QrSectionTitle(
-            title: 'Security',
+            title: 'security'.tr,
+            icon: CupertinoIcons.shield_fill,
           ),
           SizedBox(height: 10),
           ProfileQrInfoCard(),
@@ -97,9 +97,11 @@ class ProfileQrContent extends StatelessWidget {
 
 class _QrSectionTitle extends StatelessWidget {
   final String title;
+  final IconData? icon;
 
-  _QrSectionTitle({
+  const _QrSectionTitle({
     required this.title,
+    this.icon,
   });
 
   @override
@@ -111,13 +113,25 @@ class _QrSectionTitle extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: 3,
       ),
-      child: Text(
-        title,
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: colorScheme.onSurface,
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-        ),
+      child: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(
+              icon,
+              color: colorScheme.primary,
+              size: 18,
+            ),
+            SizedBox(width: 8),
+          ],
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: colorScheme.primary,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -19,17 +19,14 @@ class QrScannerAutoZoom {
     this.minimumAcceptedCoverage = 0.22,
     this.maximumZoom = 0.82,
     this.zoomStep = 0.13,
-  }) : zoomInterval =
-      zoomInterval ??
-          Duration(
-            milliseconds: 320,
-          );
+  }) : zoomInterval = zoomInterval ??
+      Duration(
+        milliseconds: 320,
+      );
 
   bool get _needsManualAutoZoom {
-    return defaultTargetPlatform ==
-        TargetPlatform.iOS ||
-        defaultTargetPlatform ==
-            TargetPlatform.macOS;
+    return defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS;
   }
 
   Future<bool> prepareCapture(
@@ -43,29 +40,24 @@ class QrScannerAutoZoom {
       return false;
     }
 
-    Barcode? qrCode =
-    _findTrackableQrCode(
+    Barcode? qrCode = _findTrackableQrCode(
       capture,
     );
 
-    if (qrCode == null ||
-        capture.size.isEmpty) {
+    if (qrCode == null || capture.size.isEmpty) {
       return true;
     }
 
-    double coverage =
-    _calculateCoverage(
+    double coverage = _calculateCoverage(
       barcode: qrCode,
       cameraSize: capture.size,
     );
 
-    if (coverage >=
-        minimumAcceptedCoverage) {
+    if (coverage >= minimumAcceptedCoverage) {
       return true;
     }
 
-    double currentZoom =
-        controller.value.zoomScale;
+    double currentZoom = controller.value.zoomScale;
 
     if (currentZoom >= maximumZoom) {
       return true;
@@ -74,8 +66,7 @@ class QrScannerAutoZoom {
     DateTime now = DateTime.now();
 
     if (_lastZoomTime != null &&
-        now.difference(_lastZoomTime!) <
-            zoomInterval) {
+        now.difference(_lastZoomTime!) < zoomInterval) {
       return false;
     }
 
@@ -83,13 +74,11 @@ class QrScannerAutoZoom {
     _isUpdatingZoom = true;
 
     try {
-      double extraZoom =
-      _calculateZoomStep(
+      double extraZoom = _calculateZoomStep(
         coverage,
       );
 
-      double nextZoom =
-      (currentZoom + extraZoom)
+      double nextZoom = (currentZoom + extraZoom)
           .clamp(
         0.0,
         maximumZoom,
@@ -115,14 +104,10 @@ class QrScannerAutoZoom {
   Barcode? _findTrackableQrCode(
       BarcodeCapture capture,
       ) {
-    for (Barcode barcode
-    in capture.barcodes) {
-      bool isQr =
-          barcode.format ==
-              BarcodeFormat.qrCode;
+    for (Barcode barcode in capture.barcodes) {
+      bool isQr = barcode.format == BarcodeFormat.qrCode;
 
-      bool hasCorners =
-          barcode.corners.length >= 4;
+      bool hasCorners = barcode.corners.length >= 4;
 
       if (isQr && hasCorners) {
         return barcode;
@@ -136,16 +121,13 @@ class QrScannerAutoZoom {
     required Barcode barcode,
     required Size cameraSize,
   }) {
-    Rect bounds =
-    _buildBarcodeBounds(
+    Rect bounds = _buildBarcodeBounds(
       barcode.corners,
     );
 
-    double widthCoverage =
-        bounds.width / cameraSize.width;
+    double widthCoverage = bounds.width / cameraSize.width;
 
-    double heightCoverage =
-        bounds.height / cameraSize.height;
+    double heightCoverage = bounds.height / cameraSize.height;
 
     return widthCoverage > heightCoverage
         ? widthCoverage

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,12 +17,9 @@ Future<void> showAddGroupPhotoSheet({
   ThemeData theme = Theme.of(context);
   ColorScheme colorScheme = theme.colorScheme;
 
-  bool isDark =
-      theme.brightness == Brightness.dark;
+  bool isDark = theme.brightness == Brightness.dark;
 
-  Color sheetColor = isDark
-      ? Color(0xFF1B1D22)
-      : Colors.white;
+  Color sheetColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
   Color borderColor = isDark
       ? Colors.white.withValues(
@@ -31,9 +29,15 @@ Future<void> showAddGroupPhotoSheet({
     alpha: 0.06,
   );
 
+  Color actionBackground = isDark
+      ? Colors.white.withValues(
+    alpha: 0.08,
+  )
+      : Color(0xFFF2F4F7);
+
   await showModalBottomSheet<void>(
     context: context,
-    useSafeArea: true,
+    useSafeArea: false,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(
@@ -42,192 +46,162 @@ Future<void> showAddGroupPhotoSheet({
     builder: (
         BuildContext sheetContext,
         ) {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.fromLTRB(
-          14,
-          9,
-          14,
-          18,
+      return Material(
+        color: sheetColor,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(28),
         ),
-        decoration: BoxDecoration(
-          color: sheetColor,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(22),
-          ),
-          border: Border(
-            top: BorderSide(
-              color: borderColor,
+        clipBehavior: Clip.antiAlias,
+        child: SafeArea(
+          top: false,
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              20,
             ),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _PhotoSheetHandle(),
-
-            SizedBox(height: 13),
-
-            Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  clipBehavior: Clip.antiAlias,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary
-                        .withValues(
-                      alpha: 0.11,
+                _PhotoSheetHandle(),
+
+                SizedBox(height: 18),
+
+                Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      clipBehavior: Clip.antiAlias,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(
+                          alpha: 0.12,
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: hasPhoto &&
+                          groupImagePath != null &&
+                          groupImagePath.trim().isNotEmpty
+                          ? _GroupPhotoPreview(
+                        imagePath: groupImagePath.trim(),
+                      )
+                          : Icon(
+                        CupertinoIcons.camera,
+                        color: colorScheme.primary,
+                        size: 20,
+                      ),
                     ),
-                    borderRadius:
-                    BorderRadius.circular(12),
-                  ),
-                  child: hasPhoto &&
-                      groupImagePath != null &&
-                      groupImagePath
-                          .trim()
-                          .isNotEmpty
-                      ? _GroupPhotoPreview(
-                    imagePath:
-                    groupImagePath.trim(),
-                  )
-                      : Icon(
-                    Icons
-                        .add_a_photo_outlined,
-                    color:
-                    colorScheme.primary,
-                    size: 20,
-                  ),
-                ),
 
-                SizedBox(width: 10),
+                    SizedBox(width: 12),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'group_photo'.tr,
-                        style: theme
-                            .textTheme.titleSmall
-                            ?.copyWith(
-                          color:
-                          colorScheme.onSurface,
-                          fontSize: 14,
-                          fontWeight:
-                          FontWeight.w700,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'group_photo'.tr,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+
+                          SizedBox(height: 2),
+
+                          Text(
+                            'choose_group_profile_photo'.tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Unit Close Button UI
+                    Container(
+                      width: 36,
+                      height: 36,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: actionBackground,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: borderColor,
+                          width: 1.0,
                         ),
                       ),
-
-                      SizedBox(height: 2),
-
-                      Text(
-                        'choose_group_profile_photo'
-                            .tr,
-                        maxLines: 1,
-                        overflow:
-                        TextOverflow.ellipsis,
-                        style: theme
-                            .textTheme.bodySmall
-                            ?.copyWith(
-                          color: colorScheme
-                              .onSurfaceVariant,
-                          fontSize: 10.5,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size(36, 36),
+                        onPressed: () {
+                          Navigator.of(sheetContext).pop();
+                        },
+                        child: Icon(
+                          CupertinoIcons.xmark,
+                          size: 18,
+                          color: colorScheme.onSurface,
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 16),
+
+                Column(
+                  children: [
+                    _PhotoOption(
+                      icon: CupertinoIcons.photo,
+                      label: 'gallery'.tr,
+                      onTap: () {
+                        _closeAndRun(
+                          context: sheetContext,
+                          action: onGallery,
+                        );
+                      },
+                    ),
+
+                    SizedBox(height: 10),
+
+                    _PhotoOption(
+                      icon: CupertinoIcons.camera,
+                      label: 'camera'.tr,
+                      onTap: () {
+                        _closeAndRun(
+                          context: sheetContext,
+                          action: onCamera,
+                        );
+                      },
+                    ),
+
+                    if (hasPhoto) ...[
+                      SizedBox(height: 10),
+
+                      _PhotoOption(
+                        icon: CupertinoIcons.trash,
+                        label: 'remove'.tr,
+                        isDanger: true,
+                        onTap: () {
+                          _closeAndRun(
+                            context: sheetContext,
+                            action: onRemove,
+                          );
+                        },
                       ),
                     ],
-                  ),
-                ),
-
-                Material(
-                  color: colorScheme
-                      .surfaceContainerHighest,
-                  shape: CircleBorder(),
-                  child: Tooltip(
-                    message: 'close'.tr,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(
-                          sheetContext,
-                        ).pop();
-                      },
-                      customBorder:
-                      CircleBorder(),
-                      splashColor:
-                      Colors.transparent,
-                      highlightColor:
-                      Colors.transparent,
-                      hoverColor:
-                      Colors.transparent,
-                      focusColor:
-                      Colors.transparent,
-                      child: SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: colorScheme
-                              .onSurfaceVariant,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
-
-            SizedBox(height: 15),
-
-            Column(
-              children: [
-                _PhotoOption(
-                  icon: Icons
-                      .photo_library_outlined,
-                  label: 'gallery'.tr,
-                  onTap: () {
-                    _closeAndRun(
-                      context: sheetContext,
-                      action: onGallery,
-                    );
-                  },
-                ),
-
-                SizedBox(height: 10),
-
-                _PhotoOption(
-                  icon:
-                  Icons.camera_alt_outlined,
-                  label: 'camera'.tr,
-                  onTap: () {
-                    _closeAndRun(
-                      context: sheetContext,
-                      action: onCamera,
-                    );
-                  },
-                ),
-
-                if (hasPhoto) ...[
-                  SizedBox(height: 10),
-
-                  _PhotoOption(
-                    icon: Icons
-                        .delete_outline_rounded,
-                    label: 'remove'.tr,
-                    isDanger: true,
-                    onTap: () {
-                      _closeAndRun(
-                        context: sheetContext,
-                        action: onRemove,
-                      );
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ],
+          ),
         ),
       );
     },
@@ -248,8 +222,7 @@ void _closeAndRun({
   );
 }
 
-class _GroupPhotoPreview
-    extends StatelessWidget {
+class _GroupPhotoPreview extends StatelessWidget {
   final String imagePath;
 
   const _GroupPhotoPreview({
@@ -273,11 +246,10 @@ class _GroupPhotoPreview
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     Widget errorWidget = Icon(
-      Icons.image_not_supported_outlined,
+      CupertinoIcons.photo,
       color: colorScheme.primary,
       size: 18,
     );
@@ -330,25 +302,21 @@ class _GroupPhotoPreview
   }
 }
 
-class _PhotoSheetHandle
-    extends StatelessWidget {
+class _PhotoSheetHandle extends StatelessWidget {
   const _PhotoSheetHandle();
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: 36,
+      width: 42,
       height: 4,
       decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant
-            .withValues(
-          alpha: 0.25,
+        color: colorScheme.onSurfaceVariant.withValues(
+          alpha: 0.28,
         ),
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20),
       ),
     );
   }
@@ -370,19 +338,14 @@ class _PhotoOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color foregroundColor = isDanger
-        ? colorScheme.error
-        : colorScheme.onSurface;
+    Color foregroundColor =
+    isDanger ? colorScheme.error : colorScheme.onSurface;
 
-    Color iconColor = isDanger
-        ? colorScheme.error
-        : colorScheme.primary;
+    Color iconColor = isDanger ? colorScheme.error : colorScheme.primary;
 
     Color backgroundColor = isDanger
         ? colorScheme.error.withValues(
@@ -408,11 +371,9 @@ class _PhotoOption extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
+        highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: Container(
@@ -421,11 +382,8 @@ class _PhotoOption extends StatelessWidget {
             vertical: 12,
           ),
           decoration: BoxDecoration(
-            color: isDark
-                ? Color(0xFF22242B)
-                : Color(0xFFF5F7FA),
-            borderRadius:
-            BorderRadius.circular(15),
+            color: isDark ? Color(0xFF1B1D22) : Color(0xFFF5F7FA),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: borderColor,
             ),
@@ -433,12 +391,12 @@ class _PhotoOption extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 38,
-                height: 38,
+                width: 40,
+                height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: backgroundColor,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(13),
                 ),
                 child: Icon(
                   icon,
@@ -446,31 +404,25 @@ class _PhotoOption extends StatelessWidget {
                   size: 20,
                 ),
               ),
-
               SizedBox(width: 14),
-
               Expanded(
                 child: Text(
                   label,
-                  style: theme
-                      .textTheme.bodyMedium
-                      ?.copyWith(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     color: foregroundColor,
                     fontSize: 14.5,
-                    fontWeight:
-                    FontWeight.w600,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-
               Icon(
-                Icons.chevron_right_rounded,
-                color: colorScheme
-                    .onSurfaceVariant
-                    .withValues(
-                  alpha: 0.4,
+                CupertinoIcons.chevron_right,
+                color: isDanger
+                    ? colorScheme.error
+                    : colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.45,
                 ),
-                size: 20,
+                size: 18,
               ),
             ],
           ),

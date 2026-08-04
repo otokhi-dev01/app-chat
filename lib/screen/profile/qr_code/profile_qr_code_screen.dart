@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../models/contact_model.dart';
 import '../../../route/app_route.dart';
 import '../../../services/download/profile_qr_download_service.dart';
+import '../../widgets/common/app_feedback.dart';
 import '../../widgets/qr_code/profile_qr_content.dart';
 import 'profile_qr_app_bar.dart';
 
@@ -18,9 +20,7 @@ class ProfileQrCodeScreen extends StatelessWidget {
     required this.name,
     required this.username,
     ProfileQrDownloadService? downloadService,
-  }) : downloadService =
-      downloadService ??
-          ProfileQrDownloadService();
+  }) : downloadService = downloadService ?? ProfileQrDownloadService();
 
   String get cleanName {
     String value = name.trim();
@@ -48,21 +48,16 @@ class ProfileQrCodeScreen extends StatelessWidget {
   }
 
   String get profileQrData {
-    String profileKey = cleanUsername.isNotEmpty
-        ? cleanUsername
-        : cleanName;
+    String profileKey = cleanUsername.isNotEmpty ? cleanUsername : cleanName;
 
-    return 'appchat://profile/'
-        '${Uri.encodeComponent(profileKey)}';
+    return 'appchat://profile/${Uri.encodeComponent(profileKey)}';
   }
 
   String get firstLetter {
-    return cleanName
-        .substring(
+    return cleanName.substring(
       0,
       1,
-    )
-        .toUpperCase();
+    ).toUpperCase();
   }
 
   String get qrFileName {
@@ -74,8 +69,7 @@ class ProfileQrCodeScreen extends StatelessWidget {
   }
 
   void _closeScreen() {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     Get.back();
   }
@@ -83,11 +77,9 @@ class ProfileQrCodeScreen extends StatelessWidget {
   Future<void> _openScanner(
       BuildContext context,
       ) async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    if (Get.currentRoute ==
-        AppRoutes.qrScanner) {
+    if (Get.currentRoute == AppRoutes.qrScanner) {
       return;
     }
 
@@ -103,14 +95,12 @@ class ProfileQrCodeScreen extends StatelessWidget {
     if (result is ContactModel) {
       _showMessage(
         title: 'contact_added'.tr,
-        message:
-        'contact_added_message'.trParams(
+        message: 'contact_added_message'.trParams(
           <String, String>{
             'name': result.name,
           },
         ),
-        icon:
-        Icons.person_add_alt_1_rounded,
+        icon: CupertinoIcons.person_badge_plus,
       );
     }
   }
@@ -118,8 +108,7 @@ class ProfileQrCodeScreen extends StatelessWidget {
   Future<void> _downloadQrCode(
       BuildContext context,
       ) async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     try {
       await downloadService.saveQrCode(
@@ -133,10 +122,8 @@ class ProfileQrCodeScreen extends StatelessWidget {
 
       _showMessage(
         title: 'qr_code_saved'.tr,
-        message:
-        'qr_code_saved_to_photos'.tr,
-        icon:
-        Icons.download_done_rounded,
+        message: 'qr_code_saved_to_photos'.tr,
+        icon: CupertinoIcons.arrow_down_to_line,
       );
     } catch (error) {
       if (!context.mounted) {
@@ -144,21 +131,17 @@ class ProfileQrCodeScreen extends StatelessWidget {
       }
 
       _showMessage(
-        title:
-        'unable_to_save_qr_code'.tr,
+        title: 'unable_to_save_qr_code'.tr,
         message: _cleanErrorMessage(
           error,
         ),
-        icon:
-        Icons.error_outline_rounded,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     }
   }
 
   void _copyProfileValue() {
-    String value = cleanUsername.isNotEmpty
-        ? '@$cleanUsername'
-        : profileQrData;
+    String value = cleanUsername.isNotEmpty ? '@$cleanUsername' : profileQrData;
 
     Clipboard.setData(
       ClipboardData(
@@ -169,10 +152,8 @@ class ProfileQrCodeScreen extends StatelessWidget {
     if (cleanUsername.isNotEmpty) {
       _showMessage(
         title: 'username_copied'.tr,
-        message:
-        'username_copied_to_clipboard'
-            .tr,
-        icon: Icons.copy_rounded,
+        message: 'username_copied_to_clipboard'.tr,
+        icon: CupertinoIcons.doc_on_doc,
       );
 
       return;
@@ -180,10 +161,8 @@ class ProfileQrCodeScreen extends StatelessWidget {
 
     _showMessage(
       title: 'profile_link_copied'.tr,
-      message:
-      'profile_link_copied_to_clipboard'
-          .tr,
-      icon: Icons.copy_rounded,
+      message: 'profile_link_copied_to_clipboard'.tr,
+      icon: CupertinoIcons.doc_on_doc,
     );
   }
 
@@ -192,23 +171,10 @@ class ProfileQrCodeScreen extends StatelessWidget {
     required String message,
     required IconData icon,
   }) {
-    Get.closeAllSnackbars();
-
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      margin: EdgeInsets.all(16),
-      borderRadius: 16,
-      icon: Icon(
-        icon,
-      ),
-      duration: Duration(
-        seconds: 3,
-      ),
-      isDismissible: true,
-      dismissDirection:
-      DismissDirection.horizontal,
+    AppFeedback.showMessage(
+      title: title,
+      message: message,
+      icon: icon,
     );
   }
 
@@ -231,51 +197,31 @@ class ProfileQrCodeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageColor =
-        theme.scaffoldBackgroundColor;
+    Color pageColor = theme.scaffoldBackgroundColor;
 
-    SystemUiOverlayStyle overlayStyle =
-    isDark
-        ? SystemUiOverlayStyle.light
-        .copyWith(
-      statusBarColor:
-      Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.light,
-      statusBarBrightness:
-      Brightness.dark,
-      systemNavigationBarColor:
-      pageColor,
-      systemNavigationBarDividerColor:
-      pageColor,
-      systemNavigationBarIconBrightness:
-      Brightness.light,
-      systemNavigationBarContrastEnforced:
-      false,
+    SystemUiOverlayStyle overlayStyle = isDark
+        ? SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: pageColor,
+      systemNavigationBarDividerColor: pageColor,
+      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarContrastEnforced: false,
     )
-        : SystemUiOverlayStyle.dark
-        .copyWith(
-      statusBarColor:
-      Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      pageColor,
-      systemNavigationBarDividerColor:
-      pageColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
-      systemNavigationBarContrastEnforced:
-      false,
+        : SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: pageColor,
+      systemNavigationBarDividerColor: pageColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarContrastEnforced: false,
     );
 
-    return AnnotatedRegion<
-        SystemUiOverlayStyle>(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
       child: Scaffold(
         backgroundColor: pageColor,
@@ -301,14 +247,11 @@ class ProfileQrCodeScreen extends StatelessWidget {
                 bottom: false,
                 child: ProfileQrContent(
                   name: cleanName,
-                  username:
-                  displayUsername,
+                  username: displayUsername,
                   qrData: profileQrData,
                   firstLetter: firstLetter,
-                  hasUsername:
-                  cleanUsername.isNotEmpty,
-                  onCopy:
-                  _copyProfileValue,
+                  hasUsername: cleanUsername.isNotEmpty,
+                  onCopy: _copyProfileValue,
                   onDownload: () {
                     return _downloadQrCode(
                       context,

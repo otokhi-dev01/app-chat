@@ -1,54 +1,58 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ProfileQrInfoCard
-    extends StatelessWidget {
-  ProfileQrInfoCard({
+class ProfileQrInfoCard extends StatelessWidget {
+  const ProfileQrInfoCard({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.primary
-            .withValues(
-          alpha: isDark ? 0.10 : 0.07,
+        color: colorScheme.primary.withValues(
+          alpha: isDark ? 0.12 : 0.08,
         ),
-        borderRadius:
-        BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: colorScheme.primary
-              .withValues(
-            alpha: 0.13,
+          color: colorScheme.primary.withValues(
+            alpha: isDark ? 0.22 : 0.15,
           ),
         ),
       ),
       child: Row(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: colorScheme.primary,
-            size: 21,
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(
+                alpha: 0.14,
+              ),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              CupertinoIcons.info_circle,
+              color: colorScheme.primary,
+              size: 18,
+            ),
           ),
-          SizedBox(width: 11),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Only share this QR code with people you trust.',
-              style: theme
-                  .textTheme.bodyMedium
-                  ?.copyWith(
-                color:
-                colorScheme.onSurface,
+              'share_qr_trusted_contacts'.tr,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontSize: 12,
                 height: 1.4,
               ),
             ),

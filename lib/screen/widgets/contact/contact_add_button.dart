@@ -10,7 +10,7 @@ import 'show_add_contact_sheet.dart';
 class ContactAddButton extends StatelessWidget {
   final ContactController controller;
 
-  ContactAddButton({
+  const ContactAddButton({
     super.key,
     required this.controller,
   });

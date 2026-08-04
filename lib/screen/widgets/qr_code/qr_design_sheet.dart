@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -15,7 +16,7 @@ Future<void> showQrDesignSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(
-      alpha: 0.38,
+      alpha: 0.42,
     ),
     builder: (
         BuildContext sheetContext,
@@ -32,16 +33,11 @@ class _QrDesignSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color sheetColor = isDark
-        ? Color(0xFF131519)
-        : Color(0xFFF6F7F9);
+    Color sheetColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -51,199 +47,166 @@ class _QrDesignSheet extends StatelessWidget {
       alpha: 0.06,
     );
 
-    QrDesignController controller =
-    Get.find<QrDesignController>();
+    QrDesignController controller = Get.find<QrDesignController>();
 
-    return Container(
-      width: double.infinity,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: sheetColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-        border: Border(
-          top: BorderSide(
-            color: borderColor,
-          ),
-        ),
+    return Material(
+      color: sheetColor,
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(28),
       ),
+      clipBehavior: Clip.antiAlias,
       child: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: BouncingScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
             16,
-            10,
+            12,
             16,
-            18,
+            20,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _SheetHandle(),
-              SizedBox(height: 13),
-            _SheetHeader(
-              onClose: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            SizedBox(height: 18),
+              SizedBox(height: 16),
+              _SheetHeader(
+                onClose: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              SizedBox(height: 18),
+              _DesignSection(
+                title: 'qr_style'.tr,
+                icon: CupertinoIcons.square_grid_2x2,
+                cardColor: cardColor,
+                borderColor: borderColor,
+                child: Obx(
+                      () {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _StyleOption(
+                            label: 'sharp'.tr,
+                            icon: CupertinoIcons.square,
+                            selected: controller.moduleShape.value ==
+                                QrDataModuleShape.square,
+                            onTap: () {
+                              controller.setModuleShape(
+                                QrDataModuleShape.square,
+                              );
 
-            _DesignSection(
-              title: 'QR style',
-              icon: Icons.grid_view_rounded,
-              cardColor: cardColor,
-              borderColor: borderColor,
-              child: Obx(
-                    () {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _StyleOption(
-                          label: 'Sharp',
-                          icon:
-                          Icons.grid_on_rounded,
-                          selected: controller
-                              .moduleShape.value ==
-                              QrDataModuleShape.square,
-                          onTap: () {
-                            controller.setModuleShape(
-                              QrDataModuleShape.square,
-                            );
-
-                            controller.setEyeShape(
-                              QrEyeShape.square,
-                            );
-                          },
+                              controller.setEyeShape(
+                                QrEyeShape.square,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 9),
-                      Expanded(
-                        child: _StyleOption(
-                          label: 'Rounded',
-                          icon: Icons
-                              .blur_circular_rounded,
-                          selected: controller
-                              .moduleShape.value ==
-                              QrDataModuleShape.circle,
-                          onTap: () {
-                            controller.setModuleShape(
-                              QrDataModuleShape.circle,
-                            );
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _StyleOption(
+                            label: 'rounded'.tr,
+                            icon: CupertinoIcons.circle,
+                            selected: controller.moduleShape.value ==
+                                QrDataModuleShape.circle,
+                            onTap: () {
+                              controller.setModuleShape(
+                                QrDataModuleShape.circle,
+                              );
 
-                            controller.setEyeShape(
-                              QrEyeShape.circle,
-                            );
-                          },
+                              controller.setEyeShape(
+                                QrEyeShape.circle,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
+              SizedBox(height: 12),
+              _DesignSection(
+                title: 'qr_color'.tr,
+                icon: CupertinoIcons.paintbrush,
+                cardColor: cardColor,
+                borderColor: borderColor,
+                child: Obx(
+                      () {
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: QrDesignController.colorPresets.map(
+                            (
+                            Color color,
+                            ) {
+                          bool selected = controller.qrColor.value.toARGB32() ==
+                              color.toARGB32();
 
-            SizedBox(height: 12),
-
-            _DesignSection(
-              title: 'QR color',
-              icon: Icons.palette_outlined,
-              cardColor: cardColor,
-              borderColor: borderColor,
-              child: Obx(
-                    () {
-                  return Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: QrDesignController
-                        .colorPresets
-                        .map(
-                          (
-                          Color color,
-                          ) {
-                        bool selected = controller
-                            .qrColor.value
-                            .toARGB32() ==
-                            color.toARGB32();
-
-                        return _ColorSwatch(
-                          color: color,
-                          selected: selected,
-                          borderColor:
-                          borderColor,
-                          onTap: () {
-                            controller.setColor(
-                              color,
-                            );
-                          },
-                        );
-                      },
-                    )
-                        .toList(),
-                  );
-                },
+                          return _ColorSwatch(
+                            color: color,
+                            selected: selected,
+                            borderColor: borderColor,
+                            onTap: () {
+                              controller.setColor(
+                                color,
+                              );
+                            },
+                          );
+                        },
+                      ).toList(),
+                    );
+                  },
+                ),
               ),
-            ),
+              SizedBox(height: 12),
+              _DesignSection(
+                title: 'background'.tr,
+                icon: CupertinoIcons.drop,
+                cardColor: cardColor,
+                borderColor: borderColor,
+                child: Obx(
+                      () {
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: QrDesignController.backgroundPresets.map(
+                            (
+                            Color color,
+                            ) {
+                          bool selected =
+                              controller.qrBackground.value.toARGB32() ==
+                                  color.toARGB32();
 
-            SizedBox(height: 12),
-
-            _DesignSection(
-              title: 'Background',
-              icon: Icons
-                  .format_color_fill_rounded,
-              cardColor: cardColor,
-              borderColor: borderColor,
-              child: Obx(
-                    () {
-                  return Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: QrDesignController
-                        .backgroundPresets
-                        .map(
-                          (
-                          Color color,
-                          ) {
-                        bool selected = controller
-                            .qrBackground.value
-                            .toARGB32() ==
-                            color.toARGB32();
-
-                        return _ColorSwatch(
-                          color: color,
-                          selected: selected,
-                          borderColor:
-                          borderColor,
-                          alwaysBordered: true,
-                          onTap: () {
-                            controller
-                                .setBackground(
-                              color,
-                            );
-                          },
-                        );
-                      },
-                    )
-                        .toList(),
-                  );
-                },
+                          return _ColorSwatch(
+                            color: color,
+                            selected: selected,
+                            borderColor: borderColor,
+                            alwaysBordered: true,
+                            onTap: () {
+                              controller.setBackground(
+                                color,
+                              );
+                            },
+                          );
+                        },
+                      ).toList(),
+                    );
+                  },
+                ),
               ),
-            ),
-
-            SizedBox(height: 14),
-
-            _ResetButton(
-              cardColor: cardColor,
-              borderColor: borderColor,
-              onTap: controller.reset,
-            ),
-          ],
+              SizedBox(height: 16),
+              _ResetButton(
+                cardColor: cardColor,
+                borderColor: borderColor,
+                onTap: controller.reset,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 class _SheetHandle extends StatelessWidget {
@@ -251,16 +214,14 @@ class _SheetHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: 36,
+      width: 42,
       height: 4,
       decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant
-            .withValues(
-          alpha: 0.25,
+        color: colorScheme.onSurfaceVariant.withValues(
+          alpha: 0.28,
         ),
         borderRadius: BorderRadius.circular(
           20,
@@ -280,68 +241,65 @@ class _SheetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color closeBackground = isDark
+    Color actionBackground = isDark
         ? Colors.white.withValues(
-      alpha: 0.07,
+      alpha: 0.08,
+    )
+        : Color(0xFFF2F4F7);
+
+    Color borderColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
     )
         : Colors.black.withValues(
-      alpha: 0.04,
+      alpha: 0.06,
     );
 
     return Row(
       children: [
         Container(
-          width: 42,
-          height: 42,
+          width: 44,
+          height: 44,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: colorScheme.primary.withValues(
-              alpha: isDark ? 0.18 : 0.11,
+              alpha: 0.11,
             ),
             borderRadius: BorderRadius.circular(
               14,
             ),
           ),
           child: Icon(
-            Icons.qr_code_2_rounded,
+            CupertinoIcons.qrcode,
             color: colorScheme.primary,
-            size: 23,
+            size: 22,
           ),
         ),
-        SizedBox(width: 11),
+        SizedBox(width: 12),
         Expanded(
           child: Column(
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Customize QR code',
-                style: theme
-                    .textTheme.titleMedium
-                    ?.copyWith(
+                'customize_qr_code'.tr,
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(height: 2),
               Text(
-                'Choose your preferred style and colors',
+                'choose_style_and_colors'.tr,
                 maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
-                  fontSize: 10,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -349,26 +307,27 @@ class _SheetHeader extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8),
-        Material(
-          color: closeBackground,
-          shape: CircleBorder(),
-          child: InkWell(
-            onTap: onClose,
-            customBorder: CircleBorder(),
-            splashColor: Colors.transparent,
-            highlightColor:
-            Colors.transparent,
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            child: SizedBox(
-              width: 38,
-              height: 38,
-              child: Icon(
-                Icons.close_rounded,
-                color:
-                colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
+        // Unit Close Button UI
+        Container(
+          width: 36,
+          height: 36,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: actionBackground,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: borderColor,
+              width: 1.0,
+            ),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(36, 36),
+            onPressed: onClose,
+            child: Icon(
+              CupertinoIcons.xmark,
+              size: 18,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -395,38 +354,44 @@ class _DesignSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(13),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(
-          18,
+          22,
         ),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 30,
-                height: 30,
+                width: 32,
+                height: 32,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
-                    alpha: 0.10,
+                  color: colorScheme.primary.withValues(
+                    alpha: 0.11,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(
+                  borderRadius: BorderRadius.circular(
                     10,
                   ),
                 ),
@@ -439,9 +404,7 @@ class _DesignSection extends StatelessWidget {
               SizedBox(width: 9),
               Text(
                 title,
-                style: theme
-                    .textTheme.bodyMedium
-                    ?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -473,11 +436,9 @@ class _StyleOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color backgroundColor = selected
         ? colorScheme.primary.withValues(
@@ -503,16 +464,15 @@ class _StyleOption extends StatelessWidget {
       alpha: 0.05,
     );
 
-    Color contentColor = selected
-        ? colorScheme.primary
-        : colorScheme.onSurfaceVariant;
+    Color contentColor =
+    selected ? colorScheme.primary : colorScheme.onSurfaceVariant;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(
-          14,
+          16,
         ),
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
@@ -527,32 +487,27 @@ class _StyleOption extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(
-              14,
+              16,
             ),
             border: Border.all(
               color: optionBorderColor,
             ),
           ),
           child: Column(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
                 color: contentColor,
-                size: 23,
+                size: 22,
               ),
               SizedBox(height: 5),
               Text(
                 label,
-                style: theme
-                    .textTheme.bodySmall
-                    ?.copyWith(
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: contentColor,
                   fontSize: 11,
-                  fontWeight: selected
-                      ? FontWeight.w700
-                      : FontWeight.w600,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
             ],
@@ -580,8 +535,7 @@ class _ColorSwatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     Color outerBorderColor = selected
         ? colorScheme.primary
@@ -618,8 +572,7 @@ class _ColorSwatch extends StatelessWidget {
               color: color,
               shape: BoxShape.circle,
               border: Border.all(
-                color: color.computeLuminance() >
-                    0.92
+                color: color.computeLuminance() > 0.92
                     ? Colors.black.withValues(
                   alpha: 0.08,
                 )
@@ -628,13 +581,11 @@ class _ColorSwatch extends StatelessWidget {
             ),
             child: selected
                 ? Icon(
-              Icons.check_rounded,
-              color:
-              color.computeLuminance() >
-                  0.55
+              CupertinoIcons.checkmark,
+              color: color.computeLuminance() > 0.55
                   ? Colors.black
                   : Colors.white,
-              size: 17,
+              size: 16,
             )
                 : null,
           ),
@@ -658,11 +609,8 @@ class _ResetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
-
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color backgroundColor = isDark
         ? colorScheme.error.withValues(
@@ -672,8 +620,7 @@ class _ResetButton extends StatelessWidget {
       alpha: 0.05,
     );
 
-    Color resetBorderColor =
-    colorScheme.error.withValues(
+    Color resetBorderColor = colorScheme.error.withValues(
       alpha: isDark ? 0.22 : 0.16,
     );
 
@@ -682,7 +629,7 @@ class _ResetButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(
-          16,
+          18,
         ),
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
@@ -690,36 +637,33 @@ class _ResetButton extends StatelessWidget {
         focusColor: Colors.transparent,
         child: Container(
           width: double.infinity,
-          height: 46,
+          height: 48,
           padding: EdgeInsets.symmetric(
             horizontal: 13,
           ),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(
-              16,
+              18,
             ),
             border: Border.all(
               color: resetBorderColor,
             ),
           ),
           child: Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.restart_alt_rounded,
+                CupertinoIcons.arrow_clockwise,
                 color: colorScheme.error,
-                size: 19,
+                size: 18,
               ),
-              SizedBox(width: 7),
+              SizedBox(width: 8),
               Text(
-                'Reset to default',
-                style: theme
-                    .textTheme.bodyMedium
-                    ?.copyWith(
+                'reset_to_default'.tr,
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.error,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
               ),

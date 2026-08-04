@@ -6,13 +6,11 @@ class QrScannerGeometry {
   static Rect buildScanWindow(
       Size screenSize,
       ) {
-    double availableWidth =
-        screenSize.width - 48;
+    double availableWidth = screenSize.width - 48;
 
-    double scannerSize =
-    availableWidth.clamp(
-      220,
-      290,
+    double scannerSize = availableWidth.clamp(
+      220.0,
+      290.0,
     );
 
     return Rect.fromCenter(
@@ -26,16 +24,14 @@ class QrScannerGeometry {
   }
 }
 
-class QrScannerOverlay
-    extends StatelessWidget {
+class QrScannerOverlay extends StatelessWidget {
   final Rect scanWindow;
 
-  final MobileScannerController
-  scannerController;
+  final MobileScannerController scannerController;
 
   final Color frameColor;
 
-  QrScannerOverlay({
+  const QrScannerOverlay({
     super.key,
     required this.scanWindow,
     required this.scannerController,
@@ -50,14 +46,12 @@ class QrScannerOverlay
         CustomPaint(
           painter: QrScannerCropPainter(
             scanWindow: scanWindow,
-            overlayColor:
-            Colors.black.withValues(
+            overlayColor: Colors.black.withValues(
               alpha: 0.58,
             ),
             frameColor: frameColor,
           ),
         ),
-
         QrTrackedCodeOverlay(
           controller: scannerController,
           color: frameColor,
@@ -67,12 +61,11 @@ class QrScannerOverlay
   }
 }
 
-class QrTrackedCodeOverlay
-    extends StatefulWidget {
+class QrTrackedCodeOverlay extends StatefulWidget {
   final MobileScannerController controller;
   final Color color;
 
-  QrTrackedCodeOverlay({
+  const QrTrackedCodeOverlay({
     super.key,
     required this.controller,
     required this.color,
@@ -84,10 +77,8 @@ class QrTrackedCodeOverlay
   }
 }
 
-class _QrTrackedCodeOverlayState
-    extends State<QrTrackedCodeOverlay> {
-  final TextPainter _textPainter =
-  TextPainter(
+class _QrTrackedCodeOverlayState extends State<QrTrackedCodeOverlay> {
+  final TextPainter _textPainter = TextPainter(
     textAlign: TextAlign.center,
     textDirection: TextDirection.ltr,
   );
@@ -100,18 +91,16 @@ class _QrTrackedCodeOverlayState
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<
-        MobileScannerState>(
+    return ValueListenableBuilder<MobileScannerState>(
       valueListenable: widget.controller,
       builder: (
           BuildContext context,
           MobileScannerState scannerState,
           Widget? child,
           ) {
-        bool scannerReady =
-            scannerState.isInitialized &&
-                scannerState.isRunning &&
-                scannerState.error == null;
+        bool scannerReady = scannerState.isInitialized &&
+            scannerState.isRunning &&
+            scannerState.error == null;
 
         if (!scannerReady) {
           return SizedBox.shrink();
@@ -121,15 +110,12 @@ class _QrTrackedCodeOverlayState
           key: ValueKey<DeviceOrientation>(
             scannerState.deviceOrientation,
           ),
-          stream:
-          widget.controller.barcodes,
+          stream: widget.controller.barcodes,
           builder: (
               BuildContext context,
-              AsyncSnapshot<BarcodeCapture>
-              snapshot,
+              AsyncSnapshot<BarcodeCapture> snapshot,
               ) {
-            BarcodeCapture? capture =
-                snapshot.data;
+            BarcodeCapture? capture = snapshot.data;
 
             if (capture == null ||
                 capture.size.isEmpty ||
@@ -137,13 +123,10 @@ class _QrTrackedCodeOverlayState
               return SizedBox.shrink();
             }
 
-            List<Barcode> qrCodes =
-            capture.barcodes.where(
+            List<Barcode> qrCodes = capture.barcodes.where(
                   (Barcode barcode) {
-                return barcode.format ==
-                    BarcodeFormat.qrCode &&
-                    barcode.corners.length >=
-                        4 &&
+                return barcode.format == BarcodeFormat.qrCode &&
+                    barcode.corners.length >= 4 &&
                     !barcode.size.isEmpty;
               },
             ).toList(
@@ -160,27 +143,20 @@ class _QrTrackedCodeOverlayState
                     (Barcode barcode) {
                   return CustomPaint(
                     painter: BarcodePainter(
-                      barcodeCorners:
-                      barcode.corners,
-                      barcodeSize:
-                      barcode.size,
+                      barcodeCorners: barcode.corners,
+                      barcodeSize: barcode.size,
 
                       // Empty so the raw QR value
                       // is not displayed over the code.
                       barcodeValue: '',
 
                       boxFit: BoxFit.cover,
-                      cameraPreviewSize:
-                      capture.size,
+                      cameraPreviewSize: capture.size,
                       color: widget.color,
-                      style:
-                      PaintingStyle.stroke,
+                      style: PaintingStyle.stroke,
                       strokeWidth: 4,
-                      textPainter:
-                      _textPainter,
-                      deviceOrientation:
-                      scannerState
-                          .deviceOrientation,
+                      textPainter: _textPainter,
+                      deviceOrientation: scannerState.deviceOrientation,
                     ),
                   );
                 },
@@ -195,8 +171,7 @@ class _QrTrackedCodeOverlayState
   }
 }
 
-class QrScannerCropPainter
-    extends CustomPainter {
+class QrScannerCropPainter extends CustomPainter {
   final Rect scanWindow;
   final Color overlayColor;
   final Color frameColor;
@@ -212,8 +187,7 @@ class QrScannerCropPainter
       Canvas canvas,
       Size size,
       ) {
-    RRect scannerRRect =
-    RRect.fromRectAndRadius(
+    RRect scannerRRect = RRect.fromRectAndRadius(
       scanWindow,
       Radius.circular(28),
     );
@@ -234,8 +208,7 @@ class QrScannerCropPainter
       scannerPath,
     );
 
-    Paint overlayPaint = Paint()
-      ..color = overlayColor;
+    Paint overlayPaint = Paint()..color = overlayColor;
 
     canvas.drawPath(
       darkArea,
@@ -293,17 +266,13 @@ class QrScannerCropPainter
     double inset = 3;
     double smallGap = 8;
 
-    double left =
-        rect.left + inset;
+    double left = rect.left + inset;
 
-    double right =
-        rect.right - inset;
+    double right = rect.right - inset;
 
-    double top =
-        rect.top + inset;
+    double top = rect.top + inset;
 
-    double bottom =
-        rect.bottom - inset;
+    double bottom = rect.bottom - inset;
 
     canvas.drawLine(
       Offset(
@@ -406,11 +375,8 @@ class QrScannerCropPainter
   bool shouldRepaint(
       QrScannerCropPainter oldDelegate,
       ) {
-    return oldDelegate.scanWindow !=
-        scanWindow ||
-        oldDelegate.overlayColor !=
-            overlayColor ||
-        oldDelegate.frameColor !=
-            frameColor;
+    return oldDelegate.scanWindow != scanWindow ||
+        oldDelegate.overlayColor != overlayColor ||
+        oldDelegate.frameColor != frameColor;
   }
 }

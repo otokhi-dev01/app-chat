@@ -1,18 +1,18 @@
 import 'package:appchat/screen/widgets/qr_code/qr_design_sheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../controllers/qr_code/qr_design_controller.dart';
 
-class ProfileQrCard
-    extends StatelessWidget {
+class ProfileQrCard extends StatelessWidget {
   final String name;
   final String username;
   final String qrData;
   final String firstLetter;
 
-  ProfileQrCard({
+  const ProfileQrCard({
     super.key,
     required this.name,
     required this.username,
@@ -31,15 +31,11 @@ class ProfileQrCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -49,8 +45,7 @@ class ProfileQrCard
       alpha: 0.06,
     );
 
-    QrDesignController designController =
-        _designController;
+    QrDesignController designController = _designController;
 
     return Container(
       width: double.infinity,
@@ -62,16 +57,14 @@ class ProfileQrCard
       ),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: borderColor,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(
-              alpha:
-              isDark ? 0.18 : 0.05,
+              alpha: isDark ? 0.18 : 0.05,
             ),
             blurRadius: 24,
             offset: Offset(
@@ -106,30 +99,20 @@ class ProfileQrCard
           Text(
             name,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
-            style: theme
-                .textTheme.titleLarge
-                ?.copyWith(
-              color:
-              colorScheme.onSurface,
-              fontWeight:
-              FontWeight.w800,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
             ),
           ),
           SizedBox(height: 4),
           Text(
             username,
             maxLines: 1,
-            overflow:
-            TextOverflow.ellipsis,
-            style: theme
-                .textTheme.bodyMedium
-                ?.copyWith(
-              color:
-              colorScheme.primary,
-              fontWeight:
-              FontWeight.w600,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(height: 22),
@@ -138,8 +121,7 @@ class ProfileQrCard
                 BuildContext context,
                 BoxConstraints constraints,
                 ) {
-              double qrSize =
-              (constraints.maxWidth - 24)
+              double qrSize = (constraints.maxWidth - 24)
                   .clamp(
                 180.0,
                 230.0,
@@ -150,41 +132,30 @@ class ProfileQrCard
                     () => _ProfileQrImage(
                   qrData: qrData,
                   size: qrSize,
-                  moduleShape: designController
-                      .moduleShape.value,
-                  eyeShape:
-                  designController.eyeShape.value,
-                  foregroundColor: designController
-                      .qrColor.value,
-                  backgroundColor: designController
-                      .qrBackground.value,
+                  moduleShape: designController.moduleShape.value,
+                  eyeShape: designController.eyeShape.value,
+                  foregroundColor: designController.qrColor.value,
+                  backgroundColor: designController.qrBackground.value,
                 ),
               );
             },
           ),
           SizedBox(height: 18),
           Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons
-                    .qr_code_scanner_rounded,
-                color: colorScheme
-                    .onSurfaceVariant,
+                CupertinoIcons.qrcode_viewfinder,
+                color: colorScheme.onSurfaceVariant,
                 size: 18,
               ),
               SizedBox(width: 7),
               Flexible(
                 child: Text(
-                  'Scan with another phone',
-                  textAlign:
-                  TextAlign.center,
-                  style: theme
-                      .textTheme.bodyMedium
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  'scan_with_another_phone'.tr,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -199,14 +170,13 @@ class ProfileQrCard
 class _CustomizeButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  _CustomizeButton({
+  const _CustomizeButton({
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Material(
       color: colorScheme.primary.withValues(
@@ -220,7 +190,7 @@ class _CustomizeButton extends StatelessWidget {
           width: 36,
           height: 36,
           child: Icon(
-            Icons.palette_outlined,
+            CupertinoIcons.paintbrush, // Fixed: CupertinoIcons.paintbrush
             size: 18,
             color: colorScheme.primary,
           ),
@@ -230,32 +200,28 @@ class _CustomizeButton extends StatelessWidget {
   }
 }
 
-class _ProfileQrAvatar
-    extends StatelessWidget {
+class _ProfileQrAvatar extends StatelessWidget {
   final String firstLetter;
 
-  _ProfileQrAvatar({
+  const _ProfileQrAvatar({
     required this.firstLetter,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: 74,
       height: 74,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: colorScheme.primary
-            .withValues(
+        color: colorScheme.primary.withValues(
           alpha: 0.13,
         ),
         shape: BoxShape.circle,
         border: Border.all(
-          color: colorScheme.primary
-              .withValues(
+          color: colorScheme.primary.withValues(
             alpha: 0.22,
           ),
           width: 2,
@@ -273,8 +239,7 @@ class _ProfileQrAvatar
   }
 }
 
-class _ProfileQrImage
-    extends StatelessWidget {
+class _ProfileQrImage extends StatelessWidget {
   final String qrData;
   final double size;
   final QrDataModuleShape moduleShape;
@@ -282,7 +247,7 @@ class _ProfileQrImage
   final Color foregroundColor;
   final Color backgroundColor;
 
-  _ProfileQrImage({
+  const _ProfileQrImage({
     required this.qrData,
     required this.size,
     required this.moduleShape,
@@ -293,16 +258,14 @@ class _ProfileQrImage
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 220),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius:
-        BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: Colors.black.withValues(
             alpha: 0.07,
@@ -331,8 +294,7 @@ class _ProfileQrImage
           eyeShape: eyeShape,
           color: foregroundColor,
         ),
-        dataModuleStyle:
-        QrDataModuleStyle(
+        dataModuleStyle: QrDataModuleStyle(
           dataModuleShape: moduleShape,
           color: foregroundColor,
         ),
@@ -345,24 +307,19 @@ class _ProfileQrImage
             height: size,
             child: Center(
               child: Column(
-                mainAxisSize:
-                MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons
-                        .error_outline_rounded,
-                    color:
-                    colorScheme.error,
+                    CupertinoIcons.exclamationmark_circle,
+                    color: colorScheme.error,
                     size: 40,
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Unable to create QR code',
-                    textAlign:
-                    TextAlign.center,
+                    'unable_to_create_qr'.tr,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color:
-                      colorScheme.error,
+                      color: colorScheme.error,
                     ),
                   ),
                 ],
