@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/chat_model.dart';
 
@@ -8,7 +10,7 @@ class ArchivedChatTile extends StatelessWidget {
   final VoidCallback onLongPress;
   final VoidCallback onSwipeUnarchive;
 
-  const ArchivedChatTile({
+  ArchivedChatTile({
     super.key,
     required this.chat,
     required this.onTap,
@@ -33,13 +35,10 @@ class ArchivedChatTile extends StatelessWidget {
         .toList();
 
     if (parts.length == 1) {
-      return parts.first
-          .substring(0, 1)
-          .toUpperCase();
+      return parts.first.substring(0, 1).toUpperCase();
     }
 
-    return '${parts.first.substring(0, 1)}'
-        '${parts.last.substring(0, 1)}'
+    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'
         .toUpperCase();
   }
 
@@ -48,37 +47,38 @@ class ArchivedChatTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
+
+    Color badgeBorderColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     return Dismissible(
       key: ValueKey<String>(
         'archived-${chat.id}',
       ),
       direction: DismissDirection.endToStart,
-      dismissThresholds: const {
+      dismissThresholds: {
         DismissDirection.endToStart: 0.35,
       },
       background: Container(
-        padding: const EdgeInsets.only(right: 24),
+        padding: EdgeInsets.only(right: 24),
         alignment: Alignment.centerRight,
         color: colorScheme.primary,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Unarchive',
+              'unarchive'.tr,
               style: TextStyle(
                 color: colorScheme.onPrimary,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Icon(
-              Icons.unarchive_rounded,
+              CupertinoIcons.archivebox,
               color: colorScheme.onPrimary,
-              size: 22,
+              size: 20,
             ),
           ],
         ),
@@ -96,7 +96,7 @@ class ArchivedChatTile extends StatelessWidget {
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               overlayColor: WidgetStateProperty.resolveWith(
-                (Set<WidgetState> states) {
+                    (Set<WidgetState> states) {
                   if (states.contains(WidgetState.pressed)) {
                     return isDark
                         ? Colors.white.withValues(alpha: 0.04)
@@ -106,7 +106,7 @@ class ArchivedChatTile extends StatelessWidget {
                 },
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                padding: EdgeInsets.fromLTRB(14, 10, 14, 10),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -115,19 +115,20 @@ class ArchivedChatTile extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 28,
-                          backgroundColor: colorScheme.surfaceContainerHighest,
+                          backgroundColor:
+                          colorScheme.primary.withValues(alpha: 0.12),
                           backgroundImage: chat.image.trim().isNotEmpty
                               ? NetworkImage(chat.image)
                               : null,
                           child: chat.image.trim().isEmpty
                               ? Text(
-                                  _getInitials(chat.name),
-                                  style: TextStyle(
-                                    color: colorScheme.primary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                )
+                            _getInitials(chat.name),
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
                               : null,
                         ),
                         if (chat.isOnline)
@@ -138,10 +139,10 @@ class ArchivedChatTile extends StatelessWidget {
                               width: 14,
                               height: 14,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50),
+                                color: Color(0xFF32C766),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: theme.scaffoldBackgroundColor,
+                                  color: badgeBorderColor,
                                   width: 2,
                                 ),
                               ),
@@ -149,7 +150,7 @@ class ArchivedChatTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +169,7 @@ class ArchivedChatTile extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Text(
                                 chat.time,
                                 style: theme.textTheme.bodySmall?.copyWith(
@@ -183,20 +184,20 @@ class ArchivedChatTile extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Row(
                             children: [
                               if (chat.isMuted) ...[
                                 Icon(
-                                  Icons.volume_off_rounded,
-                                  size: 15,
+                                  CupertinoIcons.bell_slash_fill,
+                                  size: 14,
                                   color: colorScheme.onSurfaceVariant,
                                 ),
-                                const SizedBox(width: 4),
+                                SizedBox(width: 4),
                               ],
                               Expanded(
                                 child: Text(
-                                  chat.isTyping ? 'Typing...' : chat.message,
+                                  chat.isTyping ? 'typing'.tr : chat.message,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -215,25 +216,28 @@ class ArchivedChatTile extends StatelessWidget {
                                 ),
                               ),
                               if (chat.hasUnread) ...[
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Container(
-                                  constraints: const BoxConstraints(
+                                  constraints: BoxConstraints(
                                     minWidth: 20,
                                     minHeight: 20,
                                   ),
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                     horizontal: 6,
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
                                     color: chat.isMuted
-                                        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.65)
+                                        ? colorScheme.onSurfaceVariant
+                                        .withValues(alpha: 0.65)
                                         : colorScheme.primary,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                    chat.unread > 99 ? '99+' : '${chat.unread}',
+                                    chat.unread > 99
+                                        ? '99+'
+                                        : '${chat.unread}',
                                     style: TextStyle(
                                       color: colorScheme.onPrimary,
                                       fontSize: 11,

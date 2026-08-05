@@ -1,14 +1,15 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
-class ArchivedChatsAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class ArchivedChatsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int archivedCount;
   final VoidCallback onBack;
 
- const ArchivedChatsAppBar({
+  const ArchivedChatsAppBar({
     super.key,
     required this.archivedCount,
     required this.onBack,
@@ -16,7 +17,7 @@ class ArchivedChatsAppBar extends StatelessWidget
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(64);
+    return Size.fromHeight(60);
   }
 
   SystemUiOverlayStyle _getOverlayStyle({
@@ -28,10 +29,8 @@ class ArchivedChatsAppBar extends StatelessWidget
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
@@ -39,10 +38,8 @@ class ArchivedChatsAppBar extends StatelessWidget
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
@@ -51,22 +48,17 @@ class ArchivedChatsAppBar extends StatelessWidget
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
         ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
+      alpha: 0.65,
     )
         : Colors.white.withValues(
-      alpha: 0.98,
+      alpha: 0.70,
     );
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -77,7 +69,7 @@ class ArchivedChatsAppBar extends StatelessWidget
     );
 
     return AppBar(
-      toolbarHeight: 64,
+      toolbarHeight: 60,
       automaticallyImplyLeading: false,
       elevation: 0,
       scrolledUnderElevation: 0,
@@ -113,27 +105,42 @@ class ArchivedChatsAppBar extends StatelessWidget
       ),
       leading: Padding(
         padding: EdgeInsets.fromLTRB(
-          9,
-          13,
-          7,
-          13,
+          12,
+          10,
+          6,
+          10,
         ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: Tooltip(
-            message: 'Back',
-            child: InkWell(
-              onTap: onBack,
-              customBorder: CircleBorder(),
-              child: SizedBox(
-                width: 38,
-                height: 38,
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: colorScheme.onSurface,
-                  size: 17,
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(40, 40),
+              onPressed: onBack,
+              child: Icon(
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -141,11 +148,10 @@ class ArchivedChatsAppBar extends StatelessWidget
       ),
       title: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Archived Chats',
+            'archived_chats'.tr,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -157,8 +163,10 @@ class ArchivedChatsAppBar extends StatelessWidget
           SizedBox(height: 2),
           Text(
             archivedCount == 1
-                ? '1 conversation'
-                : '$archivedCount conversations',
+                ? 'one_conversation'.tr
+                : 'conversations_count'.trParams({
+              'count': '$archivedCount',
+            }),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontSize: 11,

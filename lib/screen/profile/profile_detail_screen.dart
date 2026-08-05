@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -30,10 +31,8 @@ class ProfileDetailScreen extends StatefulWidget {
   }
 }
 
-class _ProfileDetailScreenState
-    extends State<ProfileDetailScreen> {
-  ProfileContentFilterType selectedFilter =
-      ProfileContentFilterType.posts;
+class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
+  ProfileContentFilterType selectedFilter = ProfileContentFilterType.posts;
 
   UserController get controller {
     return widget.controller;
@@ -56,10 +55,8 @@ class _ProfileDetailScreenState
           return AddContactScreen(
             name: controller.name.value,
             username: controller.username.value,
-            phoneNumber:
-            controller.phoneNumber.value,
-            imageUrl:
-            controller.profileImageUrl.value,
+            phoneNumber: controller.phoneNumber.value,
+            imageUrl: controller.profileImageUrl.value,
           );
         },
       ),
@@ -69,16 +66,14 @@ class _ProfileDetailScreenState
       return;
     }
 
-    Map<dynamic, dynamic> resultData =
-        result;
+    Map<dynamic, dynamic> resultData = result;
 
     if (resultData['saved'] != true) {
       return;
     }
 
     String contactName =
-        resultData['name']?.toString() ??
-            controller.name.value;
+        resultData['name']?.toString() ?? controller.name.value;
 
     AppFeedback.showMessage(
       title: 'contact_added'.tr,
@@ -87,7 +82,7 @@ class _ProfileDetailScreenState
           'name': contactName,
         },
       ),
-      icon: Icons.person_add_alt_1_rounded,
+      icon: CupertinoIcons.person_badge_plus,
     );
   }
 
@@ -107,7 +102,7 @@ class _ProfileDetailScreenState
           'name': controller.name.value,
         },
       ),
-      icon: Icons.call_outlined,
+      icon: CupertinoIcons.phone,
     );
   }
 
@@ -116,28 +111,21 @@ class _ProfileDetailScreenState
       ) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    String name =
-    controller.name.value.trim();
+    String name = controller.name.value.trim();
 
     if (name.isEmpty) {
       name = 'appchat_user'.tr;
     }
 
-    String username =
-    controller.username.value.trim();
+    String username = controller.username.value.trim();
 
     String normalizedUsername =
-    username.startsWith('@')
-        ? username.substring(1)
-        : username;
+    username.startsWith('@') ? username.substring(1) : username;
 
     String displayUsername =
-    normalizedUsername.isEmpty
-        ? ''
-        : '@$normalizedUsername';
+    normalizedUsername.isEmpty ? '' : '@$normalizedUsername';
 
-    StringBuffer shareMessage =
-    StringBuffer();
+    StringBuffer shareMessage = StringBuffer();
 
     shareMessage.writeln(
       'share_profile_intro'.trParams(
@@ -166,19 +154,16 @@ class _ProfileDetailScreenState
     );
 
     try {
-      ShareResult result =
-      await SharePlus.instance.share(
+      ShareResult result = await SharePlus.instance.share(
         ShareParams(
           title: 'share_profile'.tr,
-          subject:
-          'share_profile_subject'.trParams(
+          subject: 'share_profile_subject'.trParams(
             {
               'name': name,
             },
           ),
           text: shareMessage.toString().trim(),
-          sharePositionOrigin:
-          _getSharePositionOrigin(
+          sharePositionOrigin: _getSharePositionOrigin(
             context,
           ),
         ),
@@ -192,9 +177,8 @@ class _ProfileDetailScreenState
         case ShareResultStatus.success:
           AppFeedback.showMessage(
             title: 'profile_shared'.tr,
-            message:
-            'profile_shared_message'.tr,
-            icon: Icons.share_outlined,
+            message: 'profile_shared_message'.tr,
+            icon: CupertinoIcons.share,
           );
           break;
 
@@ -203,12 +187,9 @@ class _ProfileDetailScreenState
 
         case ShareResultStatus.unavailable:
           AppFeedback.showMessage(
-            title:
-            'sharing_unavailable'.tr,
-            message:
-            'sharing_unavailable_message'.tr,
-            icon:
-            Icons.error_outline_rounded,
+            title: 'sharing_unavailable'.tr,
+            message: 'sharing_unavailable_message'.tr,
+            icon: CupertinoIcons.exclamationmark_circle,
           );
           break;
       }
@@ -226,11 +207,9 @@ class _ProfileDetailScreenState
       }
 
       AppFeedback.showMessage(
-        title:
-        'unable_to_share_profile'.tr,
-        message:
-        'unable_to_share_profile_message'.tr,
-        icon: Icons.error_outline_rounded,
+        title: 'unable_to_share_profile'.tr,
+        message: 'unable_to_share_profile_message'.tr,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     }
   }
@@ -238,20 +217,16 @@ class _ProfileDetailScreenState
   Rect _getSharePositionOrigin(
       BuildContext context,
       ) {
-    RenderObject? renderObject =
-    context.findRenderObject();
+    RenderObject? renderObject = context.findRenderObject();
 
-    if (renderObject is RenderBox &&
-        renderObject.hasSize) {
-      Offset globalPosition =
-      renderObject.localToGlobal(
+    if (renderObject is RenderBox && renderObject.hasSize) {
+      Offset globalPosition = renderObject.localToGlobal(
         Offset.zero,
       );
 
       Size size = renderObject.size;
 
-      if (size.width > 0 &&
-          size.height > 0) {
+      if (size.width > 0 && size.height > 0) {
         return Rect.fromLTWH(
           globalPosition.dx,
           globalPosition.dy,
@@ -261,8 +236,7 @@ class _ProfileDetailScreenState
       }
     }
 
-    Size screenSize =
-    MediaQuery.sizeOf(context);
+    Size screenSize = MediaQuery.sizeOf(context);
 
     return Rect.fromLTWH(
       screenSize.width / 2,
@@ -277,9 +251,8 @@ class _ProfileDetailScreenState
 
     AppFeedback.showMessage(
       title: 'notification_settings'.tr,
-      message:
-      'notification_settings_message'.tr,
-      icon: Icons.notifications_outlined,
+      message: 'notification_settings_message'.tr,
+      icon: CupertinoIcons.bell,
     );
   }
 
@@ -293,7 +266,7 @@ class _ProfileDetailScreenState
           'name': controller.name.value,
         },
       ),
-      icon: Icons.block_rounded,
+      icon: CupertinoIcons.slash_circle,
     );
   }
 
@@ -310,8 +283,7 @@ class _ProfileDetailScreenState
           context,
         );
       },
-      onNotifications:
-      _openNotificationSettings,
+      onNotifications: _openNotificationSettings,
       onBlockUser: _blockUser,
     );
   }
@@ -335,8 +307,7 @@ class _ProfileDetailScreenState
       AppRoutes.profileQrCode,
       arguments: <String, dynamic>{
         'name': controller.name.value,
-        'username':
-        controller.username.value,
+        'username': controller.username.value,
       },
     );
   }
@@ -351,12 +322,10 @@ class _ProfileDetailScreenState
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageBackground = isDark
-        ? theme.scaffoldBackgroundColor
-        : Color(0xFFF6F7F9);
+    Color pageBackground =
+    isDark ? theme.scaffoldBackgroundColor : Color(0xFFF6F7F9);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,

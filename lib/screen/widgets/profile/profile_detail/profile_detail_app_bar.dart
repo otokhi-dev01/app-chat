@@ -1,16 +1,16 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class ProfileAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
   final VoidCallback? onQrCodeTap;
 
-  ProfileAppBar({
+  const ProfileAppBar({
     super.key,
     required this.title,
     this.onBack,
@@ -29,58 +29,46 @@ class ProfileAppBar extends StatelessWidget
     if (isDark) {
       return SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-        Brightness.light,
-        statusBarBrightness:
-        Brightness.dark,
-        systemNavigationBarColor:
-        theme.scaffoldBackgroundColor,
-        systemNavigationBarIconBrightness:
-        Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
       );
     }
 
     return SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
-      systemNavigationBarColor:
-      theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness:
-      Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
         ? Color(0xFF1B1D22).withValues(
-      alpha: 0.94,
+      alpha: 0.65,
     )
         : Colors.white.withValues(
-      alpha: 0.98,
+      alpha: 0.70,
     );
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
+    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
       alpha: 0.08,
     )
-        : Color(0xFFE7E9ED);
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
     return AppBar(
       toolbarHeight: 60,
@@ -88,12 +76,11 @@ class ProfileAppBar extends StatelessWidget
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: Colors.transparent,
-      foregroundColor:
-      colorScheme.onSurface,
+      foregroundColor: colorScheme.onSurface,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
-      leadingWidth: 54,
+      leadingWidth: 58,
       titleSpacing: 0,
       systemOverlayStyle: _overlayStyle(
         theme: theme,
@@ -120,37 +107,45 @@ class ProfileAppBar extends StatelessWidget
       ),
       leading: Padding(
         padding: EdgeInsets.fromLTRB(
-          8,
           12,
-          5,
-          12,
+          10,
+          6,
+          10,
         ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: Tooltip(
-            message: 'back'.tr,
-            child: InkWell(
-              onTap: onBack,
-              customBorder: CircleBorder(),
-              splashColor:
-              Colors.transparent,
-              highlightColor:
-              Colors.transparent,
-              hoverColor:
-              Colors.transparent,
-              focusColor:
-              Colors.transparent,
-              child: SizedBox(
-                width: 36,
-                height: 36,
-                child: Icon(
-                  Icons
-                      .arrow_back_ios_new_rounded,
-                  size: 16,
-                  color:
-                  colorScheme.onSurface,
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(40, 40),
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                onBack?.call();
+              },
+              child: Icon(
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -159,50 +154,53 @@ class ProfileAppBar extends StatelessWidget
       title: Text(
         title,
         maxLines: 1,
-        overflow:
-        TextOverflow.ellipsis,
-        style: theme
-            .textTheme.titleMedium
-            ?.copyWith(
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium?.copyWith(
           color: colorScheme.onSurface,
-          fontSize: 17,
+          fontSize: 18,
           height: 1.1,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
         ),
       ),
       actions: [
         Padding(
-          padding: EdgeInsets.only(
-            right: 8,
+          padding: EdgeInsets.fromLTRB(
+            6,
+            10,
+            12,
+            10,
           ),
-          child: Center(
-            child: Material(
-              color: actionBackground,
-              shape: CircleBorder(),
-              child: Tooltip(
-                message: 'qr_code'.tr,
-                child: InkWell(
-                  onTap: onQrCodeTap,
-                  customBorder:
-                  CircleBorder(),
-                  splashColor:
-                  Colors.transparent,
-                  highlightColor:
-                  Colors.transparent,
-                  hoverColor:
-                  Colors.transparent,
-                  focusColor:
-                  Colors.transparent,
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Icon(
-                      Icons.qr_code_rounded,
-                      color: colorScheme
-                          .onSurface,
-                      size: 21,
+          child: Tooltip(
+            message: 'qr_code'.tr,
+            child: Container(
+              width: 40,
+              height: 40,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: actionBackground,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: borderColor,
+                  width: 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.15 : 0.04,
                     ),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
                   ),
+                ],
+              ),
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                minimumSize: Size(40, 40),
+                onPressed: onQrCodeTap,
+                child: Icon(
+                  CupertinoIcons.qrcode,
+                  color: colorScheme.onSurface,
+                  size: 20,
                 ),
               ),
             ),

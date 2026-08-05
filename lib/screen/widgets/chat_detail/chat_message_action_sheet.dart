@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 import '../../../models/chat_message_model.dart';
 
@@ -10,102 +12,100 @@ Future<void> showChatMessageActionsSheet({
   required VoidCallback onReply,
   required VoidCallback onDelete,
 }) {
-  ThemeData theme = Theme.of(context);
+  FocusManager.instance.primaryFocus?.unfocus();
 
-  bool isDark =
-      theme.brightness == Brightness.dark;
+  bool hasText = message.text.trim().isNotEmpty;
 
-  Color sheetColor = isDark
-      ? Color(0xFF1B1D22)
-      : Colors.white;
+  String messagePreview = hasText
+      ? (message.text.length > 30
+      ? '${message.text.substring(0, 30)}...'
+      : message.text)
+      : 'message'.tr;
 
-  Color borderColor = isDark
-      ? Colors.white.withValues(alpha: 0.08)
-      : Colors.black.withValues(alpha: 0.06);
-
-  return showModalBottomSheet<void>(
+  return showCupertinoModalPopup<void>(
     context: context,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    barrierColor:
-    Colors.black.withValues(alpha: 0.35),
-    builder: (BuildContext sheetContext) {
-      return Container(
-        decoration: BoxDecoration(
-          color: sheetColor,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(26),
-          ),
-          border: Border(
-            top: BorderSide(
-              color: borderColor,
-            ),
+    builder: (sheetContext) {
+      return CupertinoActionSheet(
+        title: Text(
+          messagePreview,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              12,
-              12,
-              12,
-              16,
+        actions: [
+          if (hasText)
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: message.text),
+                );
+                Navigator.pop(sheetContext);
+                onCopied();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.doc_on_doc,
+                    size: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Text('copy'.tr),
+                ],
+              ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              Future<void>.delayed(
+                Duration(milliseconds: 100),
+                onReply,
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _MessageSheetHandle(),
-
-                SizedBox(height: 12),
-
-                if (message.text.trim().isNotEmpty)
-                  MessageActionTile(
-                    icon: Icons.copy_rounded,
-                    title: 'Copy',
-                    onTap: () {
-                      Clipboard.setData(
-                        ClipboardData(
-                          text: message.text,
-                        ),
-                      );
-
-                      Navigator.pop(sheetContext);
-
-                      onCopied();
-                    },
-                  ),
-
-                MessageActionTile(
-                  icon: Icons.reply_rounded,
-                  title: 'Reply',
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-
-                    Future<void>.delayed(
-                      Duration(milliseconds: 130),
-                      onReply,
-                    );
-                  },
+                Icon(
+                  CupertinoIcons.reply,
+                  size: 20,
                 ),
-
-                if (message.isMe)
-                  MessageActionTile(
-                    icon:
-                    Icons.delete_outline_rounded,
-                    title: 'Delete',
-                    isDanger: true,
-                    onTap: () {
-                      Navigator.pop(sheetContext);
-
-                      Future<void>.delayed(
-                        Duration(milliseconds: 130),
-                        onDelete,
-                      );
-                    },
-                  ),
+                SizedBox(width: 8),
+                Text('reply'.tr),
               ],
             ),
           ),
+          if (message.isMe)
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(sheetContext);
+                Future<void>.delayed(
+                  Duration(milliseconds: 100),
+                  onDelete,
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.trash,
+                    size: 20,
+                    color: CupertinoColors.destructiveRed,
+                  ),
+                  SizedBox(width: 8),
+                  Text('delete'.tr),
+                ],
+              ),
+            ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(sheetContext);
+          },
+          child: Text('cancel'.tr),
         ),
       );
     },
@@ -118,7 +118,7 @@ class MessageActionTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDanger;
 
-  const MessageActionTile({
+  MessageActionTile({
     super.key,
     required this.icon,
     required this.title,
@@ -131,9 +131,7 @@ class MessageActionTile extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    Color itemColor = isDanger
-        ? colorScheme.error
-        : colorScheme.primary;
+    Color itemColor = isDanger ? colorScheme.error : colorScheme.primary;
 
     return Material(
       color: Colors.transparent,
@@ -155,24 +153,19 @@ class MessageActionTile extends StatelessWidget {
                   color: itemColor.withValues(
                     alpha: 0.11,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
                   color: itemColor,
-                  size: 21,
+                  size: 20,
                 ),
               ),
-
               SizedBox(width: 13),
-
               Expanded(
                 child: Text(
                   title,
-                  style: theme
-                      .textTheme.bodyLarge
-                      ?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     color: isDanger
                         ? colorScheme.error
                         : colorScheme.onSurface,
@@ -183,25 +176,6 @@ class MessageActionTile extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _MessageSheetHandle
-    extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return Container(
-      width: 42,
-      height: 4,
-      decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant
-            .withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(20),
       ),
     );
   }

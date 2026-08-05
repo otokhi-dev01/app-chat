@@ -62,7 +62,7 @@ class DataStorageDivider extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 69,
+        left: 61, // Aligned with the compact 38px tile icon badge
       ),
       child: Divider(
         height: 1,
@@ -93,7 +93,7 @@ class DataStorageSectionTitle extends StatelessWidget {
         title,
         style: theme.textTheme.titleSmall?.copyWith(
           color: theme.colorScheme.primary,
-          fontSize: 13,
+          fontSize: 12.5, // Compact section title font size
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -125,7 +125,7 @@ class DataStorageSummaryCard extends StatelessWidget {
         : Colors.black.withValues(alpha: 0.06);
 
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(13), // Compact summary card padding
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(22),
@@ -145,22 +145,22 @@ class DataStorageSummaryCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 48, // Compact 48x48 icon container
+            height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colorScheme.primary.withValues(
                 alpha: 0.12,
               ),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(
               CupertinoIcons.tray_arrow_up,
               color: colorScheme.primary,
-              size: 28,
+              size: 24,
             ),
           ),
-          SizedBox(width: 14),
+          SizedBox(width: 12),
           Expanded(
             child: Row(
               children: [
@@ -172,10 +172,10 @@ class DataStorageSummaryCard extends StatelessWidget {
                 ),
                 Container(
                   width: 1,
-                  height: 38,
+                  height: 32,
                   color: borderColor,
                 ),
-                SizedBox(width: 14),
+                SizedBox(width: 12),
                 Expanded(
                   child: _SummaryValue(
                     label: 'network'.tr,
@@ -195,7 +195,7 @@ class _SummaryValue extends StatelessWidget {
   final String label;
   final String value;
 
- const _SummaryValue({
+  const _SummaryValue({
     required this.label,
     required this.value,
   });
@@ -214,14 +214,16 @@ class _SummaryValue extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.titleMedium?.copyWith(
             color: colorScheme.onSurface,
+            fontSize: 15,
             fontWeight: FontWeight.w700,
           ),
         ),
-        SizedBox(height: 3),
+        SizedBox(height: 2),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
+            fontSize: 11,
           ),
         ),
       ],
@@ -241,7 +243,7 @@ class DataStorageInformationCard extends StatelessWidget {
     bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      padding: EdgeInsets.all(14),
+      padding: EdgeInsets.all(12), // Compact info card padding
       decoration: BoxDecoration(
         color: colorScheme.primary.withValues(
           alpha: isDark ? 0.12 : 0.08,
@@ -257,17 +259,17 @@ class DataStorageInformationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 32, // Compact 32x32 info icon container
+            height: 32,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colorScheme.primary.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               CupertinoIcons.info_circle,
               color: colorScheme.primary,
-              size: 18,
+              size: 16,
             ),
           ),
           SizedBox(width: 10),
@@ -277,7 +279,7 @@ class DataStorageInformationCard extends StatelessWidget {
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurface,
                 fontSize: 11,
-                height: 1.45,
+                height: 1.40,
               ),
             ),
           ),

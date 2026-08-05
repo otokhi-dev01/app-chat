@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/chat_model.dart';
 import '../../widgets/archived/archived_chats_actions_sheet.dart';
 import '../../widgets/archived/archived_chats_app_bar.dart';
 import '../../widgets/archived/archived_chats_empty_state.dart';
 import '../../widgets/archived/archived_chats_title.dart';
+import '../../widgets/common/app_feedback.dart';
 
 class ArchivedChatsScreen extends StatefulWidget {
   final List<ChatModel> archivedChats;
@@ -13,7 +16,7 @@ class ArchivedChatsScreen extends StatefulWidget {
   final ValueChanged<ChatModel> onToggleMute;
   final void Function(ChatModel chat) onOpenChat;
 
-  ArchivedChatsScreen({
+  const ArchivedChatsScreen({
     super.key,
     required this.archivedChats,
     required this.onUnarchive,
@@ -28,8 +31,7 @@ class ArchivedChatsScreen extends StatefulWidget {
   }
 }
 
-class _ArchivedChatsScreenState
-    extends State<ArchivedChatsScreen> {
+class _ArchivedChatsScreenState extends State<ArchivedChatsScreen> {
   late List<ChatModel> chats;
 
   @override
@@ -79,7 +81,8 @@ class _ArchivedChatsScreenState
     widget.onUnarchive(updatedChat);
 
     _showMessage(
-      '${chat.name} was unarchived',
+      '${chat.name} ${'was_unarchived'.tr}',
+      icon: CupertinoIcons.archivebox,
     );
   }
 
@@ -95,7 +98,8 @@ class _ArchivedChatsScreenState
     widget.onDelete(chat);
 
     _showMessage(
-      '${chat.name} was deleted',
+      '${chat.name} ${'was_deleted'.tr}',
+      icon: CupertinoIcons.trash,
       isError: true,
     );
   }
@@ -110,8 +114,11 @@ class _ArchivedChatsScreenState
 
     _showMessage(
       updatedChat.isMuted
-          ? '${chat.name} was muted'
-          : '${chat.name} was unmuted',
+          ? '${chat.name} ${'was_muted'.tr}'
+          : '${chat.name} ${'was_unmuted'.tr}',
+      icon: updatedChat.isMuted
+          ? CupertinoIcons.bell_slash
+          : CupertinoIcons.bell,
     );
   }
 
@@ -121,37 +128,14 @@ class _ArchivedChatsScreenState
 
   void _showMessage(
       String message, {
+        required IconData icon,
         bool isError = false,
       }) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: TextStyle(
-              color: isError
-                  ? colorScheme.onError
-                  : colorScheme.onPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: isError
-              ? colorScheme.error
-              : colorScheme.primary,
-          margin: EdgeInsets.all(14),
-          duration: Duration(
-            milliseconds: 1800,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    AppFeedback.showMessage(
+      title: isError ? 'error'.tr : 'success'.tr,
+      message: message,
+      icon: icon,
+    );
   }
 
   Future<void> _showChatActions(
@@ -175,8 +159,7 @@ class _ArchivedChatsScreenState
       appBar: ArchivedChatsAppBar(
         archivedCount: chats.length,
         onBack: () {
-          FocusManager.instance.primaryFocus
-              ?.unfocus();
+          FocusManager.instance.primaryFocus?.unfocus();
 
           Navigator.of(context).maybePop();
         },

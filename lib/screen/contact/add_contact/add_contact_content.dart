@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,7 +16,7 @@ class AddContactContent extends StatelessWidget {
   final bool isSaving;
   final Future<void> Function() onSave;
 
-  AddContactContent({
+  const AddContactContent({
     super.key,
     required this.formKey,
     required this.name,
@@ -33,15 +34,11 @@ class AddContactContent extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageColor =
-        theme.scaffoldBackgroundColor;
+    Color pageColor = theme.scaffoldBackgroundColor;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -63,9 +60,7 @@ class AddContactContent extends StatelessWidget {
               BoxConstraints constraints,
               ) {
             return SingleChildScrollView(
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior
-                  .onDrag,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               physics: ClampingScrollPhysics(),
               padding: EdgeInsets.fromLTRB(
                 16,
@@ -87,177 +82,122 @@ class AddContactContent extends StatelessWidget {
                         username: username,
                         imageUrl: imageUrl,
                       ),
-
                       SizedBox(height: 18),
-
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: cardColor,
-                          borderRadius:
-                          BorderRadius.circular(
-                            20,
+                          borderRadius: BorderRadius.circular(
+                            22,
                           ),
                           border: Border.all(
                             color: borderColor,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.15 : 0.04,
+                              ),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
                                 Container(
-                                  width: 34,
-                                  height: 34,
-                                  alignment:
-                                  Alignment.center,
-                                  decoration:
-                                  BoxDecoration(
-                                    color: colorScheme
-                                        .primary
-                                        .withValues(
+                                  width: 36,
+                                  height: 36,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary.withValues(
                                       alpha: 0.11,
                                     ),
-                                    borderRadius:
-                                    BorderRadius
-                                        .circular(
+                                    borderRadius: BorderRadius.circular(
                                       11,
                                     ),
                                   ),
                                   child: Icon(
-                                    Icons
-                                        .contact_page_outlined,
-                                    color: colorScheme
-                                        .primary,
-                                    size: 19,
+                                    CupertinoIcons.doc_text,
+                                    color: colorScheme.primary,
+                                    size: 18,
                                   ),
                                 ),
-
                                 SizedBox(width: 10),
-
                                 Expanded(
                                   child: Text(
-                                    'contact_information'
-                                        .tr,
-                                    style: theme
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(
-                                      color: colorScheme
-                                          .onSurface,
+                                    'contact_information'.tr,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      color: colorScheme.onSurface,
                                       fontSize: 14,
-                                      fontWeight:
-                                      FontWeight
-                                          .w700,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-
                             SizedBox(height: 16),
-
                             _ContactTextField(
-                              controller:
-                              nameController,
-                              label:
-                              'contact_name'.tr,
-                              hintText:
-                              'enter_contact_name'
-                                  .tr,
-                              icon: Icons
-                                  .person_outline_rounded,
-                              textInputAction:
-                              TextInputAction.next,
-                              validator: (
-                                  String? value,
-                                  ) {
-                                if (value == null ||
-                                    value
-                                        .trim()
-                                        .isEmpty) {
-                                  return 'contact_name_required'
-                                      .tr;
+                              controller: nameController,
+                              label: 'contact_name'.tr,
+                              hintText: 'enter_contact_name'.tr,
+                              icon: CupertinoIcons.person,
+                              textInputAction: TextInputAction.next,
+                              validator: (String? value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'contact_name_required'.tr;
                                 }
 
                                 return null;
                               },
                             ),
-
                             SizedBox(height: 12),
-
                             _ContactTextField(
-                              controller:
-                              usernameController,
+                              controller: usernameController,
                               label: 'username'.tr,
-                              hintText:
-                              'username'.tr,
-                              icon: Icons
-                                  .alternate_email_rounded,
-                              textInputAction:
-                              TextInputAction.next,
+                              hintText: 'username'.tr,
+                              icon: CupertinoIcons.at,
+                              textInputAction: TextInputAction.next,
                             ),
-
                             SizedBox(height: 12),
-
                             _ContactTextField(
-                              controller:
-                              phoneController,
-                              label:
-                              'phone_number'.tr,
-                              hintText:
-                              'enter_phone_number'
-                                  .tr,
-                              icon: Icons
-                                  .phone_outlined,
-                              keyboardType:
-                              TextInputType.phone,
-                              textInputAction:
-                              TextInputAction.done,
-                              onSubmitted: (
-                                  String value,
-                                  ) {
+                              controller: phoneController,
+                              label: 'phone_number'.tr,
+                              hintText: 'enter_phone_number'.tr,
+                              icon: CupertinoIcons.phone,
+                              keyboardType: TextInputType.phone,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (String value) {
                                 onSave();
                               },
                             ),
                           ],
                         ),
                       ),
-
                       SizedBox(height: 20),
-
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
+                        height: 52,
                         child: FilledButton(
-                          onPressed: isSaving
-                              ? null
-                              : onSave,
-                          style:
-                          FilledButton.styleFrom(
-                            backgroundColor:
-                            colorScheme.primary,
-                            foregroundColor:
-                            colorScheme.onPrimary,
+                          onPressed: isSaving ? null : onSave,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
                             disabledBackgroundColor:
-                            colorScheme.primary
-                                .withValues(
+                            colorScheme.primary.withValues(
                               alpha: 0.55,
                             ),
                             disabledForegroundColor:
-                            colorScheme.onPrimary
-                                .withValues(
+                            colorScheme.onPrimary.withValues(
                               alpha: 0.75,
                             ),
                             elevation: 0,
-                            shape:
-                            RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius
-                                  .circular(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
                                 16,
                               ),
                             ),
@@ -268,45 +208,34 @@ class AddContactContent extends StatelessWidget {
                             ),
                             child: isSaving
                                 ? SizedBox(
-                              key:
-                              ValueKey<String>(
+                              key: ValueKey<String>(
                                 'saving-contact',
                               ),
                               width: 20,
                               height: 20,
-                              child:
-                              CircularProgressIndicator(
+                              child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: colorScheme
-                                    .onPrimary,
+                                color: colorScheme.onPrimary,
                               ),
                             )
                                 : Row(
-                              key:
-                              ValueKey<String>(
+                              key: ValueKey<String>(
                                 'add-contact',
                               ),
-                              mainAxisAlignment:
-                              MainAxisAlignment
-                                  .center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons
-                                      .person_add_alt_1_rounded,
-                                  size: 19,
+                                  CupertinoIcons.person_badge_plus,
+                                  size: 20,
                                 ),
                                 SizedBox(
                                   width: 8,
                                 ),
                                 Text(
-                                  'add_to_contacts'
-                                      .tr,
-                                  style:
-                                  TextStyle(
-                                    fontSize: 13,
-                                    fontWeight:
-                                    FontWeight
-                                        .w700,
+                                  'add_to_contacts'.tr,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ],
@@ -326,13 +255,12 @@ class AddContactContent extends StatelessWidget {
   }
 }
 
-class _ContactProfileHeader
-    extends StatelessWidget {
+class _ContactProfileHeader extends StatelessWidget {
   final String name;
   final String username;
   final String imageUrl;
 
-  _ContactProfileHeader({
+  const _ContactProfileHeader({
     required this.name,
     required this.username,
     required this.imageUrl,
@@ -341,15 +269,11 @@ class _ContactProfileHeader
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -361,9 +285,8 @@ class _ContactProfileHeader
 
     String cleanName = name.trim();
 
-    String firstLetter = cleanName.isNotEmpty
-        ? cleanName[0].toUpperCase()
-        : '?';
+    String firstLetter =
+    cleanName.isNotEmpty ? cleanName[0].toUpperCase() : '?';
 
     return Container(
       width: double.infinity,
@@ -374,11 +297,20 @@ class _ContactProfileHeader
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(
-          20,
+          22,
         ),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -387,14 +319,12 @@ class _ContactProfileHeader
             height: 62,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
+              color: colorScheme.primary.withValues(
                 alpha: isDark ? 0.18 : 0.10,
               ),
               shape: BoxShape.circle,
               border: Border.all(
-                color: colorScheme.primary
-                    .withValues(
+                color: colorScheme.primary.withValues(
                   alpha: 0.16,
                 ),
               ),
@@ -417,72 +347,49 @@ class _ContactProfileHeader
               letter: firstLetter,
             ),
           ),
-
           SizedBox(width: 14),
-
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  cleanName.isEmpty
-                      ? 'new_contact'.tr
-                      : cleanName,
+                  cleanName.isEmpty ? 'new_contact'.tr : cleanName,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.titleMedium
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 16,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-
-                if (username
-                    .trim()
-                    .isNotEmpty) ...[
+                if (username.trim().isNotEmpty) ...[
                   SizedBox(height: 4),
-
                   Text(
-                    username.startsWith('@')
-                        ? username
-                        : '@$username',
+                    username.startsWith('@') ? username : '@$username',
                     maxLines: 1,
-                    overflow:
-                    TextOverflow.ellipsis,
-                    style: theme
-                        .textTheme.bodySmall
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: 12,
-                      fontWeight:
-                      FontWeight.w500,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ],
             ),
           ),
-
           Container(
-            width: 36,
-            height: 36,
+            width: 38,
+            height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
+              color: colorScheme.primary.withValues(
                 alpha: 0.10,
               ),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.person_add_alt_1_rounded,
+              CupertinoIcons.person_badge_plus,
               color: colorScheme.primary,
               size: 19,
             ),
@@ -496,14 +403,13 @@ class _ContactProfileHeader
 class _AvatarLetter extends StatelessWidget {
   final String letter;
 
-  _AvatarLetter({
+  const _AvatarLetter({
     required this.letter,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Center(
       child: Text(
@@ -518,8 +424,7 @@ class _AvatarLetter extends StatelessWidget {
   }
 }
 
-class _ContactTextField
-    extends StatelessWidget {
+class _ContactTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final String hintText;
@@ -529,7 +434,7 @@ class _ContactTextField
   final String? Function(String?)? validator;
   final ValueChanged<String>? onSubmitted;
 
-  _ContactTextField({
+  const _ContactTextField({
     required this.controller,
     required this.label,
     required this.hintText,
@@ -543,17 +448,17 @@ class _ContactTextField
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color fieldColor = isDark
         ? Colors.white.withValues(
       alpha: 0.04,
     )
-        : Color(0xFFF6F7F9);
+        : Colors.black.withValues(
+      alpha: 0.025,
+    );
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -569,10 +474,9 @@ class _ContactTextField
       textInputAction: textInputAction,
       validator: validator,
       onFieldSubmitted: onSubmitted,
-      style: theme.textTheme.bodyMedium
-          ?.copyWith(
+      style: theme.textTheme.bodyMedium?.copyWith(
         color: colorScheme.onSurface,
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
@@ -581,58 +485,45 @@ class _ContactTextField
         prefixIcon: Icon(
           icon,
           color: colorScheme.primary,
-          size: 20,
+          size: 18,
         ),
         filled: true,
         fillColor: fieldColor,
-        contentPadding:
-        EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 15,
         ),
-        labelStyle: theme
-            .textTheme.bodySmall
-            ?.copyWith(
-          color:
-          colorScheme.onSurfaceVariant,
+        labelStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
           fontSize: 12,
         ),
-        hintStyle: theme
-            .textTheme.bodySmall
-            ?.copyWith(
-          color: colorScheme
-              .onSurfaceVariant
-              .withValues(
+        hintStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(
             alpha: 0.70,
           ),
           fontSize: 12,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius:
-          BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: borderColor,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius:
-          BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: colorScheme.primary,
             width: 1.4,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius:
-          BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: colorScheme.error,
           ),
         ),
-        focusedErrorBorder:
-        OutlineInputBorder(
-          borderRadius:
-          BorderRadius.circular(15),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: colorScheme.error,
             width: 1.4,

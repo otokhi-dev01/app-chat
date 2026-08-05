@@ -1,12 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ProfileInfoSection
-    extends StatelessWidget {
+class ProfileInfoSection extends StatelessWidget {
   final String phoneNumber;
   final String username;
   final String bio;
 
-  ProfileInfoSection({
+  const ProfileInfoSection({
     super.key,
     required this.phoneNumber,
     required this.username,
@@ -16,35 +17,36 @@ class ProfileInfoSection
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white
-        .withValues(alpha: 0.08)
-        : Colors.black
-        .withValues(alpha: 0.06);
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(
@@ -60,67 +62,51 @@ class ProfileInfoSection
                   height: 32,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary
-                        .withValues(alpha: 0.11),
-                    borderRadius:
-                    BorderRadius.circular(10),
+                    color: colorScheme.primary.withValues(alpha: 0.11),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
-                    Icons
-                        .person_outline_rounded,
+                    CupertinoIcons.person_crop_circle,
                     color: colorScheme.primary,
                     size: 18,
                   ),
                 ),
-
                 SizedBox(width: 10),
-
                 Text(
-                  'Profile information',
-                  style: theme
-                      .textTheme.titleSmall
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
-                    fontWeight:
-                    FontWeight.w700,
+                  'profile_information'.tr,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-
           Divider(
             height: 1,
             thickness: 1,
             color: borderColor,
           ),
-
           ProfileInfoTile(
-            icon: Icons.phone_iphone_rounded,
+            icon: CupertinoIcons.phone,
             title: phoneNumber,
-            subtitle: 'Mobile',
+            subtitle: 'mobile'.tr,
           ),
-
           _ProfileDivider(
             color: borderColor,
           ),
-
           ProfileInfoTile(
-            icon:
-            Icons.alternate_email_rounded,
+            icon: CupertinoIcons.at,
             title: username,
-            subtitle: 'Username',
+            subtitle: 'username'.tr,
           ),
-
           _ProfileDivider(
             color: borderColor,
           ),
-
           ProfileInfoTile(
-            icon: Icons.info_outline_rounded,
+            icon: CupertinoIcons.info,
             title: bio,
-            subtitle: 'Bio',
+            subtitle: 'bio'.tr,
             showArrow: false,
           ),
         ],
@@ -129,15 +115,14 @@ class ProfileInfoSection
   }
 }
 
-class ProfileInfoTile
-    extends StatelessWidget {
+class ProfileInfoTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final bool showArrow;
   final VoidCallback? onTap;
 
-  ProfileInfoTile({
+  const ProfileInfoTile({
     super.key,
     required this.icon,
     required this.title,
@@ -149,13 +134,9 @@ class ProfileInfoTile
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    String displayTitle =
-    title.trim().isEmpty
-        ? 'Not available'
-        : title;
+    String displayTitle = title.trim().isEmpty ? 'not_available'.tr : title;
 
     return Material(
       color: Colors.transparent,
@@ -169,72 +150,57 @@ class ProfileInfoTile
             13,
           ),
           child: Row(
-            crossAxisAlignment:
-            CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 42,
                 height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(alpha: 0.10),
-                  borderRadius:
-                  BorderRadius.circular(13),
+                  color: colorScheme.primary.withValues(alpha: 0.11),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   icon,
                   color: colorScheme.primary,
-                  size: 21,
+                  size: 20,
                 ),
               ),
-
               SizedBox(width: 12),
-
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       displayTitle,
-                      maxLines:
-                      subtitle == 'Bio' ? 3 : 1,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style: theme
-                          .textTheme.bodyMedium
-                          ?.copyWith(
-                        color:
-                        colorScheme.onSurface,
+                      maxLines: subtitle == 'bio'.tr ? 3 : 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
                         fontSize: 15,
                         height: 1.3,
-                        fontWeight:
-                        FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: theme
-                          .textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11.5,
                       ),
                     ),
                   ],
                 ),
               ),
-
               if (showArrow) ...[
                 SizedBox(width: 8),
                 Icon(
-                  Icons.chevron_right_rounded,
-                  color: colorScheme
-                      .onSurfaceVariant,
-                  size: 22,
+                  CupertinoIcons.chevron_right,
+                  color: colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.55,
+                  ),
+                  size: 18,
                 ),
               ],
             ],
@@ -245,11 +211,10 @@ class ProfileInfoTile
   }
 }
 
-class _ProfileDivider
-    extends StatelessWidget {
+class _ProfileDivider extends StatelessWidget {
   final Color color;
 
-  _ProfileDivider({
+  const _ProfileDivider({
     required this.color,
   });
 

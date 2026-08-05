@@ -1,6 +1,6 @@
-import 'dart:ui';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 enum ProfileContentFilterType {
   posts,
@@ -26,8 +26,7 @@ class ProfileContentFilter extends StatefulWidget {
   }
 }
 
-class _ProfileContentFilterState
-    extends State<ProfileContentFilter> {
+class _ProfileContentFilterState extends State<ProfileContentFilter> {
   double? _dragIndicatorLeft;
   bool _isDragging = false;
 
@@ -43,39 +42,36 @@ class _ProfileContentFilterState
     return <ProfileContentFilterItem>[
       ProfileContentFilterItem(
         type: ProfileContentFilterType.posts,
-        title: 'Posts',
-        icon: Icons.grid_view_rounded,
+        title: 'posts'.tr,
+        icon: CupertinoIcons.square_grid_2x2,
       ),
       ProfileContentFilterItem(
         type: ProfileContentFilterType.media,
-        title: 'Media',
-        icon: Icons.perm_media_outlined,
+        title: 'media'.tr,
+        icon: CupertinoIcons.photo,
       ),
       ProfileContentFilterItem(
         type: ProfileContentFilterType.links,
-        title: 'Links',
-        icon: Icons.link_rounded,
+        title: 'links'.tr,
+        icon: CupertinoIcons.link,
       ),
       ProfileContentFilterItem(
         type: ProfileContentFilterType.files,
-        title: 'Files',
-        icon: Icons.insert_drive_file_outlined,
+        title: 'files'.tr,
+        icon: CupertinoIcons.doc_text,
       ),
       ProfileContentFilterItem(
         type: ProfileContentFilterType.voice,
-        title: 'Voice',
-        icon: Icons.mic_none_rounded,
+        title: 'voice'.tr,
+        icon: CupertinoIcons.mic,
       ),
     ];
   }
 
   int get selectedIndex {
     int index = filterItems.indexWhere(
-          (
-          ProfileContentFilterItem item,
-          ) {
-        return item.type ==
-            widget.selectedFilter;
+          (ProfileContentFilterItem item) {
+        return item.type == widget.selectedFilter;
       },
     );
 
@@ -86,8 +82,7 @@ class _ProfileContentFilterState
     required LongPressStartDetails details,
     required double itemWidth,
   }) {
-    double selectedLeft = selectedIndex *
-        (itemWidth + itemGap);
+    double selectedLeft = selectedIndex * (itemWidth + itemGap);
 
     Rect activeArea = Rect.fromLTWH(
       selectedLeft,
@@ -96,9 +91,7 @@ class _ProfileContentFilterState
       itemHeight,
     );
 
-    if (!activeArea.contains(
-      details.localPosition,
-    )) {
+    if (!activeArea.contains(details.localPosition)) {
       return;
     }
 
@@ -117,41 +110,23 @@ class _ProfileContentFilterState
       return;
     }
 
-    double nextLeft =
-        details.localPosition.dx -
-            itemWidth / 2;
+    double nextLeft = details.localPosition.dx - itemWidth / 2;
 
-    nextLeft = nextLeft
-        .clamp(
-      0.0,
-      maximumLeft,
-    )
-        .toDouble();
+    nextLeft = nextLeft.clamp(0.0, maximumLeft).toDouble();
 
-    double indicatorCenter =
-        nextLeft + itemWidth / 2;
+    double indicatorCenter = nextLeft + itemWidth / 2;
 
-    int nextIndex =
-    (indicatorCenter /
-        (itemWidth + itemGap))
-        .floor();
+    int nextIndex = (indicatorCenter / (itemWidth + itemGap)).floor();
 
-    nextIndex = nextIndex
-        .clamp(
-      0,
-      filterItems.length - 1,
-    )
-        .toInt();
+    nextIndex = nextIndex.clamp(0, filterItems.length - 1).toInt();
 
     setState(() {
       _dragIndicatorLeft = nextLeft;
     });
 
-    ProfileContentFilterType nextFilter =
-        filterItems[nextIndex].type;
+    ProfileContentFilterType nextFilter = filterItems[nextIndex].type;
 
-    if (widget.selectedFilter !=
-        nextFilter) {
+    if (widget.selectedFilter != nextFilter) {
       widget.onChanged(nextFilter);
     }
   }
@@ -181,20 +156,11 @@ class _ProfileContentFilterState
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness ==
-            Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color backgroundColor = isDark
-        ? Color(0xFF1B1D22).withValues(
-      alpha: 0.88,
-    )
-        : Colors.white.withValues(
-      alpha: 0.90,
-    );
+    Color backgroundColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -204,174 +170,142 @@ class _ProfileContentFilterState
       alpha: 0.06,
     );
 
-    Color activeColor =
-    colorScheme.primary.withValues(
-      alpha: isDark ? 0.18 : 0.10,
+    Color activeColor = colorScheme.primary.withValues(
+      alpha: 0.11,
     );
 
-    Color activeBorderColor =
-    colorScheme.primary.withValues(
+    Color activeBorderColor = colorScheme.primary.withValues(
       alpha: isDark ? 0.28 : 0.18,
+    );
+
+    Color shadowColor = Colors.black.withValues(
+      alpha: isDark ? 0.15 : 0.04,
     );
 
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: 8,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          20,
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 18,
-            sigmaY: 18,
+      child: Container(
+        width: double.infinity,
+        height: 48,
+        padding: EdgeInsets.all(4),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(
+            24,
           ),
-          child: Container(
-            width: double.infinity,
-            height: 48,
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius:
-              BorderRadius.circular(
-                20,
-              ),
-              border: Border.all(
-                color: borderColor,
+          border: Border.all(
+            color: borderColor,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 8,
+              offset: Offset(
+                0,
+                2,
               ),
             ),
-            child: LayoutBuilder(
-              builder: (
-                  BuildContext context,
-                  BoxConstraints constraints,
+          ],
+        ),
+        child: LayoutBuilder(
+          builder: (
+              BuildContext context,
+              BoxConstraints constraints,
+              ) {
+            double totalGap = itemGap * (filterItems.length - 1);
+
+            double itemWidth =
+                (constraints.maxWidth - totalGap) / filterItems.length;
+
+            double normalIndicatorLeft = selectedIndex * (itemWidth + itemGap);
+
+            double indicatorLeft = _isDragging && _dragIndicatorLeft != null
+                ? _dragIndicatorLeft!
+                : normalIndicatorLeft;
+
+            double maximumLeft = constraints.maxWidth - itemWidth;
+
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onLongPressStart: (
+                  LongPressStartDetails details,
                   ) {
-                double totalGap =
-                    itemGap *
-                        (filterItems.length -
-                            1);
-
-                double itemWidth =
-                    (constraints.maxWidth -
-                        totalGap) /
-                        filterItems.length;
-
-                double normalIndicatorLeft =
-                    selectedIndex *
-                        (itemWidth + itemGap);
-
-                double indicatorLeft =
-                _isDragging &&
-                    _dragIndicatorLeft !=
-                        null
-                    ? _dragIndicatorLeft!
-                    : normalIndicatorLeft;
-
-                double maximumLeft =
-                    constraints.maxWidth -
-                        itemWidth;
-
-                return GestureDetector(
-                  behavior:
-                  HitTestBehavior.opaque,
-                  onLongPressStart: (
-                      LongPressStartDetails
-                      details,
-                      ) {
-                    _startDragging(
-                      details: details,
-                      itemWidth: itemWidth,
-                    );
-                  },
-                  onLongPressMoveUpdate: (
-                      LongPressMoveUpdateDetails
-                      details,
-                      ) {
-                    _updateDragging(
-                      details: details,
-                      itemWidth: itemWidth,
-                      maximumLeft:
-                      maximumLeft,
-                    );
-                  },
-                  onLongPressEnd: (
-                      LongPressEndDetails details,
-                      ) {
-                    _stopDragging();
-                  },
-                  onLongPressCancel:
-                  _cancelDragging,
-                  child: Stack(
-                    children: [
-                      AnimatedPositioned(
-                        duration: _isDragging
-                            ? Duration.zero
-                            : Duration(
-                          milliseconds:
-                          240,
-                        ),
-                        curve:
-                        Curves.easeOutCubic,
-                        left: indicatorLeft,
-                        top: 0,
-                        width: itemWidth,
-                        height: itemHeight,
-                        child: IgnorePointer(
-                          child:
-                          AnimatedContainer(
-                            duration: Duration(
-                              milliseconds:
-                              160,
-                            ),
-                            decoration:
-                            BoxDecoration(
-                              color:
-                              activeColor,
-                              borderRadius:
-                              BorderRadius
-                                  .circular(
-                                15,
-                              ),
-                              border:
-                              Border.all(
-                                color:
-                                activeBorderColor,
-                              ),
-                              boxShadow:
-                              _isDragging
-                                  ? [
-                                BoxShadow(
-                                  color: colorScheme
-                                      .primary
-                                      .withValues(
-                                    alpha:
-                                    0.12,
-                                  ),
-                                  blurRadius:
-                                  8,
-                                  offset:
-                                  Offset(
-                                    0,
-                                    2,
-                                  ),
-                                ),
-                              ]
-                                  : [],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: _buildButtons(
-                          itemWidth: itemWidth,
-                        ),
-                      ),
-                    ],
-                  ),
+                _startDragging(
+                  details: details,
+                  itemWidth: itemWidth,
                 );
               },
-            ),
-          ),
+              onLongPressMoveUpdate: (
+                  LongPressMoveUpdateDetails details,
+                  ) {
+                _updateDragging(
+                  details: details,
+                  itemWidth: itemWidth,
+                  maximumLeft: maximumLeft,
+                );
+              },
+              onLongPressEnd: (
+                  LongPressEndDetails details,
+                  ) {
+                _stopDragging();
+              },
+              onLongPressCancel: _cancelDragging,
+              child: Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: _isDragging
+                        ? Duration.zero
+                        : Duration(
+                      milliseconds: 240,
+                    ),
+                    curve: Curves.easeOutCubic,
+                    left: indicatorLeft,
+                    top: 0,
+                    width: itemWidth,
+                    height: itemHeight,
+                    child: IgnorePointer(
+                      child: AnimatedContainer(
+                        duration: Duration(
+                          milliseconds: 160,
+                        ),
+                        decoration: BoxDecoration(
+                          color: activeColor,
+                          borderRadius: BorderRadius.circular(
+                            18,
+                          ),
+                          border: Border.all(
+                            color: activeBorderColor,
+                          ),
+                          boxShadow: _isDragging
+                              ? [
+                            BoxShadow(
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.12,
+                              ),
+                              blurRadius: 8,
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            ),
+                          ]
+                              : [],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: _buildButtons(
+                      itemWidth: itemWidth,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -380,16 +314,10 @@ class _ProfileContentFilterState
   List<Widget> _buildButtons({
     required double itemWidth,
   }) {
-    List<Widget> widgets =
-    <Widget>[];
+    List<Widget> widgets = <Widget>[];
 
-    for (
-    int index = 0;
-    index < filterItems.length;
-    index++
-    ) {
-      ProfileContentFilterItem item =
-      filterItems[index];
+    for (int index = 0; index < filterItems.length; index++) {
+      ProfileContentFilterItem item = filterItems[index];
 
       widgets.add(
         SizedBox(
@@ -398,16 +326,13 @@ class _ProfileContentFilterState
           child: _ProfileFilterButton(
             title: item.title,
             icon: item.icon,
-            selected:
-            widget.selectedFilter ==
-                item.type,
+            selected: widget.selectedFilter == item.type,
             onTap: () {
               if (_isDragging) {
                 return;
               }
 
-              if (widget.selectedFilter ==
-                  item.type) {
+              if (widget.selectedFilter == item.type) {
                 return;
               }
 
@@ -419,8 +344,7 @@ class _ProfileContentFilterState
         ),
       );
 
-      if (index <
-          filterItems.length - 1) {
+      if (index < filterItems.length - 1) {
         widgets.add(
           SizedBox(
             width: itemGap,
@@ -445,8 +369,7 @@ class ProfileContentFilterItem {
   });
 }
 
-class _ProfileFilterButton
-    extends StatelessWidget {
+class _ProfileFilterButton extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool selected;
@@ -462,35 +385,24 @@ class _ProfileFilterButton
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness ==
-            Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color inactiveColor = isDark
-        ? colorScheme.onSurfaceVariant
-        .withValues(
-      alpha: 0.82,
-    )
-        : colorScheme.onSurfaceVariant;
+        ? Colors.white.withValues(alpha: 0.60)
+        : Colors.black.withValues(alpha: 0.60);
 
-    Color contentColor = selected
-        ? colorScheme.primary
-        : inactiveColor;
+    Color contentColor = selected ? colorScheme.primary : inactiveColor;
 
     return Material(
       color: Colors.transparent,
-      borderRadius:
-      BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
-        borderRadius:
-        BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         splashColor: Colors.transparent,
-        highlightColor:
-        Colors.transparent,
+        highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         child: Container(
@@ -501,10 +413,8 @@ class _ProfileFilterButton
           ),
           alignment: Alignment.center,
           child: Row(
-            mainAxisSize:
-            MainAxisSize.min,
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TweenAnimationBuilder<Color?>(
                 duration: Duration(
@@ -528,8 +438,7 @@ class _ProfileFilterButton
               ),
               SizedBox(width: 4),
               Flexible(
-                child:
-                AnimatedDefaultTextStyle(
+                child: AnimatedDefaultTextStyle(
                   duration: Duration(
                     milliseconds: 180,
                   ),
@@ -538,15 +447,12 @@ class _ProfileFilterButton
                     color: contentColor,
                     fontSize: 10,
                     height: 1,
-                    fontWeight: selected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   child: Text(
                     title,
                     maxLines: 1,
-                    overflow:
-                    TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

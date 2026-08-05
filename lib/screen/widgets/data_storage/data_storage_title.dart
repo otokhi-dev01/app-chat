@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DataStorageNavigationTile extends StatelessWidget {
@@ -29,28 +30,28 @@ class DataStorageNavigationTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            14,
             12,
-            5,
-            12,
+            9,
+            6,
+            9,
           ),
           child: Row(
             children: [
               DataStorageIcon(
                 icon: icon,
               ),
-              SizedBox(width: 13),
+              SizedBox(width: 11),
               Expanded(
                 child: DataStorageTileText(
                   title: title,
                   subtitle: subtitle,
                 ),
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 6),
               if (trailingText != null)
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: 92,
+                    maxWidth: 88,
                   ),
                   child: Text(
                     trailingText!,
@@ -65,16 +66,18 @@ class DataStorageNavigationTile extends StatelessWidget {
                   ),
                 ),
               if (trailingText != null)
-                SizedBox(width: 3),
+                SizedBox(width: 2),
               SizedBox(
-                width: 28,
-                height: 42,
+                width: 24,
+                height: 38,
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 24,
+                    CupertinoIcons.chevron_right,
+                    color: colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.55,
+                    ),
+                    size: 16,
                   ),
                 ),
               ),
@@ -104,15 +107,10 @@ class DataStorageSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Material(
-      color: value
-          ? colorScheme.primary.withValues(
-        alpha: 0.05,
-      )
-          : Colors.transparent,
+      color: Colors.transparent,
       child: InkWell(
         onTap: () {
           onChanged(!value);
@@ -121,10 +119,10 @@ class DataStorageSwitchTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            14,
             12,
-            10,
-            12,
+            9,
+            8,
+            9,
           ),
           child: Row(
             children: [
@@ -132,7 +130,7 @@ class DataStorageSwitchTile extends StatelessWidget {
                 icon: icon,
                 active: value,
               ),
-              SizedBox(width: 13),
+              SizedBox(width: 11),
               Expanded(
                 child: DataStorageTileText(
                   title: title,
@@ -140,12 +138,11 @@ class DataStorageSwitchTile extends StatelessWidget {
                   active: value,
                 ),
               ),
-              SizedBox(width: 8),
-              IgnorePointer(
-                child: Switch.adaptive(
-                  value: value,
-                  onChanged: onChanged,
-                ),
+              SizedBox(width: 6),
+              CupertinoSwitch(
+                value: value,
+                activeTrackColor: colorScheme.primary,
+                onChanged: onChanged,
               ),
             ],
           ),
@@ -186,30 +183,31 @@ class DataStorageActionTile extends StatelessWidget {
         highlightColor: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            14,
             12,
-            10,
-            12,
+            9,
+            8,
+            9,
           ),
           child: Row(
             children: [
               DataStorageIcon(
                 icon: icon,
+                active: true,
               ),
-              SizedBox(width: 13),
+              SizedBox(width: 11),
               Expanded(
                 child: DataStorageTileText(
                   title: title,
                   subtitle: subtitle,
                 ),
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 6),
               if (loading)
                 SizedBox(
-                  width: 19,
-                  height: 19,
+                  width: 16,
+                  height: 16,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: 1.8,
                     color: colorScheme.primary,
                   ),
                 )
@@ -218,6 +216,7 @@ class DataStorageActionTile extends StatelessWidget {
                   trailingText!,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.primary,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -236,32 +235,34 @@ class DataStorageIcon extends StatelessWidget {
   const DataStorageIcon({
     super.key,
     required this.icon,
-    this.active = false,
+    this.active = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    Color primary = colorScheme.primary;
 
-    return Container(
-      width: 42,
-      height: 42,
+    Color bgColor = active
+        ? primary.withValues(alpha: 0.11)
+        : colorScheme.surfaceContainerHighest;
+
+    Color iconColor = active ? primary : colorScheme.onSurfaceVariant;
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      width: 38, // Compact 38x38 badge icon container
+      height: 38,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active
-            ? colorScheme.primary.withValues(
-          alpha: 0.16,
-        )
-            : colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(13),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
         icon,
-        color: active
-            ? colorScheme.primary
-            : colorScheme.onSurfaceVariant,
-        size: 21,
+        size: 18,
+        color: iconColor,
       ),
     );
   }
@@ -287,30 +288,36 @@ class DataStorageTileText extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          maxLines: 2,
-          softWrap: true,
-          overflow: TextOverflow.visible,
+        AnimatedDefaultTextStyle(
+          duration: Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: active
-                ? colorScheme.primary
-                : colorScheme.onSurface,
-            fontWeight: active
-                ? FontWeight.w700
-                : FontWeight.w600,
+            color: active ? colorScheme.primary : colorScheme.onSurface,
+            fontSize: 13.5, // Sleek compact title size
+            fontWeight: active ? FontWeight.w700 : FontWeight.w600,
             height: 1.25,
+          ) ??
+              TextStyle(
+                color: active ? colorScheme.primary : colorScheme.onSurface,
+                fontSize: 13.5,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+              ),
+          child: Text(
+            title,
+            maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.visible,
           ),
         ),
-        SizedBox(height: 3),
+        SizedBox(height: 2),
         Text(
           subtitle,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
-            fontSize: 11,
-            height: 1.35,
+            fontSize: 10.5, // Sleek compact subtitle size
+            height: 1.30,
           ),
         ),
       ],

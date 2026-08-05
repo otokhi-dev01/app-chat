@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,7 @@ class AddContactAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final VoidCallback onBack;
 
-  AddContactAppBar({
+  const AddContactAppBar({
     super.key,
     required this.onBack,
   });
@@ -22,65 +23,44 @@ class AddContactAppBar extends StatelessWidget
     required ThemeData theme,
     required bool isDark,
   }) {
-    Brightness iconBrightness = isDark
-        ? Brightness.light
-        : Brightness.dark;
-
-    Brightness statusBrightness = isDark
-        ? Brightness.dark
-        : Brightness.light;
+    Brightness iconBrightness = isDark ? Brightness.light : Brightness.dark;
+    Brightness statusBrightness = isDark ? Brightness.dark : Brightness.light;
 
     return SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      iconBrightness,
-      statusBarBrightness:
-      statusBrightness,
-      systemStatusBarContrastEnforced:
-      false,
-      systemNavigationBarColor:
-      Colors.transparent,
-      systemNavigationBarDividerColor:
-      Colors.transparent,
-      systemNavigationBarIconBrightness:
-      iconBrightness,
-      systemNavigationBarContrastEnforced:
-      false,
+      statusBarIconBrightness: iconBrightness,
+      statusBarBrightness: statusBrightness,
+      systemStatusBarContrastEnforced: false,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: iconBrightness,
+      systemNavigationBarContrastEnforced: false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
     Color appBarColor = isDark
         ? Color(0xFF1B1D22).withValues(
-      alpha: 0.96,
+      alpha: 0.65,
     )
         : Colors.white.withValues(
-      alpha: 0.98,
+      alpha: 0.70,
     );
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : colorScheme.surfaceContainerHighest
-        .withValues(
-      alpha: 0.75,
-    );
+    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
       alpha: 0.08,
     )
-        : colorScheme.outlineVariant.withValues(
-      alpha: 0.45,
+        : Colors.black.withValues(
+      alpha: 0.06,
     );
 
     return AppBar(
@@ -89,14 +69,11 @@ class AddContactAppBar extends StatelessWidget
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: Colors.transparent,
-      foregroundColor:
-      colorScheme.onSurface,
-      surfaceTintColor:
-      Colors.transparent,
-      shadowColor:
-      Colors.transparent,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
-      leadingWidth: 54,
+      leadingWidth: 58,
       titleSpacing: 0,
       systemOverlayStyle: _overlayStyle(
         theme: theme,
@@ -123,37 +100,42 @@ class AddContactAppBar extends StatelessWidget
       ),
       leading: Padding(
         padding: EdgeInsets.fromLTRB(
-          8,
           12,
-          5,
-          12,
+          10,
+          6,
+          10,
         ),
-        child: Material(
-          color: actionBackground,
-          shape: CircleBorder(),
-          child: Tooltip(
-            message: 'back'.tr,
-            child: InkWell(
-              onTap: onBack,
-              customBorder: CircleBorder(),
-              splashColor:
-              Colors.transparent,
-              highlightColor:
-              Colors.transparent,
-              hoverColor:
-              Colors.transparent,
-              focusColor:
-              Colors.transparent,
-              child: SizedBox(
-                width: 36,
-                height: 36,
-                child: Icon(
-                  Icons
-                      .arrow_back_ios_new_rounded,
-                  size: 16,
-                  color:
-                  colorScheme.onSurface,
+        child: Tooltip(
+          message: 'back'.tr,
+          child: Container(
+            width: 40,
+            height: 40,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: actionBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
+              ],
+            ),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(40, 40),
+              onPressed: onBack,
+              child: Icon(
+                CupertinoIcons.chevron_left,
+                size: 20,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -162,16 +144,12 @@ class AddContactAppBar extends StatelessWidget
       title: Text(
         'add_contact'.tr,
         maxLines: 1,
-        overflow:
-        TextOverflow.ellipsis,
-        style: theme
-            .textTheme.titleMedium
-            ?.copyWith(
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium?.copyWith(
           color: colorScheme.onSurface,
-          fontSize: 17,
+          fontSize: 18,
           height: 1.1,
-          fontWeight:
-          FontWeight.w700,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );

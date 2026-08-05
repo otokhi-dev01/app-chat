@@ -6,7 +6,7 @@ class ProfileDetailHeader extends StatelessWidget {
   final String imageUrl;
   final bool isOnline;
 
-  ProfileDetailHeader({
+  const ProfileDetailHeader({
     super.key,
     required this.name,
     required this.status,
@@ -29,16 +29,17 @@ class ProfileDetailHeader extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
 
     Color statusColor = isOnline
         ? colorScheme.primary
@@ -114,14 +115,16 @@ class ProfileDetailHeader extends StatelessWidget {
                           color: cardColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: colorScheme.primary
-                                .withValues(alpha: 0.25),
+                            color: colorScheme.primary.withValues(
+                              alpha: 0.25,
+                            ),
                             width: 2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: colorScheme.primary
-                                  .withValues(alpha: 0.18),
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.18,
+                              ),
                               blurRadius: 18,
                               offset: Offset(0, 6),
                             ),
@@ -142,8 +145,9 @@ class ProfileDetailHeader extends StatelessWidget {
                                 width: 98,
                                 height: 98,
                                 alignment: Alignment.center,
-                                color: colorScheme.primary
-                                    .withValues(alpha: 0.12),
+                                color: colorScheme.primary.withValues(
+                                  alpha: 0.12,
+                                ),
                                 child: Text(
                                   firstLetter,
                                   style: TextStyle(

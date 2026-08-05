@@ -11,7 +11,7 @@ class AddContactScreen extends StatefulWidget {
   final String phoneNumber;
   final String imageUrl;
 
-  AddContactScreen({
+  const AddContactScreen({
     super.key,
     required this.name,
     required this.username,
@@ -25,10 +25,8 @@ class AddContactScreen extends StatefulWidget {
   }
 }
 
-class _AddContactScreenState
-    extends State<AddContactScreen> {
-  final GlobalKey<FormState> formKey =
-  GlobalKey<FormState>();
+class _AddContactScreenState extends State<AddContactScreen> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   late TextEditingController nameController;
   late TextEditingController usernameController;
@@ -86,19 +84,15 @@ class _AddContactScreenState
   }
 
   void _closeScreen() {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     Get.back();
   }
 
   Future<void> _saveContact() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    bool isValid =
-        formKey.currentState?.validate() ??
-            false;
+    bool isValid = formKey.currentState?.validate() ?? false;
 
     if (!isValid || isSaving) {
       return;
@@ -122,12 +116,9 @@ class _AddContactScreenState
       Get.back(
         result: <String, dynamic>{
           'saved': true,
-          'name':
-          nameController.text.trim(),
-          'username':
-          usernameController.text.trim(),
-          'phoneNumber':
-          phoneController.text.trim(),
+          'name': nameController.text.trim(),
+          'username': usernameController.text.trim(),
+          'phoneNumber': phoneController.text.trim(),
         },
       );
     } finally {
@@ -141,39 +132,25 @@ class _AddContactScreenState
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme =
-    Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
-    bool isDark =
-        theme.brightness ==
-            Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color pageColor =
-        theme.scaffoldBackgroundColor;
+    Color pageColor = theme.scaffoldBackgroundColor;
 
-    SystemUiOverlayStyle overlayStyle =
-    isDark
-        ? SystemUiOverlayStyle.light
-        .copyWith(
-      statusBarColor:
-      Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.light,
-      statusBarBrightness:
-      Brightness.dark,
+    SystemUiOverlayStyle overlayStyle = isDark
+        ? SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     )
-        : SystemUiOverlayStyle.dark
-        .copyWith(
-      statusBarColor:
-      Colors.transparent,
-      statusBarIconBrightness:
-      Brightness.dark,
-      statusBarBrightness:
-      Brightness.light,
+        : SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
     );
 
-    return AnnotatedRegion<
-        SystemUiOverlayStyle>(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
@@ -190,12 +167,9 @@ class _AddContactScreenState
             name: widget.name,
             username: widget.username,
             imageUrl: widget.imageUrl,
-            nameController:
-            nameController,
-            usernameController:
-            usernameController,
-            phoneController:
-            phoneController,
+            nameController: nameController,
+            usernameController: usernameController,
+            phoneController: phoneController,
             isSaving: isSaving,
             onSave: _saveContact,
           ),

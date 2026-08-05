@@ -1,8 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ArchivedChatsEmptyState
-    extends StatelessWidget {
- const ArchivedChatsEmptyState({
+class ArchivedChatsEmptyState extends StatelessWidget {
+  const ArchivedChatsEmptyState({
     super.key,
   });
 
@@ -11,12 +12,9 @@ class ArchivedChatsEmptyState
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -43,10 +41,19 @@ class ArchivedChatsEmptyState
           ),
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: borderColor,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -56,14 +63,12 @@ class ArchivedChatsEmptyState
                 height: 92,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
+                  color: colorScheme.primary.withValues(
                     alpha: 0.10,
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: colorScheme.primary
-                        .withValues(
+                    color: colorScheme.primary.withValues(
                       alpha: 0.14,
                     ),
                   ),
@@ -73,76 +78,62 @@ class ArchivedChatsEmptyState
                   height: 64,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary
-                        .withValues(
+                    color: colorScheme.primary.withValues(
                       alpha: 0.12,
                     ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.archive_outlined,
+                    CupertinoIcons.archivebox,
                     color: colorScheme.primary,
                     size: 32,
                   ),
                 ),
               ),
-
               SizedBox(height: 21),
-
               Text(
-                'No archived chats',
+                'no_archived_chats'.tr,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.titleLarge
-                    ?.copyWith(
+                style: theme.textTheme.titleLarge?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: 19,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-
               SizedBox(height: 9),
-
               Text(
-                'Chats you archive will appear here. '
-                    'Swipe a conversation from your main chat list '
-                    'to move it into the archive.',
+                'archived_chats_hint_desc'.tr,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(
-                  color:
-                  colorScheme.onSurfaceVariant,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 13,
                   height: 1.5,
                 ),
               ),
-
               SizedBox(height: 22),
-
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary
-                      .withValues(
+                  color: colorScheme.primary.withValues(
                     alpha: 0.08,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.swipe_left_alt_rounded,
+                      CupertinoIcons.arrow_left,
                       color: colorScheme.primary,
-                      size: 21,
+                      size: 18,
                     ),
                     SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        'Swipe left to archive',
+                        'swipe_left_to_archive'.tr,
                         style: TextStyle(
                           color: colorScheme.primary,
                           fontSize: 12,

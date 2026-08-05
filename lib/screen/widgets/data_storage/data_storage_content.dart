@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'data_storage_card.dart';
@@ -32,7 +31,7 @@ class DataStorageContent extends StatelessWidget {
   final VoidCallback onClearCacheTap;
   final VoidCallback onResetNetworkTap;
 
-  DataStorageContent({
+  const DataStorageContent({
     super.key,
     required this.cacheSize,
     required this.networkUsage,
@@ -113,10 +112,10 @@ class DataStorageContent extends StatelessWidget {
         parent: AlwaysScrollableScrollPhysics(),
       ),
       padding: EdgeInsets.fromLTRB(
-        16,
-        18,
-        16,
-        34,
+        14,
+        12,
+        14,
+        28,
       ),
       children: [
         DataStorageSummaryCard(
@@ -124,13 +123,13 @@ class DataStorageContent extends StatelessWidget {
           networkUsage: networkUsage,
         ),
 
-        SizedBox(height: 24),
+        SizedBox(height: 18),
 
         DataStorageSectionTitle(
           title: 'storage'.tr,
         ),
 
-        SizedBox(height: 9),
+        SizedBox(height: 6),
 
         DataStorageCard(
           children: [
@@ -157,13 +156,13 @@ class DataStorageContent extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 24),
+        SizedBox(height: 18),
 
         DataStorageSectionTitle(
           title: 'automatic_media_download'.tr,
         ),
 
-        SizedBox(height: 9),
+        SizedBox(height: 6),
 
         DataStorageCard(
           children: [
@@ -197,13 +196,13 @@ class DataStorageContent extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 24),
+        SizedBox(height: 18),
 
         DataStorageSectionTitle(
           title: 'media'.tr,
         ),
 
-        SizedBox(height: 9),
+        SizedBox(height: 6),
 
         DataStorageCard(
           children: [
@@ -239,13 +238,13 @@ class DataStorageContent extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 24),
+        SizedBox(height: 18),
 
         DataStorageSectionTitle(
           title: 'data_usage'.tr,
         ),
 
-        SizedBox(height: 9),
+        SizedBox(height: 6),
 
         DataStorageCard(
           children: [
@@ -270,7 +269,7 @@ class DataStorageContent extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 18),
+        SizedBox(height: 14),
 
         DataStorageInformationCard(),
       ],

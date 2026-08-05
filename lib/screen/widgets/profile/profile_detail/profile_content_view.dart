@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'profile_content_filter.dart';
 
@@ -25,24 +27,19 @@ class ProfileContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (selectedFilter) {
       case ProfileContentFilterType.posts:
-        return postsContent ??
-            ProfileMockPostContent();
+        return postsContent ?? ProfileMockPostContent();
 
       case ProfileContentFilterType.media:
-        return mediaContent ??
-            ProfileMockMediaContent();
+        return mediaContent ?? ProfileMockMediaContent();
 
       case ProfileContentFilterType.links:
-        return linksContent ??
-            ProfileMockLinkContent();
+        return linksContent ?? ProfileMockLinkContent();
 
       case ProfileContentFilterType.files:
-        return filesContent ??
-            ProfileMockFileContent();
+        return filesContent ?? ProfileMockFileContent();
 
       case ProfileContentFilterType.voice:
-        return voiceContent ??
-            ProfileMockVoiceContent();
+        return voiceContent ?? ProfileMockVoiceContent();
     }
   }
 }
@@ -52,12 +49,11 @@ class ProfileMockPostContent extends StatelessWidget {
     super.key,
   });
 
-  final List<_MockPostItem> posts =
-  <_MockPostItem>[
+  final List<_MockPostItem> posts = <_MockPostItem>[
     _MockPostItem(
       title: 'Weekend trip',
       subtitle: 'Beautiful mountain view',
-      icon: Icons.landscape_rounded,
+      icon: CupertinoIcons.photo_fill,
       viewCount: 238,
       gradientColors: <Color>[
         Color(0xFF4F8DF7),
@@ -67,7 +63,7 @@ class ProfileMockPostContent extends StatelessWidget {
     _MockPostItem(
       title: 'Coffee time',
       subtitle: 'Starting the day',
-      icon: Icons.coffee_rounded,
+      icon: CupertinoIcons.heart_fill,
       viewCount: 174,
       gradientColors: <Color>[
         Color(0xFFB77B5A),
@@ -77,7 +73,7 @@ class ProfileMockPostContent extends StatelessWidget {
     _MockPostItem(
       title: 'New workspace',
       subtitle: 'Simple and productive',
-      icon: Icons.desktop_mac_rounded,
+      icon: CupertinoIcons.desktopcomputer,
       viewCount: 312,
       gradientColors: <Color>[
         Color(0xFF7C6CF2),
@@ -87,7 +83,7 @@ class ProfileMockPostContent extends StatelessWidget {
     _MockPostItem(
       title: 'City walk',
       subtitle: 'Exploring new places',
-      icon: Icons.location_city_rounded,
+      icon: CupertinoIcons.building_2_fill,
       viewCount: 421,
       gradientColors: <Color>[
         Color(0xFF4F6272),
@@ -97,7 +93,7 @@ class ProfileMockPostContent extends StatelessWidget {
     _MockPostItem(
       title: 'Healthy meal',
       subtitle: 'Fresh and delicious',
-      icon: Icons.restaurant_rounded,
+      icon: CupertinoIcons.bag_fill,
       viewCount: 196,
       gradientColors: <Color>[
         Color(0xFF4FAF74),
@@ -107,7 +103,7 @@ class ProfileMockPostContent extends StatelessWidget {
     _MockPostItem(
       title: 'Sunset',
       subtitle: 'A peaceful evening',
-      icon: Icons.wb_twilight_rounded,
+      icon: CupertinoIcons.sun_max_fill,
       viewCount: 503,
       gradientColors: <Color>[
         Color(0xFFF2766B),
@@ -123,8 +119,7 @@ class ProfileMockPostContent extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       itemCount: posts.length,
-      gridDelegate:
-      SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
@@ -152,15 +147,11 @@ class _ProfilePostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -179,11 +170,19 @@ class _ProfilePostCard extends StatelessWidget {
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Container(
@@ -200,8 +199,7 @@ class _ProfilePostCard extends StatelessWidget {
                   Center(
                     child: Icon(
                       post.icon,
-                      color: Colors.white
-                          .withValues(
+                      color: Colors.white.withValues(
                         alpha: 0.92,
                       ),
                       size: 46,
@@ -216,34 +214,28 @@ class _ProfilePostCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black
-                            .withValues(
+                        color: Colors.black.withValues(
                           alpha: 0.32,
                         ),
-                        borderRadius:
-                        BorderRadius.circular(
+                        borderRadius: BorderRadius.circular(
                           20,
                         ),
                       ),
                       child: Row(
-                        mainAxisSize:
-                        MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons
-                                .visibility_outlined,
+                            CupertinoIcons.eye_fill,
                             color: Colors.white,
-                            size: 12,
+                            size: 11,
                           ),
                           SizedBox(width: 4),
                           Text(
-                            post.viewCount
-                                .toString(),
+                            post.viewCount.toString(),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 10,
-                              fontWeight:
-                              FontWeight.w600,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -257,38 +249,27 @@ class _ProfilePostCard extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(10),
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   post.title,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.titleSmall
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 12,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 3),
                 Text(
                   post.subtitle,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.w500,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -300,17 +281,15 @@ class _ProfilePostCard extends StatelessWidget {
   }
 }
 
-class ProfileMockMediaContent
-    extends StatelessWidget {
+class ProfileMockMediaContent extends StatelessWidget {
   ProfileMockMediaContent({
     super.key,
   });
 
-  final List<_MockMediaItem> mediaItems =
-  <_MockMediaItem>[
+  final List<_MockMediaItem> mediaItems = <_MockMediaItem>[
     _MockMediaItem(
-      icon: Icons.photo_camera_rounded,
-      label: 'Photo',
+      icon: CupertinoIcons.camera_fill,
+      label: 'photo'.tr,
       duration: '',
       gradientColors: <Color>[
         Color(0xFF4F8DF7),
@@ -318,8 +297,8 @@ class ProfileMockMediaContent
       ],
     ),
     _MockMediaItem(
-      icon: Icons.play_arrow_rounded,
-      label: 'Video',
+      icon: CupertinoIcons.play_fill,
+      label: 'video'.tr,
       duration: '0:24',
       gradientColors: <Color>[
         Color(0xFF6F61E8),
@@ -327,8 +306,8 @@ class ProfileMockMediaContent
       ],
     ),
     _MockMediaItem(
-      icon: Icons.image_rounded,
-      label: 'Photo',
+      icon: CupertinoIcons.photo_fill,
+      label: 'photo'.tr,
       duration: '',
       gradientColors: <Color>[
         Color(0xFF47A66D),
@@ -336,8 +315,8 @@ class ProfileMockMediaContent
       ],
     ),
     _MockMediaItem(
-      icon: Icons.play_arrow_rounded,
-      label: 'Video',
+      icon: CupertinoIcons.play_fill,
+      label: 'video'.tr,
       duration: '1:05',
       gradientColors: <Color>[
         Color(0xFFE36B6B),
@@ -345,8 +324,8 @@ class ProfileMockMediaContent
       ],
     ),
     _MockMediaItem(
-      icon: Icons.photo_library_rounded,
-      label: 'Album',
+      icon: CupertinoIcons.photo_on_rectangle,
+      label: 'album'.tr,
       duration: '8',
       gradientColors: <Color>[
         Color(0xFF52616E),
@@ -354,8 +333,8 @@ class ProfileMockMediaContent
       ],
     ),
     _MockMediaItem(
-      icon: Icons.play_arrow_rounded,
-      label: 'Video',
+      icon: CupertinoIcons.play_fill,
+      label: 'video'.tr,
       duration: '0:42',
       gradientColors: <Color>[
         Color(0xFFAF7455),
@@ -371,8 +350,7 @@ class ProfileMockMediaContent
       physics: NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       itemCount: mediaItems.length,
-      gridDelegate:
-      SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
@@ -407,7 +385,7 @@ class _ProfileMediaCard extends StatelessWidget {
           colors: media.gradientColors,
         ),
         borderRadius: BorderRadius.circular(
-          14,
+          16,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -416,8 +394,7 @@ class _ProfileMediaCard extends StatelessWidget {
           Center(
             child: Icon(
               media.icon,
-              color: Colors.white
-                  .withValues(
+              color: Colors.white.withValues(
                 alpha: 0.94,
               ),
               size: 32,
@@ -445,12 +422,10 @@ class _ProfileMediaCard extends StatelessWidget {
                   vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black
-                      .withValues(
+                  color: Colors.black.withValues(
                     alpha: 0.38,
                   ),
-                  borderRadius:
-                  BorderRadius.circular(
+                  borderRadius: BorderRadius.circular(
                     10,
                   ),
                 ),
@@ -459,8 +434,7 @@ class _ProfileMediaCard extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 8,
-                    fontWeight:
-                    FontWeight.w600,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -471,34 +445,29 @@ class _ProfileMediaCard extends StatelessWidget {
   }
 }
 
-class ProfileMockLinkContent
-    extends StatelessWidget {
+class ProfileMockLinkContent extends StatelessWidget {
   ProfileMockLinkContent({
     super.key,
   });
 
-  final List<_MockLinkItem> links =
-  <_MockLinkItem>[
+  final List<_MockLinkItem> links = <_MockLinkItem>[
     _MockLinkItem(
       title: 'Flutter documentation',
       url: 'docs.flutter.dev',
-      description:
-      'Build beautiful multiplatform apps.',
-      icon: Icons.flutter_dash_rounded,
+      description: 'Build beautiful multiplatform apps.',
+      icon: CupertinoIcons.link,
     ),
     _MockLinkItem(
       title: 'Project design',
       url: 'figma.com/piitsiitchat',
-      description:
-      'Latest PiitsiitChat UI design.',
-      icon: Icons.design_services_rounded,
+      description: 'Latest PiitsiitChat UI design.',
+      icon: CupertinoIcons.square_pencil,
     ),
     _MockLinkItem(
       title: 'Project repository',
       url: 'github.com/piitsiitchat',
-      description:
-      'Source code and project updates.',
-      icon: Icons.code_rounded,
+      description: 'Source code and project updates.',
+      icon: CupertinoIcons.text_quote,
     ),
   ];
 
@@ -510,10 +479,7 @@ class ProfileMockLinkContent
             (int index) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom:
-              index == links.length - 1
-                  ? 0
-                  : 8,
+              bottom: index == links.length - 1 ? 0 : 8,
             ),
             child: _ProfileLinkCard(
               link: links[index],
@@ -535,15 +501,11 @@ class _ProfileLinkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -559,11 +521,20 @@ class _ProfileLinkCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(
-          16,
+          18,
         ),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -572,64 +543,52 @@ class _ProfileLinkCard extends StatelessWidget {
             height: 42,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: isDark ? 0.18 : 0.10,
+              color: colorScheme.primary.withValues(
+                alpha: 0.11,
               ),
-              borderRadius:
-              BorderRadius.circular(
-                13,
+              borderRadius: BorderRadius.circular(
+                14,
               ),
             ),
             child: Icon(
               link.icon,
               color: colorScheme.primary,
-              size: 21,
+              size: 20,
             ),
           ),
           SizedBox(width: 11),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   link.title,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.titleSmall
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 12,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 3),
                 Text(
                   link.url,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.w600,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 2),
                 Text(
                   link.description,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 10,
                   ),
                 ),
@@ -637,10 +596,9 @@ class _ProfileLinkCard extends StatelessWidget {
             ),
           ),
           Icon(
-            Icons.open_in_new_rounded,
-            color:
-            colorScheme.onSurfaceVariant,
-            size: 17,
+            CupertinoIcons.arrow_up_right,
+            color: colorScheme.onSurfaceVariant,
+            size: 16,
           ),
         ],
       ),
@@ -648,37 +606,35 @@ class _ProfileLinkCard extends StatelessWidget {
   }
 }
 
-class ProfileMockFileContent
-    extends StatelessWidget {
+class ProfileMockFileContent extends StatelessWidget {
   ProfileMockFileContent({
     super.key,
   });
 
-  final List<_MockFileItem> files =
-  <_MockFileItem>[
+  final List<_MockFileItem> files = <_MockFileItem>[
     _MockFileItem(
       name: 'Project proposal.pdf',
       size: '3.8 MB',
       date: 'Today, 9:42 AM',
-      icon: Icons.picture_as_pdf_rounded,
+      icon: CupertinoIcons.doc_fill,
     ),
     _MockFileItem(
       name: 'UI design assets.zip',
       size: '18.2 MB',
       date: 'Yesterday',
-      icon: Icons.folder_zip_rounded,
+      icon: CupertinoIcons.archivebox_fill,
     ),
     _MockFileItem(
       name: 'Meeting notes.docx',
       size: '842 KB',
       date: 'Jul 20',
-      icon: Icons.description_rounded,
+      icon: CupertinoIcons.doc_text_fill,
     ),
     _MockFileItem(
       name: 'Budget report.xlsx',
       size: '1.4 MB',
       date: 'Jul 18',
-      icon: Icons.table_chart_rounded,
+      icon: CupertinoIcons.table_fill,
     ),
   ];
 
@@ -690,10 +646,7 @@ class ProfileMockFileContent
             (int index) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom:
-              index == files.length - 1
-                  ? 0
-                  : 8,
+              bottom: index == files.length - 1 ? 0 : 8,
             ),
             child: _ProfileFileCard(
               file: files[index],
@@ -715,15 +668,11 @@ class _ProfileFileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -742,73 +691,72 @@ class _ProfileFileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(
-          16,
+          18,
         ),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 42,
+            height: 42,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorScheme.primary
-                  .withValues(
-                alpha: isDark ? 0.18 : 0.10,
+              color: colorScheme.primary.withValues(
+                alpha: 0.11,
               ),
-              borderRadius:
-              BorderRadius.circular(
-                13,
+              borderRadius: BorderRadius.circular(
+                14,
               ),
             ),
             child: Icon(
               file.icon,
               color: colorScheme.primary,
-              size: 22,
+              size: 20,
             ),
           ),
           SizedBox(width: 11),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   file.name,
                   maxLines: 1,
-                  overflow:
-                  TextOverflow.ellipsis,
-                  style: theme
-                      .textTheme.titleSmall
-                      ?.copyWith(
-                    color:
-                    colorScheme.onSurface,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 12,
-                    fontWeight:
-                    FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   '${file.size} • ${file.date}',
                   style: TextStyle(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.w500,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
           Icon(
-            Icons.download_rounded,
+            CupertinoIcons.arrow_down_to_line,
             color: colorScheme.primary,
-            size: 20,
+            size: 18,
           ),
         ],
       ),
@@ -816,14 +764,12 @@ class _ProfileFileCard extends StatelessWidget {
   }
 }
 
-class ProfileMockVoiceContent
-    extends StatelessWidget {
+class ProfileMockVoiceContent extends StatelessWidget {
   ProfileMockVoiceContent({
     super.key,
   });
 
-  final List<_MockVoiceItem> voiceMessages =
-  <_MockVoiceItem>[
+  final List<_MockVoiceItem> voiceMessages = <_MockVoiceItem>[
     _MockVoiceItem(
       duration: '0:18',
       date: 'Today, 10:14 AM',
@@ -849,10 +795,7 @@ class ProfileMockVoiceContent
             (int index) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom: index ==
-                  voiceMessages.length - 1
-                  ? 0
-                  : 8,
+              bottom: index == voiceMessages.length - 1 ? 0 : 8,
             ),
             child: _ProfileVoiceCard(
               voice: voiceMessages[index],
@@ -864,8 +807,7 @@ class ProfileMockVoiceContent
   }
 }
 
-class _ProfileVoiceCard
-    extends StatelessWidget {
+class _ProfileVoiceCard extends StatelessWidget {
   final _MockVoiceItem voice;
 
   _ProfileVoiceCard({
@@ -875,15 +817,11 @@ class _ProfileVoiceCard
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
+    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(
@@ -899,11 +837,20 @@ class _ProfileVoiceCard
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(
-          16,
+          18,
         ),
         border: Border.all(
           color: borderColor,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.15 : 0.04,
+            ),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -916,37 +863,30 @@ class _ProfileVoiceCard
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.play_arrow_rounded,
+              CupertinoIcons.play_fill,
               color: colorScheme.onPrimary,
-              size: 25,
+              size: 20,
             ),
           ),
           SizedBox(width: 11),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Expanded(
                       child: ClipRRect(
-                        borderRadius:
-                        BorderRadius.circular(
+                        borderRadius: BorderRadius.circular(
                           10,
                         ),
-                        child:
-                        LinearProgressIndicator(
+                        child: LinearProgressIndicator(
                           value: voice.progress,
                           minHeight: 4,
-                          backgroundColor:
-                          colorScheme.primary
-                              .withValues(
+                          backgroundColor: colorScheme.primary.withValues(
                             alpha: 0.12,
                           ),
-                          valueColor:
-                          AlwaysStoppedAnimation<
-                              Color>(
+                          valueColor: AlwaysStoppedAnimation<Color>(
                             colorScheme.primary,
                           ),
                         ),
@@ -956,11 +896,9 @@ class _ProfileVoiceCard
                     Text(
                       voice.duration,
                       style: TextStyle(
-                        color: colorScheme
-                            .onSurface,
+                        color: colorScheme.onSurface,
                         fontSize: 10,
-                        fontWeight:
-                        FontWeight.w700,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -969,11 +907,9 @@ class _ProfileVoiceCard
                 Text(
                   voice.date,
                   style: TextStyle(
-                    color: colorScheme
-                        .onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.w500,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -981,10 +917,9 @@ class _ProfileVoiceCard
           ),
           SizedBox(width: 8),
           Icon(
-            Icons.more_vert_rounded,
-            color:
-            colorScheme.onSurfaceVariant,
-            size: 19,
+            CupertinoIcons.ellipsis,
+            color: colorScheme.onSurfaceVariant,
+            size: 18,
           ),
         ],
       ),

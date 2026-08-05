@@ -1,10 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ProfileAddContactButton
-    extends StatelessWidget {
+class ProfileAddContactButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  ProfileAddContactButton({
+  const ProfileAddContactButton({
     super.key,
     required this.onTap,
   });
@@ -12,34 +13,30 @@ class ProfileAddContactButton
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme =
-        theme.colorScheme;
+    ColorScheme colorScheme = theme.colorScheme;
 
     return SizedBox(
       width: double.infinity,
-      height: 46,
+      height: 48,
       child: FilledButton.icon(
         onPressed: onTap,
         icon: Icon(
-          Icons.person_add_alt_1_rounded,
+          CupertinoIcons.person_badge_plus,
           size: 19,
         ),
         label: Text(
-          'Add to contacts',
+          'add_to_contacts'.tr,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
         ),
         style: FilledButton.styleFrom(
-          backgroundColor:
-          colorScheme.primary,
-          foregroundColor:
-          colorScheme.onPrimary,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),

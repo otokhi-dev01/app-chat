@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import '../../controllers/chat/chat_controller.dart';
 import '../../models/chat_folder_model.dart';
 import '../../models/chat_model.dart';
 import '../chat_detail/chat_detail_screen.dart';
+import '../widgets/common/app_feedback.dart'; // Imported AppFeedback
 import '../widgets/home/home_chat_archived_tile.dart';
 import '../widgets/home/home_chat_state_views.dart';
 import '../widgets/home/home_chat_tile.dart';
@@ -37,9 +39,9 @@ class _HomeChatListState extends State<HomeChatList> {
     }
 
     await Get.to(
-      () => ChatDetailScreen(chat: chat),
+          () => ChatDetailScreen(chat: chat),
       transition: Transition.cupertino,
-      duration: const Duration(milliseconds: 280),
+      duration: Duration(milliseconds: 280),
     );
   }
 
@@ -49,38 +51,11 @@ class _HomeChatListState extends State<HomeChatList> {
     HapticFeedback.lightImpact();
     controller.archiveChat(chat.id);
 
-    _showSnackBar(context, '${chat.name} archived');
-  }
-
-
-  void _showSnackBar(
-    BuildContext context,
-    String message, {
-    bool isError = false,
-  }) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: TextStyle(
-              color: isError ? colorScheme.onError : colorScheme.onPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor:
-              isError ? colorScheme.error : colorScheme.primary,
-          margin: const EdgeInsets.all(14),
-          duration: const Duration(milliseconds: 1800),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    AppFeedback.showMessage(
+      title: 'archived'.tr,
+      message: '${chat.name} ${'was_archived'.tr}',
+      icon: CupertinoIcons.archivebox,
+    );
   }
 
   // ── Scroll handling ──────────────────────────────────────────────────────
@@ -102,9 +77,7 @@ class _HomeChatListState extends State<HomeChatList> {
       } else {
         double overscroll = -pixels;
         if (overscroll > 20.0 ||
-            (scrollDelta != null &&
-                scrollDelta < -10.0 &&
-                pixels <= 0)) {
+            (scrollDelta != null && scrollDelta < -10.0 && pixels <= 0)) {
           if (!_isArchivedVisible) {
             setState(() => _isArchivedVisible = true);
           }
@@ -124,11 +97,10 @@ class _HomeChatListState extends State<HomeChatList> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () {
+          () {
         List<ChatModel> visibleChats = controller.filteredChats;
 
-        ChatFolderType selectedFolderType =
-            controller.selectedFolderType.value;
+        ChatFolderType selectedFolderType = controller.selectedFolderType.value;
 
         bool hasArchivedChats = selectedFolderType == ChatFolderType.all &&
             controller.archivedChatCount > 0;
@@ -153,19 +125,19 @@ class _HomeChatListState extends State<HomeChatList> {
             onRefresh: controller.refreshChats,
             child: CustomScrollView(
               keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior.onDrag,
-              physics: const BouncingScrollPhysics(
+              ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               slivers: [
                 if (hasArchivedChats)
                   SliverToBoxAdapter(
                     child: AnimatedCrossFade(
-                      duration: const Duration(milliseconds: 250),
+                      duration: Duration(milliseconds: 250),
                       crossFadeState: showArchivedTile
                           ? CrossFadeState.showSecond
                           : CrossFadeState.showFirst,
-                      firstChild: const SizedBox(height: 0),
+                      firstChild: SizedBox(height: 0),
                       secondChild: HomeChatArchivedTile(
                         count: controller.archivedChatCount,
                         onTap: controller.openArchivedChatsScreen,
@@ -183,7 +155,7 @@ class _HomeChatListState extends State<HomeChatList> {
                 else
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
+                          (BuildContext context, int index) {
                         ChatModel chat = visibleChats[index];
 
                         return HomeChatTileWrapper(
@@ -192,44 +164,54 @@ class _HomeChatListState extends State<HomeChatList> {
                           onTap: () => _openChat(chat),
                           onArchive: () => _archiveChat(context, chat),
                           onPin: () {
+                            bool wasPinned = chat.isPinned;
                             controller.togglePin(chat.id);
-                            _showSnackBar(
-                              context,
-                              chat.isPinned
-                                  ? '${chat.name} unpinned'
-                                  : '${chat.name} pinned',
+                            AppFeedback.showMessage(
+                              title: wasPinned ? 'unpinned'.tr : 'pinned'.tr,
+                              message: wasPinned
+                                  ? '${chat.name} ${'was_unpinned'.tr}'
+                                  : '${chat.name} ${'was_pinned'.tr}',
+                              icon: wasPinned
+                                  ? CupertinoIcons.pin
+                                  : CupertinoIcons.pin_fill,
                             );
                           },
                           onMuteToggle: () {
+                            bool wasMuted = chat.isMuted;
                             controller.toggleMute(chat.id);
-                            _showSnackBar(
-                              context,
-                              chat.isMuted
-                                  ? '${chat.name} unmuted'
-                                  : '${chat.name} muted',
+                            AppFeedback.showMessage(
+                              title: wasMuted ? 'unmuted'.tr : 'muted'.tr,
+                              message: wasMuted
+                                  ? '${chat.name} ${'was_unmuted'.tr}'
+                                  : '${chat.name} ${'was_muted'.tr}',
+                              icon: wasMuted
+                                  ? CupertinoIcons.bell
+                                  : CupertinoIcons.bell_slash_fill,
                             );
                           },
                           onMarkRead: () {
                             if (chat.unread > 0) {
                               controller.markAsRead(chat.id);
-                              _showSnackBar(
-                                context,
-                                '${chat.name} marked as read',
+                              AppFeedback.showMessage(
+                                title: 'marked_as_read'.tr,
+                                message: '${chat.name} ${'marked_as_read'.tr}',
+                                icon: CupertinoIcons.checkmark_circle,
                               );
                             } else {
                               controller.markAsUnread(chat.id);
-                              _showSnackBar(
-                                context,
-                                '${chat.name} marked as unread',
+                              AppFeedback.showMessage(
+                                title: 'marked_as_unread'.tr,
+                                message: '${chat.name} ${'marked_as_unread'.tr}',
+                                icon: CupertinoIcons.chat_bubble,
                               );
                             }
                           },
                           onDelete: () {
                             controller.deleteChat(chat.id);
-                            _showSnackBar(
-                              context,
-                              '${chat.name} deleted',
-                              isError: true,
+                            AppFeedback.showMessage(
+                              title: 'deleted'.tr,
+                              message: '${chat.name} ${'was_deleted'.tr}',
+                              icon: CupertinoIcons.trash,
                             );
                           },
                         );
@@ -238,7 +220,9 @@ class _HomeChatListState extends State<HomeChatList> {
                     ),
                   ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 18)),
+                SliverToBoxAdapter(
+                  child: SizedBox(height: 18),
+                ),
               ],
             ),
           ),
