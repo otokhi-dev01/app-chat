@@ -9,6 +9,7 @@ abstract class AppRoutes {
   static const String resetPassword = '/reset-password';
   static const String verifyOtp = '/verify-otp';
   static const String phoneInput = '/phone-input';
+  static const String deleteAccount = '/delete-account';
   // home chat
   static const String home = '/home';
   static const String archivedChats = '/archived-chats';

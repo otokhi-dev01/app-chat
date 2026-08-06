@@ -1,29 +1,31 @@
 import 'package:get/get.dart';
+
 import '../data/mock_auth_user.dart';
 
 enum AuthServiceError {
   invalidCredentials,
   emailAlreadyExists,
-  unknown,
+  notAuthenticated,
+  deleteFailed,
 }
 
 class AuthServiceException implements Exception {
   final AuthServiceError error;
   final String message;
 
-  AuthServiceException({
+  const AuthServiceException({
     required this.error,
     required this.message,
   });
 
   @override
-  String toString() {
-    return message;
-  }
+  String toString() => message;
 }
 
 abstract class AuthService {
   RxList<MockAuthUser> get users;
+
+  Rxn<MockAuthUser> get currentUser;
 
   Future<MockAuthUser> login({
     required String email,
@@ -37,4 +39,6 @@ abstract class AuthService {
   });
 
   Future<void> logout();
+
+  Future<void> deleteAccount();
 }

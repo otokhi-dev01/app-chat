@@ -26,24 +26,40 @@ class AccountSettingsSection extends StatelessWidget {
     );
   }
 
+  void _openDeleteAccount() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (Get.currentRoute == AppRoutes.deleteAccount) {
+      return;
+    }
+
+    Get.toNamed(
+      AppRoutes.deleteAccount,
+      preventDuplicates: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
 
-    bool isDark = theme.brightness == Brightness.dark;
+    bool isDark =
+        theme.brightness == Brightness.dark;
 
     Color dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
-    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+    Color cardColor = isDark
+        ? const Color(0xFF1B1D22)
+        : Colors.white;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
             left: 6,
             right: 6,
             bottom: 8,
@@ -55,7 +71,7 @@ class AccountSettingsSection extends StatelessWidget {
                 color: colorScheme.primary,
                 size: 18,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'account'.tr,
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -81,7 +97,7 @@ class AccountSettingsSection extends StatelessWidget {
                   alpha: isDark ? 0.15 : 0.04,
                 ),
                 blurRadius: 8,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -113,6 +129,12 @@ class AccountSettingsSection extends StatelessWidget {
                     value: controller.userEmail.value,
                     onTap: _openProfileDetails,
                   ),
+                  _AccountDivider(
+                    color: dividerColor,
+                  ),
+                  _DeleteAccountTile(
+                    onTap: _openDeleteAccount,
+                  ),
                 ],
               );
             },
@@ -143,12 +165,13 @@ class _AccountTile extends StatelessWidget {
 
     Color primary = colorScheme.primary;
 
-    String displayValue = value.trim().isEmpty ? 'not_set'.tr : value;
+    String displayValue =
+    value.trim().isEmpty ? 'not_set'.tr : value;
 
     return _BouncyTileEffect(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 13,
         ),
@@ -170,7 +193,7 @@ class _AccountTile extends StatelessWidget {
                 color: primary,
               ),
             ),
-            SizedBox(width: 13),
+            const SizedBox(width: 13),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +207,7 @@ class _AccountTile extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Text(
                     displayValue,
                     maxLines: 1,
@@ -199,12 +222,93 @@ class _AccountTile extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Icon(
               CupertinoIcons.chevron_right,
               size: 18,
               color: colorScheme.onSurfaceVariant.withValues(
                 alpha: 0.55,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteAccountTile extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _DeleteAccountTile({
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
+    Color errorColor = colorScheme.error;
+
+    return _BouncyTileEffect(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 13,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: errorColor.withValues(
+                  alpha: 0.11,
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                CupertinoIcons.delete,
+                size: 20,
+                color: errorColor,
+              ),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'delete_account'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: errorColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'delete_account_description'.tr,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              CupertinoIcons.chevron_right,
+              size: 18,
+              color: errorColor.withValues(
+                alpha: 0.70,
               ),
             ),
           ],
@@ -247,7 +351,8 @@ class _BouncyTileEffect extends StatefulWidget {
   }
 }
 
-class _BouncyTileEffectState extends State<_BouncyTileEffect> {
+class _BouncyTileEffectState
+    extends State<_BouncyTileEffect> {
   bool _isPressed = false;
 
   void _resetPressedState() {
@@ -276,7 +381,7 @@ class _BouncyTileEffectState extends State<_BouncyTileEffect> {
       onTapCancel: _resetPressedState,
       child: AnimatedScale(
         scale: _isPressed ? 0.98 : 1,
-        duration: Duration(
+        duration: const Duration(
           milliseconds: 100,
         ),
         curve: Curves.easeOutCubic,

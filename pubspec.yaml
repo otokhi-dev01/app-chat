@@ -53,6 +53,7 @@ dependencies:
   package_info_plus: ^9.0.1
   http: ^1.6.0
   flutter_secure_storage: ^10.3.1
+  country_picker: ^2.0.28
 
 dev_dependencies:
   flutter_test:
@@ -87,7 +88,6 @@ flutter:
 
   assets:
     - assets/icon/otokhi_app_logo.jpg
-    - assets/images/chat_attachment/
     - assets/images/languages/
 #    - assets/images/group/
 

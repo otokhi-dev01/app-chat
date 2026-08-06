@@ -1,6 +1,7 @@
 import 'package:appchat/screen/settings/setting_screen.dart';
 import 'package:get/get.dart';
 import '../controllers/chat/chat_controller.dart';
+import '../controllers/profile/delete_account_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
 import '../screen/auth/auth_binding.dart';
 import '../screen/auth/login_screen.dart';
@@ -21,6 +22,7 @@ import '../screen/home/home_binding.dart';
 import '../screen/home/home_screen.dart';
 import '../screen/home/save/save_message_screen.dart';
 import '../screen/home/search/search_screen.dart';
+import '../screen/profile/delete_account/delete_account_screen.dart';
 import '../screen/profile/profile_detail_screen.dart';
 import '../screen/profile/profile_edit_screen.dart';
 import '../screen/profile/qr_code/profile_qr_code_screen.dart';
@@ -35,6 +37,7 @@ import '../screen/settings/privacy_security/privacy_security_binding.dart';
 import '../screen/settings/privacy_security/privacy_security_screen.dart';
 import '../screen/settings/settings_search_screen.dart';
 import '../screen/splash/splash_screen.dart';
+import '../services/auth_service.dart';
 import 'app_route.dart';
 
 class AppPages {
@@ -109,6 +112,24 @@ class AppPages {
         Get.arguments?['destination']?.toString() ?? '',
       ),
       binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+      transitionDuration: Duration(
+        milliseconds: 250,
+      ),
+    ),
+
+    GetPage(
+      name: AppRoutes.deleteAccount,
+      page: () => DeleteAccountView(),
+      binding: BindingsBuilder(
+            () {
+          Get.lazyPut<DeleteAccountController>(
+                () => DeleteAccountController(
+              authService: Get.find<AuthService>(),
+            ),
+          );
+        },
+      ),
       transition: Transition.rightToLeft,
       transitionDuration: Duration(
         milliseconds: 250,

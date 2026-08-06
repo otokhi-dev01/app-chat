@@ -37,18 +37,15 @@ class AuthLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    SettingsController settingsController =
-    Get.find<SettingsController>();
+    SettingsController settingsController = Get.find<SettingsController>();
 
     return Scaffold(
-      backgroundColor:
-      theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () {
-          FocusManager.instance.primaryFocus
-              ?.unfocus();
+          FocusManager.instance.primaryFocus?.unfocus();
         },
         child: SafeArea(
           child: LayoutBuilder(
@@ -57,14 +54,11 @@ class AuthLayout extends StatelessWidget {
                 BoxConstraints constraints,
                 ) {
               double availableHeight =
-                  constraints.maxHeight -
-                      padding.vertical;
+                  constraints.maxHeight - padding.vertical;
 
-              double languageSpace =
-              showLanguageDropdown ? 64 : 0;
+              double languageSpace = showLanguageDropdown ? 64 : 0;
 
-              double contentHeight =
-                  availableHeight - languageSpace;
+              double contentHeight = availableHeight - languageSpace;
 
               if (contentHeight < 0) {
                 contentHeight = 0;
@@ -72,10 +66,8 @@ class AuthLayout extends StatelessWidget {
 
               return SingleChildScrollView(
                 keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior
-                    .onDrag,
-                physics:
-                const BouncingScrollPhysics(),
+                ScrollViewKeyboardDismissBehavior.onDrag,
+                physics: BouncingScrollPhysics(),
                 padding: padding,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
@@ -93,33 +85,26 @@ class AuthLayout extends StatelessWidget {
                               top: languageSpace,
                             ),
                             child: ConstrainedBox(
-                              constraints:
-                              BoxConstraints(
-                                minHeight:
-                                contentHeight,
+                              constraints: BoxConstraints(
+                                minHeight: contentHeight,
                               ),
                               child: Align(
-                                alignment:
-                                _contentAlignment,
+                                alignment: _contentAlignment,
                                 child: SizedBox(
-                                  width:
-                                  double.infinity,
+                                  width: double.infinity,
                                   child: child,
                                 ),
                               ),
                             ),
                           ),
-
                           if (showLanguageDropdown)
                             Positioned(
                               top: 0,
                               left: 0,
                               child: SizedBox(
                                 width: 130,
-                                child:
-                                AppLanguageDropdown(
-                                  controller:
-                                  settingsController,
+                                child: AppLanguageDropdown(
+                                  controller: settingsController,
                                 ),
                               ),
                             ),

@@ -20,6 +20,18 @@ final Map<String, String> kmKH = {
   'មិនទាន់មានគណនីមែនទេ?',
   'create_account': 'បង្កើតគណនី',
 
+  'delete_account': 'លុបគណនី',
+  'delete_account_question': 'តើអ្នកចង់លុបគណនីមែនទេ?',
+  'delete_account_confirmation':
+  'សកម្មភាពនេះនឹងលុបគណនីរបស់អ្នកជាអចិន្ត្រៃយ៍ និងមិនអាចស្ដារឡើងវិញបានទេ។ តើអ្នកពិតជាចង់បន្តមែនទេ?',
+  'cancel': 'បោះបង់',
+  'delete_permanently': 'លុបជាអចិន្ត្រៃយ៍',
+  'back': 'ត្រឡប់ក្រោយ',
+  'permanently_delete_account': 'លុបគណនីជាអចិន្ត្រៃយ៍',
+  'delete_account_warning_desc':
+  'គណនីរបស់អ្នក និងទិន្នន័យទាំងអស់ដែលពាក់ព័ន្ធនឹងត្រូវលុបជាអចិន្ត្រៃយ៍។ សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។',
+  'deleting_account': 'កំពុងលុបគណនី...',
+
   'about': 'អំពីកម្មវិធី',
   'app_version': 'កំណែកម្មវិធី',
   'tap_to_copy': 'ចុចដើម្បីចម្លង',
@@ -75,7 +87,6 @@ final Map<String, String> kmKH = {
 'phone': 'លេខទូរស័ព្ទ',
 'not_set': 'មិនទាន់បានកំណត់',
 
-  'back': 'ត្រឡប់ក្រោយ',
   'forgot_password_title':
   'ភ្លេចពាក្យសម្ងាត់?',
   'forgot_password_description':
@@ -92,12 +103,54 @@ final Map<String, String> kmKH = {
   'reset_link_sent_message':
   'សូមពិនិត្យអ៊ីមែលរបស់អ្នកសម្រាប់ការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញ។',
 
+  'account_deleted': 'បានលុបគណនី',
+  'account_deleted_permanently_message':
+  'គណនីរបស់អ្នកត្រូវបានលុបជាអចិន្ត្រៃយ៍ដោយជោគជ័យ។',
+  'unable_to_delete_account': 'មិនអាចលុបគណនីបាន',
+  'unable_to_delete_account_try_again':
+  'មិនអាចលុបគណនីរបស់អ្នកបានទេ។ សូមព្យាយាមម្ដងទៀត។',
+
+  'verify_code': 'ផ្ទៀងផ្ទាត់លេខកូដ',
+  'verify_otp': 'លេខកូដផ្ទៀងផ្ទាត់',
+  'six_digit_code': 'លេខកូដផ្ទៀងផ្ទាត់ ៦ ខ្ទង់',
+  'sent_code_description':
+  'យើងបានផ្ញើលេខកូដផ្ទៀងផ្ទាត់ ៦ ខ្ទង់។ សូមបញ្ចូលលេខកូដខាងក្រោមដើម្បីបន្ត។',
+  'sent_code_to_destination':
+  'យើងបានផ្ញើលេខកូដផ្ទៀងផ្ទាត់ ៦ ខ្ទង់ទៅកាន់ @destination។',
+  'enter_6_digit_code': 'សូមបញ្ចូលលេខកូដទាំង ៦ ខ្ទង់។',
+  'verifying': 'កំពុងផ្ទៀងផ្ទាត់...',
+  'didnt_receive_code': 'មិនបានទទួលលេខកូដមែនទេ?',
+  'resend_in': 'ផ្ញើម្ដងទៀតក្នុងរយៈពេល @time',
+  'resend_code': 'ផ្ញើលេខកូដម្ដងទៀត',
+  'change_email': 'ប្ដូរអ៊ីមែល ឬលេខទូរសព្ទ',
+
+  'api_not_connected': 'មិនទាន់បានភ្ជាប់ API',
+  'connect_verify_otp_api':
+  'សូមភ្ជាប់ API ផ្ទៀងផ្ទាត់ មុនពេលផ្ទៀងផ្ទាត់លេខកូដ។',
+  'connect_resend_otp_api':
+  'សូមភ្ជាប់ API ផ្ញើលេខកូដម្ដងទៀតជាមុនសិន។',
+
+  'otp_verified': 'បានផ្ទៀងផ្ទាត់លេខកូដ',
+  'verification_code_confirmed':
+  'លេខកូដផ្ទៀងផ្ទាត់របស់អ្នកត្រូវបានបញ្ជាក់ដោយជោគជ័យ។',
+  'verification_failed': 'ការផ្ទៀងផ្ទាត់បរាជ័យ',
+  'invalid_or_expired_code':
+  'លេខកូដមិនត្រឹមត្រូវ ឬបានផុតកំណត់។',
+  'invalid_or_expired_code_message':
+  'លេខកូដផ្ទៀងផ្ទាត់មិនត្រឹមត្រូវ ឬបានផុតកំណត់។ សូមព្យាយាមម្ដងទៀត។',
+
+  'code_sent': 'បានផ្ញើលេខកូដ',
+  'new_verification_code_sent':
+  'លេខកូដផ្ទៀងផ្ទាត់ថ្មីត្រូវបានផ្ញើរួចរាល់។',
+  'unable_to_resend': 'មិនអាចផ្ញើម្ដងទៀតបាន',
+  'unable_to_resend_code_message':
+  'មិនអាចផ្ញើលេខកូដផ្ទៀងផ្ទាត់ម្ដងទៀតបានទេ។ សូមព្យាយាមម្ដងទៀត។',
+
 // Account editing
 'edit': 'កែប្រែ @field',
 'edit_button': 'កែប្រែ',
 'save': 'រក្សាទុក',
 'saving': 'កំពុងរក្សាទុក...',
-'cancel': 'បោះបង់',
 'close': 'បិទ',
 'update_account_information':
 'ធ្វើបច្ចុប្បន្នភាពព័ត៌មានគណនីរបស់អ្នក',
@@ -112,8 +165,6 @@ final Map<String, String> kmKH = {
   'confirm_password': 'បញ្ជាក់ពាក្យសម្ងាត់',
   'creating_account': 'កំពុងបង្កើតគណនី...',
   'already_have_account': 'មានគណនីរួចហើយ?',
-  'api_not_connected':
-  'មិនទាន់ភ្ជាប់ API',
   'forgot_password_api_not_connected_message':
   'សូមភ្ជាប់ API ភ្លេចពាក្យសម្ងាត់ ដើម្បីបន្ត។',
 

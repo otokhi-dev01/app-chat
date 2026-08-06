@@ -27,7 +27,7 @@ class SplashScreen extends StatelessWidget {
           () {
         if (Get.currentRoute == AppRoutes.splash) {
           Get.offAllNamed(
-            AppRoutes.home,
+            AppRoutes.phoneInput,
           );
         }
       },

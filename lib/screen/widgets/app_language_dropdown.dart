@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,41 +16,50 @@ class AppLanguageDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    Color fieldColor =
-        theme.inputDecorationTheme.fillColor ??
-            colorScheme.surface;
+    Color fieldColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+
+    Color borderColor = isDark
+        ? Colors.white.withValues(
+      alpha: 0.08,
+    )
+        : Colors.black.withValues(
+      alpha: 0.06,
+    );
+
+    Color menuBgColor = isDark ? Color(0xFF24272E) : Colors.white;
 
     return Obx(
           () {
         return DropdownButtonFormField<AppLanguage>(
-          value: controller.selectedLanguage.value,
+          initialValue: controller.selectedLanguage.value,
           isExpanded: true,
-          dropdownColor: colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          dropdownColor: menuBgColor,
+          borderRadius: BorderRadius.circular(16),
           menuMaxHeight: 280,
           isDense: true,
           icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
+            CupertinoIcons.chevron_down,
             color: colorScheme.onSurfaceVariant,
-            size: 18,
+            size: 14,
           ),
           decoration: InputDecoration(
             filled: true,
             fillColor: fieldColor,
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 8,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: colorScheme.outlineVariant,
+                color: borderColor,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
                 color: colorScheme.primary,
                 width: 1.4,
@@ -78,8 +88,7 @@ class AppLanguageDropdown extends StatelessWidget {
                 title: 'English',
                 subtitle: 'English',
                 isSelected:
-                controller.selectedLanguage.value ==
-                    AppLanguage.english,
+                controller.selectedLanguage.value == AppLanguage.english,
               ),
             ),
             DropdownMenuItem<AppLanguage>(
@@ -89,8 +98,7 @@ class AppLanguageDropdown extends StatelessWidget {
                 title: 'ខ្មែរ',
                 subtitle: 'Khmer (Cambodia)',
                 isSelected:
-                controller.selectedLanguage.value ==
-                    AppLanguage.khmer,
+                controller.selectedLanguage.value == AppLanguage.khmer,
               ),
             ),
             DropdownMenuItem<AppLanguage>(
@@ -100,8 +108,7 @@ class AppLanguageDropdown extends StatelessWidget {
                 title: '中文',
                 subtitle: 'Chinese',
                 isSelected:
-                controller.selectedLanguage.value ==
-                    AppLanguage.chinese,
+                controller.selectedLanguage.value == AppLanguage.chinese,
               ),
             ),
           ],
@@ -112,8 +119,7 @@ class AppLanguageDropdown extends StatelessWidget {
               return;
             }
 
-            FocusManager.instance.primaryFocus
-                ?.unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
 
             controller.changeLanguage(
               language,
@@ -142,19 +148,18 @@ class _SelectedLanguage extends StatelessWidget {
       children: [
         Text(
           _flag,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
           ),
         ),
-        const SizedBox(
+        SizedBox(
           width: 6,
         ),
         Text(
           _shortLabel,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall
-              ?.copyWith(
+          style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
@@ -176,7 +181,6 @@ class _SelectedLanguage extends StatelessWidget {
     }
   }
 
-  // Short code instead of full name to keep the closed button compact
   String get _shortLabel {
     switch (language) {
       case AppLanguage.english:
@@ -213,41 +217,36 @@ class _LanguageOption extends StatelessWidget {
       children: [
         Text(
           flag,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
           ),
         ),
-        const SizedBox(
+        SizedBox(
           width: 10,
         ),
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: isSelected
                       ? colorScheme.primary
                       : colorScheme.onSurface,
-                  fontWeight: isSelected
-                      ? FontWeight.w700
-                      : FontWeight.w600,
+                  fontWeight:
+                  isSelected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
               Text(
                 subtitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
@@ -256,7 +255,7 @@ class _LanguageOption extends StatelessWidget {
         ),
         if (isSelected)
           Icon(
-            Icons.check_circle_rounded,
+            CupertinoIcons.checkmark,
             color: colorScheme.primary,
             size: 16,
           ),

@@ -20,6 +20,18 @@ final Map<String, String> enUS = {
   'add_members': 'Add Members',
   'folder_name': 'Folder Name',
 
+  'delete_account': 'Delete Account',
+  'delete_account_question': 'Delete your account?',
+  'delete_account_confirmation':
+  'This action is permanent and cannot be undone. Are you sure you want to continue?',
+  'cancel': 'Cancel',
+  'delete_permanently': 'Delete Permanently',
+  'back': 'Back',
+  'permanently_delete_account': 'Permanently Delete Account',
+  'delete_account_warning_desc':
+  'Your account and all associated data will be permanently deleted. This action cannot be undone.',
+  'deleting_account': 'Deleting Account...',
+
 
   'welcome_back': 'Welcome Back',
   'login_continue_chatting':
@@ -89,7 +101,6 @@ final Map<String, String> enUS = {
 'phone': 'Phone number',
 'not_set': 'Not set',
 
-  'back': 'Back',
   'forgot_password_title':
   'Forgot Password?',
   'forgot_password_description':
@@ -106,12 +117,52 @@ final Map<String, String> enUS = {
   'reset_link_sent_message':
   'Please check your email for password reset instructions.',
 
+  'account_deleted': 'Account Deleted',
+  'account_deleted_permanently_message':
+  'Your account has been permanently deleted.',
+  'unable_to_delete_account': 'Unable to Delete Account',
+  'unable_to_delete_account_try_again':
+  'Unable to delete your account. Please try again.',
+  'verify_code': 'Verify Code',
+  'verify_otp': 'Verification Code',
+  'six_digit_code': 'Six-digit verification code',
+  'sent_code_description':
+  'We sent a 6-digit verification code. Enter it below to continue.',
+  'sent_code_to_destination':
+  'We sent a 6-digit verification code to @destination.',
+  'enter_6_digit_code': 'Please enter the complete 6-digit code.',
+  'verifying': 'Verifying...',
+  'didnt_receive_code': "Didn't receive the code?",
+  'resend_in': 'Resend in @time',
+  'resend_code': 'Resend Code',
+  'change_email': 'Change Email or Phone',
+
+  'api_not_connected': 'API Not Connected',
+  'connect_verify_otp_api':
+  'Please connect the verification API before verifying the code.',
+  'connect_resend_otp_api':
+  'Please connect the resend API before requesting another code.',
+
+  'otp_verified': 'Code Verified',
+  'verification_code_confirmed':
+  'Your verification code has been confirmed.',
+  'verification_failed': 'Verification Failed',
+  'invalid_or_expired_code': 'The code is invalid or has expired.',
+  'invalid_or_expired_code_message':
+  'The verification code is invalid or has expired. Please try again.',
+
+  'code_sent': 'Code Sent',
+  'new_verification_code_sent':
+  'A new verification code has been sent.',
+  'unable_to_resend': 'Unable to Resend',
+  'unable_to_resend_code_message':
+  'Unable to resend the verification code. Please try again.',
+
 // Account editing
 'edit': 'Edit @field',
 'edit_button': 'Edit',
 'save': 'Save',
 'saving': 'Saving...',
-'cancel': 'Cancel',
 'close': 'Close',
 'update_account_information':
 'Update your account information',
@@ -119,7 +170,6 @@ final Map<String, String> enUS = {
 
   'back_to_login': 'Back to Login',
 
-  'api_not_connected': 'API Not Connected',
   'forgot_password_api_not_connected_message':
   'Connect your forgot-password API to continue.',
 

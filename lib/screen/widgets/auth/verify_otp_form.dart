@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
 import '../common/app_feedback.dart';
 
 class VerifyOtpForm extends StatefulWidget {
@@ -11,7 +13,7 @@ class VerifyOtpForm extends StatefulWidget {
   final Future<void> Function()? onResend;
   final VoidCallback? onVerified;
 
- const VerifyOtpForm({
+  const VerifyOtpForm({
     super.key,
     required this.destination,
     this.onVerify,
@@ -101,7 +103,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
 
     if (otp.length != 6) {
       setState(() {
-        _errorText = 'Please enter the 6-digit verification code';
+        _errorText = 'enter_6_digit_code'.tr;
       });
 
       return;
@@ -109,9 +111,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
 
     if (widget.onVerify == null) {
       AppFeedback.showMessage(
-        title: 'API Not Connected',
-        message: 'Connect your verify OTP API to continue.',
-        icon: Icons.info_outline_rounded,
+        title: 'api_not_connected'.tr,
+        message: 'connect_verify_otp_api'.tr,
+        icon: CupertinoIcons.info_circle,
       );
 
       return;
@@ -134,9 +136,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
       verified = true;
 
       AppFeedback.showMessage(
-        title: 'OTP Verified',
-        message: 'Verification code confirmed successfully.',
-        icon: Icons.verified_outlined,
+        title: 'otp_verified'.tr,
+        message: 'verification_code_confirmed'.tr,
+        icon: CupertinoIcons.checkmark_circle,
       );
     } catch (error) {
       if (!mounted) {
@@ -144,13 +146,13 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
       }
 
       setState(() {
-        _errorText = 'Invalid or expired verification code';
+        _errorText = 'invalid_or_expired_code'.tr;
       });
 
       AppFeedback.showMessage(
-        title: 'Verification Failed',
-        message: 'The verification code is invalid or has expired.',
-        icon: Icons.error_outline_rounded,
+        title: 'verification_failed'.tr,
+        message: 'invalid_or_expired_code_message'.tr,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     } finally {
       if (mounted) {
@@ -172,9 +174,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
 
     if (widget.onResend == null) {
       AppFeedback.showMessage(
-        title: 'API Not Connected',
-        message: 'Connect your resend OTP API to continue.',
-        icon: Icons.info_outline_rounded,
+        title: 'api_not_connected'.tr,
+        message: 'connect_resend_otp_api'.tr,
+        icon: CupertinoIcons.info_circle,
       );
 
       return;
@@ -203,9 +205,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
       );
 
       AppFeedback.showMessage(
-        title: 'Code Sent',
-        message: 'A new verification code has been sent.',
-        icon: Icons.mark_email_read_outlined,
+        title: 'code_sent'.tr,
+        message: 'new_verification_code_sent'.tr,
+        icon: CupertinoIcons.mail,
       );
 
       _otpFocusNode.requestFocus();
@@ -215,9 +217,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
       }
 
       AppFeedback.showMessage(
-        title: 'Unable to Resend',
-        message: 'Unable to resend the code. Please try again.',
-        icon: Icons.error_outline_rounded,
+        title: 'unable_to_resend'.tr,
+        message: 'unable_to_resend_code_message'.tr,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     } finally {
       if (mounted) {
@@ -231,11 +233,12 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
   Widget _buildOtpInput(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
     String otp = _otpController.text;
 
     return Semantics(
-      label: 'Six digit verification code',
+      label: 'six_digit_code'.tr,
       textField: true,
       child: GestureDetector(
         onTap: () {
@@ -282,7 +285,6 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                 ),
               ),
             ),
-
             IgnorePointer(
               child: Row(
                 children: List<Widget>.generate(
@@ -294,9 +296,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                         index == (otp.length >= 6 ? 5 : otp.length);
 
                     Color backgroundColor =
-                    theme.brightness == Brightness.dark
-                        ? Color(0xFF1B1D22)
-                        : Colors.white;
+                    isDark ? Color(0xFF1B1D22) : Colors.white;
 
                     Color borderColor;
 
@@ -305,10 +305,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                     } else if (isActive) {
                       borderColor = colorScheme.primary;
                     } else {
-                      borderColor =
-                          colorScheme.outlineVariant.withValues(
-                            alpha: 0.65,
-                          );
+                      borderColor = isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.06);
                     }
 
                     return Expanded(
@@ -321,7 +320,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: backgroundColor,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: borderColor,
                             width: isActive ? 1.8 : 1,
@@ -365,24 +364,22 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
     String destination = widget.destination.trim();
 
     String description = destination.isEmpty
-        ? 'We sent a 6-digit verification code to your email.'
-        : 'We sent a 6-digit verification code to $destination.';
+        ? 'sent_code_description'.tr
+        : 'sent_code_to_destination'.trParams({'destination': destination});
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Verify OTP',
+          'verify_otp'.tr,
           textAlign: TextAlign.center,
           style: theme.textTheme.headlineMedium?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
-
         SizedBox(height: 8),
-
         Text(
           description,
           textAlign: TextAlign.center,
@@ -391,9 +388,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             height: 1.4,
           ),
         ),
-
         SizedBox(height: 38),
-
         Align(
           alignment: Alignment.center,
           child: ConstrainedBox(
@@ -403,7 +398,6 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             child: _buildOtpInput(context),
           ),
         ),
-
         if (_errorText != null) ...[
           SizedBox(height: 10),
           Text(
@@ -414,11 +408,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             ),
           ),
         ],
-
         SizedBox(height: 24),
-
         SizedBox(
-          height: 55,
+          height: 52,
           child: FilledButton(
             onPressed: _isVerifying ? null : _verifyOtp,
             style: FilledButton.styleFrom(
@@ -429,7 +421,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
               ),
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
             child: AnimatedSwitcher(
@@ -442,16 +434,16 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 21,
-                    height: 21,
+                    width: 20,
+                    height: 20,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2.4,
+                      strokeWidth: 2.2,
                       color: colorScheme.onPrimary,
                     ),
                   ),
                   SizedBox(width: 10),
                   Text(
-                    'Verifying...',
+                    'verifying'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -460,32 +452,29 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                 ],
               )
                   : Text(
-                'Verify Code',
+                'verify_code'.tr,
                 key: ValueKey<String>(
                   'verify-otp-button',
                 ),
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
         ),
-
         SizedBox(height: 16),
-
         Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
-              "Didn't receive the code?",
+              'didnt_receive_code'.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-
             TextButton(
               onPressed: _secondsRemaining == 0 &&
                   !_isResending &&
@@ -503,8 +492,8 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
               )
                   : Text(
                 _secondsRemaining > 0
-                    ? 'Resend in $_countdownText'
-                    : 'Resend Code',
+                    ? 'resend_in'.trParams({'time': _countdownText})
+                    : 'resend_code'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                 ),
@@ -512,7 +501,6 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             ),
           ],
         ),
-
         Center(
           child: TextButton(
             onPressed: _isVerifying || _isResending
@@ -522,7 +510,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
               Get.back();
             },
             child: Text(
-              'Change Email',
+              'change_email'.tr,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
               ),

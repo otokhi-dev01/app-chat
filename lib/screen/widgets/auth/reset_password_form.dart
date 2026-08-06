@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../common/app_feedback.dart';
 import 'auth_text_field.dart';
 
@@ -20,9 +22,7 @@ class ResetPasswordForm extends StatefulWidget {
 class _ResetPasswordFormState extends State<ResetPasswordForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _passwordController =
-  TextEditingController();
-
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
   TextEditingController();
 
@@ -81,7 +81,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
       AppFeedback.showMessage(
         title: 'api_not_connected'.tr,
         message: 'connect_reset_password_api'.tr,
-        icon: Icons.info_outline_rounded,
+        icon: CupertinoIcons.info_circle,
       );
 
       return;
@@ -103,7 +103,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
       AppFeedback.showMessage(
         title: 'password_updated'.tr,
         message: 'password_reset_successfully'.tr,
-        icon: Icons.check_circle_outline_rounded,
+        icon: CupertinoIcons.checkmark_circle,
       );
     } catch (error) {
       if (!mounted) {
@@ -113,7 +113,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
       AppFeedback.showMessage(
         title: 'reset_failed'.tr,
         message: 'unable_to_reset_password'.tr,
-        icon: Icons.error_outline_rounded,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     } finally {
       if (mounted) {
@@ -161,10 +161,10 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
             controller: _passwordController,
             focusNode: _passwordFocusNode,
             label: 'new_password'.tr,
-            icon: Icons.lock_outline_rounded,
+            icon: CupertinoIcons.lock,
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.next,
-            autofillHints: [
+            autofillHints: const [
               AutofillHints.newPassword,
             ],
             validator: _validatePassword,
@@ -182,8 +182,9 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
               },
               icon: Icon(
                 _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+                    ? CupertinoIcons.eye
+                    : CupertinoIcons.eye_slash,
+                size: 20,
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
@@ -195,10 +196,10 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
             controller: _confirmPasswordController,
             focusNode: _confirmPasswordFocusNode,
             label: 'confirm_new_password'.tr,
-            icon: Icons.lock_reset_rounded,
+            icon: CupertinoIcons.lock_shield,
             obscureText: _obscureConfirmPassword,
             textInputAction: TextInputAction.done,
-            autofillHints: [
+            autofillHints: const [
               AutofillHints.newPassword,
             ],
             validator: _validateConfirmPassword,
@@ -211,14 +212,14 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                   : 'hide_password'.tr,
               onPressed: () {
                 setState(() {
-                  _obscureConfirmPassword =
-                  !_obscureConfirmPassword;
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
                 });
               },
               icon: Icon(
                 _obscureConfirmPassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+                    ? CupertinoIcons.eye
+                    : CupertinoIcons.eye_slash,
+                size: 20,
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
@@ -227,7 +228,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           SizedBox(height: 24),
 
           SizedBox(
-            height: 55,
+            height: 52,
             child: FilledButton(
               onPressed: _isLoading ? null : _resetPassword,
               style: FilledButton.styleFrom(
@@ -238,7 +239,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                 ),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: AnimatedSwitcher(
@@ -251,10 +252,10 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 21,
-                      height: 21,
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(
-                        strokeWidth: 2.4,
+                        strokeWidth: 2.2,
                         color: colorScheme.onPrimary,
                       ),
                     ),
@@ -274,7 +275,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                     'reset-password-button',
                   ),
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -285,18 +286,14 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           SizedBox(height: 16),
 
           Center(
-            child: TextButton.icon(
+            child: TextButton(
               onPressed: _isLoading
                   ? null
                   : () {
                 FocusManager.instance.primaryFocus?.unfocus();
                 Get.back();
               },
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                size: 19,
-              ),
-              label: Text(
+              child: Text(
                 'back_to_login'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,

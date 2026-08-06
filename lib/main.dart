@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'app_binding.dart';
 import 'controllers/notification/notification_controller.dart';
 import 'controllers/profile/profile_controller.dart';
 import 'controllers/settings/settings_controller.dart';
@@ -36,7 +37,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({
+  const MyApp({
     super.key,
   });
 
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.dark,
           themeMode:
           settingsController.themeMode.value,
-
+          initialBinding: AppBinding(),
           initialRoute: AppRoutes.splash,
           getPages: AppPages.pages,
         );
