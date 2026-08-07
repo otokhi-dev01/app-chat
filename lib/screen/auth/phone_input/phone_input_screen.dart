@@ -458,7 +458,7 @@ class PhoneInputScreen extends StatelessWidget {
     CountryPickerSheet.show(
       context: context,
       controller: controller,
-      favoriteIsoCodes: ['KH', 'US', 'ZHA', 'GB'], // Updated parameter name
+      favoriteIsoCodes: ['KH', 'US', 'CN', 'GB'], // Updated parameter name
     );
   }
 }

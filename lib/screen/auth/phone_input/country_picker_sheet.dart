@@ -9,13 +9,13 @@ import '../../auth/telegram_login_controller.dart';
 class CountryPickerSheet {
   CountryPickerSheet._();
 
-  /// Opens the country picker modal with native haptic feedback and search UI.
+  /// Opens the country picker modal with native haptic feedback and chat search style UI.
   static Future<void> show({
     required BuildContext context,
     required TelegramLoginController controller,
     List<String>? favoriteIsoCodes,
   }) async {
-    // Light haptic feedback on sheet open (matching HomeChatActionsSheet)
+    // Light haptic feedback on sheet open
     HapticFeedback.lightImpact();
 
     await showModalBottomSheet<void>(
@@ -27,7 +27,8 @@ class CountryPickerSheet {
       builder: (BuildContext sheetContext) {
         return _CountryPickerSheetContent(
           controller: controller,
-          favoriteIsoCodes: favoriteIsoCodes ?? const ['KH', 'US', 'TH', 'SG', 'GB'],
+          favoriteIsoCodes:
+          favoriteIsoCodes ?? const ['KH', 'US', 'TH', 'SG', 'GB'],
         );
       },
     );
@@ -70,6 +71,7 @@ class __CountryPickerSheetContentState
   }
 
   void _clearSearch() {
+    HapticFeedback.lightImpact();
     _searchController.clear();
     setState(() {
       _searchQuery = '';
@@ -85,13 +87,16 @@ class __CountryPickerSheetContentState
       final String name = country.name.toLowerCase();
       final String code = country.phoneCode.toLowerCase();
       final String iso = country.countryCode.toLowerCase();
-      return name.contains(query) || code.contains(query) || iso.contains(query);
+      return name.contains(query) ||
+          code.contains(query) ||
+          iso.contains(query);
     }).toList();
   }
 
   List<Country> get _favoriteCountries {
     return _allCountries.where((Country country) {
-      return widget.favoriteIsoCodes.contains(country.countryCode.toUpperCase());
+      return widget.favoriteIsoCodes
+          .contains(country.countryCode.toUpperCase());
     }).toList();
   }
 
@@ -103,7 +108,7 @@ class __CountryPickerSheetContentState
 
     Color sheetColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
     Color cardColor = isDark ? const Color(0xFF26282E) : Colors.white;
-    Color inputColor = isDark ? const Color(0xFF26282E) : theme.inputDecorationTheme.fillColor ?? colorScheme.surfaceContainerHighest;
+    Color searchBackground = isDark ? const Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
@@ -135,7 +140,7 @@ class __CountryPickerSheetContentState
 
           const SizedBox(height: 12),
 
-          // Search Header (Matching SettingsSearchScreen search bar)
+          // Search Header (Matching Chat Message Search style)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
@@ -144,7 +149,7 @@ class __CountryPickerSheetContentState
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
-                      color: inputColor,
+                      color: searchBackground,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: borderColor),
                       boxShadow: [
@@ -161,6 +166,9 @@ class __CountryPickerSheetContentState
                       controller: _searchController,
                       focusNode: _searchFocusNode,
                       textInputAction: TextInputAction.search,
+                      keyboardAppearance:
+                      isDark ? Brightness.dark : Brightness.light,
+                      cursorColor: colorScheme.primary,
                       onChanged: (String val) {
                         setState(() {
                           _searchQuery = val;
@@ -201,8 +209,12 @@ class __CountryPickerSheetContentState
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        contentPadding:
+                        const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -419,7 +431,7 @@ class _CountrySearchTile extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
           child: Row(
             children: [
-              // Flag Container Box (Matching SettingsSearchTile icon box)
+              // Flag Container Box
               Container(
                 width: 42,
                 height: 42,
