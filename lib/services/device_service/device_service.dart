@@ -1,4 +1,4 @@
-import '../models/device_session_model.dart';
+import '../../models/device_session_model.dart';
 
 abstract class DeviceService {
   Future<List<DeviceSessionModel>> getSessions();

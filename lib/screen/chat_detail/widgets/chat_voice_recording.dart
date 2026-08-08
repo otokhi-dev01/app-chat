@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// UPDATED: Unit UI active voice recording bar featuring pulse recording indicator, slide-to-cancel chevrons, timer, and action buttons
 class ChatVoiceRecordingBar extends StatefulWidget {
   final double dragDx;
   final double cancelThreshold;
@@ -25,31 +27,30 @@ class ChatVoiceRecordingBar extends StatefulWidget {
   }
 }
 
-class _ChatVoiceRecordingBarState
-    extends State<ChatVoiceRecordingBar>
+class _ChatVoiceRecordingBarState extends State<ChatVoiceRecordingBar>
     with TickerProviderStateMixin {
   Timer? _timer;
-
   Duration _elapsed = Duration.zero;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  // Bouncing "slide to cancel" chevrons — Telegram-style nudge
+  // UPDATED: Bouncing "slide to cancel" chevrons animation controller
   late AnimationController _chevronController;
 
   @override
   void initState() {
     super.initState();
 
+    // UPDATED: Initialize 850ms pulse animation for red recording indicator
     _pulseController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 850),
+      duration: const Duration(milliseconds: 850),
     );
 
     _pulseAnimation = Tween<double>(
       begin: 0.35,
-      end: 1,
+      end: 1.0,
     ).animate(
       CurvedAnimation(
         parent: _pulseController,
@@ -57,42 +58,31 @@ class _ChatVoiceRecordingBarState
       ),
     );
 
-    _pulseController.repeat(
-      reverse: true,
-    );
+    _pulseController.repeat(reverse: true);
 
+    // UPDATED: Initialize 900ms repeat animation for bouncing chevrons
     _chevronController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 900),
     )..repeat();
 
+    // UPDATED: Periodic 1-second timer tracking elapsed recording duration
     _timer = Timer.periodic(
-      Duration(seconds: 1),
+      const Duration(seconds: 1),
           (_) {
-        if (!mounted) {
-          return;
-        }
-
+        if (!mounted) return;
         setState(() {
-          _elapsed += Duration(seconds: 1);
+          _elapsed += const Duration(seconds: 1);
         });
       },
     );
   }
 
+  /// UPDATED: Formats elapsed recording duration as MM:SS with tabular figures
   String _formatDuration(Duration duration) {
-    String twoDigits(int value) {
-      return value.toString().padLeft(2, '0');
-    }
-
-    String minutes = twoDigits(
-      duration.inMinutes.remainder(60),
-    );
-
-    String seconds = twoDigits(
-      duration.inSeconds.remainder(60),
-    );
-
+    String twoDigits(int value) => value.toString().padLeft(2, '0');
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
     return '$minutes:$seconds';
   }
 
@@ -105,55 +95,46 @@ class _ChatVoiceRecordingBarState
     _timer?.cancel();
     _pulseController.dispose();
     _chevronController.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // UPDATED: Retrieve current theme and colorScheme for dynamic styling
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isDark = theme.brightness == Brightness.dark;
 
-    bool isDark =
-        theme.brightness == Brightness.dark;
-
-    double progress = (
-        widget.dragDx / widget.cancelThreshold
-    ).clamp(0.0, 1.0);
-
+    // UPDATED: Calculates cancel drag progress (0.0 to 1.0)
+    double progress =
+    (widget.dragDx / widget.cancelThreshold).clamp(0.0, 1.0);
     bool nearCancel = progress >= 0.65;
 
-    double translationX = widget.dragDx.clamp(
-      widget.cancelThreshold,
-      0.0,
-    ).toDouble();
+    double translationX =
+    widget.dragDx.clamp(widget.cancelThreshold, 0.0).toDouble();
 
-    Color backgroundColor = isDark
-        ? Color(0xFF1B1D22)
-        : Colors.white;
-
+    // UPDATED: Standardized unit UI colors for glass surfaces, borders, and danger highlights
+    Color backgroundColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
     Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.09)
-        : Colors.black.withValues(alpha: 0.07);
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     Color secondaryBackground = isDark
-        ? Colors.white.withValues(alpha: 0.07)
+        ? const Color(0xFF26282E)
         : Colors.black.withValues(alpha: 0.035);
 
     Color dangerColor = colorScheme.error;
 
     return AnimatedContainer(
-      duration: Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 180),
       curve: Curves.easeOutCubic,
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 7,
       ),
       decoration: BoxDecoration(
         color: nearCancel
-            ? dangerColor.withValues(
-          alpha: isDark ? 0.16 : 0.08,
-        )
+            ? dangerColor.withValues(alpha: isDark ? 0.16 : 0.08)
             : backgroundColor,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
@@ -164,41 +145,40 @@ class _ChatVoiceRecordingBarState
       ),
       child: Row(
         children: [
+          // UPDATED: Cancel recording button with Cupertino xmark icon
           Material(
             color: dangerColor.withValues(alpha: 0.11),
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             child: InkWell(
               onTap: widget.onCancel,
-              customBorder: CircleBorder(),
+              customBorder: const CircleBorder(),
               child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Icon(
-                  Icons.close_rounded,
+                  CupertinoIcons.xmark,
                   color: dangerColor,
-                  size: 23,
+                  size: 20,
                 ),
               ),
             ),
           ),
 
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
 
+          // UPDATED: Recording status container with pulsing red dot, timer, and slide-to-cancel prompt
           Expanded(
             child: Container(
               height: 44,
-              padding: EdgeInsets.symmetric(
-                horizontal: 13,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 13),
               decoration: BoxDecoration(
                 color: secondaryBackground,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: borderColor,
-                ),
+                border: Border.all(color: borderColor),
               ),
               child: Row(
                 children: [
+                  // UPDATED: Pulsing red dot recording indicator
                   FadeTransition(
                     opacity: _pulseAnimation,
                     child: Container(
@@ -211,61 +191,51 @@ class _ChatVoiceRecordingBarState
                     ),
                   ),
 
-                  SizedBox(width: 9),
+                  const SizedBox(width: 9),
 
+                  // UPDATED: Elapsed timer text with tabular figures to prevent width jumping
                   Text(
                     _formatDuration(_elapsed),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
-                      fontFeatures: [
-                        FontFeature.tabularFigures(),
-                      ],
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
 
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
+                  // UPDATED: Slide-to-cancel prompt or tap-send instructions
                   Expanded(
                     child: widget.isHoldMode
                         ? Transform.translate(
-                      offset: Offset(
-                        translationX * 0.20,
-                        0,
-                      ),
+                      offset: Offset(translationX * 0.20, 0),
                       child: AnimatedBuilder(
-                        // Stop bouncing once the user is committed to
-                        // cancelling — Telegram freezes the chevrons here.
                         animation: _chevronController,
                         builder: (context, child) {
                           double bounce = nearCancel
                               ? 0.0
-                              : math.sin(
-                            _chevronController.value *
-                                2 *
-                                math.pi,
-                          ) * 3;
-
+                              : math.sin(_chevronController.value *
+                              2 *
+                              math.pi) *
+                              3;
                           return Transform.translate(
                             offset: Offset(bounce, 0),
                             child: child,
                           );
                         },
                         child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons
-                                  .keyboard_double_arrow_left_rounded,
+                              CupertinoIcons.chevron_left_2,
                               color: nearCancel
                                   ? dangerColor
-                                  : colorScheme
-                                  .onSurfaceVariant,
-                              size: 18,
+                                  : colorScheme.onSurfaceVariant,
+                              size: 16,
                             ),
 
-                            SizedBox(width: 3),
+                            const SizedBox(width: 4),
 
                             Flexible(
                               child: Text(
@@ -273,15 +243,11 @@ class _ChatVoiceRecordingBarState
                                     ? 'Release to cancel'
                                     : 'Slide left to cancel',
                                 maxLines: 1,
-                                overflow:
-                                TextOverflow.ellipsis,
-                                style: theme
-                                    .textTheme.bodySmall
-                                    ?.copyWith(
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   color: nearCancel
                                       ? dangerColor
-                                      : colorScheme
-                                      .onSurfaceVariant,
+                                      : colorScheme.onSurfaceVariant,
                                   fontWeight: nearCancel
                                       ? FontWeight.w700
                                       : FontWeight.w500,
@@ -297,10 +263,8 @@ class _ChatVoiceRecordingBarState
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style:
-                      theme.textTheme.bodySmall?.copyWith(
-                        color:
-                        colorScheme.onSurfaceVariant,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -310,8 +274,9 @@ class _ChatVoiceRecordingBarState
             ),
           ),
 
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
 
+          // UPDATED: Right action indicator (mic or send button)
           widget.isHoldMode
               ? Container(
             width: 44,
@@ -320,34 +285,30 @@ class _ChatVoiceRecordingBarState
             decoration: BoxDecoration(
               color: nearCancel
                   ? dangerColor.withValues(alpha: 0.13)
-                  : colorScheme.primary.withValues(
-                alpha: 0.11,
-              ),
+                  : colorScheme.primary.withValues(alpha: 0.11),
               shape: BoxShape.circle,
             ),
             child: Icon(
               nearCancel
-                  ? Icons.delete_outline_rounded
-                  : Icons.mic_rounded,
-              color: nearCancel
-                  ? dangerColor
-                  : colorScheme.primary,
-              size: 24,
+                  ? CupertinoIcons.trash
+                  : CupertinoIcons.mic_fill,
+              color: nearCancel ? dangerColor : colorScheme.primary,
+              size: 22,
             ),
           )
               : Material(
             color: colorScheme.primary,
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             child: InkWell(
               onTap: _sendRecording,
-              customBorder: CircleBorder(),
+              customBorder: const CircleBorder(),
               child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Icon(
-                  Icons.send_rounded,
+                  CupertinoIcons.paperplane_fill,
                   color: colorScheme.onPrimary,
-                  size: 21,
+                  size: 20,
                 ),
               ),
             ),

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/navigation/main_navigation_controller.dart';
-import 'navigation/nav_drag_state.dart';
-import 'navigation/navigation_item.dart';
+import '../../../controllers/navigation/main_navigation_controller.dart';
+import 'nav_drag_state.dart';
+import 'navigation_item.dart';
 
 class MainBottomNavigation extends StatefulWidget {
   final int currentIndex;

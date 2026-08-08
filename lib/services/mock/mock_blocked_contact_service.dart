@@ -1,5 +1,5 @@
 import '../../models/blocked_contact_model.dart';
-import '../blocked_contacts_service.dart';
+import '../blocked_contact_service/blocked_contacts_service.dart';
 
 class MockBlockedContactService
     implements BlockedContactsService {

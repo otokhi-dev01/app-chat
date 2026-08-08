@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/qr_contact_scanner_controller.dart';
-import '../../widgets/qr_code/qr_sanner_camera_view.dart';
-import '../../widgets/qr_code/qr_scanner_feedback.dart';
+import '../../profile/qr_scanner/qr_sanner_camera_view.dart';
+import '../../profile/qr_scanner/qr_scanner_feedback.dart';
 
 class QrContactScannerScreen extends GetView<QrContactScannerController> {
   const QrContactScannerScreen({

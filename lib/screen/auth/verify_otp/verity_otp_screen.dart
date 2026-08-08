@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../widgets/auth/verify_otp_form.dart';
+import 'verify_otp_form.dart';
 
 class VerifyOtpScreen extends StatelessWidget {
   final String destination;

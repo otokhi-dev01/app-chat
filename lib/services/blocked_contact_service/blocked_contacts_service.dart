@@ -1,5 +1,5 @@
 
-import '../models/blocked_contact_model.dart';
+import '../../models/blocked_contact_model.dart';
 
 abstract class BlockedContactsService {
   List<BlockedContactModel> getBlockedContacts();

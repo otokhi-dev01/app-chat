@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../models/device_session_model.dart';
-import '../../settings/device/device_session_title.dart';
+import 'device_session_title.dart';
 import 'device_action.dart';
 import 'device_section.dart';
 import 'session_comfirmation_dialog.dart';

@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 
 import '../../../models/contact_model.dart';
 import '../../controllers/contact/contact_controller.dart';
-import '../widgets/contact/contact_empty_state.dart';
-import '../widgets/contact/contact_section_header.dart';
-import '../widgets/contact/contact_title.dart';
+import 'contact_empty_state.dart';
+import 'contact_section_header.dart';
+import 'contact_title.dart';
 
 class ContactList extends StatelessWidget {
   final ContactController controller;

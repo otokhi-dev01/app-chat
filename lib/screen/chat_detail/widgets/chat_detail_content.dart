@@ -5,12 +5,12 @@ import 'chat_empty_conversation.dart';
 import 'chat_input_bar.dart';
 import 'chat_message_list.dart';
 
+/// UPDATED: Unit UI chat detail body wrapper handling content switching and sticky input positioning
 class ChatDetailContent extends StatelessWidget {
   final String chatName;
   final List<ChatMessageModel> messages;
 
   final double appBarSpace;
-
   final ScrollController scrollController;
   final TextEditingController messageController;
   final FocusNode messageFocusNode;
@@ -62,11 +62,13 @@ class ChatDetailContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // UPDATED: Main scrollable message layer filling screen behind translucent app bar
         Positioned.fill(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
+            // UPDATED: Smooth 250ms cross-fade transition when first message is sent
             child: messages.isEmpty
                 ? _buildEmptyConversation()
                 : ChatMessageList(
@@ -78,6 +80,8 @@ class ChatDetailContent extends StatelessWidget {
             ),
           ),
         ),
+
+        // UPDATED: Sticky bottom ChatInputBar aligned over scrollable content
         Positioned(
           left: 0,
           right: 0,
@@ -105,11 +109,15 @@ class ChatDetailContent extends StatelessWidget {
     );
   }
 
+  /// UPDATED: Empty conversation builder with precise padding to clear translucent header & input bar
   Widget _buildEmptyConversation() {
     return KeyedSubtree(
       key: const ValueKey('empty-conversation'),
       child: Padding(
-        padding: EdgeInsets.only(top: appBarSpace, bottom: 100),
+        padding: EdgeInsets.only(
+          top: appBarSpace,
+          bottom: 90, // UPDATED: Clears 90px bottom clearance for input bar
+        ),
         child: ChatEmptyConversation(name: chatName),
       ),
     );

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:appchat/screen/auth/verity_otp_screen.dart';
+import 'package:appchat/screen/auth/verify_otp/verity_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

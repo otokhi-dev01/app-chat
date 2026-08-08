@@ -7,12 +7,12 @@ import '../../controllers/contact/contact_controller.dart';
 import '../../controllers/notification/notification_controller.dart';
 import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
-import '../widgets/settings/about_settings_section.dart';
-import '../widgets/settings/account_screen.dart';
-import '../widgets/settings/contact_settings_section.dart';
-import '../widgets/settings/display_settings_section.dart';
-import '../widgets/settings/general_settings_section.dart';
-import '../widgets/settings/language_settings_section.dart';
+import 'section/about_settings_section.dart';
+import 'section/account_screen.dart';
+import 'section/contact_settings_section.dart';
+import 'section/display_settings_section.dart';
+import 'section/general_settings_section.dart';
+import 'section/language_settings_section.dart';
 
 class SettingScreen extends StatelessWidget {
   final bool showTopPadding;

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/settings_controller.dart';
-import 'settings_divider.dart';
+import '../language/language_settings_screen.dart';
+import 'settings_icon.dart';
 import 'settings_section_title.dart';
 
+/// UPDATED: Displays section title and a clean navigation button tile to open LanguageSettingsScreen without vibration/shake
 class LanguageSettingsSection extends StatelessWidget {
   final SettingsController controller;
 
@@ -16,321 +18,123 @@ class LanguageSettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // UPDATED: Theme awareness for dynamic light and dark mode adaptation
     ThemeData theme = Theme.of(context);
-
+    ColorScheme colorScheme = theme.colorScheme;
     bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
-
-    Color dividerColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
-
-    AppLanguage selectedLanguage = controller.currentLanguage;
+    // UPDATED: Standardized unit UI card background and border colors
+    Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
+    Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ADDED: Kept the section title above the navigation card
         SettingsSectionTitle(
           title: 'language'.tr,
           icon: CupertinoIcons.globe,
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
+
+        // UPDATED: Navigation button tile card leading to LanguageSettingsScreen
         Container(
-          width: double.infinity,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: dividerColor,
-            ),
+            border: Border.all(color: borderColor),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(
                   alpha: isDark ? 0.15 : 0.04,
                 ),
                 blurRadius: 8,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: Column(
-            children: [
-              _LanguageSectionItem(
-                title: 'english'.tr,
-                subtitle: 'English',
-                imagePath: 'assets/images/languages/english.png',
-                fallbackText: 'EN',
-                selected: selectedLanguage == AppLanguage.english,
-                onTap: () {
-                  controller.changeLanguage(
-                    AppLanguage.english,
-                  );
-                },
-              ),
-              SettingsDivider(
-                color: dividerColor,
-              ),
-              _LanguageSectionItem(
-                title: 'khmer'.tr,
-                subtitle: 'ភាសាខ្មែរ',
-                imagePath: 'assets/images/languages/khmer.png',
-                fallbackText: 'ខ',
-                selected: selectedLanguage == AppLanguage.khmer,
-                onTap: () {
-                  controller.changeLanguage(
-                    AppLanguage.khmer,
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LanguageSectionItem extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String imagePath;
-  final String fallbackText;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _LanguageSectionItem({
-    required this.title,
-    required this.subtitle,
-    required this.imagePath,
-    required this.fallbackText,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isDark = theme.brightness == Brightness.dark;
-
-    Color pressedColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.05,
-    )
-        : Colors.black.withValues(
-      alpha: 0.035,
-    );
-
-    Color backgroundColor = selected
-        ? colorScheme.primary.withValues(
-      alpha: 0.07,
-    )
-        : Colors.transparent;
-
-    return Material(
-      color: backgroundColor,
-      child: InkWell(
-        onTap: selected ? null : onTap,
-        splashColor: Colors.transparent,
-        highlightColor: pressedColor,
-        hoverColor: Colors.transparent,
-        focusColor: Colors.transparent,
-        child: SizedBox(
-          height: 70,
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 14,
-            ),
-            child: Row(
-              children: [
-                _LanguageIcon(
-                  imagePath: imagePath,
-                  fallbackText: fallbackText,
-                  selected: selected,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              // REMOVED: Removed HapticFeedback to prevent screen/device vibration
+              onTap: () {
+                Get.to(
+                      () => LanguageSettingsScreen(controller: controller),
+                  transition: Transition.cupertino,
+                  duration: const Duration(milliseconds: 280),
+                );
+              },
+              borderRadius: BorderRadius.circular(22),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
                 ),
-                SizedBox(width: 13),
-                Expanded(
-                  child: _LanguageInformation(
-                    title: title,
-                    subtitle: subtitle,
-                    selected: selected,
-                  ),
+                child: Row(
+                  children: [
+                    // UPDATED: Settings icon widget with Cupertino globe icon
+                    const SettingsIcon(
+                      icon: CupertinoIcons.globe,
+                      active: true,
+                    ),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'language'.tr,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          // UPDATED: Dynamically displays active language name (English, ភាសាខ្មែរ, or 中文)
+                          Obx(() {
+                            String activeLanguageName;
+                            final lang = controller.currentLanguage;
+                            if (lang == AppLanguage.english) {
+                              activeLanguageName = 'English';
+                            } else if (lang == AppLanguage.khmer) {
+                              activeLanguageName = 'ភាសាខ្មែរ';
+                            } else if (lang == AppLanguage.chinese) {
+                              activeLanguageName = '中文';
+                            } else {
+                              activeLanguageName = 'English';
+                            }
+
+                            return Text(
+                              activeLanguageName,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 12,
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // UPDATED: Trailing Cupertino chevron right icon
+                    Icon(
+                      CupertinoIcons.chevron_right,
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.55,
+                      ),
+                      size: 18,
+                    ),
+                  ],
                 ),
-                SizedBox(width: 12),
-                _LanguageIndicator(
-                  selected: selected,
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _LanguageIcon extends StatelessWidget {
-  final String imagePath;
-  final String fallbackText;
-  final bool selected;
-
-  const _LanguageIcon({
-    required this.imagePath,
-    required this.fallbackText,
-    required this.selected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    Color backgroundColor = selected
-        ? colorScheme.primary.withValues(
-      alpha: 0.13,
-    )
-        : colorScheme.primary.withValues(
-      alpha: 0.11,
-    );
-
-    Color borderColor = selected
-        ? colorScheme.primary
-        : colorScheme.outlineVariant.withValues(
-      alpha: 0.20,
-    );
-
-    return Container(
-      width: 42,
-      height: 42,
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: borderColor,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          imagePath,
-          width: 32,
-          height: 32,
-          fit: BoxFit.cover,
-          filterQuality: FilterQuality.high,
-          errorBuilder: (
-              BuildContext context,
-              Object error,
-              StackTrace? stackTrace,
-              ) {
-            return Container(
-              width: 32,
-              height: 32,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme.primary.withValues(alpha: 0.11),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                fallbackText,
-                style: TextStyle(
-                  color: selected
-                      ? colorScheme.onPrimary
-                      : colorScheme.primary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _LanguageInformation extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final bool selected;
-
-  const _LanguageInformation({
-    required this.title,
-    required this.subtitle,
-    required this.selected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: selected ? colorScheme.primary : colorScheme.onSurface,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 3),
-        Text(
-          subtitle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
       ],
-    );
-  }
-}
-
-class _LanguageIndicator extends StatelessWidget {
-  final bool selected;
-
-  const _LanguageIndicator({
-    required this.selected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      width: 22,
-      height: 22,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? colorScheme.primary : Colors.transparent,
-        shape: BoxShape.circle,
-        border: Border.all(
-          width: 1.5,
-          color: selected ? colorScheme.primary : colorScheme.outlineVariant,
-        ),
-      ),
-      child: selected
-          ? Icon(
-        CupertinoIcons.checkmark,
-        size: 13,
-        color: colorScheme.onPrimary,
-      )
-          : SizedBox.shrink(),
     );
   }
 }

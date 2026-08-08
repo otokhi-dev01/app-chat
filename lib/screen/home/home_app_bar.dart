@@ -1,13 +1,15 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
 import '../../route/app_route.dart';
+import 'folder_filter/home_category_filter.dart';
 import 'home_app_bar_actions.dart';
-import 'home_category_filter.dart';
+import 'home_app_bar_button.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int selectedIndex;
@@ -123,7 +125,25 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
       centerTitle: selectedIndex != 0,
-      titleSpacing: 20,
+      // UPDATED: Set titleSpacing to 0 on Profile tab so center title is balanced with leading button
+      titleSpacing: selectedIndex == 3 ? 0 : 20,
+      // ADDED: Width configuration for the leading QR Scan button container
+      leadingWidth: selectedIndex == 3 ? 58 : null,
+      // ADDED: QR Scan button placed on the LEFT side (leading) when on Profile tab (selectedIndex == 3)
+      leading: selectedIndex == 3
+          ? Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+        child: HomeAppBarActionButton(
+          tooltip: 'scan_qr'.tr,
+          icon: CupertinoIcons.qrcode_viewfinder,
+          backgroundColor: actionBackground,
+          foregroundColor: colorScheme.onSurface,
+          onPressed: () {
+            Get.toNamed(AppRoutes.qrScanner);
+          },
+        ),
+      )
+          : null,
       systemOverlayStyle: _overlayStyle(
         theme,
         isDark,
@@ -191,6 +211,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      // UPDATED: Right side actions (contains Edit Profile button when selectedIndex == 3)
       actions: [
         HomeAppBarActions(
           selectedIndex: selectedIndex,

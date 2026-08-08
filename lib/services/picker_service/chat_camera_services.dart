@@ -2,7 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../models/chat_message_model.dart';
+import '../../models/chat_message_model.dart';
 
 class ChatCameraService {
   final ImagePicker _imagePicker = ImagePicker();

@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/chat/chat_controller.dart';
-import '../../models/chat_folder_model.dart';
-import '../../models/chat_model.dart';
-import '../chat_detail/chat_detail_screen.dart';
-import '../widgets/common/app_feedback.dart'; // Imported AppFeedback
-import '../widgets/home/home_chat_archived_tile.dart';
-import '../widgets/home/home_chat_state_views.dart';
-import '../widgets/home/home_chat_tile.dart';
+import '../../../controllers/chat/chat_controller.dart';
+import '../../../models/chat_folder_model.dart';
+import '../../../models/chat_model.dart';
+import '../../chat_detail/chat_detail_screen.dart';
+import '../../widgets/app_feedback.dart'; // Imported AppFeedback
+import '../home_chat_archived_tile.dart';
+import '../home_chat_state_views.dart';
+import '../home_chat_tile.dart';
 
 class HomeChatList extends StatefulWidget {
   final ChatController controller;

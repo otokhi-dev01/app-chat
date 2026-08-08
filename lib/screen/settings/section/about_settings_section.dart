@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../common/app_feedback.dart';
+import '../../widgets/app_feedback.dart';
 import 'settings_divider.dart';
 import 'settings_navigation_title.dart';
 import 'settings_section_title.dart';

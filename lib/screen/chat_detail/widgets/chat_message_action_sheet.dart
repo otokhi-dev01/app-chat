@@ -10,19 +10,20 @@ Future<void> showChatMessageActionsSheet({
   required ChatMessageModel message,
   required VoidCallback onCopied,
   required VoidCallback onReply,
+  required VoidCallback onForward,
   required VoidCallback onDelete,
-}) {
+}) async {
   FocusManager.instance.primaryFocus?.unfocus();
 
-  bool hasText = message.text.trim().isNotEmpty;
+  final bool hasText = message.text.trim().isNotEmpty;
 
-  String messagePreview = hasText
+  final String messagePreview = hasText
       ? (message.text.length > 30
       ? '${message.text.substring(0, 30)}...'
       : message.text)
       : 'message'.tr;
 
-  return showCupertinoModalPopup<void>(
+  await showCupertinoModalPopup<void>(
     context: context,
     builder: (sheetContext) {
       return CupertinoActionSheet(
@@ -30,7 +31,7 @@ Future<void> showChatMessageActionsSheet({
           messagePreview,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -48,54 +49,71 @@ Future<void> showChatMessageActionsSheet({
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    CupertinoIcons.doc_on_doc,
-                    size: 20,
-                  ),
-                  SizedBox(width: 8),
+                  const Icon(CupertinoIcons.doc_on_doc, size: 20),
+                  const SizedBox(width: 8),
                   Text('copy'.tr),
                 ],
               ),
             ),
+
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(sheetContext);
-              Future<void>.delayed(
-                Duration(milliseconds: 100),
+              Future.delayed(
+                const Duration(milliseconds: 100),
                 onReply,
               );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  CupertinoIcons.reply,
-                  size: 20,
-                ),
-                SizedBox(width: 8),
+                const Icon(CupertinoIcons.reply, size: 20),
+                const SizedBox(width: 8),
                 Text('reply'.tr),
               ],
             ),
           ),
+
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              Future.delayed(
+                const Duration(milliseconds: 100),
+                onForward,
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.arrowshape_turn_up_right,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text('forward'.tr),
+              ],
+            ),
+          ),
+
           if (message.isMe)
             CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
                 Navigator.pop(sheetContext);
-                Future<void>.delayed(
-                  Duration(milliseconds: 100),
+                Future.delayed(
+                  const Duration(milliseconds: 100),
                   onDelete,
                 );
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     CupertinoIcons.trash,
                     size: 20,
                     color: CupertinoColors.destructiveRed,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text('delete'.tr),
                 ],
               ),
@@ -118,7 +136,7 @@ class MessageActionTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDanger;
 
-  MessageActionTile({
+  const MessageActionTile({
     super.key,
     required this.icon,
     required this.title,
@@ -128,10 +146,10 @@ class MessageActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    Color itemColor = isDanger ? colorScheme.error : colorScheme.primary;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final Color itemColor =
+    isDanger ? colorScheme.error : colorScheme.primary;
 
     return Material(
       color: Colors.transparent,
@@ -139,7 +157,7 @@ class MessageActionTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 9,
           ),
@@ -150,9 +168,7 @@ class MessageActionTile extends StatelessWidget {
                 height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: itemColor.withValues(
-                    alpha: 0.11,
-                  ),
+                  color: itemColor.withValues(alpha: 0.11),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -161,7 +177,7 @@ class MessageActionTile extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              SizedBox(width: 13),
+              const SizedBox(width: 13),
               Expanded(
                 child: Text(
                   title,

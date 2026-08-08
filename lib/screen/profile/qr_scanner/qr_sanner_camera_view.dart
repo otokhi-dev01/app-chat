@@ -8,6 +8,7 @@ import 'qr_scanner_feedback.dart';
 import 'qr_scanner_geometry.dart' as scanner_geometry;
 import 'qr_scanner_overlay.dart';
 
+/// UPDATED: Unit UI QR scanner camera view wrapping MobileScanner with auto-zoom, geometry calculations, and overlay
 class QrScannerCameraView extends StatefulWidget {
   final MobileScannerController scannerController;
 
@@ -33,12 +34,14 @@ class QrScannerCameraView extends StatefulWidget {
 class _QrScannerCameraViewState extends State<QrScannerCameraView> {
   late QrScannerAutoZoom _autoZoomController;
 
+  // UPDATED: Guard flag preventing concurrent duplicate barcode processing
   bool _isHandlingCapture = false;
 
   @override
   void initState() {
     super.initState();
 
+    // UPDATED: Initialize auto-zoom helper with active mobile scanner controller
     _autoZoomController = QrScannerAutoZoom(
       controller: widget.scannerController,
     );
@@ -50,6 +53,7 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
       ) {
     super.didUpdateWidget(oldWidget);
 
+    // UPDATED: Rebind auto-zoom helper if camera controller instance updates
     if (oldWidget.scannerController != widget.scannerController) {
       _autoZoomController = QrScannerAutoZoom(
         controller: widget.scannerController,
@@ -57,6 +61,7 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
     }
   }
 
+  /// UPDATED: Captures barcode scan events and prevents duplicate concurrent handlers
   void _handleCapture(
       BarcodeCapture capture,
       ) {
@@ -71,6 +76,7 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
     );
   }
 
+  /// UPDATED: Prepares barcode capture using auto-zoom controller before passing to onDetect
   Future<void> _prepareCapture(
       BarcodeCapture capture,
       ) async {
@@ -97,6 +103,7 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
 
   @override
   Widget build(BuildContext context) {
+    // UPDATED: Access colorScheme for theme-aware scanner overlay framing
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return OrientationBuilder(
@@ -110,14 +117,14 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
               BoxConstraints constraints,
               ) {
             double width = constraints.maxWidth;
-
             double height = constraints.maxHeight;
 
+            // UPDATED: Render camera loading view if layout bounds are non-finite or invalid
             if (!width.isFinite ||
                 !height.isFinite ||
                 width <= 0 ||
                 height <= 0) {
-              return QrCameraLoadingView();
+              return const QrCameraLoadingView();
             }
 
             Size layoutSize = Size(
@@ -125,17 +132,14 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
               height,
             );
 
-            // Pixel-space rect: used only for drawing the visible
-            // overlay frame on screen.
+            // UPDATED: Calculates pixel-space rectangle for screen overlay frame drawing
             Rect scanWindowPixels =
             scanner_geometry.QrScannerGeometry.buildScanWindowPixels(
               screenSize: layoutSize,
               orientation: orientation,
             );
 
-            // Normalized (0.0-1.0) rect: this is what
-            // mobile_scanner's scanWindow parameter actually
-            // requires.
+            // UPDATED: Calculates normalized (0.0 - 1.0) rect required by MobileScanner detection window
             Rect scanWindowNormalized =
             scanner_geometry.QrScannerGeometry.buildScanWindow(
               screenSize: layoutSize,
@@ -151,6 +155,7 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
               return true;
             }());
 
+            // UPDATED: MobileScanner camera view with tap-to-focus, scanWindow, and custom overlay
             return MobileScanner(
               controller: widget.scannerController,
               fit: BoxFit.cover,
@@ -163,22 +168,20 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
                   StackTrace stackTrace,
                   ) {
                 debugPrint(
-                  'Mobile scanner detection error: '
-                      '$error',
+                  'Mobile scanner detection error: $error',
                 );
               },
               placeholderBuilder: (
                   BuildContext context,
                   ) {
-                return QrCameraLoadingView();
+                return const QrCameraLoadingView();
               },
               errorBuilder: (
                   BuildContext context,
                   MobileScannerException error,
                   ) {
                 debugPrint(
-                  'Mobile scanner camera error: '
-                      '${error.errorCode}',
+                  'Mobile scanner camera error: ${error.errorCode}',
                 );
 
                 return QrCameraErrorView(

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/qr_contact_scanner_controller.dart';
-import '../../widgets/qr_code/qr_scanner_buttons.dart';
+import '../../profile/qr_scanner/qr_scanner_buttons.dart';
 
 class QrScannerBottomPanel extends StatelessWidget {
   final QrContactScannerController controller;

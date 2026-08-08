@@ -7,8 +7,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../models/contact_model.dart';
 import '../../models/user_model.dart';
-import '../../services/contact_service.dart';
-import '../../services/user_service.dart';
+import '../../services/contact_service/contact_service.dart';
+import '../../services/user_service/user_service.dart';
 
 class QrContactScannerController extends GetxController with WidgetsBindingObserver {
   final AppUserService appUserService;
@@ -266,7 +266,7 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
       isTorchOn.toggle();
       errorMessage.value = '';
     } catch (error) {
-      errorMessage.value = 'Flashlight is not available on this device.';
+      errorMessage.value = 'Flashlight is not available on this device_service.';
     }
   }
 

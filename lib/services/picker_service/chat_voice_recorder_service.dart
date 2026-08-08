@@ -29,7 +29,7 @@ class ChatMicPermissionException implements Exception {
         return 'Microphone access is disabled for this app. '
             'Enable it in Settings to send voice messages.';
       case ChatMicPermissionError.restricted:
-        return 'Microphone access is restricted on this device.';
+        return 'Microphone access is restricted on this device_service.';
       case ChatMicPermissionError.denied:
         return 'Microphone permission is required to record voice messages.';
     }

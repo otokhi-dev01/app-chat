@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../../controllers/auth/auth_controller.dart';
-import '../../services/auth_service.dart';
+import '../../services/auth_service /auth_service.dart';
 import '../../services/mock/mock_auth_service.dart';
 
 class AuthBinding extends Bindings {

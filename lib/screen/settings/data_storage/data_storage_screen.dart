@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/data_storage_controller.dart';
-import '../../widgets/common/app_feedback.dart';
-import '../../widgets/data_storage/data_storage_content.dart';
-import '../../widgets/data_storage/media_quality_sheet.dart';
+import '../../widgets/app_feedback.dart';
+import 'data_storage_content.dart';
+import 'media_quality_sheet.dart';
 import 'data_storage_app_bar.dart';
 
 class DataStorageScreen extends StatelessWidget {

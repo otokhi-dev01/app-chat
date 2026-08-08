@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/call/call_controller.dart';
-import '../../widgets/call/call_controls.dart';
-import '../../widgets/call/call_person_section.dart';
-import '../../widgets/call/call_top_app.dart';
+import 'call_controls.dart';
+import 'call_person_section.dart';
+import 'call_top_app.dart';
 
 class CallScreen extends GetView<CallController> {
   const CallScreen({

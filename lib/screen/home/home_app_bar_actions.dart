@@ -1,11 +1,11 @@
-import 'package:appchat/screen/profile/profile_edit_screen.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
 import '../../route/app_route.dart';
 import 'home_app_bar_button.dart';
-import 'home_chat_menu.dart';
+import 'menu/home_chat_menu.dart';
 
 class HomeAppBarActions extends StatelessWidget {
   final int selectedIndex;
@@ -44,20 +44,23 @@ class HomeAppBarActions extends StatelessWidget {
               onSelected: onChatMenuSelected,
             ),
           ],
-        );;
+        );
 
       case 1:
         return const SizedBox.shrink();
 
       case 2:
+      // UPDATED: Settings Search button (case 2: Settings Tab) navigating to AppRoutes.settingsSearch
         return HomeAppBarActionButton(
           tooltip: 'search_settings'.tr,
           icon: CupertinoIcons.search,
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () async {
+            // UPDATED: Dismisses keyboard cleanly before initiating page transition
             FocusManager.instance.primaryFocus?.unfocus();
 
+            // UPDATED: Opens SettingsSearchScreen via GetX route and awaits selected setting result
             dynamic result = await Get.toNamed(
               AppRoutes.settingsSearch,
             );
@@ -77,12 +80,8 @@ class HomeAppBarActions extends StatelessWidget {
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () {
-            Get.to(
-                  () => ProfileEditScreen(),
-              transition: Transition.rightToLeft,
-              duration: const Duration(milliseconds: 280),
-              opaque: false,
-            );
+            // FIXED: Uses Get.toNamed with AppRoutes.editProfile to navigate to ProfileEditScreen
+            Get.toNamed(AppRoutes.editProfile);
           },
         );
 

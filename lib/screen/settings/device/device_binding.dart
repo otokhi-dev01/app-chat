@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../controllers/device/device_controller.dart';
-import '../../../services/device_service.dart';
+import '../../../services/device_service/device_service.dart';
 import '../../../services/mock/mock_device_service.dart';
 class DeviceBinding extends Bindings {
   @override

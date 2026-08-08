@@ -1,6 +1,6 @@
 import '../../data/mock_device_session_data.dart';
 import '../../models/device_session_model.dart';
-import '../device_service.dart';
+import '../device_service/device_service.dart';
 
 class MockDeviceService
     implements DeviceService {
@@ -43,7 +43,7 @@ class MockDeviceService
 
     if (session.isCurrent) {
       throw StateError(
-        'The current device cannot be terminated.',
+        'The current device_service cannot be terminated.',
       );
     }
 

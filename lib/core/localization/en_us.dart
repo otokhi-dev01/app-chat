@@ -31,6 +31,112 @@ final Map<String, String> enUS = {
   'delete_account_warning_desc':
   'Your account and all associated data will be permanently deleted. This action cannot be undone.',
   'deleting_account': 'Deleting Account...',
+  'unable_to_delete_account': 'Unable to Delete Account',
+  'unable_to_delete_account_message':
+  'Unable to delete your account. Please try again.',
+  'delete_account_description': 'Delete your account',
+
+  'add_post': 'Add Post',
+
+  'scan_qr_code': 'Scan QR Code',
+  'scan_contact_qr_code': 'Scan Contact QR Code',
+  'place_qr_in_frame': 'Place QR Code in Frame',
+  'flash_on': 'Flash On',
+  'flash_off': 'Flash Off',
+  'turn_on_flash': 'Turn on flash',
+  'turn_off_flash': 'Turn off flash',
+  'qr_auto_follow_desc':'Qr Auto Follow',
+  'flip_camera': 'Flip Camera',
+
+  'create_group_description': 'Create a new group',
+  'create_new_contact':'New Contact',
+  'add_via_qr_code': 'Add via QR Code',
+  'or_enter_details': 'or enter details',
+  'enter_first_name': 'Enter first name',
+  'enter_last_name': 'Enter last name',
+  'mark_as_read': 'Mark as read',
+  'mark_as_unread': 'Mark as unread',
+  'delete_chat': 'Delete Chat',
+  'private_notes': 'Private Notes',
+  'delete_message_question': 'Delete this message?',
+  'delete_message_desc': 'This action is permanent and cannot be undone. Are you sure you want to continue?',
+  'share_content': 'Share Content',
+  'one_conversation': 'One Conversation',
+  'archived_conversation': 'Archived Conversations',
+  'mute_notifications': 'Mute Notifications',
+  'unmute_notifications': 'Unmute Notifications',
+  'conversation_count': 'Conversation Count',
+  'no_archived_chats': 'No Archived Chats',
+  'archived_chats_hint_desc': 'Archive conversations to save space',
+  'swipe_left_to_archive': 'Swipe left to archive',
+  'start_a_call': 'Start a Call',
+  'choose_how_you_want_to_call': 'Choose how you want to call',
+  'audio_call': 'Audio Call',
+  'video_call': 'Video Call',
+  'more_options': 'More Options',
+  'share_profile': 'Share Profile',
+  'my_qr_code': 'My QR Code',
+  'share_or_scan_profile': 'Share or scan profile',
+  'scan_with_another_phone': 'Scan with another phone',
+  'quick_actions': 'Quick Actions',
+  'copy_username': 'Copy Username',
+  'save_qr': 'Save QR Code',
+  'share_qr_trusted_contacts': 'Share QR Code with Trusted Contacts',
+  'customize_qr_code': 'Customize QR Code',
+  'choose_style_and_colors': 'Choose style and color',
+  'qr_style': 'QR Style',
+  'qr_color': 'QR Color',
+  'reset_to_default': 'Reset to Default',
+  'default_folder': 'Default Folder',
+  'delete_folder_question': 'Delete folder?',
+  'delete_folder_desc': 'This action is permanent and cannot be undone. Are you sure you want to continue?',
+  'device_service': 'Device Services',
+  'other_active_sessions': 'Other Active Sessions',
+  'loading_devices': 'Loading Devices...',
+
+  'blocked_contacts_info': 'Blocked Contacts',
+  'unblock_contact': 'Unblock Contact',
+  'unblock_confirmation':
+  'Are you sure you want to unblock @name?',
+
+  'follow_device_appearance': 'Follow Device Appearance',
+
+  'control_privacy_security': 'Control Privacy and Security',
+  'privacy_header_description': 'Manage your privacy and security',
+  'phone_number_privacy_desc': 'Keep your phone number private',
+  'last_seen_privacy_desc': 'Keep your last seen status private',
+  'profile_photo_privacy_desc': 'Keep your profile photo private',
+  'calls_privacy_desc': 'Keep your calls private',
+  'groups_and_channels': 'Group and Channels',
+  'groups_privacy_desc': 'Keep your group privacy private',
+  'blocked_users': 'Blocked Users',
+  'my_contacts': 'My Contacts',
+  'last_seen_and_online': 'Last Seen and Online',
+  'profile_photos': 'Profile Photos',
+  'two_step_verification': 'Two-Step Verification',
+  'two_step_desc': 'Keep your account secure with two-step verification',
+  'app_lock_desc': 'Keep your account secure with app lock',
+  'screen_security_desc': 'Keep your screen secure',
+  'active_sessions_desc': 'Keep track of your active sessions',
+  'delete_synced_contacts': 'Delete Synced Contacts',
+  'delete_synced_contacts_desc': 'Delete your synced contacts',
+  'delete_my_account': 'Delete My Account',
+  'if_away_for': 'If you are away for',
+  'delete_account_if_away_desc': 'Delete your account if you are away',
+  'delete_account_if_away_for': 'Delete Account If Away',
+  'three_months': '3 months',
+  'six_months': '6 months',
+  'one_year': '1 year',
+  'privacy_warning_description': 'Privacy Warning',
+  'protect_your_account': 'Protect your account',
+  'search_hint_description': 'Search contacts',
+  'scan_qr': 'Scan QR',
+
+  'no_saved_messages': 'No Saved Messages',
+  'saved_messages_empty_desc': 'Save messages to access them later',
+
+
+
 
 
   'welcome_back': 'Welcome Back',
@@ -82,7 +188,7 @@ final Map<String, String> enUS = {
 
 'data_storage': 'Data and Storage',
 'manage_storage':
-'Manage the cache and data stored on this device',
+'Manage the cache and data stored on this device_service',
 
 'backup_sync': 'Backup and Sync',
 'manage_backup_sync':
@@ -120,7 +226,6 @@ final Map<String, String> enUS = {
   'account_deleted': 'Account Deleted',
   'account_deleted_permanently_message':
   'Your account has been permanently deleted.',
-  'unable_to_delete_account': 'Unable to Delete Account',
   'unable_to_delete_account_try_again':
   'Unable to delete your account. Please try again.',
   'verify_code': 'Verify Code',
@@ -196,7 +301,7 @@ final Map<String, String> enUS = {
 
 'system_default': 'System default',
 'follow_device':
-'Automatically follow your device appearance',
+'Automatically follow your device_service appearance',
 
 'light': 'Light',
 'light_theme': 'Always use light mode',
@@ -436,7 +541,7 @@ final Map<String, String> enUS = {
   'platform_windows': 'Windows',
   'platform_linux': 'Linux',
   'platform_web': 'Web',
-  'platform_unknown': 'Unknown device',
+  'platform_unknown': 'Unknown device_service',
 
   // Devices
   'this_device': 'This Device',
@@ -454,9 +559,9 @@ final Map<String, String> enUS = {
   'no_other_active_sessions':
   'No Other Active Sessions',
   'account_only_signed_in_here':
-  'Your account is currently signed in only on this device.',
+  'Your account is currently signed in only on this device_service.',
   'current_device_unavailable':
-  'Current device information is unavailable.',
+  'Current device_service information is unavailable.',
 
   // Device loading and errors
   'unable_to_load_devices': 'Unable to Load Devices',
@@ -468,15 +573,15 @@ final Map<String, String> enUS = {
   'terminate_all_sessions_title':
   'Terminate Other Sessions?',
   'terminate_all_sessions_confirmation':
-  'Are you sure you want to sign out of all other devices? You will remain signed in on this device.',
+  'Are you sure you want to sign out of all other devices? You will remain signed in on this device_service.',
 
   'terminate_session_confirmation':
-  'Are you sure you want to terminate the session on @device?',
+  'Are you sure you want to terminate the session on @device_service?',
 
   // Device termination results
   'session_terminated': 'Session Terminated',
   'device_logged_out':
-  '@device has been signed out',
+  '@device_service has been signed out',
 
   'unable_to_terminate_session':
   'Unable to Terminate Session',
@@ -492,17 +597,17 @@ final Map<String, String> enUS = {
   // Data and storage confirmation
   'clear_cache_title': 'Clear Cache?',
   'clear_cache_size_confirmation':
-  'Clear @size of cached files from this device? Your messages and media will remain available.',
+  'Clear @size of cached files from this device_service? Your messages and media will remain available.',
 
   'clear_downloads_title': 'Clear Downloads?',
   'clear_downloads': 'Clear Downloads',
   'clear_downloads_confirmation':
-  'Downloaded files will be removed from this device. You can download them again later.',
+  'Downloaded files will be removed from this device_service. You can download them again later.',
 
   'clear_media_title': 'Clear Stored Media?',
   'clear_media': 'Clear Media',
   'clear_media_confirmation':
-  'Stored photos, videos, audio, and other media will be removed from this device.',
+  'Stored photos, videos, audio, and other media will be removed from this device_service.',
 
   'cache_cleared': 'Cache Cleared',
 
@@ -611,7 +716,7 @@ final Map<String, String> enUS = {
   'sharing_unavailable':
   'Sharing Unavailable',
   'sharing_unavailable_message':
-  'Sharing is unavailable on this device.',
+  'Sharing is unavailable on this device_service.',
   'unable_to_share_profile':
   'Unable to Share Profile',
   'unable_to_share_profile_message':
@@ -663,7 +768,7 @@ final Map<String, String> enUS = {
   'Notification permission was not allowed.',
   'permission_required': 'Permission Required',
   'enable_notifications_in_settings':
-  'Enable notifications from your device settings.',
+  'Enable notifications from your device_service settings.',
   'unable_to_update': 'Unable to Update',
   'notification_update_failed':
   'Notification settings could not be changed.',
@@ -673,7 +778,7 @@ final Map<String, String> enUS = {
   'contacts_synced_message':
   'Your phone contacts have been synced successfully.',
   'contacts_permission_settings_message':
-  'Allow contacts access from your device settings.',
+  'Allow contacts access from your device_service settings.',
   'contacts_permission_denied_message':
   'Contacts permission was not allowed.',
   'unable_to_sync': 'Unable to Sync',

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../data/mock_auth_user.dart';
+import '../../data/mock_auth_user.dart';
 
 enum AuthServiceError {
   invalidCredentials,

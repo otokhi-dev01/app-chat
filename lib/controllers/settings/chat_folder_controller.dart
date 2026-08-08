@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../models/chat_folder_model.dart';
-import '../../services/chat_folder_service.dart';
+import '../../services/folder_service/chat_folder_service.dart';
 
 class ChatFolderController
     extends GetxController {

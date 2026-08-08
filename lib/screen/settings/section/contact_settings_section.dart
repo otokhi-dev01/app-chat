@@ -1,4 +1,4 @@
-import 'package:appchat/screen/widgets/settings/settings_navigation_title.dart';
+import 'package:appchat/screen/settings/section/settings_navigation_title.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

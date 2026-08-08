@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// UPDATED: Unit UI animated action button that toggles between Send (paperplane) and Voice Mic buttons based on text input state
 class ChatSendOrVoiceButton extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
@@ -26,6 +28,7 @@ class ChatSendOrVoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // UPDATED: Retrieve colorScheme for dynamic light/dark theme adaptation
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return ValueListenableBuilder<TextEditingValue>(
@@ -33,6 +36,7 @@ class ChatSendOrVoiceButton extends StatelessWidget {
       builder: (BuildContext context, TextEditingValue value, Widget? child) {
         bool hasMessage = value.text.trim().isNotEmpty;
 
+        // UPDATED: Smooth 180ms fade and scale transition when switching between send and voice mic buttons
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           switchInCurve: Curves.easeOutCubic,
@@ -41,7 +45,7 @@ class ChatSendOrVoiceButton extends StatelessWidget {
             return FadeTransition(
               opacity: animation,
               child: ScaleTransition(
-                scale: Tween<double>(begin: 0.85, end: 1).animate(animation),
+                scale: Tween<double>(begin: 0.85, end: 1.0).animate(animation),
                 child: child,
               ),
             );
@@ -54,13 +58,14 @@ class ChatSendOrVoiceButton extends StatelessWidget {
             child: InkWell(
               onTap: onSend,
               customBorder: const CircleBorder(),
+              // UPDATED: Primary filled send button with Cupertino paperplane icon
               child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Icon(
-                  Icons.send_rounded,
+                  CupertinoIcons.paperplane_fill,
                   color: colorScheme.onPrimary,
-                  size: 21,
+                  size: 20,
                 ),
               ),
             ),
@@ -74,22 +79,24 @@ class ChatSendOrVoiceButton extends StatelessWidget {
               onVoiceDrag?.call(details.offsetFromOrigin.dx);
             },
             onLongPressEnd: (_) => onVoiceEnd?.call(),
-            // Fires if the gesture is cancelled by the system rather
-            // than released normally — cleans up recording state so
-            // it never gets stuck "in progress".
+            // UPDATED: Handles OS gesture cancellations (e.g. system UI / calls) so recording state doesn't get stuck
             onLongPressCancel: onVoiceCancel,
+            // UPDATED: Unit UI circular microphone button with primary color tint (12% opacity)
             child: Container(
               width: 44,
               height: 44,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.11),
+                color: colorScheme.primary.withValues(
+                  alpha: 0.12,
+                ),
                 shape: BoxShape.circle,
               ),
+              // UPDATED: Replaced Material icon with Cupertino mic icon
               child: Icon(
-                Icons.mic_none_rounded,
+                CupertinoIcons.mic,
                 color: colorScheme.primary,
-                size: 26,
+                size: 22,
               ),
             ),
           ),

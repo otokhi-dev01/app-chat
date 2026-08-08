@@ -1,14 +1,16 @@
-import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../models/chat_message_model.dart';
+import 'chat_file_massage.dart';
+import 'chat_voice_massage.dart';
 
+/// UPDATED: Cleaned main bubble container routing message types to sub-widgets
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessageModel message;
   final VoidCallback? onLongPress;
@@ -22,17 +24,11 @@ class ChatMessageBubble extends StatelessWidget {
   String _formatTime(DateTime dateTime) {
     int hour = dateTime.hour;
     int minute = dateTime.minute;
-
     String period = hour >= 12 ? 'PM' : 'AM';
-
     int formattedHour = hour % 12;
 
-    if (formattedHour == 0) {
-      formattedHour = 12;
-    }
-
+    if (formattedHour == 0) formattedHour = 12;
     String formattedMinute = minute.toString().padLeft(2, '0');
-
     return '$formattedHour:$formattedMinute $period';
   }
 
@@ -42,14 +38,8 @@ class ChatMessageBubble extends StatelessWidget {
         message.mediaPath!.trim().isNotEmpty;
   }
 
-  bool get _isVoiceMessage {
-    return message.type == ChatMessageType.voice;
-  }
-
-  bool get _isFileMessage {
-    return message.type == ChatMessageType.file;
-  }
-
+  bool get _isVoiceMessage => message.type == ChatMessageType.voice;
+  bool get _isFileMessage => message.type == ChatMessageType.file;
   bool get _isLocationMessage {
     return message.type == ChatMessageType.location &&
         message.latitude != null &&
@@ -59,20 +49,14 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-
     bool isDark = theme.brightness == Brightness.dark;
 
     Color receivedBackground = isDark ? const Color(0xFF24272D) : Colors.white;
-
     Color receivedTextColor = isDark ? Colors.white : const Color(0xFF202124);
 
-    EdgeInsets bubblePadding;
-
-    if (_isImageMessage || _isLocationMessage) {
-      bubblePadding = const EdgeInsets.all(4);
-    } else {
-      bubblePadding = const EdgeInsets.fromLTRB(13, 9, 10, 7);
-    }
+    EdgeInsets bubblePadding = (_isImageMessage || _isLocationMessage)
+        ? const EdgeInsets.all(4)
+        : const EdgeInsets.fromLTRB(13, 9, 10, 7);
 
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -93,12 +77,8 @@ class ChatMessageBubble extends StatelessWidget {
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
-              bottomLeft: Radius.circular(
-                message.isMe ? 18 : 4,
-              ),
-              bottomRight: Radius.circular(
-                message.isMe ? 4 : 18,
-              ),
+              bottomLeft: Radius.circular(message.isMe ? 18 : 4),
+              bottomRight: Radius.circular(message.isMe ? 4 : 18),
             ),
             border: message.isMe
                 ? null
@@ -117,10 +97,7 @@ class ChatMessageBubble extends StatelessWidget {
               ),
             ],
           ),
-          child: _buildMessageContent(
-            context,
-            receivedTextColor,
-          ),
+          child: _buildMessageContent(context, receivedTextColor),
         ),
       ),
     );
@@ -131,16 +108,11 @@ class ChatMessageBubble extends StatelessWidget {
       Color receivedTextColor,
       ) {
     if (_isLocationMessage) {
-      return _buildLocationMessage(
-        context,
-        receivedTextColor,
-      );
+      return _buildLocationMessage(context, receivedTextColor);
     }
-
     if (_isImageMessage) {
       return _buildImageMessage(context);
     }
-
     if (_isVoiceMessage) {
       return ChatVoiceMessage(
         message: message,
@@ -148,7 +120,6 @@ class ChatMessageBubble extends StatelessWidget {
         timeStatus: _buildTimeStatus(),
       );
     }
-
     if (_isFileMessage) {
       return ChatFileMessage(
         message: message,
@@ -156,15 +127,10 @@ class ChatMessageBubble extends StatelessWidget {
         timeStatus: _buildTimeStatus(),
       );
     }
-
-    return _buildTextMessage(
-      receivedTextColor,
-    );
+    return _buildTextMessage(receivedTextColor);
   }
 
-  Widget _buildTextMessage(
-      Color receivedTextColor,
-      ) {
+  Widget _buildTextMessage(Color receivedTextColor) {
     return IntrinsicWidth(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -186,9 +152,7 @@ class ChatMessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildImageMessage(
-      BuildContext context,
-      ) {
+  Widget _buildImageMessage(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -207,17 +171,8 @@ class ChatMessageBubble extends StatelessWidget {
                 width: 240,
                 height: 280,
                 fit: BoxFit.cover,
-                // Fades the image in smoothly once the frame is decoded
-                // instead of popping in abruptly on first paint.
-                frameBuilder: (
-                    BuildContext context,
-                    Widget child,
-                    int? frame,
-                    bool wasSynchronouslyLoaded,
-                    ) {
-                  if (wasSynchronouslyLoaded) {
-                    return child;
-                  }
+                frameBuilder: (context, child, frame, wasSync) {
+                  if (wasSync) return child;
                   return AnimatedOpacity(
                     opacity: frame == null ? 0 : 1,
                     duration: const Duration(milliseconds: 220),
@@ -244,35 +199,27 @@ class ChatMessageBubble extends StatelessWidget {
                         : child,
                   );
                 },
-                errorBuilder: (
-                    BuildContext context,
-                    Object error,
-                    StackTrace? stackTrace,
-                    ) {
-                  return Container(
-                    width: 240,
-                    height: 180,
-                    alignment: Alignment.center,
-                    color: Colors.grey.shade300,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.broken_image_outlined,
-                          color: Colors.grey.shade700,
-                          size: 42,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Image unavailable',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                errorBuilder: (_, __, ___) => Container(
+                  width: 240,
+                  height: 180,
+                  alignment: Alignment.center,
+                  color: Colors.grey.shade300,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.photo,
+                        color: Colors.grey.shade700,
+                        size: 42,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Image unavailable',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -292,11 +239,7 @@ class ChatMessageBubble extends StatelessWidget {
             ),
           ),
         Padding(
-          padding: const EdgeInsets.only(
-            top: 5,
-            right: 5,
-            bottom: 3,
-          ),
+          padding: const EdgeInsets.only(top: 5, right: 5, bottom: 3),
           child: _buildTimeStatus(),
         ),
       ],
@@ -312,18 +255,14 @@ class ChatMessageBubble extends StatelessWidget {
 
     double latitude = message.latitude!;
     double longitude = message.longitude!;
-
     String coordinates =
         '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}';
 
     Color locationBackground = message.isMe
         ? Colors.white.withValues(alpha: 0.13)
-        : colorScheme.primary.withValues(
-      alpha: 0.10,
-    );
+        : colorScheme.primary.withValues(alpha: 0.10);
 
     Color titleColor = message.isMe ? Colors.white : receivedTextColor;
-
     Color subtitleColor = message.isMe
         ? Colors.white.withValues(alpha: 0.78)
         : colorScheme.onSurfaceVariant;
@@ -361,12 +300,8 @@ class ChatMessageBubble extends StatelessWidget {
                           child: CustomPaint(
                             painter: _LocationPatternPainter(
                               color: message.isMe
-                                  ? Colors.white.withValues(
-                                alpha: 0.10,
-                              )
-                                  : colorScheme.primary.withValues(
-                                alpha: 0.11,
-                              ),
+                                  ? Colors.white.withValues(alpha: 0.10)
+                                  : colorScheme.primary.withValues(alpha: 0.11),
                             ),
                           ),
                         ),
@@ -381,20 +316,18 @@ class ChatMessageBubble extends StatelessWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(
-                                  alpha: 0.16,
-                                ),
+                                color: Colors.black.withValues(alpha: 0.16),
                                 blurRadius: 14,
                                 offset: const Offset(0, 5),
                               ),
                             ],
                           ),
                           child: Icon(
-                            Icons.location_on_rounded,
+                            CupertinoIcons.location_fill,
                             color: message.isMe
                                 ? AppTheme.primaryColor
                                 : colorScheme.onPrimary,
-                            size: 30,
+                            size: 28,
                           ),
                         ),
                       ],
@@ -441,7 +374,7 @@ class ChatMessageBubble extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Icon(
-                          Icons.open_in_new_rounded,
+                          CupertinoIcons.arrow_up_right,
                           size: 18,
                           color: subtitleColor,
                         ),
@@ -453,11 +386,7 @@ class ChatMessageBubble extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(
-              top: 4,
-              right: 5,
-              bottom: 3,
-            ),
+            padding: const EdgeInsets.only(top: 4, right: 5, bottom: 3),
             child: _buildTimeStatus(),
           ),
         ],
@@ -465,65 +394,21 @@ class ChatMessageBubble extends StatelessWidget {
     );
   }
 
-  Future<void> _openLocation(
-      BuildContext context,
-      ) async {
+  Future<void> _openLocation(BuildContext context) async {
     double? latitude = message.latitude;
     double? longitude = message.longitude;
-
-    if (latitude == null || longitude == null) {
-      _showSnackBar(
-        context,
-        'Location information is unavailable.',
-      );
-      return;
-    }
+    if (latitude == null || longitude == null) return;
 
     Uri mapUri = Uri.parse(
       'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude',
     );
 
     try {
-      bool didOpen = await launchUrl(
-        mapUri,
-        mode: LaunchMode.externalApplication,
-      );
-
-      if (!didOpen && context.mounted) {
-        _showSnackBar(
-          context,
-          'Could not open the map.',
-        );
-      }
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      _showSnackBar(
-        context,
-        'Could not open the map.',
-      );
-    }
+      await launchUrl(mapUri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
   }
 
-  static void _showSnackBar(
-      BuildContext context,
-      String text,
-      ) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(text),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
-  }
-
+  /// FIXED: Replaced non-existent 'CupertinoIcons.checkmark_alt_wordmark' with 'Icons.done_all_rounded'
   Widget _buildTimeStatus() {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -531,31 +416,32 @@ class ChatMessageBubble extends StatelessWidget {
         Text(
           _formatTime(message.sentAt),
           style: TextStyle(
-            color: message.isMe ? Colors.white.withValues(alpha: 0.75) : Colors.grey,
+            color: message.isMe
+                ? Colors.white.withValues(alpha: 0.75)
+                : Colors.grey,
             fontSize: 9,
             height: 1,
           ),
         ),
         if (message.isMe) ...[
           const SizedBox(width: 3),
+          // FIXED: Used valid double checkmark icon for read receipts
           Icon(
             message.isRead ? Icons.done_all_rounded : Icons.done_rounded,
             size: 14,
-            color: message.isRead ? const Color(0xFFB9F6CA) : Colors.white.withValues(alpha: 0.75),
+            color: message.isRead
+                ? const Color(0xFF32C766)
+                : Colors.white.withValues(alpha: 0.75),
           ),
         ],
       ],
     );
   }
 
-  void _openFullImage(
-      BuildContext context,
-      ) {
+  void _openFullImage(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (
-            BuildContext context,
-            ) {
+        builder: (context) {
           return Scaffold(
             backgroundColor: Colors.black,
             appBar: AppBar(
@@ -584,697 +470,14 @@ class ChatMessageBubble extends StatelessWidget {
   }
 }
 
-class ChatVoiceMessage extends StatefulWidget {
-  final ChatMessageModel message;
-  final Color receivedTextColor;
-  final Widget timeStatus;
-
-  const ChatVoiceMessage({
-    super.key,
-    required this.message,
-    required this.receivedTextColor,
-    required this.timeStatus,
-  });
-
-  @override
-  State<ChatVoiceMessage> createState() {
-    return _ChatVoiceMessageState();
-  }
-}
-
-class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
-  Duration _duration = Duration.zero;
-
-  bool _isLoading = true;
-  bool _hasError = false;
-
-  // Cycles 1x -> 1.5x -> 2x -> 1x, Telegram-style
-  static const List<double> _speeds = [1.0, 1.5, 2.0];
-  int _speedIndex = 0;
-
-  // Tracks whether the user is actively dragging the slider so incoming
-  // position updates from the stream don't fight the drag and cause jitter.
-  bool _isSeeking = false;
-  double _seekPreviewValue = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadVoice();
-  }
-
-  Future<void> _loadVoice() async {
-    String? audioPath = widget.message.mediaPath;
-
-    if (audioPath == null || audioPath.trim().isEmpty) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-        _hasError = true;
-      });
-      return;
-    }
-
-    try {
-      Duration? loadedDuration;
-
-      Uri? uri = Uri.tryParse(audioPath);
-
-      if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
-        loadedDuration = await _audioPlayer.setUrl(
-          audioPath,
-        );
-      } else if (uri != null && uri.scheme == 'file') {
-        loadedDuration = await _audioPlayer.setFilePath(
-          uri.toFilePath(),
-        );
-      } else {
-        File audioFile = File(audioPath);
-
-        bool exists = await audioFile.exists();
-
-        if (!exists) {
-          throw Exception(
-            'Voice file not found.',
-          );
-        }
-
-        loadedDuration = await _audioPlayer.setFilePath(
-          audioPath,
-        );
-      }
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _duration = loadedDuration ?? Duration.zero;
-        _isLoading = false;
-        _hasError = false;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-        _hasError = true;
-      });
-    }
-  }
-
-  Future<void> _togglePlayback() async {
-    if (_isLoading || _hasError) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-
-    try {
-      if (_audioPlayer.processingState == ProcessingState.completed) {
-        await _audioPlayer.seek(
-          Duration.zero,
-        );
-      }
-
-      if (_audioPlayer.playing) {
-        await _audioPlayer.pause();
-      } else {
-        unawaited(_audioPlayer.play());
-      }
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _hasError = true;
-      });
-    }
-  }
-
-  Future<void> _cycleSpeed() async {
-    if (_isLoading || _hasError) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-
-    setState(() {
-      _speedIndex = (_speedIndex + 1) % _speeds.length;
-    });
-
-    try {
-      await _audioPlayer.setSpeed(_speeds[_speedIndex]);
-    } catch (_) {
-      // Non-fatal — playback continues at the previous speed.
-    }
-  }
-
-  Future<void> _seek(
-      double milliseconds,
-      ) async {
-    if (_duration == Duration.zero) {
-      return;
-    }
-
-    await _audioPlayer.seek(
-      Duration(
-        milliseconds: milliseconds.round(),
-      ),
-    );
-  }
-
-  String _formatDuration(
-      Duration duration,
-      ) {
-    int minutes = duration.inMinutes;
-
-    int seconds = duration.inSeconds.remainder(60);
-
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isMe = widget.message.isMe;
-
-    Color primaryTextColor = isMe ? Colors.white : widget.receivedTextColor;
-
-    Color secondaryTextColor = isMe
-        ? Colors.white.withValues(alpha: 0.72)
-        : colorScheme.onSurfaceVariant;
-
-    Color buttonBackground = isMe ? Colors.white : colorScheme.primary;
-
-    Color buttonForeground = isMe ? AppTheme.primaryColor : colorScheme.onPrimary;
-
-    if (_hasError) {
-      return SizedBox(
-        width: 230,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isMe
-                        ? Colors.white.withValues(
-                      alpha: 0.14,
-                    )
-                        : colorScheme.error.withValues(
-                      alpha: 0.10,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.error_outline_rounded,
-                    color: isMe ? Colors.white : colorScheme.error,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Voice unavailable',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: primaryTextColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            widget.timeStatus,
-          ],
-        ),
-      );
-    }
-
-    return SizedBox(
-      width: 240,
-      child: StreamBuilder<PlayerState>(
-        stream: _audioPlayer.playerStateStream,
-        builder: (
-            BuildContext context,
-            AsyncSnapshot<PlayerState> snapshot,
-            ) {
-          PlayerState? playerState = snapshot.data;
-
-          bool isPlaying = playerState?.playing ?? false;
-
-          if (playerState?.processingState == ProcessingState.completed) {
-            isPlaying = false;
-          }
-
-          return StreamBuilder<Duration>(
-            stream: _audioPlayer.positionStream,
-            initialData: Duration.zero,
-            builder: (
-                BuildContext context,
-                AsyncSnapshot<Duration> snapshot,
-                ) {
-              Duration position = snapshot.data ?? Duration.zero;
-
-              int durationMilliseconds = _duration.inMilliseconds;
-
-              double maximum = durationMilliseconds > 0
-                  ? durationMilliseconds.toDouble()
-                  : 1;
-
-              // While the user is dragging, trust the local preview value
-              // instead of the (slightly lagging) stream position — this
-              // is what keeps the thumb from stuttering mid-drag.
-              double value = _isSeeking
-                  ? _seekPreviewValue
-                  : position.inMilliseconds
-                  .clamp(
-                0,
-                durationMilliseconds > 0 ? durationMilliseconds : 0,
-              )
-                  .toDouble();
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Material(
-                        color: buttonBackground,
-                        shape: const CircleBorder(),
-                        child: InkWell(
-                          onTap: _isLoading ? null : _togglePlayback,
-                          customBorder: const CircleBorder(),
-                          child: SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: _isLoading
-                                ? Padding(
-                              padding: const EdgeInsets.all(
-                                12,
-                              ),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: buttonForeground,
-                              ),
-                            )
-                                : AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 180),
-                              transitionBuilder: (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                  scale: animation,
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: isPlaying
-                                  ? Icon(
-                                Icons.pause_rounded,
-                                key: const ValueKey('pause'),
-                                color: buttonForeground,
-                                size: 28,
-                              )
-                                  : Icon(
-                                Icons.play_arrow_rounded,
-                                key: const ValueKey('play'),
-                                color: buttonForeground,
-                                size: 28,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            SliderTheme(
-                              data: SliderTheme.of(
-                                context,
-                              ).copyWith(
-                                trackHeight: 2.5,
-                                activeTrackColor: isMe ? Colors.white : colorScheme.primary,
-                                inactiveTrackColor: secondaryTextColor.withValues(
-                                  alpha: 0.30,
-                                ),
-                                thumbColor: isMe ? Colors.white : colorScheme.primary,
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 5,
-                                ),
-                                overlayShape: const RoundSliderOverlayShape(
-                                  overlayRadius: 12,
-                                ),
-                              ),
-                              child: Slider(
-                                min: 0,
-                                max: maximum,
-                                value: value.clamp(0, maximum),
-                                onChangeStart: _isLoading || durationMilliseconds <= 0
-                                    ? null
-                                    : (double start) {
-                                  HapticFeedback.selectionClick();
-                                  setState(() {
-                                    _isSeeking = true;
-                                    _seekPreviewValue = start;
-                                  });
-                                },
-                                onChanged: _isLoading || durationMilliseconds <= 0
-                                    ? null
-                                    : (double dragging) {
-                                  setState(() {
-                                    _seekPreviewValue = dragging;
-                                  });
-                                },
-                                onChangeEnd: _isLoading || durationMilliseconds <= 0
-                                    ? null
-                                    : (double end) {
-                                  setState(() {
-                                    _isSeeking = false;
-                                  });
-                                  _seek(end);
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    _formatDuration(
-                                      _isSeeking
-                                          ? Duration(
-                                        milliseconds: _seekPreviewValue.round(),
-                                      )
-                                          : position,
-                                    ),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: secondaryTextColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  // Speed toggle replaces the static total
-                                  // duration once playback starts, mirroring
-                                  // Telegram's 1x/1.5x/2x control. Shows the
-                                  // total duration up front so the user still
-                                  // knows the clip length before playing.
-                                  GestureDetector(
-                                    onTap: _cycleSpeed,
-                                    child: Text(
-                                      isPlaying || _speedIndex != 0
-                                          ? '${_speeds[_speedIndex] == _speeds[_speedIndex].roundToDouble() ? _speeds[_speedIndex].round() : _speeds[_speedIndex]}x'
-                                          : _formatDuration(_duration),
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: secondaryTextColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  widget.timeStatus,
-                ],
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-/// Tap-to-open file bubble with per-extension icon, an open-in-progress
-/// state, and graceful failure handling — previously this was a static
-/// row with no way to actually open the file.
-class ChatFileMessage extends StatefulWidget {
-  final ChatMessageModel message;
-  final Color receivedTextColor;
-  final Widget timeStatus;
-
-  const ChatFileMessage({
-    super.key,
-    required this.message,
-    required this.receivedTextColor,
-    required this.timeStatus,
-  });
-
-  @override
-  State<ChatFileMessage> createState() => _ChatFileMessageState();
-}
-
-class _ChatFileMessageState extends State<ChatFileMessage> {
-  bool _isOpening = false;
-
-  String get _fileName {
-    String name = widget.message.text.trim();
-
-    if (name.isEmpty && widget.message.mediaPath != null) {
-      name = widget.message.mediaPath!.split(Platform.pathSeparator).last;
-    }
-
-    return name.isEmpty ? 'File' : name;
-  }
-
-  String get _extension {
-    int dotIndex = _fileName.lastIndexOf('.');
-    if (dotIndex == -1 || dotIndex == _fileName.length - 1) {
-      return '';
-    }
-    return _fileName.substring(dotIndex + 1).toLowerCase();
-  }
-
-  IconData get _iconForType {
-    switch (_extension) {
-      case 'pdf':
-        return Icons.picture_as_pdf_rounded;
-      case 'doc':
-      case 'docx':
-        return Icons.description_rounded;
-      case 'xls':
-      case 'xlsx':
-      case 'csv':
-        return Icons.table_chart_rounded;
-      case 'ppt':
-      case 'pptx':
-        return Icons.slideshow_rounded;
-      case 'zip':
-      case 'rar':
-      case '7z':
-        return Icons.folder_zip_rounded;
-      case 'mp3':
-      case 'wav':
-      case 'm4a':
-        return Icons.audiotrack_rounded;
-      case 'mp4':
-      case 'mov':
-      case 'avi':
-        return Icons.movie_rounded;
-      default:
-        return Icons.insert_drive_file_rounded;
-    }
-  }
-
-  String get _subtitleLabel {
-    if (_isOpening) {
-      return 'Opening…';
-    }
-    return _extension.isEmpty ? 'Document' : _extension.toUpperCase();
-  }
-
-  Future<void> _openFile() async {
-    String? path = widget.message.mediaPath;
-
-    if (path == null || path.trim().isEmpty || _isOpening) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-
-    setState(() {
-      _isOpening = true;
-    });
-
-    try {
-      bool didOpen = await launchUrl(
-        Uri.file(path),
-        mode: LaunchMode.externalApplication,
-      );
-
-      if (!didOpen && mounted) {
-        _showUnavailable();
-      }
-    } catch (_) {
-      if (mounted) {
-        _showUnavailable();
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isOpening = false;
-        });
-      }
-    }
-  }
-
-  void _showUnavailable() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text('Could not open this file.'),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    bool isMe = widget.message.isMe;
-
-    Color iconBackground = isMe
-        ? Colors.white.withValues(alpha: 0.16)
-        : colorScheme.primary.withValues(alpha: 0.12);
-
-    Color iconColor = isMe ? Colors.white : colorScheme.primary;
-
-    Color titleColor = isMe ? Colors.white : widget.receivedTextColor;
-
-    Color subtitleColor = isMe
-        ? Colors.white.withValues(alpha: 0.72)
-        : colorScheme.onSurfaceVariant;
-
-    return SizedBox(
-      width: 240,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _openFile,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 46,
-                      height: 46,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: iconBackground,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 160),
-                        child: _isOpening
-                            ? SizedBox(
-                          key: const ValueKey('opening'),
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: iconColor,
-                          ),
-                        )
-                            : Icon(
-                          _iconForType,
-                          key: const ValueKey('icon'),
-                          color: iconColor,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _fileName,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: titleColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            _subtitleLabel,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: subtitleColor,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 7),
-          widget.timeStatus,
-        ],
-      ),
-    );
-  }
-}
-
+/// UPDATED: Custom painter for location background grid pattern
 class _LocationPatternPainter extends CustomPainter {
   final Color color;
 
-  _LocationPatternPainter({
-    required this.color,
-  });
+  _LocationPatternPainter({required this.color});
 
   @override
-  void paint(
-      Canvas canvas,
-      Size size,
-      ) {
+  void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = color
       ..strokeWidth = 1.3
@@ -1283,34 +486,21 @@ class _LocationPatternPainter extends CustomPainter {
     double spacing = 24;
 
     for (double x = -size.height; x < size.width; x += spacing) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(
-          x + size.height,
-          size.height,
-        ),
-        paint,
-      );
+      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), paint);
     }
 
     for (double y = spacing; y < size.height; y += spacing) {
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        paint,
-      );
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
   @override
-  bool shouldRepaint(
-      _LocationPatternPainter oldDelegate,
-      ) {
+  bool shouldRepaint(_LocationPatternPainter oldDelegate) {
     return oldDelegate.color != color;
   }
 }
 
-// Lightweight private stateful gesture handler to keep the main widget stateless
+/// UPDATED: Long press bouncy press effect wrapper
 class _BouncyPressEffect extends StatefulWidget {
   final Widget child;
   final VoidCallback? onLongPress;
@@ -1333,26 +523,12 @@ class _BouncyPressEffectState extends State<_BouncyPressEffect> {
       onLongPress: widget.onLongPress == null
           ? null
           : () {
-        // A firm, distinct pulse for long-press so it reads clearly as
-        // "context menu opened" rather than a regular tap.
         HapticFeedback.mediumImpact();
         widget.onLongPress!();
       },
-      onTapDown: (_) {
-        setState(() {
-          _isPressed = true;
-        });
-      },
-      onTapUp: (_) {
-        setState(() {
-          _isPressed = false;
-        });
-      },
-      onTapCancel: () {
-        setState(() {
-          _isPressed = false;
-        });
-      },
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
       onTap: () {},
       child: AnimatedScale(
         scale: _isPressed ? 0.96 : 1.0,

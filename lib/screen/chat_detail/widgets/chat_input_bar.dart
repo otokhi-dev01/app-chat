@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'chat_input_action_button.dart';
@@ -7,6 +8,7 @@ import 'chat_input_text_field.dart';
 import 'chat_send_or_voice_button.dart';
 import 'chat_voice_recording.dart';
 
+/// UPDATED: Unit UI floating glass input bar featuring backdrop blur, attachment action button, text field, and voice recording overlay
 class ChatInputBar extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -48,35 +50,35 @@ class ChatInputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // UPDATED: Retrieve current theme and colorScheme for dynamic light/dark mode styling
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
-
     bool isDark = theme.brightness == Brightness.dark;
 
+    // UPDATED: Standardized unit UI colors for translucent glass background and subtle borders
     Color navigationColor = isDark
-        ? const Color(0xFF1B1D22).withValues(alpha: 0.96)
-        : Colors.white.withValues(alpha: 0.96);
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.85)
+        : Colors.white.withValues(alpha: 0.88);
 
     Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.09)
-        : Colors.black.withValues(alpha: 0.07);
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     Color inputColor = isDark
-        ? Colors.white.withValues(alpha: 0.07)
+        ? const Color(0xFF26282E)
         : Colors.black.withValues(alpha: 0.035);
 
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(10, 4, 10, 8),
+      // UPDATED: Rounded 28px glass container clipped for backdrop blur filter
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Stack(
             children: [
-              // Wrapped in IgnorePointer while recording — previously
-              // this row was only visually faded (opacity 0) but still
-              // received taps underneath the recording bar overlay.
+              // UPDATED: IgnorePointer disables tap events during active voice recording overlay
               IgnorePointer(
                 ignoring: isRecording,
                 child: AnimatedOpacity(
@@ -105,12 +107,13 @@ class ChatInputBar extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        // UPDATED: Attachment action button with Cupertino add icon
                         ChatInputActionButton(
                           tooltip: 'Attach',
-                          icon: Icons.add_rounded,
+                          icon: CupertinoIcons.add,
                           iconColor: colorScheme.primary,
                           backgroundColor: colorScheme.primary.withValues(
-                            alpha: 0.11,
+                            alpha: 0.12,
                           ),
                           onPressed: onAttachment,
                         ),
@@ -140,6 +143,7 @@ class ChatInputBar extends StatelessWidget {
                 ),
               ),
 
+              // UPDATED: Animated overlay showing voice recording progress when isRecording is true
               Positioned.fill(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 180),
@@ -149,7 +153,7 @@ class ChatInputBar extends StatelessWidget {
                     return FadeTransition(
                       opacity: animation,
                       child: ScaleTransition(
-                        scale: Tween<double>(begin: 0.97, end: 1).animate(animation),
+                        scale: Tween<double>(begin: 0.97, end: 1.0).animate(animation),
                         child: child,
                       ),
                     );

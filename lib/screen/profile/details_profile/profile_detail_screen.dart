@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../controllers/user/user_controller.dart';
-import '../../route/app_route.dart';
-import '../contact/add_contact/add_contact_screen.dart';
-import '../widgets/common/app_feedback.dart';
-import '../widgets/profile/profile_detail/profile_content_filter.dart';
-import '../widgets/profile/profile_detail/profile_detail_app_bar.dart';
-import '../widgets/profile/profile_detail/profile_detail_content.dart';
-import '../widgets/profile/profile_detail/profile_more_option_sheet.dart';
+import '../../../controllers/user/user_controller.dart';
+import '../../../route/app_route.dart';
+import '../../contact/add_contact/add_contact_screen.dart';
+import '../../widgets/app_feedback.dart';
+import 'profile_content_filter.dart';
+import 'profile_detail_app_bar.dart';
+import 'profile_detail_content.dart';
+import 'profile_more_option_sheet.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   final UserController controller;

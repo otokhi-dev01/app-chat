@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../controllers/settings/chat_folder_controller.dart';
-import '../../../services/chat_folder_service.dart';
+import '../../../services/folder_service/chat_folder_service.dart';
 import '../../../services/mock/mock_chat_folder_service.dart';
 
 class ChatFolderBinding extends Bindings {

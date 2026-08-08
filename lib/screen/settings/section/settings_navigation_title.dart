@@ -1,5 +1,5 @@
-import 'package:appchat/screen/widgets/settings/settings_smooth_title.dart';
-import 'package:appchat/screen/widgets/settings/settings_title_text.dart';
+import 'package:appchat/screen/settings/section/settings_smooth_title.dart';
+import 'package:appchat/screen/settings/section/settings_title_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'settings_icon.dart';

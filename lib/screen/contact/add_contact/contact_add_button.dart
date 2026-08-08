@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/contact_controller.dart';
-import '../../contact/qr_scan/qr_contact_scanner_binding.dart';
-import '../common/app_feedback.dart';
-import 'show_add_contact_sheet.dart';
+import '../qr_scan/qr_contact_scanner_binding.dart';
+import '../../widgets/app_feedback.dart';
+import '../show_add_contact_sheet.dart';
 
 class ContactAddButton extends StatelessWidget {
   final ContactController controller;

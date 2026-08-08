@@ -1,3 +1,8 @@
+import 'package:appchat/screen/chat_detail/widgets/chat_attachment_sheet.dart';
+import 'package:appchat/screen/chat_detail/widgets/chat_detail_content.dart';
+import 'package:appchat/screen/chat_detail/widgets/chat_message_action_sheet.dart';
+import 'package:appchat/screen/chat_detail/widgets/chat_sample_messages.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,15 +11,12 @@ import '../../controllers/call/call_controller.dart';
 import '../../models/chat_message_model.dart';
 import '../../models/chat_model.dart';
 import '../../route/app_route.dart';
-import '../../services/chat_camera_services.dart';
-import '../../services/chat_voice_recorder_service.dart';
-import '../widgets/chat_detail/chat_attachment_sheet.dart';
+import '../../services/picker_service/chat_camera_services.dart';
+import '../../services/picker_service/chat_voice_recorder_service.dart';
+import '../widgets/app_feedback.dart';
 import 'call/call_screen.dart';
 import 'chat_detail_app_bar.dart';
-import '../widgets/chat_detail/chat_detail_content.dart';
-import '../widgets/chat_detail/chat_message_action_sheet.dart';
-import '../widgets/chat_detail/chat_sample_messages.dart';
-import 'chat_message_search_screen.dart';
+import 'chat_search/chat_message_search_screen.dart';
 
 // ---------------------------------------------------------------------
 // 1. Controller handling all state and lifecycles
@@ -31,7 +33,8 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
   final RxList<ChatMessageModel> messages = <ChatMessageModel>[].obs;
 
   final ChatCameraService cameraService = ChatCameraService();
-  final ChatVoiceRecorderService voiceRecorderService = ChatVoiceRecorderService();
+  final ChatVoiceRecorderService voiceRecorderService =
+  ChatVoiceRecorderService();
 
   DateTime? voiceRecordingStartedAt;
 
@@ -163,8 +166,10 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       }
 
       double maxScrollExtent = scrollController.position.maxScrollExtent;
-      double scrollPercent = messages.length <= 1 ? 0 : messageIndex / (messages.length - 1);
-      double targetOffset = (maxScrollExtent * scrollPercent).clamp(0, maxScrollExtent);
+      double scrollPercent =
+      messages.length <= 1 ? 0 : messageIndex / (messages.length - 1);
+      double targetOffset =
+      (maxScrollExtent * scrollPercent).clamp(0, maxScrollExtent);
 
       scrollController.animateTo(
         targetOffset,
@@ -180,24 +185,21 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> confirmClearConversation() async {
+    HapticFeedback.lightImpact();
     bool? shouldClear = await Get.dialog<bool>(
-      AlertDialog(
+      CupertinoAlertDialog(
         title: const Text('Clear conversation?'),
-        content: const Text('All messages in this conversation will be removed.'),
+        content:
+        const Text('All messages in this conversation will be removed.'),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () => Get.back(result: false),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          CupertinoDialogAction(
+            isDestructiveAction: true,
             onPressed: () => Get.back(result: true),
-            child: Text(
-              'Clear',
-              style: TextStyle(
-                color: Get.theme.colorScheme.error,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            child: const Text('Clear'),
           ),
         ],
       ),
@@ -206,7 +208,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     if (isClosed || shouldClear != true) return;
 
     messages.clear();
-    _showSnackBar(message: 'Conversation cleared');
+    AppFeedback.showMessage(
+      title: 'Cleared',
+      message: 'Conversation cleared successfully',
+      icon: CupertinoIcons.trash,
+    );
   }
 
   Future<void> openCamera() async {
@@ -222,14 +228,16 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       messages.add(photoMessage);
       scrollToBottom();
     } on PlatformException catch (error) {
-      _showSnackBar(
-        message: 'Camera error: ${error.message ?? error.code}',
-        isError: true,
+      AppFeedback.showMessage(
+        title: 'Camera Error',
+        message: error.message ?? error.code,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     } catch (error) {
-      _showSnackBar(
+      AppFeedback.showMessage(
+        title: 'Error',
         message: 'Could not open camera: $error',
-        isError: true,
+        icon: CupertinoIcons.exclamationmark_circle,
       );
     }
   }
@@ -245,9 +253,17 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       messages.add(photoMessage);
       scrollToBottom();
     } on PlatformException catch (e) {
-      _showSnackBar(message: 'Gallery error: ${e.message ?? e.code}', isError: true);
+      AppFeedback.showMessage(
+        title: 'Gallery Error',
+        message: e.message ?? e.code,
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     } catch (e) {
-      _showSnackBar(message: 'Could not open gallery: $e', isError: true);
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not open gallery: $e',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     }
   }
 
@@ -262,9 +278,17 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       messages.add(fileMessage);
       scrollToBottom();
     } on PlatformException catch (e) {
-      _showSnackBar(message: 'File picker error: ${e.message ?? e.code}', isError: true);
+      AppFeedback.showMessage(
+        title: 'File Error',
+        message: e.message ?? e.code,
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     } catch (e) {
-      _showSnackBar(message: 'Could not open file picker: $e', isError: true);
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not open file picker: $e',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     }
   }
 
@@ -281,7 +305,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       messages.add(locationMessage);
       scrollToBottom();
     } catch (error) {
-      _showSnackBar(message: '$error', isError: true);
+      AppFeedback.showMessage(
+        title: 'Location Error',
+        message: '$error',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     }
   }
 
@@ -299,14 +327,34 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     showChatMessageActionsSheet(
       context: Get.context!,
       message: message,
-      onCopied: () => _showSnackBar(message: 'Message copied'),
+      onCopied: () {
+        AppFeedback.showMessage(
+          title: 'Copied',
+          message: 'Message copied to clipboard',
+          icon: CupertinoIcons.doc_on_doc,
+        );
+      },
       onReply: () {
         if (isClosed) return;
         messageFocusNode.requestFocus();
       },
+      onForward: () {
+        if (isClosed) return;
+
+        // Open your forward screen here
+        // Get.to(() => ForwardMessageView(message: message));
+      },
       onDelete: () {
         if (isClosed) return;
-        messages.removeWhere((ChatMessageModel item) => item.id == message.id);
+        messages.removeWhere(
+              (ChatMessageModel item) => item.id == message.id,
+        );
+
+        AppFeedback.showMessage(
+          title: 'Deleted',
+          message: 'Message deleted',
+          icon: CupertinoIcons.trash,
+        );
       },
     );
   }
@@ -336,15 +384,21 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     } on ChatMicPermissionException catch (error) {
       await _handleMicPermissionError(error);
     } catch (error) {
-      _showSnackBar(message: 'Could not start recording: $error', isError: true);
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not start recording: $error',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     }
   }
 
-  Future<void> _handleMicPermissionError(ChatMicPermissionException error) async {
+  Future<void> _handleMicPermissionError(
+      ChatMicPermissionException error) async {
     if (error.type == ChatMicPermissionError.denied) {
       bool shouldRetry = await _showPermissionDialog(
         title: 'Microphone access needed',
-        message: 'Allow microphone access so you can record and send voice messages.',
+        message:
+        'Allow microphone access so you can record and send voice messages.',
         confirmLabel: 'Allow',
       );
 
@@ -357,9 +411,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     bool shouldOpenSettings = await _showPermissionDialog(
       title: 'Microphone access disabled',
       message: error.type == ChatMicPermissionError.restricted
-          ? 'Microphone access is restricted on this device and can\'t be changed here.'
+          ? 'Microphone access is restricted on this device_service and can\'t be changed here.'
           : 'Voice messages need microphone access. Enable it for this app in Settings.',
-      confirmLabel: error.type == ChatMicPermissionError.restricted ? 'OK' : 'Open Settings',
+      confirmLabel: error.type == ChatMicPermissionError.restricted
+          ? 'OK'
+          : 'Open Settings',
       showSettingsAction: error.type != ChatMicPermissionError.restricted,
     );
 
@@ -375,15 +431,16 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     bool showSettingsAction = true,
   }) async {
     bool? result = await Get.dialog<bool>(
-      AlertDialog(
+      CupertinoAlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () => Get.back(result: false),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
             onPressed: () => Get.back(result: true),
             child: Text(confirmLabel),
           ),
@@ -411,7 +468,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     } on ChatMicPermissionException catch (error) {
       await _handleMicPermissionError(error);
     } catch (error) {
-      _showSnackBar(message: 'Could not start recording: $error', isError: true);
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not start recording: $error',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
     }
   }
 
@@ -460,7 +521,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     voiceRecordingStartedAt = null;
 
     if (audioPath == null || audioPath.trim().isEmpty) {
-      _showSnackBar(message: 'Recording was too short.', isError: true);
+      AppFeedback.showMessage(
+        title: 'Recording Cancelled',
+        message: 'Recording was too short.',
+        icon: CupertinoIcons.info_circle,
+      );
       return;
     }
 
@@ -483,14 +548,17 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
   void handleMenu(String value) {
     switch (value) {
       case 'view_profile':
-        _showSnackBar(message: 'Open ${chat.name} profile');
+        openProfileDetail();
         break;
       case 'search':
         openMessageSearch();
         break;
       case 'mute':
-        _showSnackBar(
-          message: chat.isMuted ? 'Notifications unmuted' : 'Notifications muted',
+        AppFeedback.showMessage(
+          title: 'Notifications',
+          message:
+          chat.isMuted ? 'Notifications unmuted' : 'Notifications muted',
+          icon: chat.isMuted ? CupertinoIcons.bell : CupertinoIcons.bell_slash,
         );
         break;
       case 'clear':
@@ -520,24 +588,6 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
       );
     });
   }
-
-  void _showSnackBar({
-    required String message,
-    bool isError = false,
-  }) {
-    final ColorScheme colorScheme = Get.theme.colorScheme;
-    Get.rawSnackbar(
-      messageText: Text(
-        message,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-      ),
-      backgroundColor: isError ? colorScheme.error : colorScheme.primary,
-      borderRadius: 14,
-      margin: const EdgeInsets.all(14),
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(milliseconds: 2000),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------
@@ -550,7 +600,6 @@ class ChatDetailScreen extends StatelessWidget {
     super.key,
     required this.chat,
   }) {
-    // Registers a unique controller tagged by hash code so nested/parallel chats don't collide
     Get.put(
       ChatDetailController(chat: chat),
       tag: chat.hashCode.toString(),
@@ -560,17 +609,17 @@ class ChatDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String tag = chat.hashCode.toString();
-    final ChatDetailController controller = Get.find<ChatDetailController>(tag: tag);
+    final ChatDetailController controller =
+    Get.find<ChatDetailController>(tag: tag);
     final ThemeData theme = Theme.of(context);
 
-    final double appBarSpace = MediaQuery.paddingOf(context).top + 68;
+    final double appBarSpace = MediaQuery.paddingOf(context).top + 60;
 
     return GestureDetector(
       onTapUp: (TapUpDetails details) {
         final double screenHeight = MediaQuery.of(context).size.height;
         final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-        // Excludes bottom input bar area from dismissing keyboard
         final double dismissBoundary = screenHeight - keyboardHeight - 90;
 
         if (details.globalPosition.dy < dismissBoundary) {
@@ -606,7 +655,6 @@ class ChatDetailScreen extends StatelessWidget {
           },
           onMenuSelected: controller.handleMenu,
         ),
-        // Obx monitors active streams like voice recording & message updates beautifully
         body: Obx(
               () => ChatDetailContent(
             chatName: chat.name,
@@ -620,7 +668,8 @@ class ChatDetailScreen extends StatelessWidget {
             onCamera: controller.openCamera,
             onMessageLongPress: controller.showMessageActions,
             isRecording: controller.isRecordingVoice.value,
-            isHoldRecording: controller.isRecordingVoice.value && !controller.isTapRecordingMode.value,
+            isHoldRecording: controller.isRecordingVoice.value &&
+                !controller.isTapRecordingMode.value,
             voiceDragDx: controller.voiceDragDx.value,
             cancelThreshold: ChatDetailController.cancelDragThreshold,
             onVoiceTap: controller.onVoiceTap,

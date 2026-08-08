@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../widgets/auth/reset_password_form.dart';
+import 'reset_password_form.dart';
 
 class ResetPasswordScreen extends StatelessWidget {
   final Future<void> Function(String password)? onSubmit;

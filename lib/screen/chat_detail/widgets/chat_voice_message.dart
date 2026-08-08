@@ -1,178 +1,370 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
 
-class ChatVoiceRecordingBar extends StatefulWidget {
-  final bool isHoldMode;
-  final double dragDx;
-  final double cancelThreshold;
+import '../../../models/chat_message_model.dart';
 
-  const ChatVoiceRecordingBar({
+/// REPLACED: Modern Voice Message Bubble (Replaces old Slider UI with Waveform Visualizer + Soft Pink Play Button + Transcript)
+class ChatVoiceMessage extends StatefulWidget {
+  final ChatMessageModel message;
+  final Color receivedTextColor;
+  final Widget timeStatus;
+
+  const ChatVoiceMessage({
     super.key,
-    required this.isHoldMode,
-    required this.dragDx,
-    required this.cancelThreshold,
+    required this.message,
+    required this.receivedTextColor,
+    required this.timeStatus,
   });
 
   @override
-  State<ChatVoiceRecordingBar> createState() => _ChatVoiceRecordingBarState();
+  State<ChatVoiceMessage> createState() => _ChatVoiceMessageState();
 }
 
-class _ChatVoiceRecordingBarState extends State<ChatVoiceRecordingBar>
-    with TickerProviderStateMixin {
-  late final Timer _timer;
-  Duration _elapsed = Duration.zero;
+class _ChatVoiceMessageState extends State<ChatVoiceMessage> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  Duration _duration = Duration.zero;
 
-  // Pulsing red recording dot
-  late final AnimationController _pulseController;
+  bool _isLoading = true;
+  bool _hasError = false;
 
-  // Bouncing "slide to cancel" chevrons
-  late final AnimationController _chevronController;
+  // REPLACED: Vertical waveform bar heights replacing the old Slider line
+  static const List<double> _waveformHeights = [
+    6, 10, 14, 8, 18, 22, 12, 16, 20, 10, 14, 18, 24, 20, 14, 10, 16, 22, 18,
+    12, 8, 14, 10, 6, 12, 8, 16, 10, 6
+  ];
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        setState(() => _elapsed += const Duration(seconds: 1));
+    _loadVoice();
+  }
+
+  /// FIXED: Audio loading logic supporting local file paths & URIs safely
+  Future<void> _loadVoice() async {
+    String? audioPath = widget.message.mediaPath;
+
+    if (audioPath == null || audioPath.trim().isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+      return;
+    }
+
+    try {
+      Duration? loadedDuration;
+      String cleanPath = audioPath.trim();
+
+      if (cleanPath.startsWith('file://')) {
+        cleanPath = Uri.parse(cleanPath).toFilePath();
       }
-    });
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    )..repeat(reverse: true);
+      if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+        loadedDuration = await _audioPlayer.setUrl(cleanPath);
+      } else {
+        File file = File(cleanPath);
 
-    _chevronController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat();
+        if (!await file.exists()) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+
+        if (await file.exists()) {
+          loadedDuration = await _audioPlayer.setAudioSource(
+            AudioSource.uri(Uri.file(file.path)),
+          );
+        } else {
+          throw Exception('Voice file not found at path: $cleanPath');
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _duration = loadedDuration ?? _audioPlayer.duration ?? Duration.zero;
+        _isLoading = false;
+        _hasError = false;
+      });
+    } catch (error) {
+      debugPrint('Error loading voice message: $error');
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
+  }
+
+  Future<void> _togglePlayback() async {
+    if (_isLoading || _hasError) return;
+    HapticFeedback.selectionClick();
+
+    try {
+      if (_audioPlayer.processingState == ProcessingState.completed) {
+        await _audioPlayer.seek(Duration.zero);
+      }
+      if (_audioPlayer.playing) {
+        await _audioPlayer.pause();
+      } else {
+        unawaited(_audioPlayer.play());
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _hasError = true;
+      });
+    }
+  }
+
+  /// ADDED: Tap & Drag gesture seeking across the waveform bars
+  void _seekToPercent(double percent) {
+    if (_duration == Duration.zero) return;
+    int targetMs = (_duration.inMilliseconds * percent.clamp(0.0, 1.0)).round();
+    _audioPlayer.seek(Duration(milliseconds: targetMs));
+  }
+
+  String _formatDuration(Duration duration) {
+    int minutes = duration.inMinutes;
+    int seconds = duration.inSeconds.remainder(60);
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
   @override
   void dispose() {
-    _timer.cancel();
-    _pulseController.dispose();
-    _chevronController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
-  }
-
-  String _format(Duration d) {
-    String m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$m:$s';
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
+    bool isMe = widget.message.isMe;
 
-    double cancelProgress =
-    (widget.dragDx / widget.cancelThreshold).clamp(0.0, 1.0);
+    // REPLACED: Soft pink circular play button background (matches target design)
+    Color playButtonBg = isMe
+        ? Colors.white.withValues(alpha: 0.25)
+        : const Color(0xFFFDE8EC);
 
-    Color cancelColor = Color.lerp(
-      colorScheme.onSurfaceVariant,
-      colorScheme.error,
-      cancelProgress,
-    )!;
+    Color playIconColor = isMe ? Colors.white : const Color(0xFF2C3E50);
 
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Row(
-        children: [
-          // Recording indicator: pulsing red dot
-          FadeTransition(
-            opacity: Tween(begin: 0.35, end: 1.0).animate(
-              CurvedAnimation(
-                parent: _pulseController,
-                curve: Curves.easeInOut,
-              ),
-            ),
-            child: Container(
-              width: 10,
-              height: 10,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
+    Color activeWaveColor = isMe ? Colors.white : const Color(0xFF1E293B);
 
-          // Timer
-          Text(
-            _format(_elapsed),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
+    Color inactiveWaveColor = isMe
+        ? Colors.white.withValues(alpha: 0.38)
+        : const Color(0xFFCBD5E1);
 
-          const Spacer(),
+    Color textColor = isMe
+        ? Colors.white.withValues(alpha: 0.82)
+        : const Color(0xFF64748B);
 
-          // "Slide to cancel" — fades out and shifts left as user drags,
-          // turns red near the cancel threshold. Chevrons gently bounce
-          // left/right the way Telegram's do.
-          if (widget.isHoldMode)
-            Opacity(
-              opacity: 1 - cancelProgress,
-              child: Transform.translate(
-                offset: Offset(-50 * cancelProgress, 0),
-                child: AnimatedBuilder(
-                  animation: _chevronController,
-                  builder: (context, child) {
-                    double bounce = math.sin(
-                      _chevronController.value * 2 * math.pi,
-                    ) * 3;
-                    return Transform.translate(
-                      offset: Offset(bounce, 0),
-                      child: child,
-                    );
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.keyboard_double_arrow_left_rounded,
-                        size: 18,
-                        color: cancelColor,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        'Slide to cancel',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: cancelColor,
-                          fontWeight: cancelProgress > 0.6
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                        ),
-                      ),
-                    ],
+    if (_hasError) {
+      return SizedBox(
+        width: 250,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? Colors.white.withValues(alpha: 0.14)
+                        : colorScheme.error.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.exclamationmark_circle,
+                    color: isMe ? Colors.white : colorScheme.error,
+                    size: 22,
                   ),
                 ),
-              ),
-            )
-          else
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.mic_none_rounded,
-                  size: 16,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Tap to stop',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Voice unavailable',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isMe ? Colors.white : widget.receivedTextColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-        ],
+            const SizedBox(height: 6),
+            widget.timeStatus,
+          ],
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: 250,
+      child: StreamBuilder<PlayerState>(
+        stream: _audioPlayer.playerStateStream,
+        builder: (context, snapshot) {
+          PlayerState? playerState = snapshot.data;
+          bool isPlaying = playerState?.playing ?? false;
+
+          if (playerState?.processingState == ProcessingState.completed) {
+            isPlaying = false;
+          }
+
+          return StreamBuilder<Duration>(
+            stream: _audioPlayer.positionStream,
+            initialData: Duration.zero,
+            builder: (context, snapshot) {
+              Duration position = snapshot.data ?? Duration.zero;
+              double progress = _duration.inMilliseconds > 0
+                  ? (position.inMilliseconds / _duration.inMilliseconds)
+                  .clamp(0.0, 1.0)
+                  : 0.0;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // REPLACED: Top Row - Soft Pink Play Button + Audio Waveform Visualizer
+                  Row(
+                    children: [
+                      // REPLACED: Circular soft-pink play/pause button
+                      GestureDetector(
+                        onTap: _isLoading ? null : _togglePlayback,
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: playButtonBg,
+                            shape: BoxShape.circle,
+                          ),
+                          child: _isLoading
+                              ? Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: playIconColor,
+                            ),
+                          )
+                              : Icon(
+                            isPlaying
+                                ? CupertinoIcons.pause_fill
+                                : CupertinoIcons.play_fill,
+                            color: playIconColor,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // REPLACED: Vertical waveform visualizer bars replacing old Slider line
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTapDown: (details) {
+                            RenderBox? box =
+                            context.findRenderObject() as RenderBox?;
+                            if (box != null) {
+                              double dx = details.localPosition.dx;
+                              _seekToPercent(dx / box.size.width);
+                            }
+                          },
+                          onHorizontalDragUpdate: (details) {
+                            RenderBox? box =
+                            context.findRenderObject() as RenderBox?;
+                            if (box != null) {
+                              double dx = details.localPosition.dx;
+                              _seekToPercent(dx / box.size.width);
+                            }
+                          },
+                          child: SizedBox(
+                            height: 28,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: List.generate(
+                                _waveformHeights.length,
+                                    (index) {
+                                  double barProgress =
+                                      (index + 1) / _waveformHeights.length;
+                                  bool isPlayed = barProgress <= progress;
+
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 100),
+                                    width: 2.8,
+                                    height: _waveformHeights[index],
+                                    decoration: BoxDecoration(
+                                      color: isPlayed
+                                          ? activeWaveColor
+                                          : inactiveWaveColor,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // REPLACED: Bottom Row - Transcript Text Preview & Duration Timestamp
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // REPLACED: Transcript preview text ("Generating transcript..." or transcribed text)
+                      Expanded(
+                        child: Text(
+                          widget.message.text.trim().isNotEmpty
+                              ? widget.message.text
+                              : 'Generating transcript...',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: textColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // REPLACED: Duration timestamp on right (e.g., 0:03 or 00:23)
+                      Text(
+                        _formatDuration(isPlaying ? position : _duration),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: textColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // ADDED: Timestamp and read status ticks at bottom right
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: widget.timeStatus,
+                  ),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }

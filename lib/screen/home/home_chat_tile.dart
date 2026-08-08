@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/chat_model.dart';
-import 'home_chat_actions_sheet.dart';
+import '../../models/chat_model.dart';
+import 'sheet/home_chat_actions_sheet.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Swipe-to-archive + long-press-actions wrapper

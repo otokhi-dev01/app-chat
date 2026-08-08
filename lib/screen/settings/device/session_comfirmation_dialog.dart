@@ -10,7 +10,7 @@ class SessionConfirmationDialog {
       context: context,
       title: 'terminate_session'.tr,
       message: 'terminate_session_confirmation'.trParams({
-        'device': deviceName,
+        'device_service': deviceName,
       }),
     );
   }

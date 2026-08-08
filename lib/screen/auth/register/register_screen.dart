@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/auth/auth_controller.dart';
-import '../widgets/auth/auth_text_field.dart';
+import '../../../controllers/auth/auth_controller.dart';
+import '../auth_text_field.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({

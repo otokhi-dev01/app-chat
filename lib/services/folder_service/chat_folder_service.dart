@@ -1,4 +1,4 @@
-import '../models/chat_folder_model.dart';
+import '../../models/chat_folder_model.dart';
 
 abstract class ChatFolderService {
   Future<List<ChatFolderModel>> getFolders();

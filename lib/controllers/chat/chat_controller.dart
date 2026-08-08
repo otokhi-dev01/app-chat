@@ -8,7 +8,7 @@ import '../../route/app_route.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
 import '../../screen/home/archived_chat/archived_chat_screen.dart';
 import '../../screen/home/search/search_screen.dart';
-import '../../services/chat_list_service.dart';
+import '../../services/massage_service /chat_list_service.dart';
 
 class ChatController extends GetxController {
   final ChatListService chatService;

@@ -113,7 +113,7 @@ class AddPostCameraController
 
       if (_cameras.isEmpty) {
         errorMessage.value =
-        'No camera was found on this device.';
+        'No camera was found on this device_service.';
 
         return;
       }

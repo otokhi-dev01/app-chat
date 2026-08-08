@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/chat_folder_model.dart';
+import '../../models/chat_folder_model.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empty folder view

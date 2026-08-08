@@ -1,4 +1,4 @@
-import 'package:appchat/services/user_service.dart';
+import 'package:appchat/services/user_service/user_service.dart';
 import '../../../models/user_model.dart';
 import '../../data/mock_chat_database.dart';
 import 'mock_service_delay.dart';

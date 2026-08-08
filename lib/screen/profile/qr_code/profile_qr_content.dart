@@ -1,4 +1,4 @@
-import 'package:appchat/screen/widgets/qr_code/profile_qr_action_button.dart';
+import 'package:appchat/screen/profile/qr_code/profile_qr_action_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../common/app_feedback.dart';
+import '../../widgets/app_feedback.dart';
 
 class QrScannerMessage extends StatelessWidget {
   final String message;

@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 import '../../../models/contact_model.dart';
 import '../../../route/app_route.dart';
 import '../../../services/download/profile_qr_download_service.dart';
-import '../../widgets/common/app_feedback.dart';
-import '../../widgets/qr_code/profile_qr_content.dart';
+import '../../widgets/app_feedback.dart';
+import 'profile_qr_content.dart';
 import 'profile_qr_app_bar.dart';
 
 class ProfileQrCodeScreen extends StatelessWidget {

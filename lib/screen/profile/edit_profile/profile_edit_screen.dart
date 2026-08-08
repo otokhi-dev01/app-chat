@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/profile/edit_profile_controller.dart';
-import '../../controllers/settings/settings_controller.dart';
-import '../../services/chat_camera_services.dart';
-import '../widgets/profile/edit/full_profile_image_viewer.dart';
-import '../widgets/profile/edit/profile_avatar_section.dart';
-import '../widgets/profile/edit/profile_field.dart';
-import '../widgets/profile/edit/profile_photo_sheet.dart';
+import '../../../controllers/profile/edit_profile_controller.dart';
+import '../../../controllers/settings/settings_controller.dart';
+import '../../../services/picker_service/chat_camera_services.dart';
+import 'full_profile_image_viewer.dart';
+import 'profile_avatar_section.dart';
+import 'profile_field.dart';
+import 'profile_photo_sheet.dart';
 
 class ProfileEditScreen extends StatelessWidget {
   ProfileEditScreen({

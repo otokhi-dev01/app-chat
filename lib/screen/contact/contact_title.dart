@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../models/contact_model.dart';
+import '../../models/contact_model.dart';
 
 class ContactTile extends StatelessWidget {
   final ContactModel contact;

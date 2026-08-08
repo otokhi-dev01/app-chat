@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/auth/auth_controller.dart';
-import '../widgets/auth/auth_text_field.dart';
-import 'auth_layout.dart';
-import 'forgot_password_screen.dart';
-import 'register_screen.dart';
+import '../../../controllers/auth/auth_controller.dart';
+import '../auth_text_field.dart';
+import '../auth_layout.dart';
+import '../forgot_password/forgot_password_screen.dart';
+import '../register/register_screen.dart';
 
 class LoginScreen extends GetView<AuthController> {
   const LoginScreen({

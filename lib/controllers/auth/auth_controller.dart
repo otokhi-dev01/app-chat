@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import '../../data/mock_auth_user.dart';
 import '../../route/app_route.dart';
-import '../../screen/widgets/common/app_feedback.dart';
-import '../../services/auth_service.dart';
+import '../../screen/widgets/app_feedback.dart';
+import '../../services/auth_service /auth_service.dart';
 import '../../services/mock/mock_auth_service.dart';
 
 class AuthController extends GetxController {

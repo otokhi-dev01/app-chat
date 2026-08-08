@@ -1,4 +1,4 @@
-import '../../models/contact_model.dart';
+import '../../../models/contact_model.dart';
 
 abstract class ContactService {
   Future<List<ContactModel>> getContacts();

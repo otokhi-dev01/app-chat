@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../../models/blocked_contact_model.dart';
-import '../../services/blocked_contacts_service.dart';
+import '../../services/blocked_contact_service/blocked_contacts_service.dart';
 
 class BlockedContactController
     extends GetxController {

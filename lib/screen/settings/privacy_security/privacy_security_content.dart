@@ -1,4 +1,4 @@
-import 'package:appchat/screen/widgets/privacy_securty/privacy_security_title.dart';
+import 'package:appchat/screen/settings/privacy_security/privacy_security_title.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 

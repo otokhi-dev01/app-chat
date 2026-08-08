@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import '../../../controllers/contact/add_group_controller.dart';
 import '../../../models/contact_model.dart';
-import '../../widgets/add_group/add_group_content.dart';
-import '../../widgets/common/app_feedback.dart';
+import 'add_group_content.dart';
+import '../../widgets/app_feedback.dart';
 import 'add_group_app_bar.dart';
 
 class AddGroupScreen extends StatelessWidget {

@@ -2,7 +2,7 @@ import 'package:appchat/screen/settings/privacy_security/privacy_option_sheet.da
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/settings/settings_privacy_security_controller.dart';
-import '../../widgets/privacy_securty/privacy_security_content.dart';
+import 'privacy_security_content.dart';
 import 'privacy_security_app_bar.dart';
 
 class PrivacySecurityScreen extends StatelessWidget {

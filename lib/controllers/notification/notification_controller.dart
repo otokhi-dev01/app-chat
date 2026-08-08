@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../screen/widgets/common/app_feedback.dart';
+import '../../screen/widgets/app_feedback.dart';
 import '../../services/notification/notification_settings_service.dart';
 
 class NotificationController

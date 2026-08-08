@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/device_session_model.dart';
-import '../../services/device_service.dart';
+import '../../services/device_service/device_service.dart';
 
 class DeviceController extends GetxController {
   final DeviceService deviceService;
@@ -101,7 +101,7 @@ class DeviceController extends GetxController {
       Get.snackbar(
         'session_terminated'.tr,
         'device_logged_out'.trParams({
-          'device': session.deviceName,
+          'device_service': session.deviceName,
         }),
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.all(16),

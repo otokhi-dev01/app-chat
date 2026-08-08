@@ -1,5 +1,5 @@
-import '../models/chat_model.dart';
-import '../models/user_model.dart';
+import '../../models/chat_model.dart';
+import '../../models/user_model.dart';
 
 abstract class ChatListService {
   Future<List<ChatModel>> getChats();

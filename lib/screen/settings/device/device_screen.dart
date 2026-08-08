@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/device/device_controller.dart';
-import '../../../services/device_service.dart';
+import '../../../services/device_service/device_service.dart';
 import '../../../services/mock/mock_device_service.dart';
-import '../../widgets/device/device_content.dart';
-import '../../widgets/device/device_state_view.dart';
+import 'device_content.dart';
+import 'device_state_view.dart';
 import 'device_app_bar.dart';
 
 class DevicesScreen extends StatelessWidget {

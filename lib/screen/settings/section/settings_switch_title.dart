@@ -1,4 +1,4 @@
-import 'package:appchat/screen/widgets/settings/settings_title_text.dart';
+import 'package:appchat/screen/settings/section/settings_title_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

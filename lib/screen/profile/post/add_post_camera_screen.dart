@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/profile/add_post_camera_controller.dart';
-import '../../widgets/post/add_post_camera_controls.dart';
-import '../../widgets/post/add_post_camera_preview.dart';
+import 'add_post_camera_controls.dart';
+import 'add_post_camera_preview.dart';
 import 'add_post_camera_top_bar.dart';
 
 class AddPostCameraScreen

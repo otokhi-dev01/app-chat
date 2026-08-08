@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../contact/add_contact/add_contact_sheet.dart';
+import 'add_contact/add_contact_sheet.dart';
 
-export '../../contact/add_contact/add_contact_sheet.dart'
+export 'add_contact/add_contact_sheet.dart'
     show AddContactData;
 
 Future<void> showAddContactSheet({

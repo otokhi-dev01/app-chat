@@ -2,10 +2,10 @@ import 'package:get/get.dart';
 
 import '../../../controllers/contact/qr_contact_scanner_controller.dart';
 import '../../../route/app_route.dart';
-import '../../../services/contact_service.dart';
+import '../../../services/contact_service/contact_service.dart';
 import '../../../services/mock/mock_app_user_service.dart';
 import '../../../services/mock/mock_contact_service.dart';
-import '../../../services/user_service.dart';
+import '../../../services/user_service/user_service.dart';
 
 class QrContactScannerBinding extends Bindings {
   @override

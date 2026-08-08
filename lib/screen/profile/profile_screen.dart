@@ -1,5 +1,8 @@
 import 'package:appchat/screen/profile/post/add_post_camera_screen.dart';
 import 'package:appchat/screen/profile/qr_code/profile_qr_code_screen.dart';
+import 'package:appchat/screen/profile/story/profile_add_post_button.dart';
+import 'package:appchat/screen/profile/story/profile_post_viewer_screen.dart';
+import 'package:appchat/screen/profile/story/profile_story_post_section.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,10 +14,7 @@ import '../../data/mock_profile_story_post_data.dart';
 import '../../models/add_post_capture_result.dart';
 import '../../models/profile_story_post_model.dart';
 import '../../route/app_route.dart';
-import '../widgets/settings/account_screen.dart';
-import '../widgets/story/profile_add_post_button.dart';
-import '../widgets/story/profile_post_viewer_screen.dart';
-import '../widgets/story/profile_story_post_section.dart';
+import '../settings/section/account_screen.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({

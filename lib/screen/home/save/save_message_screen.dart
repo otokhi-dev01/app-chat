@@ -8,13 +8,13 @@ import 'package:get/get.dart';
 import '../../../controllers/save/save_message_controller.dart';
 import '../../../models/chat_message_model.dart';
 import '../../../models/save_message_model.dart';
-import '../../../services/message_service.dart';
+import '../../../services/massage_service /message_service.dart';
 import '../../../services/mock/mock_message_service.dart';
 import '../../../services/mock/mock_saved_message_service.dart';
-import '../../../services/save_message_service.dart';
-import '../../widgets/chat_detail/chat_attachment_sheet.dart';
-import '../../widgets/chat_detail/chat_input_bar.dart';
-import '../../widgets/chat_detail/chat_message_list.dart';
+import '../../../services/saved_service/save_message_service.dart';
+import '../../chat_detail/widgets/chat_attachment_sheet.dart';
+import '../../chat_detail/widgets/chat_input_bar.dart';
+import '../../chat_detail/widgets/chat_message_list.dart';
 
 class SavedMessagesScreen extends StatelessWidget {
   const SavedMessagesScreen({super.key});

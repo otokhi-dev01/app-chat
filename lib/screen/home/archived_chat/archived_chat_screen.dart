@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../models/chat_model.dart';
-import '../../widgets/archived/archived_chats_actions_sheet.dart';
-import '../../widgets/archived/archived_chats_app_bar.dart';
-import '../../widgets/archived/archived_chats_empty_state.dart';
-import '../../widgets/archived/archived_chats_title.dart';
-import '../../widgets/common/app_feedback.dart';
+import 'archived_chats_actions_sheet.dart';
+import 'archived_chats_app_bar.dart';
+import 'archived_chats_empty_state.dart';
+import 'archived_chats_title.dart';
+import '../../widgets/app_feedback.dart';
 
 class ArchivedChatsScreen extends StatefulWidget {
   final List<ChatModel> archivedChats;

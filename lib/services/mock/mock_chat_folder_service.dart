@@ -1,6 +1,6 @@
 import '../../data/mock_chat_folder_data.dart';
 import '../../models/chat_folder_model.dart';
-import '../chat_folder_service.dart';
+import '../folder_service/chat_folder_service.dart';
 
 class MockChatFolderService
     implements ChatFolderService {

@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import '../../models/chat_model.dart';
 import '../../models/contact_model.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
-import '../../screen/widgets/common/app_feedback.dart';
-import '../../services/contact_service.dart';
+import '../../screen/widgets/app_feedback.dart';
+import '../../services/contact_service/contact_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ContactController extends GetxController {

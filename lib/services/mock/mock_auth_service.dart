@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../data/mock_auth_user.dart';
-import '../auth_service.dart';
+import '../auth_service /auth_service.dart';
 
 class MockAuthService implements AuthService {
   @override

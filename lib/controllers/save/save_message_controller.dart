@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 
 import '../../models/chat_message_model.dart';
 import '../../models/save_message_model.dart';
-import '../../services/chat_camera_services.dart';
-import '../../services/chat_voice_recorder_service.dart';
-import '../../services/save_message_service.dart';
+import '../../services/picker_service/chat_camera_services.dart';
+import '../../services/picker_service/chat_voice_recorder_service.dart';
+import '../../services/saved_service/save_message_service.dart';
 
 class SavedMessagesController extends GetxController {
   final SavedMessageService savedMessageService;

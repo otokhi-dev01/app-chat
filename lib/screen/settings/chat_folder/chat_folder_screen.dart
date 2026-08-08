@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import '../../../controllers/settings/chat_folder_controller.dart';
 import '../../../models/chat_folder_model.dart';
-import '../../widgets/chat_folder/chat_folder_content.dart';
-import '../../widgets/common/app_feedback.dart';
+import 'chat_folder_content.dart';
+import '../../widgets/app_feedback.dart';
 import 'chat_folder_app_bar.dart';
 import 'create_folder_screen.dart';
 

@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../route/app_route.dart';
-import '../../screen/widgets/common/app_feedback.dart';
-import '../../services/auth_service.dart';
+import '../../screen/widgets/app_feedback.dart';
+import '../../services/auth_service /auth_service.dart';
 
 class DeleteAccountController extends GetxController {
   final AuthService authService;

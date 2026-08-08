@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../models/chat_message_model.dart';
-import '../../../services/chat_camera_services.dart';
+import '../../../services/picker_service/chat_camera_services.dart';
 
 class AddPostScreen extends StatefulWidget {
   AddPostScreen({

@@ -468,13 +468,13 @@ final Map<String, String> kmKH = {
   'តើអ្នកពិតជាចង់ចាកចេញពីគណនីលើឧបករណ៍ផ្សេងទៀតទាំងអស់មែនទេ? អ្នកនឹងនៅតែចូលគណនីលើឧបករណ៍នេះ។',
 
   'terminate_session_confirmation':
-  'តើអ្នកពិតជាចង់បញ្ចប់ការប្រើប្រាស់គណនីលើឧបករណ៍ @device មែនទេ?',
+  'តើអ្នកពិតជាចង់បញ្ចប់ការប្រើប្រាស់គណនីលើឧបករណ៍ @device_service មែនទេ?',
 
   // Device termination results
   'session_terminated':
   'បានបញ្ចប់ការប្រើប្រាស់',
   'device_logged_out':
-  'ឧបករណ៍ @device ត្រូវបានចាកចេញពីគណនី',
+  'ឧបករណ៍ @device_service ត្រូវបានចាកចេញពីគណនី',
 
   'unable_to_terminate_session':
   'មិនអាចបញ្ចប់ការប្រើប្រាស់បានទេ',

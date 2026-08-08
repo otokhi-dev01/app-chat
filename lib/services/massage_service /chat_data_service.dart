@@ -1,8 +1,8 @@
-import '../models/chat_message_model.dart';
-import '../models/chat_model.dart';
-import '../models/contact_model.dart';
-import '../models/save_message_model.dart';
-import '../models/user_model.dart';
+import '../../models/chat_message_model.dart';
+import '../../models/chat_model.dart';
+import '../../models/contact_model.dart';
+import '../../models/save_message_model.dart';
+import '../../models/user_model.dart';
 
 abstract class ChatDataService {
   Future<AppUserModel?> getCurrentProfile();

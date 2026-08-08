@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/chat/chat_controller.dart';
-import '../../../controllers/settings/chat_folder_controller.dart';
-import '../../../models/chat_folder_model.dart';
+import '../../../../controllers/chat/chat_controller.dart';
+import '../../../../controllers/settings/chat_folder_controller.dart';
+import '../../../../models/chat_folder_model.dart';
 
 class HomeCategoryFilter extends StatefulWidget {
   final ChatController controller;

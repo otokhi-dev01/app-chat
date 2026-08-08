@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../common/app_feedback.dart';
+import '../../widgets/app_feedback.dart';
 
 class VerifyOtpForm extends StatefulWidget {
   final String destination;

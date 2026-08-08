@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../widgets/auth/forgot_password_form.dart';
+import 'forgot_password_form.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   final Future<void> Function(String email)? onSubmit;
