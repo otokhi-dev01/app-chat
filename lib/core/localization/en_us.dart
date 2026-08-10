@@ -9,7 +9,7 @@ final Map<String, String> enUS = {
   'edit_folder': 'Edit Folder',
   'delete_folder': 'Deleted Folder',
   'folder_header_description': 'Manage your chat folders',
-  'folder_count': 'Folder Count',
+  'folders_count': 'Folder Count',
   'default_folders': 'Default Folders',
   'custom_folder': 'Custom Folders',
   'custom_folders': 'Custom Folders',
@@ -19,7 +19,6 @@ final Map<String, String> enUS = {
   'folder_name_example': 'Example Folder Name',
   'add_members': 'Add Members',
   'folder_name': 'Folder Name',
-
   'delete_account': 'Delete Account',
   'delete_account_question': 'Delete your account?',
   'delete_account_confirmation':
@@ -65,7 +64,7 @@ final Map<String, String> enUS = {
   'archived_conversation': 'Archived Conversations',
   'mute_notifications': 'Mute Notifications',
   'unmute_notifications': 'Unmute Notifications',
-  'conversation_count': 'Conversation Count',
+  'conversations_count': 'Conversation Count',
   'no_archived_chats': 'No Archived Chats',
   'archived_chats_hint_desc': 'Archive conversations to save space',
   'swipe_left_to_archive': 'Swipe left to archive',
@@ -134,6 +133,25 @@ final Map<String, String> enUS = {
 
   'no_saved_messages': 'No Saved Messages',
   'saved_messages_empty_desc': 'Save messages to access them later',
+  'search_country': 'Search Country',
+  'no_results_found': 'No Results Found',
+  'no_results_for': 'No results for',
+  'no_contacts_match_search': 'No contacts match search',
+  'no_contacts_found': 'No Contacts Found',
+  'no_chats_match': 'No chats match',
+  'clear_search': 'Clear Search',
+  'create_new_group': 'Create New Group',
+  'send_message': 'Send Message',
+  'delete_contact': 'Delete Contact',
+  'are_you_sure_delete_contact': 'Are you sure you want to delete this contact?',
+  'group_chat': 'Group Chat',
+  'personal_chat': 'Personal Chat',
+
+
+  'no_contacts_yet': 'No Contacts Yet',
+  'add_contacts_to_start': 'Add contacts to start chatting',
+  'recently_active': 'Recently Active',
+
 
 
 
