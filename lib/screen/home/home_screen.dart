@@ -1,6 +1,7 @@
 import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../controllers/settings/chat_folder_controller.dart';
 import '../../services/folder_service/chat_folder_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
@@ -10,8 +11,8 @@ import '../contact/contact_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/setting_screen.dart';
 import '../widgets/navigation/main_bottom_navigation.dart';
-import 'home_app_bar.dart';
 import 'chat_list/home_chat_list.dart';
+import 'home_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -42,7 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    pageController = PageController(initialPage: selectedIndex);
+    pageController = PageController(
+      initialPage: selectedIndex,
+    );
 
     if (!Get.isRegistered<ChatListService>()) {
       Get.put<ChatListService>(
@@ -54,8 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!Get.isRegistered<ChatController>()) {
       Get.put<ChatController>(
         ChatController(
-          chatService:
-          Get.find<ChatListService>(),
+          chatService: Get.find<ChatListService>(),
         ),
         permanent: true,
       );
@@ -71,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!Get.isRegistered<ChatFolderController>()) {
       Get.put<ChatFolderController>(
         ChatFolderController(
-          folderService:
-          Get.find<ChatFolderService>(),
+          folderService: Get.find<ChatFolderService>(),
         ),
         permanent: true,
       );
@@ -88,8 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  /// Called when the bottom nav is tapped — animates the PageView,
-  /// which in turn triggers onPageSwiped to update selectedIndex.
   void changePage(int index) {
     if (index == selectedIndex) {
       return;
@@ -102,9 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Called by PageView itself — covers both swipe gestures and the
-  /// animateToPage() call above, so this is the single source of truth
-  /// for selectedIndex instead of setState living in two places.
   void _onPageSwiped(int index) {
     if (index == selectedIndex) {
       return;
@@ -115,9 +111,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _onHeaderSwipe(DragEndDetails details) {
+    final double velocity = details.primaryVelocity ?? 0;
+
+    if (velocity < -250 && selectedIndex < titles.length - 1) {
+      changePage(selectedIndex + 1);
+    } else if (velocity > 250 && selectedIndex > 0) {
+      changePage(selectedIndex - 1);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [
+    final List<Widget> screens = [
       HomeChatList(
         controller: controller,
       ),
@@ -126,22 +132,33 @@ class _HomeScreenState extends State<HomeScreen> {
       ProfileScreen(),
     ];
 
+    final HomeAppBar homeAppBar = HomeAppBar(
+      selectedIndex: selectedIndex,
+      titles: titles,
+      controller: controller,
+      onOpenSettings: () {},
+    );
+
     return Scaffold(
-      backgroundColor:
-      Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: true,
-      appBar: HomeAppBar(
-        selectedIndex: selectedIndex,
-        titles: titles,
-        controller: controller,
-        onOpenSettings: () {},
+
+      appBar: PreferredSize(
+        preferredSize: homeAppBar.preferredSize,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragEnd: _onHeaderSwipe,
+          child: homeAppBar,
+        ),
       ),
+
       body: PageView(
         controller: pageController,
         physics: const BouncingScrollPhysics(),
         onPageChanged: _onPageSwiped,
         children: screens,
       ),
+
       bottomNavigationBar: MainBottomNavigation(
         currentIndex: selectedIndex,
         onTap: changePage,

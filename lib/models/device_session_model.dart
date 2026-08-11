@@ -58,7 +58,7 @@ class DeviceSessionModel {
 
   String get lastActiveText {
     if (isCurrent) {
-      return 'This device_service';
+      return 'This device';
     }
 
     if (isOnline) {

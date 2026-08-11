@@ -114,11 +114,14 @@ final Map<String, String> enUS = {
   'profile_photos': 'Profile Photos',
   'two_step_verification': 'Two-Step Verification',
   'two_step_desc': 'Keep your account secure with two-step verification',
+  'app_lock': 'App Lock',
   'app_lock_desc': 'Keep your account secure with app lock',
+  'screen_security': 'Screen Security',
   'screen_security_desc': 'Keep your screen secure',
   'active_sessions_desc': 'Keep track of your active sessions',
   'delete_synced_contacts': 'Delete Synced Contacts',
   'delete_synced_contacts_desc': 'Delete your synced contacts',
+  'delete_synced_contacts_confirmation': 'Are you sure you want to delete your synced contacts?',
   'delete_my_account': 'Delete My Account',
   'if_away_for': 'If you are away for',
   'delete_account_if_away_desc': 'Delete your account if you are away',
@@ -151,6 +154,10 @@ final Map<String, String> enUS = {
   'no_contacts_yet': 'No Contacts Yet',
   'add_contacts_to_start': 'Add contacts to start chatting',
   'recently_active': 'Recently Active',
+  'display_language': 'Display & Language',
+
+
+
 
 
 
@@ -206,7 +213,7 @@ final Map<String, String> enUS = {
 
 'data_storage': 'Data and Storage',
 'manage_storage':
-'Manage the cache and data stored on this device_service',
+'Manage the cache and data stored on this device',
 
 'backup_sync': 'Backup and Sync',
 'manage_backup_sync':
@@ -559,7 +566,7 @@ final Map<String, String> enUS = {
   'platform_windows': 'Windows',
   'platform_linux': 'Linux',
   'platform_web': 'Web',
-  'platform_unknown': 'Unknown device_service',
+  'platform_unknown': 'Unknown device',
 
   // Devices
   'this_device': 'This Device',
@@ -577,9 +584,9 @@ final Map<String, String> enUS = {
   'no_other_active_sessions':
   'No Other Active Sessions',
   'account_only_signed_in_here':
-  'Your account is currently signed in only on this device_service.',
+  'Your account is currently signed in only on this device.',
   'current_device_unavailable':
-  'Current device_service information is unavailable.',
+  'Current device information is unavailable.',
 
   // Device loading and errors
   'unable_to_load_devices': 'Unable to Load Devices',
@@ -591,7 +598,7 @@ final Map<String, String> enUS = {
   'terminate_all_sessions_title':
   'Terminate Other Sessions?',
   'terminate_all_sessions_confirmation':
-  'Are you sure you want to sign out of all other devices? You will remain signed in on this device_service.',
+  'Are you sure you want to sign out of all other devices? You will remain signed in on this device.',
 
   'terminate_session_confirmation':
   'Are you sure you want to terminate the session on @device_service?',

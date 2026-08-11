@@ -12,6 +12,7 @@ import 'settings_section_title.dart';
 class ContactSettingsSection extends StatelessWidget {
   final ContactController contactController;
 
+
   const ContactSettingsSection({
     super.key,
     required this.contactController,
@@ -21,6 +22,33 @@ class ContactSettingsSection extends StatelessWidget {
     FocusManager.instance.primaryFocus?.unfocus();
     if (Get.currentRoute == route) return;
     Get.toNamed(route, preventDuplicates: true);
+  }
+
+  Future<void> _confirmDeleteSyncedContacts(BuildContext context) async {
+    final bool? confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return CupertinoAlertDialog(
+          title: Text('delete_synced_contacts'.tr),
+          content: Text('delete_synced_contacts_confirmation'.tr),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text('cancel'.tr),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text('delete'.tr),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await contactController.deleteSyncedContacts();
+    }
   }
 
   @override
@@ -79,6 +107,17 @@ class ContactSettingsSection extends StatelessWidget {
                   _openRoute(AppRoutes.blockedContacts);
                 },
               ),
+              SettingsDivider(color: dividerColor),
+              Obx(() {
+                return ActionSettingsTile(
+                  icon: CupertinoIcons.trash_fill,
+                  title: 'delete_synced_contacts'.tr,
+                  subtitle: 'delete_synced_contacts_desc'.tr,
+                  buttonText: 'delete'.tr,
+                  isLoading: contactController.isDeletingSyncedContacts.value,
+                  onPressed: () => _confirmDeleteSyncedContacts(context),
+                );
+              }),
             ],
           ),
         ),

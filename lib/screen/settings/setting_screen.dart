@@ -1,3 +1,4 @@
+import 'package:appchat/screen/settings/section/display_langauge_settings_section.dart';
 import 'package:appchat/screen/widgets/logout_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,14 +6,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../controllers/contact/contact_controller.dart';
 import '../../controllers/notification/notification_controller.dart';
-import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import 'section/about_settings_section.dart';
-import 'section/account_screen.dart';
 import 'section/contact_settings_section.dart';
-import 'section/display_settings_section.dart';
 import 'section/general_settings_section.dart';
-import 'section/language_settings_section.dart';
 
 class SettingScreen extends StatelessWidget {
   final bool showTopPadding;
@@ -25,7 +22,6 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SettingsController settingsController = Get.find<SettingsController>();
-    ProfileController profileController = Get.find<ProfileController>();
     NotificationController notificationController = Get.find<NotificationController>();
     ContactController contactController = Get.find<ContactController>();
 
@@ -45,11 +41,10 @@ class SettingScreen extends StatelessWidget {
             120,
           ),
           children: [
-            AccountSettingsSection(
-              controller: profileController,
-            ),
-
-            SizedBox(height: 24),
+            // AccountSettingsSection(
+            //   controller: profileController,
+            // ),
+            //
 
             GeneralSettingsSection(
               settingsController: settingsController,
@@ -64,15 +59,18 @@ class SettingScreen extends StatelessWidget {
 
             SizedBox(height: 24),
 
-            DisplaySettingsSection(
-              controller: settingsController,
-            ),
+            // DisplaySettingsSection(
+            //   controller: settingsController,
+            // ),
+            //
+            // SizedBox(height: 24),
+            //
+            // LanguageSettingsSection(
+            //   controller: settingsController,
+            // ),
 
-            SizedBox(height: 24),
+            DisplayLanguageSettingsSection(controller: settingsController),
 
-            LanguageSettingsSection(
-              controller: settingsController,
-            ),
 
             SizedBox(height: 24),
 

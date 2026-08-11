@@ -43,6 +43,18 @@ class MockContactService
   }
 
   @override
+  Future<void> deleteSyncedContacts() async {
+    await simulateDelay();
+
+    MockChatDatabase.contacts.removeWhere(
+          (ContactModel contact) {
+        // Keep manually added contacts
+        return !contact.id.startsWith('local_contact_');
+      },
+    );
+  }
+
+  @override
   Future<ContactModel?> addContactByUserId(
       String userId,
       ) async {

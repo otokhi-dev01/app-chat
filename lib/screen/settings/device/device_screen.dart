@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../controllers/device/device_controller.dart';
 import '../../../services/device_service/device_service.dart';
-import '../../../services/mock/mock_device_service.dart';
+import '../../../services/device_service/real_device_service.dart';
 import 'device_content.dart';
 import 'device_state_view.dart';
 import 'device_app_bar.dart';
@@ -16,7 +16,7 @@ class DevicesScreen extends StatelessWidget {
   DeviceController get controller {
     if (!Get.isRegistered<DeviceService>()) {
       Get.put<DeviceService>(
-        MockDeviceService(),
+        RealDeviceService(),
         permanent: true,
       );
     }

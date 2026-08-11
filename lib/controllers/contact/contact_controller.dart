@@ -24,6 +24,7 @@ class ContactController extends GetxController {
   ScrollController();
 
   final RxBool isSyncingContacts = false.obs;
+  final RxBool isDeletingSyncedContacts = false.obs;
 
   final RxList<ContactModel> contacts =
       <ContactModel>[].obs;
@@ -45,6 +46,33 @@ class ContactController extends GetxController {
     );
 
     loadContacts();
+  }
+
+  Future<void> deleteSyncedContacts() async {
+    if (isDeletingSyncedContacts.value) return;
+
+    isDeletingSyncedContacts.value = true;
+
+    try {
+      await contactService.deleteSyncedContacts();
+      await loadContacts();
+
+      AppFeedback.showMessage(
+        title: 'contacts_deleted'.tr,
+        message: 'contacts_deleted_message'.tr,
+        icon: Icons.check_circle_outline,
+      );
+    } catch (error) {
+      debugPrint('Delete synced contacts error: $error');
+
+      AppFeedback.showMessage(
+        title: 'unable_to_delete_contacts'.tr,
+        message: 'contacts_delete_failed_message'.tr,
+        icon: Icons.error_outline,
+      );
+    } finally {
+      isDeletingSyncedContacts.value = false;
+    }
   }
 
   Future<void> syncPhoneContacts() async {

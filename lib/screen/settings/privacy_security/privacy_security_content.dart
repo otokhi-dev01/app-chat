@@ -188,32 +188,6 @@ class PrivacySecurityContent extends StatelessWidget {
         SizedBox(height: 24),
 
         PrivacySecuritySectionTitle(
-          title: 'contacts'.tr,
-        ),
-        SizedBox(height: 9),
-
-        PrivacySecurityCard(
-          children: [
-            PrivacySwitchTile(
-              icon: CupertinoIcons.person_crop_circle_badge_checkmark,
-              title: 'sync_contacts'.tr,
-              subtitle: 'sync_contacts_description'.tr,
-              value: syncContactsEnabled,
-              onChanged: onSyncContactsChanged,
-            ),
-            PrivacySecurityDivider(),
-            PrivacyActionTile(
-              icon: CupertinoIcons.trash,
-              title: 'delete_synced_contacts'.tr,
-              subtitle: 'delete_synced_contacts_desc'.tr,
-              onTap: () {},
-            ),
-          ],
-        ),
-
-        SizedBox(height: 24),
-
-        PrivacySecuritySectionTitle(
           title: 'delete_my_account'.tr,
         ),
         SizedBox(height: 9),
