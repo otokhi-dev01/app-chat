@@ -20,6 +20,7 @@ abstract class AppRoutes {
   static const String editProfile = '/edit-profile';
   static const String profileDetail = '/profile-detail';
   static const String profileQrCode = '/profile-qr-code';
+  static const String call = '/call';
 
   // settings
   static const String settings = '/settings';

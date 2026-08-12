@@ -793,8 +793,10 @@ final Map<String, String> enUS = {
   'Notification permission was not allowed.',
   'permission_required': 'Permission Required',
   'enable_notifications_in_settings':
-  'Enable notifications from your device_service settings.',
+  'Enable notifications from your device settings.',
   'unable_to_update': 'Unable to Update',
+  'open_settings': 'Open Settings',
+
   'notification_update_failed':
   'Notification settings could not be changed.',
   'updating': 'Updating...',

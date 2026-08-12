@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -42,12 +42,30 @@
 	<string>OTOKHI Chat needs access to your contacts to help you find friends who use the app.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>OTOKHI Chat needs your location so you can share it in chat.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>OTOKHI Chat needs location access to share your location in chat.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>OTOKHI Chat needs microphone access to record voice messages and audio for videos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>OTOKHI Chat needs permission to save photos and QR codes to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>OTOKHI Chat needs photo library access to select photos and videos for chats and posts.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>OTOKHI Chat uses Face ID to securely unlock the app and protect your privacy.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>OTOKHI Chat uses speech recognition to convert voice messages to text.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>OTOKHI Chat uses Bluetooth to connect with wireless audio devices during calls.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>OTOKHI Chat uses Bluetooth to connect with wireless audio devices during calls.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>OTOKHI Chat needs access to your media library to share audio files.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>OTOKHI Chat uses motion sensors to optimize screen interactions and orientation.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>OTOKHI Chat uses calendar access to schedule chat events and reminders.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>OTOKHI Chat uses reminders access to set message reminders.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

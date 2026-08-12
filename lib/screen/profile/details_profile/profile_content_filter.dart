@@ -14,7 +14,7 @@ class ProfileContentFilter extends StatefulWidget {
   final ProfileContentFilterType selectedFilter;
   final ValueChanged<ProfileContentFilterType> onChanged;
 
-  ProfileContentFilter({
+  const ProfileContentFilter({
     super.key,
     required this.selectedFilter,
     required this.onChanged,
@@ -375,7 +375,7 @@ class _ProfileFilterButton extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  _ProfileFilterButton({
+  const _ProfileFilterButton({
     required this.title,
     required this.icon,
     required this.selected,

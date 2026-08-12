@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/add_post_capture_result.dart';
 
@@ -311,6 +312,46 @@ class AddPostCameraController
   Future<void> openGallery() async {
     if (isBusy.value ||
         isRecording.value) {
+      return;
+    }
+
+    PermissionStatus status = await Permission.photos.status;
+    if (!status.isGranted && !status.isLimited) {
+      status = await Permission.photos.request();
+    }
+
+    bool hasPermission = status.isGranted || status.isLimited;
+    if (!hasPermission) {
+      PermissionStatus storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
+        storageStatus = await Permission.storage.request();
+      }
+      hasPermission = storageStatus.isGranted;
+    }
+
+    if (!hasPermission) {
+      Get.dialog(
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text('permission_required'.tr),
+          content: Text('Enable photo library access from your device settings.'),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text('cancel'.tr),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back();
+                openAppSettings();
+              },
+              child: Text('open_settings'.tr),
+            ),
+          ],
+        ),
+      );
       return;
     }
 

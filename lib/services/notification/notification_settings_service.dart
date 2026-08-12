@@ -14,6 +14,10 @@ class NotificationSettingsService {
 
   final GetStorage _storage = GetStorage();
 
+  Future<PermissionStatus> checkPermissionStatus() async {
+    return await Permission.notification.status;
+  }
+
   Future<bool> loadEnabledState() async {
     bool savedValue =
         _storage.read<bool>(_notificationKey) ?? false;

@@ -95,14 +95,12 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   void _startCall() {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    AppFeedback.showMessage(
-      title: 'calling'.tr,
-      message: 'calling_user'.trParams(
-        {
-          'name': controller.name.value,
-        },
-      ),
-      icon: CupertinoIcons.phone,
+    Get.toNamed(
+      AppRoutes.call,
+      arguments: {
+        'name': controller.name.value,
+        'isVideo': false,
+      },
     );
   }
 

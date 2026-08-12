@@ -1,3 +1,4 @@
+import 'package:appchat/screen/chat_detail/chat_call_option_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -66,7 +67,11 @@ class ProfileActions extends StatelessWidget {
             child: ProfileActionButton(
               icon: CupertinoIcons.phone,
               label: 'call'.tr,
-              onTap: onCall,
+              onTap: () =>
+              ChatCallOptionsSheet.show(
+                context: context,
+                onAudioCall: onCall,
+              ),
             ),
           ),
           Expanded(

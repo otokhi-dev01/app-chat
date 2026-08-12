@@ -669,6 +669,7 @@ final Map<String, String> kmKH = {
   'permission_required': 'ត្រូវការការអនុញ្ញាត',
   'enable_notifications_in_settings':
   'សូមបើកការជូនដំណឹងក្នុងការកំណត់ឧបករណ៍។',
+  'open_settings': 'បើកការកំណត់',
   'unable_to_update': 'មិនអាចកែប្រែបាន',
   'notification_update_failed':
   'មិនអាចកែប្រែការកំណត់ការជូនដំណឹងបានទេ។',

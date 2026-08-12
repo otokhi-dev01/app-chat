@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:gal/gal.dart';
+import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ProfileQrDownloadService {
@@ -27,6 +29,29 @@ class ProfileQrDownloadService {
         await Gal.requestAccess();
 
         if (!permissionGranted) {
+          Get.dialog(
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text('permission_required'.tr),
+              content: const Text('Enable photo library access from your device settings to save QR codes.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('cancel'.tr),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.back();
+                    openAppSettings();
+                  },
+                  child: Text('open_settings'.tr),
+                ),
+              ],
+            ),
+          );
+
           throw StateError(
             'Permission to save photos was denied.',
           );

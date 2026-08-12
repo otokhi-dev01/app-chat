@@ -145,7 +145,7 @@ class AboutSettingsSection extends StatelessWidget {
                 subtitle: 'leave_a_review'.tr,
                 onTap: () {
                   _openUrl(
-                    'https://example.com/rate',
+                    'https://apps.apple.com/app/id6794264625?action=write-review',
                   );
                 },
               ),

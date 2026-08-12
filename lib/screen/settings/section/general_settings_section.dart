@@ -3,6 +3,7 @@ import 'package:appchat/screen/settings/section/settings_switch_title.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../controllers/notification/notification_controller.dart';
 import '../../../controllers/settings/settings_controller.dart';
 import '../../../route/app_route.dart';
@@ -96,12 +97,20 @@ class GeneralSettingsSection extends StatelessWidget {
           child: Column(
             children: [
               Obx(() {
+                String subtitleText = 'enable_notifications'.tr;
+                if (notificationController.isUpdatingNotifications.value) {
+                  subtitleText = 'updating'.tr;
+                } else if (notificationController
+                        .permissionStatus.value.isPermanentlyDenied ||
+                    notificationController
+                        .permissionStatus.value.isRestricted) {
+                  subtitleText = 'enable_notifications_in_settings'.tr;
+                }
+
                 return SettingsSwitchTile(
                   icon: CupertinoIcons.bell,
                   title: 'notifications'.tr,
-                  subtitle: notificationController.isUpdatingNotifications.value
-                      ? 'updating'.tr
-                      : 'enable_notifications'.tr,
+                  subtitle: subtitleText,
                   value: notificationController.notificationsEnabled.value,
                   onChanged: notificationController.toggleNotifications,
                 );

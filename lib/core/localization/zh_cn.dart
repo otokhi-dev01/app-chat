@@ -7,6 +7,7 @@ Map<String, String> zhCN = {
   'settings': '设置',
   'notifications': '通知',
   'enable_notifications': '启用通知',
+  'open_settings': '打开设置',
   'sync_contacts': '同步联系人',
   'sync_contacts_description': '从手机同步联系人',
   'sync_now': '立即同步',

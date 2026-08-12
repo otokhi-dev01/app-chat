@@ -1,6 +1,9 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/chat_message_model.dart';
 
@@ -23,8 +26,145 @@ class ChatCameraService {
     return _isPickingLocation;
   }
 
+  Future<bool> checkCameraPermission() async {
+    PermissionStatus status = await Permission.camera.status;
+
+    if (status.isGranted) {
+      return true;
+    }
+
+    if (!status.isPermanentlyDenied) {
+      status = await Permission.camera.request();
+      if (status.isGranted) {
+        return true;
+      }
+    }
+
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      _showPermissionDialog(
+        title: 'permission_required'.tr,
+        message: 'Enable camera access from your device settings.',
+      );
+    }
+    return false;
+  }
+
+  Future<bool> checkGalleryPermission() async {
+    PermissionStatus status = await Permission.photos.status;
+
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+
+    if (!status.isPermanentlyDenied) {
+      status = await Permission.photos.request();
+      if (status.isGranted || status.isLimited) {
+        return true;
+      }
+    }
+
+    if (GetPlatform.isAndroid) {
+      PermissionStatus storageStatus = await Permission.storage.status;
+      if (storageStatus.isGranted) {
+        return true;
+      }
+      if (!storageStatus.isPermanentlyDenied) {
+        storageStatus = await Permission.storage.request();
+        if (storageStatus.isGranted) {
+          return true;
+        }
+      }
+    }
+
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      _showPermissionDialog(
+        title: 'permission_required'.tr,
+        message: 'Enable photo library access from your device settings.',
+      );
+    }
+    return false;
+  }
+
+  Future<bool> checkFilePermission() async {
+    PermissionStatus photosStatus = await Permission.photos.status;
+
+    if (photosStatus.isGranted || photosStatus.isLimited) {
+      return true;
+    }
+
+    if (!photosStatus.isPermanentlyDenied) {
+      photosStatus = await Permission.photos.request();
+      if (photosStatus.isGranted || photosStatus.isLimited) {
+        return true;
+      }
+    }
+
+    if (GetPlatform.isAndroid) {
+      PermissionStatus storageStatus = await Permission.storage.status;
+      if (storageStatus.isGranted) {
+        return true;
+      }
+      if (!storageStatus.isPermanentlyDenied) {
+        storageStatus = await Permission.storage.request();
+        if (storageStatus.isGranted) {
+          return true;
+        }
+      }
+      if (storageStatus.isPermanentlyDenied || photosStatus.isPermanentlyDenied) {
+        _showPermissionDialog(
+          title: 'permission_required'.tr,
+          message: 'Enable storage access from your device settings.',
+        );
+        return false;
+      }
+    } else {
+      if (photosStatus.isPermanentlyDenied || photosStatus.isRestricted) {
+        _showPermissionDialog(
+          title: 'permission_required'.tr,
+          message: 'Enable photo and document access from your device settings.',
+        );
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  void _showPermissionDialog({
+    required String title,
+    required String message,
+  }) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              openAppSettings();
+            },
+            child: Text('open_settings'.tr),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<ChatMessageModel?> takePhoto() async {
     if (_isOpeningCamera) {
+      return null;
+    }
+
+    bool hasPermission = await checkCameraPermission();
+    if (!hasPermission) {
       return null;
     }
 
@@ -65,6 +205,11 @@ class ChatCameraService {
       return null;
     }
 
+    bool hasPermission = await checkGalleryPermission();
+    if (!hasPermission) {
+      return null;
+    }
+
     try {
       _isOpeningCamera = true;
 
@@ -97,6 +242,11 @@ class ChatCameraService {
 
   Future<ChatMessageModel?> pickFile() async {
     if (_isPickingFile) {
+      return null;
+    }
+
+    bool hasPermission = await checkFilePermission();
+    if (!hasPermission) {
       return null;
     }
 

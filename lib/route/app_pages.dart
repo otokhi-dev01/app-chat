@@ -9,6 +9,7 @@ import '../screen/auth/phone_input/phone_input_screen.dart';
 import '../screen/auth/register/register_screen.dart';
 import '../screen/auth/reset_password/reset_password_screen.dart';
 import '../screen/auth/verify_otp/verity_otp_screen.dart';
+import '../screen/chat_detail/call/call_screen.dart';
 import '../screen/contact/add_contact/add_contact_screen.dart';
 import '../screen/contact/add_group/add_group_binding.dart';
 import '../screen/contact/add_group/add_group_screen.dart';
@@ -215,6 +216,16 @@ class AppPages {
         milliseconds: 200,
       ),
     ),
+
+    GetPage(
+      name: AppRoutes.call,
+      page: () => CallScreen(),
+      transition: Transition.cupertino,
+      transitionDuration: Duration(
+        milliseconds: 200,
+      ),
+    ),
+
 
     // ── QR Contact Scanner ──────────────────────────────────
     GetPage(
