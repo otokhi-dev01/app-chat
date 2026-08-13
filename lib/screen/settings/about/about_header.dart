@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AboutHeader extends StatelessWidget {
+  final String appVersion;
+
   const AboutHeader({
     super.key,
+    required this.appVersion,
   });
 
   @override
@@ -83,7 +86,7 @@ class AboutHeader extends StatelessWidget {
           SizedBox(height: 16),
 
           Text(
-            'Piisiit Chat',
+            'OTOKHI Chat',
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               color: colorScheme.onSurface,
@@ -96,7 +99,7 @@ class AboutHeader extends StatelessWidget {
 
           Text(
             'app_version'.trParams({
-              'version': '1.0.0',
+              'version': appVersion.isNotEmpty ? appVersion : '1.0.0',
             }),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.primary,
@@ -163,27 +166,8 @@ class AboutFooter extends StatelessWidget {
 
     return Column(
       children: [
-        Icon(
-          CupertinoIcons.heart_fill,
-          color: colorScheme.primary,
-          size: 22,
-        ),
-
-        SizedBox(height: 8),
-
         Text(
-          'made_with_care'.tr,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-
-        SizedBox(height: 4),
-
-        Text(
-          '© 2026 PiisiitChat',
+          '© 2026 OTOKHI Chat. All rights reserved.',
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant.withValues(
               alpha: 0.70,
