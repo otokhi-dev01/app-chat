@@ -1,109 +1,142 @@
-// import 'dart:async';
-//
-// import 'package:get/get.dart';
-//
-// import '../models/chat_model.dart';
-// import '../models/contact_model.dart';
-// import 'chat_controller.dart';
-//
-// enum SearchScope { chats, contacts, all }
-//
-// class AppSearchController extends GetxController {
-//   final ChatController chatController;
-//
-//   AppSearchController({required this.chatController});
-//
-//   final RxString query = ''.obs;
-//   final RxBool isSearching = false.obs;
-//   final Rx<SearchScope> scope = SearchScope.all.obs;
-//
-//   final RxList<ChatModel> chatResults = <ChatModel>[].obs;
-//   final RxList<ContactModel> contactResults = <ContactModel>[].obs;
-//
-//   final RxList<String> recentSearches = <String>[].obs;
-//
-//   Timer? _debounce;
-//
-//   void updateQuery(String value) {
-//     query.value = value;
-//
-//     _debounce?.cancel();
-//
-//     if (value.trim().isEmpty) {
-//       chatResults.clear();
-//       contactResults.clear();
-//       return;
-//     }
-//
-//     _debounce = Timer(const Duration(milliseconds: 250), () {
-//       _runSearch(value.trim());
-//     });
-//   }
-//
-//   void _runSearch(String term) {
-//     final String lower = term.toLowerCase();
-//
-//     if (scope.value == SearchScope.chats || scope.value == SearchScope.all) {
-//       chatResults.assignAll(
-//         chatController.chats.where((ChatModel chat) {
-//           return chat.name.toLowerCase().contains(lower) ||
-//               chat.lastMessage.toLowerCase().contains(lower);
-//         }),
-//       );
-//     } else {
-//       chatResults.clear();
-//     }
-//
-//     if (scope.value == SearchScope.contacts ||
-//         scope.value == SearchScope.all) {
-//       // TODO: replace with real contacts source (ContactController) once available
-//       contactResults.clear();
-//     } else {
-//       contactResults.clear();
-//     }
-//   }
-//
-//   void changeScope(SearchScope newScope) {
-//     scope.value = newScope;
-//
-//     if (query.value.trim().isNotEmpty) {
-//       _runSearch(query.value.trim());
-//     }
-//   }
-//
-//   void submitSearch(String term) {
-//     final String trimmed = term.trim();
-//     if (trimmed.isEmpty) return;
-//
-//     recentSearches.remove(trimmed);
-//     recentSearches.insert(0, trimmed);
-//
-//     if (recentSearches.length > 10) {
-//       recentSearches.removeLast();
-//     }
-//   }
-//
-//   void removeRecentSearch(String term) {
-//     recentSearches.remove(term);
-//   }
-//
-//   void clearRecentSearches() {
-//     recentSearches.clear();
-//   }
-//
-//   void clearSearch() {
-//     query.value = '';
-//     chatResults.clear();
-//     contactResults.clear();
-//   }
-//
-//   bool get hasResults => chatResults.isNotEmpty || contactResults.isNotEmpty;
-//
-//   bool get hasQuery => query.value.trim().isNotEmpty;
-//
-//   @override
-//   void onClose() {
-//     _debounce?.cancel();
-//     super.onClose();
-//   }
-// }
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
+
+import '../../services/search_service/search_history_service.dart';
+
+enum SearchScope {
+  chats,
+  contacts,
+  all,
+}
+
+class ChatSearchController extends GetxController {
+  final SearchHistoryService historyService =
+  SearchHistoryService();
+
+  final TextEditingController searchTextController =
+  TextEditingController();
+
+  final RxString searchQuery = ''.obs;
+
+  final RxList<String> searchHistory =
+      <String>[].obs;
+
+  final RxList<VisitedUser> visitedUsers =
+      <VisitedUser>[].obs;
+
+  final Rx<SearchScope> selectedScope =
+      SearchScope.chats.obs;
+
+  // Optional alias if you already use searchController elsewhere.
+  TextEditingController get searchController {
+    return searchTextController;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadHistory();
+    loadVisitedUsers();
+  }
+
+  Future<void> loadHistory() async {
+    final List<String> history =
+    await historyService.getHistory();
+
+    searchHistory.assignAll(history);
+  }
+
+  Future<void> loadVisitedUsers() async {
+    final List<VisitedUser> users =
+    await historyService.getVisitedUsers();
+
+    visitedUsers.assignAll(users);
+  }
+
+  Future<void> addVisitedUser(VisitedUser user) async {
+    await historyService.addVisitedUser(user);
+    await loadVisitedUsers();
+  }
+
+  Future<void> removeVisitedUser(String id) async {
+    await historyService.removeVisitedUser(id);
+    await loadVisitedUsers();
+  }
+
+  Future<void> clearVisitedUsers() async {
+    await historyService.clearVisitedUsers();
+    visitedUsers.clear();
+  }
+
+  void updateSearch(String value) {
+    searchQuery.value = value;
+  }
+
+  Future<void> addHistory(String value) async {
+    final String query = value.trim();
+    if (query.isEmpty) {
+      return;
+    }
+    await historyService.addSearch(query);
+    await loadHistory();
+  }
+
+  Future<void> search(String value) async {
+    final String query = value.trim();
+
+    updateSearch(query);
+
+    if (query.isEmpty) {
+      return;
+    }
+
+    await addHistory(query);
+
+    // Call your search API here.
+    // await chatService.searchMessages(
+    //   query: query,
+    //   scope: selectedScope.value,
+    // );
+  }
+
+  Future<void> selectHistory(String value) async {
+    final String query = value.trim();
+    searchTextController.value = TextEditingValue(
+      text: query,
+      selection: TextSelection.collapsed(
+        offset: query.length,
+      ),
+    );
+
+    updateSearch(query);
+
+    if (query.isNotEmpty) {
+      await addHistory(query);
+    }
+  }
+
+  void clearSearch() {
+    searchTextController.clear();
+    searchQuery.value = '';
+  }
+
+  Future<void> removeHistory(String value) async {
+    await historyService.removeSearch(value);
+    await loadHistory();
+  }
+
+  Future<void> clearHistory() async {
+    await historyService.clearHistory();
+    searchHistory.clear();
+  }
+
+  void changeScope(SearchScope scope) {
+    selectedScope.value = scope;
+  }
+
+  @override
+  void onClose() {
+    searchTextController.dispose();
+    super.onClose();
+  }
+}

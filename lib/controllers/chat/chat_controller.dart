@@ -136,13 +136,9 @@ class ChatController extends GetxController {
 
     try {
       await Get.to(
-            () => SearchScreen(
-          controller: this,
-        ),
+            () => const SearchScreen(),
         transition: Transition.fadeIn,
-        duration: Duration(
-          milliseconds: 220,
-        ),
+        duration: const Duration(milliseconds: 220),
       );
     } finally {
       FocusManager.instance.primaryFocus

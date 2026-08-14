@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -5,6 +6,7 @@ import '../../../../controllers/chat/chat_controller.dart';
 import '../../../../controllers/settings/chat_folder_controller.dart';
 import '../../../../models/chat_folder_model.dart';
 
+/// UPDATED: Unit UI category folder filter with sliding indicator, theme-aware glass container, and Cupertino icons
 class HomeCategoryFilter extends StatefulWidget {
   final ChatController controller;
 
@@ -38,10 +40,10 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
     super.dispose();
   }
 
+  /// UPDATED: Measures active folder dimensions to calculate smooth sliding indicator bounds
   void _measure() {
     if (!mounted) return;
 
-    // Safely wait for frame layout to finish before accessing RenderBox.size
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -70,6 +72,7 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
     });
   }
 
+  /// UPDATED: Centers active folder tab smoothly in horizontal scroll view
   void _scrollToActive(BuildContext itemContext) {
     Scrollable.ensureVisible(
       itemContext,
@@ -85,12 +88,19 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
     final bool isDark = theme.brightness == Brightness.dark;
     final ColorScheme colorScheme = theme.colorScheme;
 
+    // UPDATED: Unit UI colors for outer container card, borders, and active indicator
     final Color backgroundColor =
     isDark ? const Color(0xFF1B1D22) : Colors.white;
+
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
+
     final Color activeBackground = colorScheme.primary.withValues(alpha: 0.11);
+
+    final Color activeBorderColor = colorScheme.primary.withValues(
+      alpha: isDark ? 0.28 : 0.18,
+    );
 
     return Obx(
           () {
@@ -116,6 +126,7 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          // UPDATED: Unit UI container card with 24px border radius, subtle border, and soft elevation shadow
           child: Container(
             height: 48,
             padding: const EdgeInsets.all(4),
@@ -124,6 +135,15 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
               color: backgroundColor,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.15 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {
@@ -139,7 +159,8 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
                 child: Stack(
                   key: _stackKey,
                   children: [
-                    _buildIndicator(activeBackground),
+                    // UPDATED: Sliding active indicator pill with 18px radius and subtle primary border
+                    _buildIndicator(activeBackground, activeBorderColor),
                     Row(
                       children: List.generate(folders.length, (index) {
                         ChatFolderModel folder = folders[index];
@@ -182,7 +203,8 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
     );
   }
 
-  Widget _buildIndicator(Color activeBackground) {
+  /// UPDATED: Renders animated sliding active indicator pill with 18px radius and theme-aware primary border
+  Widget _buildIndicator(Color activeBackground, Color activeBorderColor) {
     if (_indicatorRect == null) return const SizedBox.shrink();
 
     return AnimatedPositioned(
@@ -196,6 +218,7 @@ class _HomeCategoryFilterState extends State<HomeCategoryFilter> {
         decoration: BoxDecoration(
           color: activeBackground,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: activeBorderColor),
         ),
       ),
     );
@@ -237,8 +260,10 @@ class _CategoryItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
-        splashColor: primaryColor.withValues(alpha: 0.12),
-        highlightColor: primaryColor.withValues(alpha: 0.06),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
         child: Container(
           constraints: const BoxConstraints(minWidth: 76),
           height: 40,
@@ -248,10 +273,13 @@ class _CategoryItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isCustom) ...[
+                // REPLACED: Replaced Material folder icon with Cupertino folder icon
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
-                    Icons.folder_outlined,
+                    isActive
+                        ? CupertinoIcons.folder_fill
+                        : CupertinoIcons.folder,
                     size: 14,
                     color: textColor,
                   ),
@@ -265,7 +293,7 @@ class _CategoryItem extends StatelessWidget {
                     color: textColor,
                     fontSize: 13,
                     height: 1,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                   ),
                   child: Text(
                     label,
@@ -276,6 +304,7 @@ class _CategoryItem extends StatelessWidget {
               ),
               if (count > 0) ...[
                 const SizedBox(width: 6),
+                // UPDATED: Unread count badge container with theme-aware rounded capsule
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   constraints: const BoxConstraints(minWidth: 18),

@@ -280,6 +280,16 @@ final Map<String, String> kmKH = {
 'search_contacts': 'ស្វែងរកទំនាក់ទំនង',
 'add_contact': 'បន្ថែមទំនាក់ទំនង',
 'search_settings': 'ស្វែងរកការកំណត់',
+'search_hint_description': 'ស្វែងរកការជជែក ទំនាក់ទំនង និងសារ',
+'recent_searches': 'ការស្វែងរកថ្មីៗ',
+'recent_visited': 'បានចូលមើលថ្មីៗ',
+'recent_contacts': 'ទំនាក់ទំនងថ្មីៗ',
+'view_profile': 'មើលព័ត៌មានគណនី',
+'clear_all': 'សម្អាតទាំងអស់',
+'clear': 'សម្អាត',
+'clear_search_history_title': 'សម្អាតប្រវត្តិស្វែងរកមែនទេ?',
+'clear_search_history_confirm': 'តើអ្នកពិតជាចង់សម្អាតប្រវត្តិស្វែងរកទាំងអស់មែនទេ?',
+'no_chats_match': 'គ្មានការជជែកដែលត្រូវគ្នានឹង "@query"',
 
 // Chat menu
 'mark_all_read': 'សម្គាល់ទាំងអស់ថាបានអាន',

@@ -359,13 +359,9 @@ class AppPages {
     // ── Search Chats ────────────────────────────────────────
     GetPage(
       name: AppRoutes.searchChats,
-      page: () => SearchScreen(
-        controller: Get.find<ChatController>(),
-      ),
+      page: () => const SearchScreen(),
       transition: Transition.cupertino,
-      transitionDuration: Duration(
-        milliseconds: 280, // Reduced to 200ms
-      ),
+      transitionDuration: const Duration(milliseconds: 280),
     ),
 
     GetPage(

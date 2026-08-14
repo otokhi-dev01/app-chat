@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/chat/chat_controller.dart';
+import '../../../controllers/search/search_controller.dart';
 
-class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final ChatController controller;
+class SearchAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final ChatSearchController controller;
 
   const SearchAppBar({
     super.key,
@@ -92,10 +93,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
       forceMaterialTransparency: true,
       titleSpacing: 0,
       leadingWidth: 58,
-      systemOverlayStyle: _overlayStyle(
-        theme,
-        isDark,
-      ),
+      systemOverlayStyle: _overlayStyle(theme, isDark),
       flexibleSpace: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
@@ -128,7 +126,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: borderColor,
-                width: 1.0,
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
@@ -142,7 +140,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             child: CupertinoButton(
               padding: EdgeInsets.zero,
-              minimumSize: const Size(40, 40), // Updated to minimumSize
+              minimumSize: const Size(40, 40),
               onPressed: () => _closeSearch(context),
               child: Icon(
                 CupertinoIcons.chevron_left,
@@ -162,7 +160,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: borderColor,
-              width: 1.0,
+              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -188,6 +186,9 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
                   controller: controller.searchTextController,
                   autofocus: true,
                   onChanged: controller.updateSearch,
+                  onSubmitted: (String value) {
+                    controller.search(value);
+                  },
                   textInputAction: TextInputAction.search,
                   keyboardType: TextInputType.text,
                   enableSuggestions: true,
@@ -218,29 +219,27 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                 ),
               ),
-              Obx(
-                    () {
-                  if (controller.searchQuery.value.isEmpty) {
-                    return const SizedBox(width: 12);
-                  }
+              Obx(() {
+                if (controller.searchQuery.value.isEmpty) {
+                  return const SizedBox(width: 12);
+                }
 
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(32, 32), // Updated to minimumSize
-                      onPressed: _clearSearch,
-                      child: Icon(
-                        CupertinoIcons.xmark_circle_fill,
-                        size: 18,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.4)
-                            : Colors.black.withValues(alpha: 0.4),
-                      ),
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(32, 32),
+                    onPressed: _clearSearch,
+                    child: Icon(
+                      CupertinoIcons.xmark_circle_fill,
+                      size: 18,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : Colors.black.withValues(alpha: 0.4),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              }),
             ],
           ),
         ),
