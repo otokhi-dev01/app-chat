@@ -1,87 +1,100 @@
+import 'package:appchat/services/user_service/user_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
+import '../../data/model/login_response_model.dart';
+
 class ProfileController extends GetxController {
-  final RxString userName =
-      'John Doe'.obs;
+  final UserApiService authApiService;
 
-  final RxString userPhone =
-      '+1 555 000 1234'.obs;
+  ProfileController({
+    required this.authApiService,
+  });
 
-  final RxString userEmail =
-      'john@example.com'.obs;
+  final RxString name = ''.obs;
+  final RxString userPhone = ''.obs;
+  final RxString userEmail = ''.obs;
+  final RxString userUsername = ''.obs;
+  final RxString userBio = ''.obs;
+  final RxBool isLoading = false.obs;
 
-  final RxString userUsername =
-      '@johndoe'.obs;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfile();
+  }
 
-  final RxString userBio =
-      'Available'.obs;
+  Future<void> fetchProfile() async {
+    try {
+      isLoading.value = true;
 
-  void updateName(
-      String value,
-      ) {
+      LoginDataModel profile = await authApiService.getProfile();
+
+      name.value = profile.fullName;
+      userPhone.value = profile.phone;
+      userEmail.value = profile.email;
+      userUsername.value = profile.username.isEmpty ? '' : '@${profile.username.replaceFirst('@', '')}';
+      userBio.value = profile.bio;
+    } catch (e) {
+      debugPrint('Failed to fetch profile: $e');
+
+      Get.snackbar(
+        'Unable to load profile',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void updateName(String value) {
     String newValue = value.trim();
 
-    if (newValue.isEmpty ||
-        newValue == userName.value) {
+    if (newValue.isEmpty || newValue == name.value) {
       return;
     }
 
-    userName.value = newValue;
+    name.value = newValue;
   }
 
-  void updatePhone(
-      String value,
-      ) {
+  void updatePhone(String value) {
     String newValue = value.trim();
 
-    if (newValue.isEmpty ||
-        newValue == userPhone.value) {
+    if (newValue.isEmpty || newValue == userPhone.value) {
       return;
     }
 
     userPhone.value = newValue;
   }
 
-  void updateEmail(
-      String value,
-      ) {
+  void updateEmail(String value) {
     String newValue = value.trim();
 
-    if (newValue.isEmpty ||
-        newValue == userEmail.value ||
-        !GetUtils.isEmail(newValue)) {
+    if (newValue.isEmpty || newValue == userEmail.value || !GetUtils.isEmail(newValue)) {
       return;
     }
 
     userEmail.value = newValue;
   }
 
-  void updateUsername(
-      String value,
-      ) {
-    String newValue = value.trim();
+  void updateUsername(String value) {
+    String newValue = value.trim().replaceFirst('@', '');
 
     if (newValue.isEmpty) {
       return;
     }
 
-    String normalizedUsername =
-    newValue.startsWith('@')
-        ? newValue
-        : '@$newValue';
+    String normalizedUsername = '@$newValue';
 
-    if (normalizedUsername ==
-        userUsername.value) {
+    if (normalizedUsername == userUsername.value) {
       return;
     }
 
-    userUsername.value =
-        normalizedUsername;
+    userUsername.value = normalizedUsername;
   }
 
-  void updateBio(
-      String value,
-      ) {
+  void updateBio(String value) {
     String newValue = value.trim();
 
     if (newValue == userBio.value) {

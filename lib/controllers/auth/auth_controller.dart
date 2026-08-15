@@ -1,20 +1,38 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../data/mock_auth_user.dart';
+import '../../data/model/login_otp_response_model.dart';
+import '../../data/model/login_response_model.dart';
 import '../../route/app_route.dart';
+import '../../screen/auth/verify_otp/verity_otp_screen.dart';
 import '../../screen/widgets/app_feedback.dart';
+import '../../services/api_service.dart';
+import '../../services/auth_service /auth_api_service.dart';
 import '../../services/auth_service /auth_service.dart';
 import '../../services/mock/mock_auth_service.dart';
+import '../../services/user_service/user_service.dart';
+import '../../screen/home/home_binding.dart';
+import '../chat/chat_controller.dart';
+import '../contact/contact_controller.dart';
 
 class AuthController extends GetxController {
+  // Kept temporarily for mock registration.
   final AuthService authService;
+
+  // Real Laravel authentication service.
+  final AuthApiService authApiService;
 
   AuthController({
     AuthService? authService,
-  }) : authService =
-      authService ?? MockAuthService();
+    AuthApiService? authApiService,
+  })  : authService =
+      authService ?? MockAuthService(),
+        authApiService = authApiService ??
+            Get.find<AuthApiService>();
 
   final GlobalKey<FormState> loginFormKey =
   GlobalKey<FormState>();
@@ -39,6 +57,10 @@ class AuthController extends GetxController {
   TextEditingController();
 
   final TextEditingController
+  registerPhoneController =
+  TextEditingController();
+
+  final TextEditingController
   registerPasswordController =
   TextEditingController();
 
@@ -58,6 +80,9 @@ class AuthController extends GetxController {
   final FocusNode registerEmailFocusNode =
   FocusNode();
 
+  final FocusNode registerPhoneFocusNode =
+  FocusNode();
+
   final FocusNode registerPasswordFocusNode =
   FocusNode();
 
@@ -65,11 +90,12 @@ class AuthController extends GetxController {
   registerConfirmPasswordFocusNode =
   FocusNode();
 
-  final RxBool isLoginLoading =
-      false.obs;
+  // Country picker state for registration phone field
+  final RxString registerCountryCode = '+1'.obs;
+  final RxString registerCountryName = 'United States'.obs;
 
-  final RxBool isRegisterLoading =
-      false.obs;
+  final RxBool isLoginLoading = false.obs;
+  final RxBool isRegisterLoading = false.obs;
 
   final RxBool obscureLoginPassword =
       true.obs;
@@ -80,14 +106,21 @@ class AuthController extends GetxController {
   final RxBool obscureConfirmPassword =
       true.obs;
 
-  final Rxn<MockAuthUser> currentUser =
-  Rxn<MockAuthUser>();
+  // Holds the otpToken + email from step 1 of login until verifyLoginOtp()
+  // either succeeds or a fresh login() call replaces it.
+  final Rxn<LoginOtpResponseModel> pendingOtpLogin =
+  Rxn<LoginOtpResponseModel>();
 
+  // Real user returned by Laravel.
+  final Rxn<LoginDataModel> currentUser =
+  Rxn<LoginDataModel>();
+
+  // Mock users retained until registration is connected.
   RxList<MockAuthUser> get users =>
       authService.users;
 
   String? validateName(String? value) {
-    String name = value?.trim() ?? '';
+    final String name = value?.trim() ?? '';
 
     if (name.isEmpty) {
       return 'Enter your name';
@@ -100,8 +133,15 @@ class AuthController extends GetxController {
     return null;
   }
 
+  String? validatePhone(String? value) {
+    final String phone = value?.trim() ?? '';
+    if (phone.isEmpty) return 'Enter your phone number';
+    if (phone.length < 6) return 'Enter a valid phone number';
+    return null;
+  }
+
   String? validateEmail(String? value) {
-    String email = value?.trim() ?? '';
+    final String email = value?.trim() ?? '';
 
     if (email.isEmpty) {
       return 'Enter your email';
@@ -115,7 +155,7 @@ class AuthController extends GetxController {
   }
 
   String? validatePassword(String? value) {
-    String password = value ?? '';
+    final String password = value ?? '';
 
     if (password.isEmpty) {
       return 'Enter your password';
@@ -131,7 +171,8 @@ class AuthController extends GetxController {
   String? validateConfirmPassword(
       String? value,
       ) {
-    String confirmPassword = value ?? '';
+    final String confirmPassword =
+        value ?? '';
 
     if (confirmPassword.isEmpty) {
       return 'Confirm your password';
@@ -160,6 +201,11 @@ class AuthController extends GetxController {
     obscureConfirmPassword.toggle();
   }
 
+  /// Step 1 of login: verifies the password and requests an OTP, then
+  /// pushes VerifyOtpScreen with callbacks bound to [verifyLoginOtp] /
+  /// [resendLoginOtp] / [_handleLoginOtpVerified]. The screen owns its
+  /// own loading state, error text, resend countdown, and toasts — this
+  /// controller just does the network calls.
   Future<void> login() async {
     FocusManager.instance.primaryFocus
         ?.unfocus();
@@ -168,7 +214,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    bool isValid =
+    final bool isValid =
         loginFormKey.currentState?.validate() ??
             false;
 
@@ -186,41 +232,34 @@ class AuthController extends GetxController {
     isLoginLoading.value = true;
 
     try {
-      MockAuthUser matchedUser =
-      await authService.login(
-        email: loginEmailController.text,
+      final LoginOtpResponseModel response =
+      await authApiService.login(
+        login: loginEmailController.text
+            .trim()
+            .toLowerCase(),
         password:
         loginPasswordController.text,
       );
 
-      currentUser.value = matchedUser;
+      pendingOtpLogin.value = response;
 
-      TextInput.finishAutofillContext();
-
-      AppFeedback.showMessage(
-        title: 'Login Successful',
-        message:
-        'Welcome back, ${matchedUser.name}.',
-        icon:
-        Icons.check_circle_outline_rounded,
-      );
-
-      isLoginLoading.value = false;
-
-      await Future<void>.delayed(
-        Duration(milliseconds: 300),
-      );
-
-      Get.offAllNamed(
-        AppRoutes.home,
-      );
-    } on AuthServiceException catch (error) {
+      if (!isClosed) {
+        Get.to(
+              () => VerifyOtpScreen(
+            destination: response.email,
+            onVerify: verifyLoginOtp,
+            onResend: resendLoginOtp,
+            onVerified: _handleLoginOtpVerified,
+          ),
+        );
+      }
+    } on ApiException catch (error) {
       AppFeedback.showMessage(
         title: 'Login Failed',
         message: error.message,
         icon: Icons.error_outline_rounded,
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
       AppFeedback.showMessage(
         title: 'Login Failed',
         message:
@@ -228,8 +267,9 @@ class AuthController extends GetxController {
         icon: Icons.error_outline_rounded,
       );
 
-      debugPrint(
-        'Login error: $error',
+      debugPrint('Login error: $error');
+      debugPrintStack(
+        stackTrace: stackTrace,
       );
     } finally {
       if (!isClosed) {
@@ -238,24 +278,115 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> register() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
 
-    if (isRegisterLoading.value) {
-      return;
+  /// Step 2 of login: verifies the emailed [otp] against
+  /// [pendingOtpLogin]. Deliberately throws instead of catching —
+  /// VerifyOtpForm's own try/catch is what shows the error state and
+  /// the "verification_failed" toast.
+  Future<void> verifyLoginOtp(String otp) async {
+    final LoginOtpResponseModel? pending =
+        pendingOtpLogin.value;
+
+    if (pending == null) {
+      throw const ApiException(
+        statusCode: 422,
+        message:
+        'Please log in again to request a new code.',
+      );
     }
 
-    bool isValid =
-        registerFormKey.currentState
-            ?.validate() ??
-            false;
+    final LoginResponseModel response =
+    await authApiService.verifyLoginOtp(
+      otpToken: pending.otpToken,
+      otp: otp,
+    );
+
+    final LoginDataModel? user = response.data;
+
+    if (user == null) {
+      throw const ApiException(
+        statusCode: 500,
+        message:
+        'User information was not returned.',
+      );
+    }
+
+    currentUser.value = user;
+    pendingOtpLogin.value = null;
+  }
+
+  /// Re-sends the login OTP by re-running step 1 with the credentials
+  /// still sitting in the login form (they aren't cleared until step 2
+  /// succeeds). Also throws instead of catching — VerifyOtpForm shows
+  /// its own "unable_to_resend" / "code_sent" toasts around this call.
+  Future<void> resendLoginOtp() async {
+    final LoginOtpResponseModel response =
+    await authApiService.login(
+      login: loginEmailController.text
+          .trim()
+          .toLowerCase(),
+      password:
+      loginPasswordController.text,
+    );
+
+    pendingOtpLogin.value = response;
+  }
+
+
+  /// Fired by VerifyOtpForm's onVerified after a successful verify.
+  /// Fire-and-forget on purpose: onVerified is a VoidCallback (sync),
+  /// but the prefetch + navigation work is async.
+  void _handleLoginOtpVerified() {
+    unawaited(_finishPostLoginFlow());
+  }
+
+  Future<void> _finishPostLoginFlow() async {
+    TextInput.finishAutofillContext();
+
+    try {
+      HomeBinding().dependencies();
+
+      // Populate UserApiService.currentUserValue so the profile screen
+      // and any other widget that reads it has real data immediately.
+      if (Get.isRegistered<UserApiService>()) {
+        try {
+          await Get.find<UserApiService>().getProfile();
+        } catch (e) {
+          debugPrint('Profile prefetch error: $e');
+        }
+      }
+
+      final chatCtrl = Get.find<ChatController>();
+      final contactCtrl = Get.find<ContactController>();
+
+      // Wait for controllers to finish their initial load
+      while (chatCtrl.isLoading.value || contactCtrl.isLoading.value) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    } catch (e) {
+      debugPrint('Pre-fetch error: $e');
+    }
+
+    await Future<void>.delayed(
+      const Duration(milliseconds: 300),
+    );
+
+    if (!isClosed) {
+      Get.offAllNamed(AppRoutes.home);
+    }
+  }
+
+  Future<void> register() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (isRegisterLoading.value) return;
+
+    final bool isValid = registerFormKey.currentState?.validate() ?? false;
 
     if (!isValid) {
       AppFeedback.showMessage(
         title: 'Invalid Information',
-        message:
-        'Please check the registration form.',
+        message: 'Please check the registration form.',
         icon: Icons.info_outline_rounded,
       );
 
@@ -265,56 +396,46 @@ class AuthController extends GetxController {
     isRegisterLoading.value = true;
 
     try {
-      String email =
-      registerEmailController.text
-          .trim()
-          .toLowerCase();
+      final String email = registerEmailController.text.trim().toLowerCase();
+      final String localPhone = registerPhoneController.text.trim().replaceFirst(RegExp(r'^0+'), '');
+      final String phoneNumber = '${registerCountryCode.value}$localPhone';
 
-      await authService.register(
-        name:
-        registerNameController.text,
+      await authApiService.register(
+        name: registerNameController.text.trim(),
+        phoneNumber: phoneNumber,
         email: email,
-        password:
-        registerPasswordController.text,
+        password: registerPasswordController.text,
+        passwordConfirmation: registerConfirmPasswordController.text,
       );
 
       loginEmailController.text = email;
       loginPasswordController.clear();
 
       clearRegisterForm();
-
-      isRegisterLoading.value = false;
-
       Get.back();
 
       AppFeedback.showMessage(
         title: 'Account Created',
-        message:
-        'You can now log in with your new account.',
-        icon:
-        Icons.check_circle_outline_rounded,
+        message: 'You can now log in with your new account.',
+        icon: Icons.check_circle_outline_rounded,
       );
-    } on AuthServiceException catch (error) {
+    } on ApiException catch (error) {
       AppFeedback.showMessage(
         title: 'Registration Failed',
         message: error.message,
         icon: Icons.error_outline_rounded,
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
       AppFeedback.showMessage(
         title: 'Registration Failed',
-        message:
-        'Something went wrong. Please try again.',
+        message: 'Something went wrong. Please try again.',
         icon: Icons.error_outline_rounded,
       );
 
-      debugPrint(
-        'Registration error: $error',
-      );
+      debugPrint('Registration error: $error');
+      debugPrintStack(stackTrace: stackTrace);
     } finally {
-      if (!isClosed) {
-        isRegisterLoading.value = false;
-      }
+      if (!isClosed) isRegisterLoading.value = false;
     }
   }
 
@@ -323,15 +444,24 @@ class AuthController extends GetxController {
         ?.unfocus();
 
     try {
+      await authApiService.logout();
+    } catch (error) {
+      debugPrint(
+        'API logout error: $error',
+      );
+    }
+
+    try {
       await authService.logout();
     } catch (error) {
       debugPrint(
-        'Logout error: $error',
+        'Mock logout error: $error',
       );
     }
 
     currentUser.value = null;
     loginPasswordController.clear();
+    pendingOtpLogin.value = null;
 
     Get.offAllNamed(
       AppRoutes.login,
@@ -348,9 +478,12 @@ class AuthController extends GetxController {
   void clearRegisterForm() {
     registerNameController.clear();
     registerEmailController.clear();
+    registerPhoneController.clear();
     registerPasswordController.clear();
-    registerConfirmPasswordController
-        .clear();
+    registerConfirmPasswordController.clear();
+
+    registerCountryCode.value = '+1';
+    registerCountryName.value = 'United States';
 
     obscureRegisterPassword.value = true;
     obscureConfirmPassword.value = true;
@@ -374,18 +507,18 @@ class AuthController extends GetxController {
 
     registerNameController.dispose();
     registerEmailController.dispose();
+    registerPhoneController.dispose();
     registerPasswordController.dispose();
-    registerConfirmPasswordController
-        .dispose();
+    registerConfirmPasswordController.dispose();
 
     loginEmailFocusNode.dispose();
     loginPasswordFocusNode.dispose();
 
     registerNameFocusNode.dispose();
     registerEmailFocusNode.dispose();
+    registerPhoneFocusNode.dispose();
     registerPasswordFocusNode.dispose();
-    registerConfirmPasswordFocusNode
-        .dispose();
+    registerConfirmPasswordFocusNode.dispose();
 
     super.onClose();
   }

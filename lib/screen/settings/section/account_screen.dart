@@ -108,7 +108,7 @@ class AccountSettingsSection extends StatelessWidget {
                   _AccountTile(
                     icon: CupertinoIcons.person,
                     label: 'name'.tr,
-                    value: controller.userName.value,
+                    value: controller.name.value,
                     onTap: _openProfileDetails,
                   ),
                   _AccountDivider(

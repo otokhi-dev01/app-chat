@@ -153,7 +153,7 @@ class ProfileScreen extends GetView<ProfileController> {
           Positioned.fill(
             child: Obx(
                   () {
-                String name = controller.userName.value.trim();
+                String name = controller.name.value.trim();
                 String email = controller.userEmail.value.trim();
                 String username = controller.userUsername.value.trim();
 

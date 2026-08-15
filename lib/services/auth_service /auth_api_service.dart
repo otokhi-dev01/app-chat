@@ -1,0 +1,89 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../core/constants/api_constants.dart';
+import '../../data/model/login_otp_response_model.dart';
+import '../../data/model/login_response_model.dart';
+import '../api_service.dart';
+
+class AuthApiService {
+  final ApiService apiService;
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  static const String _tokenKey = 'access_token';
+
+  AuthApiService({required this.apiService});
+
+  /// Step 1: verifies credentials, returns otpToken
+  Future<LoginOtpResponseModel> login({
+    required String login,
+    required String password,
+  }) async {
+    final Map<String, dynamic> json = await apiService.post(
+      ApiConstants.login,
+      body: {'login': login.trim(), 'password': password},
+    );
+    return LoginOtpResponseModel.fromJson(json);
+  }
+
+  Future<LoginResponseModel> register({
+    required String name,
+    required String phoneNumber,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    final Map<String, dynamic> response = await apiService.post(
+      ApiConstants.register,
+      body: {
+        'name': name.trim(),
+        'phoneNumber': phoneNumber.trim(),
+        'email': email.trim().toLowerCase(),
+        'password': password,
+        'passwordConfirmation': passwordConfirmation,
+      },
+    );
+
+    return LoginResponseModel.fromJson(response);
+  }
+
+  /// Step 2: Exchanges otpToken for real accessToken
+  Future<LoginResponseModel> verifyLoginOtp({
+    required String otpToken,
+    required String otp,
+  }) async {
+    final Map<String, dynamic> json = await apiService.post(
+      ApiConstants.verifyEmailOtp,
+      body: {'otp': otp},
+      token: otpToken,
+    );
+
+    final response = LoginResponseModel.fromJson(json);
+    if (response.accessToken.isNotEmpty) {
+      await _storage.write(key: _tokenKey, value: response.accessToken);
+    }
+    return response;
+  }
+
+  // --- Token Management ---
+  Future<String?> getToken() => _storage.read(key: _tokenKey);
+
+  Future<String> requireToken() async {
+    final token = await getToken();
+    if (token == null || token.trim().isEmpty) {
+      throw const ApiException(statusCode: 401, message: 'Session expired.');
+    }
+    return token.trim();
+  }
+
+  Future<void> logout() async {
+    final token = await getToken();
+    try {
+      if (token != null) await apiService.post(ApiConstants.logout, token: token);
+    } finally {
+      await _storage.delete(key: _tokenKey);
+    }
+  }
+
+  // --- General OTP methods ---
+  Future<Map<String, dynamic>> resendOtp(String email) async {
+    return await apiService.post(ApiConstants.sendEmailOtp, body: {"email": email});
+  }
+}

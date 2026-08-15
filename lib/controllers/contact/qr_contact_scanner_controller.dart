@@ -11,7 +11,7 @@ import '../../services/contact_service/contact_service.dart';
 import '../../services/user_service/user_service.dart';
 
 class QrContactScannerController extends GetxController with WidgetsBindingObserver {
-  final AppUserService appUserService;
+  final UserApiService appUserService;
   final ContactService contactService;
 
   QrContactScannerController({

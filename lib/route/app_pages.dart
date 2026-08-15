@@ -1,6 +1,5 @@
 import 'package:appchat/screen/settings/setting_screen.dart';
 import 'package:get/get.dart';
-import '../controllers/chat/chat_controller.dart';
 import '../controllers/profile/delete_account_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
 import '../screen/auth/auth_binding.dart';
@@ -231,7 +230,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.qrScanner,
       page: () => QrContactScannerScreen(),
-      binding: QrContactScannerBinding(),
+      // binding: QrContactScannerBinding(),
       transition: Transition.cupertino,
       transitionDuration: Duration(
         milliseconds: 220, // Reduced to 220ms

@@ -1,21 +1,28 @@
 import 'package:get/get.dart';
 import '../../controllers/auth/auth_controller.dart';
-import '../../services/auth_service /auth_service.dart';
-import '../../services/mock/mock_auth_service.dart';
+import '../../services/api_service.dart';
+import '../../services/auth_service /auth_api_service.dart';
 
 class AuthBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<AuthService>()) {
-      Get.put<AuthService>(
-        MockAuthService(),
-        permanent: true,
-      );
-    }
+    Get.lazyPut<ApiService>(
+          () => ApiService(),
+      fenix: true,
+    );
+
+    Get.lazyPut<AuthApiService>(
+          () => AuthApiService(
+        apiService: Get.find<ApiService>(),
+      ),
+      fenix: true,
+    );
 
     Get.lazyPut<AuthController>(
-          () => AuthController(),
-      fenix: true,
+          () => AuthController(
+        authApiService:
+        Get.find<AuthApiService>(),
+      ),
     );
   }
 }

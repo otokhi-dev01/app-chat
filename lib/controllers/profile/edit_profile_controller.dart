@@ -1,176 +1,133 @@
+import 'package:appchat/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../data/model/login_response_model.dart';
+import '../../services/auth_service /auth_api_service.dart';
+
 
 class ProfileEditController extends GetxController {
-  final GlobalKey<FormState> formKey =
-  GlobalKey<FormState>();
+  final UserApiService authApiService;
 
-  final TextEditingController nameController =
-  TextEditingController(
-    text: 'User Name',
-  );
+  // 1. Hold the initial user data to pre-fill fields and get the ID
+  final LoginDataModel? currentUser = Get.find<UserApiService>().currentUserValue;
 
-  final TextEditingController firstNameController =
-  TextEditingController(
-    text: 'User',
-  );
+  ProfileEditController({required this.authApiService});
 
-  final TextEditingController lastNameController =
-  TextEditingController(
-    text: 'Name',
-  );
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final TextEditingController bioController =
-  TextEditingController(
-    text: 'Available',
-  );
-
-  final TextEditingController phoneController =
-  TextEditingController(
-    text: '+855 12 345 678',
-  );
-
-  final TextEditingController usernameController =
-  TextEditingController(
-    text: 'username',
-  );
+  // Text Controllers
+  late TextEditingController nameController;
+  late TextEditingController firstNameController;
+  late TextEditingController lastNameController;
+  late TextEditingController bioController;
+  late TextEditingController phoneController;
+  late TextEditingController usernameController;
+  late TextEditingController emailController;
 
   final RxBool isSaving = false.obs;
-
   final RxString profileImagePath = ''.obs;
 
-  void setProfileImage(
-      String value,
-      ) {
-    profileImagePath.value =
-        value.trim();
+  @override
+  void onInit() {
+    super.onInit();
+
+    // 2. Pre-fill controllers using the LoginDataModel
+    // Logic for splitting name if necessary, or just using the fields
+    nameController = TextEditingController(text: currentUser?.name ?? '');
+
+    // Splitting name into first/last for the UI controllers if they are separate
+    List<String> nameParts = (currentUser?.name ?? '').split(' ');
+    firstNameController = TextEditingController(text: nameParts.isNotEmpty ? nameParts[0] : '');
+    lastNameController = TextEditingController(text: nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '');
+
+    bioController = TextEditingController(text: currentUser?.bio ?? '');
+    phoneController = TextEditingController(text: currentUser?.phoneNumber ?? '');
+    usernameController = TextEditingController(text: currentUser?.username ?? '');
+    emailController = TextEditingController(text: currentUser?.email ?? '');
+
+    // Set initial avatar URL
+    profileImagePath.value = currentUser?.avatarUrl ?? '';
+  }
+
+  void setProfileImage(String value) {
+    profileImagePath.value = value.trim();
   }
 
   void removeProfileImage() {
     profileImagePath.value = '';
   }
 
-  String? validateRequired(
-      String? value,
-      ) {
-    if (value == null ||
-        value.trim().isEmpty) {
-      return 'field_required'.tr;
-    }
-
+  // --- Validators (Matching your LoginDataModel requirements) ---
+  String? validateRequired(String? value) {
+    if (value == null || value.trim().isEmpty) return 'field_required'.tr;
     return null;
   }
 
-  String? validateUsername(
-      String? value,
-      ) {
-    if (value == null ||
-        value.trim().isEmpty) {
-      return 'username_required'.tr;
-    }
-
-    String username = value
-        .trim()
-        .replaceFirst(
-      '@',
-      '',
-    );
-
-    if (username.length < 3) {
-      return 'username_too_short'.tr;
-    }
-
-    RegExp usernamePattern = RegExp(
-      r'^[a-zA-Z0-9_]+$',
-    );
-
-    if (!usernamePattern.hasMatch(
-      username,
-    )) {
-      return 'invalid_username'.tr;
-    }
-
+  String? validateUsername(String? value) {
+    if (value == null || value.trim().isEmpty) return 'username_required'.tr;
+    String username = value.trim().replaceFirst('@', '');
+    if (username.length < 3) return 'username_too_short'.tr;
     return null;
   }
 
-  String? validatePhone(
-      String? value,
-      ) {
-    if (value == null ||
-        value.trim().isEmpty) {
-      return 'phone_required'.tr;
-    }
-
-    String phone = value.replaceAll(
-      RegExp(r'[\s\-\(\)]'),
-      '',
-    );
-
-    if (phone.length < 8) {
-      return 'invalid_phone_number'.tr;
-    }
-
+  String? validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) return 'phone_required'.tr;
+    // Basic check for phone length based on your model
+    if (value.length < 8) return 'invalid_phone_number'.tr;
     return null;
   }
 
+  String? validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) return null; // email is optional
+    if (!GetUtils.isEmail(value.trim())) return 'invalid_email'.tr;
+    return null;
+  }
+
+  // --- API Action ---
   Future<void> saveProfile() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    if (isSaving.value) {
-      return;
-    }
-
-    bool isValid =
-        formKey.currentState?.validate() ??
-            false;
-
-    if (!isValid) {
-      return;
-    }
+    if (isSaving.value) return;
+    if (!(formKey.currentState?.validate() ?? false)) return;
 
     try {
       isSaving.value = true;
 
+      // 3. Map keys to match LoginDataModel and Laravel expectations
       Map<String, dynamic> profileData = {
-        'name':
-        nameController.text.trim(),
-        'firstName':
-        firstNameController.text.trim(),
-        'lastName':
-        lastNameController.text.trim(),
-        'bio':
-        bioController.text.trim(),
-        'phone':
-        phoneController.text.trim(),
-        'username': usernameController
-            .text
-            .trim()
-            .replaceFirst(
-          '@',
-          '',
-        ),
-        'profileImagePath':
-        profileImagePath.value.trim(),
+        'name': nameController.text.trim(),
+        'username': usernameController.text.trim().replaceFirst('@', ''),
+        'phoneNumber': phoneController.text.trim(),
+        'email': emailController.text.trim(),
+        'bio': bioController.text.trim(),
+        'avatarUrl': profileImagePath.value.trim(),
+        // Add first/last name if your backend expects them separately
+        'first_name': firstNameController.text.trim(),
+        'last_name': lastNameController.text.trim(),
       };
 
-      debugPrint(
-        'Saving profile: $profileData',
+      // 4. Call API using the user's ID (Patch users/{user})
+      await authApiService.updateProfile(
+        userId: currentUser?.id ?? '',
+        data: profileData,
       );
 
-      // Replace this delay with your API request.
-      await Future.delayed(
-        Duration(
-          milliseconds: 800,
-        ),
+      Get.back();
+      Get.snackbar(
+        'success'.tr,
+        'profile_updated_successfully'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
-
-      // Example:
-      // await profileService.updateProfile(
-      //   profileData,
-      // );
     } catch (error) {
-      rethrow;
+      Get.snackbar(
+        'error'.tr,
+        error.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       isSaving.value = false;
     }
@@ -184,7 +141,7 @@ class ProfileEditController extends GetxController {
     bioController.dispose();
     phoneController.dispose();
     usernameController.dispose();
-
+    emailController.dispose();
     super.onClose();
   }
 }

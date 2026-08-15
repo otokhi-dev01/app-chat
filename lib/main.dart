@@ -6,7 +6,6 @@ import 'package:get_storage/get_storage.dart';
 
 import 'app_binding.dart';
 import 'controllers/notification/notification_controller.dart';
-import 'controllers/profile/profile_controller.dart';
 import 'controllers/settings/settings_controller.dart';
 import 'core/localization/app_translation.dart';
 import 'core/theme/app_theme.dart';
@@ -26,10 +25,7 @@ Future<void> main() async {
     permanent: true,
   );
 
-  Get.put<ProfileController>(
-    ProfileController(),
-    permanent: true,
-  );
+
 
   runApp(
     MyApp(),
