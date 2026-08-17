@@ -1,8 +1,8 @@
 import 'package:appchat/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/profile/profile_controller.dart';
 import '../../data/model/login_response_model.dart';
-import '../../services/auth_service /auth_api_service.dart';
 
 
 class ProfileEditController extends GetxController {
@@ -111,6 +111,11 @@ class ProfileEditController extends GetxController {
         userId: currentUser?.id ?? '',
         data: profileData,
       );
+
+      // 5. Refresh ProfileController so profile screen & account section update
+      if (Get.isRegistered<ProfileController>()) {
+        await Get.find<ProfileController>().fetchProfile();
+      }
 
       Get.back();
       Get.snackbar(

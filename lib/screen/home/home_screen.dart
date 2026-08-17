@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/settings/chat_folder_controller.dart';
-import '../../services/folder_service/chat_folder_service.dart';
+import '../../services/folder_service/chat_folder_api_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
-import '../../services/mock/mock_chat_folder_service.dart';
+
 import '../../services/mock/mock_chat_list_service.dart';
 import '../contact/contact_screen.dart';
 import '../profile/profile_screen.dart';
@@ -63,17 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    if (!Get.isRegistered<ChatFolderService>()) {
-      Get.put<ChatFolderService>(
-        MockChatFolderService(),
-        permanent: true,
-      );
-    }
-
     if (!Get.isRegistered<ChatFolderController>()) {
       Get.put<ChatFolderController>(
         ChatFolderController(
-          folderService: Get.find<ChatFolderService>(),
+          chatFolderApiService: Get.find<ChatFolderApiService>(),
         ),
         permanent: true,
       );

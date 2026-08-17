@@ -23,6 +23,23 @@ class ChatFolderModel {
     chatIds ?? <String>[],
   );
 
+  factory ChatFolderModel.fromJson(Map<String, dynamic> json) {
+    ChatFolderType parseType(dynamic typeStr) {
+      if (typeStr == 'all') return ChatFolderType.all;
+      if (typeStr == 'personal') return ChatFolderType.personal;
+      return ChatFolderType.custom;
+    }
+
+    return ChatFolderModel(
+      id: json['id']?.toString() ?? json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      type: parseType(json['type']),
+      chatCount: int.tryParse(json['chatCount']?.toString() ?? '0') ?? 0,
+      isSystem: json['isSystem'] == 1 || json['isSystem'] == true || json['isSystem'] == '1',
+      chatIds: json['chatIds'] is List ? (json['chatIds'] as List).map((e) => e.toString()).toList() : [],
+    );
+  }
+
   ChatFolderModel copyWith({
     String? id,
     String? name,

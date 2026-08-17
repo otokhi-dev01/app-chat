@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../controllers/user/user_controller.dart';
 import '../../../route/app_route.dart';
+import '../../../services/user_service/user_service.dart';
 import '../../contact/add_contact/add_contact_screen.dart';
 import '../../widgets/app_feedback.dart';
 import 'profile_content_filter.dart';
@@ -22,7 +23,9 @@ class ProfileDetailScreen extends StatefulWidget {
       (Get.isRegistered<UserController>()
           ? Get.find<UserController>()
           : Get.put(
-        UserController(),
+        UserController(
+          userApiService: Get.find<UserApiService>(),
+        ),
       ));
 
   @override

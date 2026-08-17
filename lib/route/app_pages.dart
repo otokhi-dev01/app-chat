@@ -1,7 +1,10 @@
 import 'package:appchat/screen/settings/setting_screen.dart';
+import 'package:appchat/services/contact_service/contact_api_service.dart';
 import 'package:get/get.dart';
+import '../controllers/contact/qr_contact_scanner_controller.dart';
 import '../controllers/profile/delete_account_controller.dart';
 import '../controllers/settings/settings_search_controller.dart';
+import '../services/user_service/user_service.dart';
 import '../screen/auth/auth_binding.dart';
 import '../screen/auth/login/login_screen.dart';
 import '../screen/auth/phone_input/phone_input_screen.dart';
@@ -16,7 +19,6 @@ import '../screen/contact/blocked_contacts/blocked_contact_binding.dart';
 import '../screen/contact/blocked_contacts/blocked_contact_screen.dart';
 import '../screen/contact/contact_binding.dart';
 import '../screen/contact/contact_screen.dart';
-import '../screen/contact/qr_scan/qr_contact_scanner_binding.dart';
 import '../screen/contact/qr_scan/qr_contact_scanner_screen.dart';
 import '../screen/home/home_binding.dart';
 import '../screen/home/home_screen.dart';
@@ -37,7 +39,6 @@ import '../screen/settings/privacy_security/privacy_security_binding.dart';
 import '../screen/settings/privacy_security/privacy_security_screen.dart';
 import '../screen/settings/settings_search_screen.dart';
 import '../screen/splash/splash_screen.dart';
-import '../services/auth_service /auth_service.dart';
 import 'app_route.dart';
 
 class AppPages {
@@ -125,7 +126,7 @@ class AppPages {
             () {
           Get.lazyPut<DeleteAccountController>(
                 () => DeleteAccountController(
-              authService: Get.find<AuthService>(),
+              userApiService: Get.find<UserApiService>(),
             ),
           );
         },
@@ -230,10 +231,17 @@ class AppPages {
     GetPage(
       name: AppRoutes.qrScanner,
       page: () => QrContactScannerScreen(),
-      // binding: QrContactScannerBinding(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<QrContactScannerController>(
+          () => QrContactScannerController(
+            appUserService: Get.find<UserApiService>(),
+            contactService: Get.find<ContactApiService>(),
+          ),
+        );
+      }),
       transition: Transition.cupertino,
       transitionDuration: Duration(
-        milliseconds: 220, // Reduced to 220ms
+        milliseconds: 220,
       ),
     ),
 

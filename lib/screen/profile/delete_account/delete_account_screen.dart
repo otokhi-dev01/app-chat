@@ -13,13 +13,17 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
   Future<void> _confirmDeletion(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    bool? confirmed = await showCupertinoDialog<bool>(
+    // Validate the form first; abort if invalid
+    final bool isValid = controller.formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    final bool? confirmed = await showCupertinoDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return CupertinoAlertDialog(
           title: Text('delete_account_question'.tr),
           content: Padding(
-            padding: EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: 8),
             child: Text('delete_account_confirmation'.tr),
           ),
           actions: [
@@ -43,38 +47,39 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-    bool isDark = theme.brightness == Brightness.dark;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
 
-    Color appBarColor = isDark
-        ? Color(0xFF1B1D22).withValues(alpha: 0.65)
+    final Color appBarColor = isDark
+        ? const Color(0xFF1B1D22).withValues(alpha: 0.65)
         : Colors.white.withValues(alpha: 0.70);
 
-    Color actionBackground = isDark ? Color(0xFF1B1D22) : Colors.white;
+    final Color actionBackground =
+        isDark ? const Color(0xFF1B1D22) : Colors.white;
 
-    Color borderColor = isDark
+    final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
-    SystemUiOverlayStyle overlayStyle = isDark
+    final SystemUiOverlayStyle overlayStyle = isDark
         ? SystemUiOverlayStyle.light.copyWith(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness: Brightness.light,
-    )
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+            systemNavigationBarColor: theme.scaffoldBackgroundColor,
+            systemNavigationBarIconBrightness: Brightness.light,
+          )
         : SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-      systemNavigationBarColor: theme.scaffoldBackgroundColor,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    );
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+            systemNavigationBarColor: theme.scaffoldBackgroundColor,
+            systemNavigationBarIconBrightness: Brightness.dark,
+          );
 
     return PreferredSize(
-      preferredSize: Size.fromHeight(60),
+      preferredSize: const Size.fromHeight(60),
       child: AppBar(
         toolbarHeight: 60,
         automaticallyImplyLeading: false,
@@ -90,25 +95,19 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
         systemOverlayStyle: overlayStyle,
         flexibleSpace: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 18,
-              sigmaY: 18,
-            ),
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
                 color: appBarColor,
                 border: Border(
-                  bottom: BorderSide(
-                    color: borderColor,
-                    width: 1,
-                  ),
+                  bottom: BorderSide(color: borderColor, width: 1),
                 ),
               ),
             ),
           ),
         ),
         leading: Padding(
-          padding: EdgeInsets.fromLTRB(12, 10, 6, 10),
+          padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
           child: Tooltip(
             message: 'back'.tr,
             child: Container(
@@ -118,23 +117,20 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
               decoration: BoxDecoration(
                 color: actionBackground,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: borderColor,
-                  width: 1.0,
-                ),
+                border: Border.all(color: borderColor, width: 1.0),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(
                       alpha: isDark ? 0.15 : 0.04,
                     ),
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: CupertinoButton(
                 padding: EdgeInsets.zero,
-                minimumSize: Size(40, 40),
+                minimumSize: const Size(40, 40),
                 onPressed: () {
                   FocusManager.instance.primaryFocus?.unfocus();
                   Get.back();
@@ -164,21 +160,29 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colors = theme.colorScheme;
-    bool isDark = theme.brightness == Brightness.dark;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colors = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
+
+    final Color cardColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
+    final Color borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
+        child: Form(
+          key: controller.formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            physics: const BouncingScrollPhysics(),
             children: [
+              // ── Warning Banner ────────────────────────────────────────────
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: colors.error.withValues(
                     alpha: isDark ? 0.12 : 0.08,
@@ -195,7 +199,7 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
                         alpha: isDark ? 0.15 : 0.04,
                       ),
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -215,7 +219,7 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
                         color: colors.error,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
                       'permanently_delete_account'.tr,
                       textAlign: TextAlign.center,
@@ -225,7 +229,7 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'delete_account_warning_desc'.tr,
                       textAlign: TextAlign.center,
@@ -238,9 +242,92 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
                   ],
                 ),
               ),
-              Spacer(),
+
+              const SizedBox(height: 24),
+
+              // ── Password Fields ───────────────────────────────────────────
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.15 : 0.04,
+                      ),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Label
+                    Padding(
+                      padding: const EdgeInsets.only(left: 2, bottom: 12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.lock_fill,
+                            size: 16,
+                            color: colors.error,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'confirm_your_identity'.tr,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colors.error,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Password Field
+                    Obx(() => _PasswordField(
+                          controller: controller.passwordController,
+                          label: 'password'.tr,
+                          obscure: controller.obscurePassword.value,
+                          onToggle: controller.togglePasswordVisibility,
+                          validator: controller.validatePassword,
+                          isDark: isDark,
+                          borderColor: borderColor,
+                          cardColor: cardColor,
+                          theme: theme,
+                          colors: colors,
+                          textInputAction: TextInputAction.next,
+                        )),
+
+                    const SizedBox(height: 12),
+
+                    // Confirm Password Field
+                    Obx(() => _PasswordField(
+                          controller: controller.confirmPasswordController,
+                          label: 'confirm_password'.tr,
+                          obscure: controller.obscureConfirmPassword.value,
+                          onToggle: controller.toggleConfirmPasswordVisibility,
+                          validator: controller.validateConfirmPassword,
+                          isDark: isDark,
+                          borderColor: borderColor,
+                          cardColor: cardColor,
+                          theme: theme,
+                          colors: colors,
+                          textInputAction: TextInputAction.done,
+                        )),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // ── Delete Button ─────────────────────────────────────────────
               Obx(
-                    () => SizedBox(
+                () => SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: FilledButton.icon(
@@ -257,22 +344,19 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
                         : () => _confirmDeletion(context),
                     icon: controller.isDeleting.value
                         ? SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: colors.onError,
-                      ),
-                    )
-                        : Icon(
-                      CupertinoIcons.trash,
-                      size: 20,
-                    ),
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colors.onError,
+                            ),
+                          )
+                        : const Icon(CupertinoIcons.trash, size: 20),
                     label: Text(
                       controller.isDeleting.value
                           ? 'deleting_account'.tr
                           : 'delete_account'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -282,6 +366,105 @@ class DeleteAccountView extends GetView<DeleteAccountController> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Private password field widget ─────────────────────────────────────────────
+class _PasswordField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final bool obscure;
+  final VoidCallback onToggle;
+  final String? Function(String?)? validator;
+  final bool isDark;
+  final Color borderColor;
+  final Color cardColor;
+  final ThemeData theme;
+  final ColorScheme colors;
+  final TextInputAction textInputAction;
+
+  const _PasswordField({
+    required this.controller,
+    required this.label,
+    required this.obscure,
+    required this.onToggle,
+    required this.validator,
+    required this.isDark,
+    required this.borderColor,
+    required this.cardColor,
+    required this.theme,
+    required this.colors,
+    required this.textInputAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: validator,
+      textInputAction: textInputAction,
+      keyboardType: TextInputType.visiblePassword,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: colors.onSurfaceVariant,
+          fontSize: 14,
+        ),
+        prefixIcon: Icon(
+          CupertinoIcons.lock,
+          size: 20,
+          color: colors.error.withValues(alpha: 0.75),
+        ),
+        suffixIcon: CupertinoButton(
+          padding: EdgeInsets.zero,
+          minimumSize: const Size(40, 40),
+          onPressed: onToggle,
+          child: Icon(
+            obscure
+                ? CupertinoIcons.eye_slash
+                : CupertinoIcons.eye,
+            size: 20,
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+        filled: true,
+        fillColor: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : Colors.black.withValues(alpha: 0.02),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: colors.error.withValues(alpha: 0.6),
+            width: 1.5,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: colors.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: colors.error, width: 1.5),
         ),
       ),
     );

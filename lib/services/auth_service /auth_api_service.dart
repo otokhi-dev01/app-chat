@@ -1,6 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/constants/api_constants.dart';
-import '../../data/model/login_otp_response_model.dart';
 import '../../data/model/login_response_model.dart';
 import '../api_service.dart';
 
@@ -11,8 +10,9 @@ class AuthApiService {
 
   AuthApiService({required this.apiService});
 
-  /// Step 1: verifies credentials, returns otpToken
-  Future<LoginOtpResponseModel> login({
+  /// Verifies credentials and returns the full access token + user directly
+  /// (OTP step is disabled — the API issues the token in one step).
+  Future<LoginResponseModel> login({
     required String login,
     required String password,
   }) async {
@@ -20,7 +20,11 @@ class AuthApiService {
       ApiConstants.login,
       body: {'login': login.trim(), 'password': password},
     );
-    return LoginOtpResponseModel.fromJson(json);
+    final response = LoginResponseModel.fromJson(json);
+    if (response.accessToken.isNotEmpty) {
+      await _storage.write(key: _tokenKey, value: response.accessToken);
+    }
+    return response;
   }
 
   Future<LoginResponseModel> register({

@@ -7,12 +7,12 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../models/contact_model.dart';
 import '../../models/user_model.dart';
-import '../../services/contact_service/contact_service.dart';
+import '../../services/contact_service/contact_api_service.dart';
 import '../../services/user_service/user_service.dart';
 
 class QrContactScannerController extends GetxController with WidgetsBindingObserver {
   final UserApiService appUserService;
-  final ContactService contactService;
+  final ContactApiService contactService;
 
   QrContactScannerController({
     required this.appUserService,
@@ -110,8 +110,8 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
         );
       }
 
-      ContactModel? contact = await contactService.addContactByUserId(
-        user.id,
+      ContactModel? contact = await contactService.createContact(
+        contactUserId: user.id,
       );
 
       if (contact == null) {
@@ -197,7 +197,7 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
     }
 
     List<AppUserModel> results = await appUserService.searchUsers(
-      cleanValue,
+      query: cleanValue,
     );
 
     if (results.isEmpty) {

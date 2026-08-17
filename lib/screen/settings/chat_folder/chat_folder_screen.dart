@@ -35,8 +35,8 @@ class ChatFolderScreen extends StatelessWidget {
       return;
     }
 
-    bool created = await controller.addFolder(
-      result.name,
+    bool created = await controller.createFolder(
+      name: result.name,
       chatIds: result.selectedMemberIds,
     );
 
@@ -173,7 +173,7 @@ class ChatFolderScreen extends StatelessWidget {
     }
 
     bool deleted = await controller.deleteFolder(
-      folder.id,
+      folder,
     );
 
     if (!context.mounted) {

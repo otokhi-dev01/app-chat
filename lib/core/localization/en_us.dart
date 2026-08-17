@@ -297,6 +297,14 @@ final Map<String, String> enUS = {
   'unable_to_resend_code_message':
   'Unable to resend the verification code. Please try again.',
 
+
+  // Delete Account
+  'confirm_your_identity': 'Confirm your identity',
+  'password_required': 'Password is required',
+  'confirm_password_required': 'Confirm password is required',
+
+
+
 // Account editing
 'edit': 'Edit @field',
 'edit_button': 'Edit',

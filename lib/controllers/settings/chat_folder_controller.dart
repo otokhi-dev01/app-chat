@@ -1,51 +1,62 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
+import '../../data/model/chat_folder_member_model.dart';
 import '../../models/chat_folder_model.dart';
-import '../../services/folder_service/chat_folder_service.dart';
+import '../../services/folder_service/chat_folder_api_service.dart';
 
-class ChatFolderController
-    extends GetxController {
-  final ChatFolderService folderService;
+class ChatFolderController extends GetxController {
+  final ChatFolderApiService chatFolderApiService;
 
   ChatFolderController({
-    required this.folderService,
+    required this.chatFolderApiService,
   });
 
   final RxList<ChatFolderModel> folders =
       <ChatFolderModel>[].obs;
 
+  final RxList<ChatFolderMemberModel> memberOptions =
+      <ChatFolderMemberModel>[].obs;
+
+  final RxSet<String> selectedChatIds =
+      <String>{}.obs;
+
+  final RxSet<String> selectedMemberIds =
+      <String>{}.obs;
+
+  final Rxn<ChatFolderModel> selectedFolder =
+  Rxn<ChatFolderModel>();
+
+  final RxString memberSearch = ''.obs;
+  final RxString errorMessage = ''.obs;
+  final RxString successMessage = ''.obs;
+
   final RxBool isLoading = false.obs;
   final RxBool isSaving = false.obs;
+  final RxBool isDeleting = false.obs;
+  final RxBool isLoadingMembers = false.obs;
 
-  final RxString errorMessage = ''.obs;
-
-  List<ChatFolderModel>
-  get defaultFolders {
-    return folders
-        .where(
-          (ChatFolderModel folder) {
-        return folder.isSystem;
-      },
-    )
-        .toList();
-  }
-
-  List<ChatFolderModel>
-  get customFolders {
-    return folders
-        .where(
-          (ChatFolderModel folder) {
-        return !folder.isSystem;
-      },
-    )
-        .toList();
-  }
+  Worker? _memberSearchWorker;
 
   @override
   void onInit() {
     super.onInit();
 
+    _memberSearchWorker = debounce<String>(
+      memberSearch,
+          (value) {
+        loadMemberOptions(search: value);
+      },
+      time: const Duration(milliseconds: 500),
+    );
+
     loadFolders();
+  }
+
+  @override
+  void onClose() {
+    _memberSearchWorker?.dispose();
+    super.onClose();
   }
 
   Future<void> loadFolders() async {
@@ -53,57 +64,113 @@ class ChatFolderController
       return;
     }
 
-    isLoading.value = true;
-    errorMessage.value = '';
-
     try {
-      List<ChatFolderModel> result =
-      await folderService.getFolders();
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final result =
+      await chatFolderApiService.getFolders();
 
       folders.assignAll(result);
     } catch (error) {
-      errorMessage.value =
-      'Unable to load chat folders.';
+      errorMessage.value = _errorText(error);
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<bool> addFolder(
-    String name, {
+  Future<void> loadMemberOptions({
+    String search = '',
+  }) async {
+    try {
+      isLoadingMembers.value = true;
+      errorMessage.value = '';
+
+      final result = await chatFolderApiService
+          .getMemberOptions(
+        search: search,
+      );
+
+      memberOptions.assignAll(result);
+    } catch (error) {
+      memberOptions.clear();
+      errorMessage.value = _errorText(error);
+    } finally {
+      isLoadingMembers.value = false;
+    }
+  }
+
+  void onMemberSearchChanged(String value) {
+    memberSearch.value = value.trim();
+  }
+
+  void selectFolder(ChatFolderModel folder) {
+    selectedFolder.value = folder;
+
+    selectedChatIds.assignAll(
+      folder.chatIds,
+    );
+
+    selectedMemberIds.clear();
+  }
+
+  void toggleChat(String chatId) {
+    if (selectedChatIds.contains(chatId)) {
+      selectedChatIds.remove(chatId);
+    } else {
+      selectedChatIds.add(chatId);
+    }
+  }
+
+  void toggleMember(String memberId) {
+    if (selectedMemberIds.contains(memberId)) {
+      selectedMemberIds.remove(memberId);
+    } else {
+      selectedMemberIds.add(memberId);
+    }
+  }
+
+  bool isChatSelected(String chatId) {
+    return selectedChatIds.contains(chatId);
+  }
+
+  bool isMemberSelected(String memberId) {
+    return selectedMemberIds.contains(memberId);
+  }
+
+  Future<bool> createFolder({
+    required String name,
     List<String>? chatIds,
   }) async {
-    String cleanName = name.trim();
-
-    if (cleanName.isEmpty ||
-        isSaving.value) {
+    if (name.trim().isEmpty) {
+      errorMessage.value =
+      'Please enter a folder name.';
       return false;
     }
 
-    isSaving.value = true;
-    errorMessage.value = '';
-
     try {
-      ChatFolderModel? folder =
-      await folderService.createFolder(
-        name: cleanName,
-        chatIds: chatIds,
+      isSaving.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final folder =
+      await chatFolderApiService.createFolder(
+        name: name,
+        chatIds: chatIds ?? selectedChatIds.toList(),
+        memberIds: selectedMemberIds.toList(),
       );
 
-      if (folder == null) {
-        errorMessage.value =
-        'A folder with this name already exists.';
-
-        return false;
-      }
-
       folders.add(folder);
+      selectedFolder.value = folder;
 
+      successMessage.value =
+      'Chat folder created successfully.';
+
+      debugPrint('✅ createFolder success: folder ${folder.id} created.');
       return true;
     } catch (error) {
-      errorMessage.value =
-      'Unable to create folder.';
-
+      errorMessage.value = _errorText(error);
+      debugPrint('❌ createFolder error: $error');
       return false;
     } finally {
       isSaving.value = false;
@@ -112,60 +179,44 @@ class ChatFolderController
 
   Future<bool> updateFolder({
     required String folderId,
-    required String name,
+    String? name,
+    bool updateSelection = true,
   }) async {
-    String cleanName = name.trim();
-
-    if (cleanName.isEmpty ||
-        isSaving.value) {
-      return false;
-    }
-
-    int index = folders.indexWhere(
-          (ChatFolderModel folder) {
-        return folder.id == folderId;
-      },
-    );
-
-    if (index < 0) {
-      return false;
-    }
-
-    ChatFolderModel currentFolder =
-    folders[index];
-
-    // Default folders cannot be edited.
-    if (currentFolder.isSystem) {
-      errorMessage.value =
-      'Default folders cannot be edited.';
-
-      return false;
-    }
-
-    isSaving.value = true;
-    errorMessage.value = '';
-
     try {
-      ChatFolderModel? updatedFolder =
-      await folderService.updateFolder(
+      isSaving.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final updatedFolder =
+      await chatFolderApiService.updateFolder(
         folderId: folderId,
-        name: cleanName,
+        name: name,
+        chatIds: updateSelection
+            ? selectedChatIds.toList()
+            : null,
+        memberIds: updateSelection
+            ? selectedMemberIds.toList()
+            : null,
       );
 
-      if (updatedFolder == null) {
-        errorMessage.value =
-        'A folder with this name already exists.';
+      final index = folders.indexWhere(
+            (folder) => folder.id == folderId,
+      );
 
-        return false;
+      if (index >= 0) {
+        folders[index] = updatedFolder;
       }
 
-      folders[index] = updatedFolder;
+      selectedFolder.value = updatedFolder;
 
+      successMessage.value =
+      'Chat folder updated successfully.';
+
+      debugPrint('✅ updateFolder success: folder $folderId updated.');
       return true;
     } catch (error) {
-      errorMessage.value =
-      'Unable to update folder.';
-
+      errorMessage.value = _errorText(error);
+      debugPrint('❌ updateFolder error: $error');
       return false;
     } finally {
       isSaving.value = false;
@@ -173,64 +224,60 @@ class ChatFolderController
   }
 
   Future<bool> deleteFolder(
-      String folderId,
+      ChatFolderModel folder,
       ) async {
-    int index = folders.indexWhere(
-          (ChatFolderModel folder) {
-        return folder.id == folderId;
-      },
-    );
-
-    if (index < 0) {
-      return false;
-    }
-
-    ChatFolderModel folder =
-    folders[index];
-
-    // Default folders cannot be deleted.
     if (folder.isSystem) {
       errorMessage.value =
-      'Default folders cannot be deleted.';
-
+      'System folders cannot be deleted.';
       return false;
     }
-
-    bool deleted =
-    await folderService.deleteFolder(
-      folderId: folderId,
-    );
-
-    if (!deleted) {
-      errorMessage.value =
-      'Unable to delete folder.';
-
-      return false;
-    }
-
-    folders.removeAt(index);
-
-    return true;
-  }
-
-  Future<void> resetFolders() async {
-    if (isLoading.value) {
-      return;
-    }
-
-    isLoading.value = true;
-    errorMessage.value = '';
 
     try {
-      List<ChatFolderModel> result =
-      await folderService.resetFolders();
+      isDeleting.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
 
-      folders.assignAll(result);
+      final message =
+      await chatFolderApiService.deleteFolder(
+        folder.id,
+      );
+
+      folders.removeWhere(
+            (item) => item.id == folder.id,
+      );
+
+      if (selectedFolder.value?.id == folder.id) {
+        selectedFolder.value = null;
+      }
+
+      clearSelection();
+      successMessage.value = message;
+
+      debugPrint('✅ deleteFolder success: folder ${folder.id} deleted.');
+      return true;
     } catch (error) {
-      errorMessage.value =
-      'Unable to reset folders.';
+      errorMessage.value = _errorText(error);
+      debugPrint('❌ deleteFolder error: $error');
+      return false;
     } finally {
-      isLoading.value = false;
+      isDeleting.value = false;
     }
+  }
+
+  void clearSelection() {
+    selectedChatIds.clear();
+    selectedMemberIds.clear();
+  }
+
+  void clearMessages() {
+    errorMessage.value = '';
+    successMessage.value = '';
+  }
+
+  String _errorText(Object error) {
+    return error
+        .toString()
+        .replaceFirst('Exception: ', '')
+        .replaceFirst('FormatException: ', '');
   }
 }

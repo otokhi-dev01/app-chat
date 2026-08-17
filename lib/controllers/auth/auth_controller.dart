@@ -5,10 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../data/mock_auth_user.dart';
-import '../../data/model/login_otp_response_model.dart';
 import '../../data/model/login_response_model.dart';
 import '../../route/app_route.dart';
-import '../../screen/auth/verify_otp/verity_otp_screen.dart';
 import '../../screen/widgets/app_feedback.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service /auth_api_service.dart';
@@ -108,8 +106,8 @@ class AuthController extends GetxController {
 
   // Holds the otpToken + email from step 1 of login until verifyLoginOtp()
   // either succeeds or a fresh login() call replaces it.
-  final Rxn<LoginOtpResponseModel> pendingOtpLogin =
-  Rxn<LoginOtpResponseModel>();
+  // NOTE: OTP is currently disabled — kept for easy re-enable.
+  // final Rxn<LoginOtpResponseModel> pendingOtpLogin = Rxn<LoginOtpResponseModel>();
 
   // Real user returned by Laravel.
   final Rxn<LoginDataModel> currentUser =
@@ -201,57 +199,46 @@ class AuthController extends GetxController {
     obscureConfirmPassword.toggle();
   }
 
-  /// Step 1 of login: verifies the password and requests an OTP, then
-  /// pushes VerifyOtpScreen with callbacks bound to [verifyLoginOtp] /
-  /// [resendLoginOtp] / [_handleLoginOtpVerified]. The screen owns its
-  /// own loading state, error text, resend countdown, and toasts — this
-  /// controller just does the network calls.
+  /// Login: verifies credentials and goes directly to home.
+  /// OTP is disabled — the API now issues the access token in one step.
   Future<void> login() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    if (isLoginLoading.value) {
-      return;
-    }
+    if (isLoginLoading.value) return;
 
     final bool isValid =
-        loginFormKey.currentState?.validate() ??
-            false;
+        loginFormKey.currentState?.validate() ?? false;
 
     if (!isValid) {
       AppFeedback.showMessage(
         title: 'Invalid Information',
-        message:
-        'Please check your email and password.',
+        message: 'Please check your email and password.',
         icon: Icons.info_outline_rounded,
       );
-
       return;
     }
 
     isLoginLoading.value = true;
 
     try {
-      final LoginOtpResponseModel response =
-      await authApiService.login(
-        login: loginEmailController.text
-            .trim()
-            .toLowerCase(),
-        password:
-        loginPasswordController.text,
+      final LoginResponseModel response = await authApiService.login(
+        login: loginEmailController.text.trim().toLowerCase(),
+        password: loginPasswordController.text,
       );
 
-      pendingOtpLogin.value = response;
+      final LoginDataModel? user = response.data;
+
+      if (user == null) {
+        throw const ApiException(
+          statusCode: 500,
+          message: 'User information was not returned.',
+        );
+      }
+
+      currentUser.value = user;
 
       if (!isClosed) {
-        Get.to(
-              () => VerifyOtpScreen(
-            destination: response.email,
-            onVerify: verifyLoginOtp,
-            onResend: resendLoginOtp,
-            onVerified: _handleLoginOtpVerified,
-          ),
-        );
+        unawaited(_finishPostLoginFlow());
       }
     } on ApiException catch (error) {
       AppFeedback.showMessage(
@@ -262,15 +249,11 @@ class AuthController extends GetxController {
     } catch (error, stackTrace) {
       AppFeedback.showMessage(
         title: 'Login Failed',
-        message:
-        'Something went wrong. Please try again.',
+        message: 'Something went wrong. Please try again.',
         icon: Icons.error_outline_rounded,
       );
-
       debugPrint('Login error: $error');
-      debugPrintStack(
-        stackTrace: stackTrace,
-      );
+      debugPrintStack(stackTrace: stackTrace);
     } finally {
       if (!isClosed) {
         isLoginLoading.value = false;
@@ -279,66 +262,14 @@ class AuthController extends GetxController {
   }
 
 
-  /// Step 2 of login: verifies the emailed [otp] against
-  /// [pendingOtpLogin]. Deliberately throws instead of catching —
-  /// VerifyOtpForm's own try/catch is what shows the error state and
-  /// the "verification_failed" toast.
-  Future<void> verifyLoginOtp(String otp) async {
-    final LoginOtpResponseModel? pending =
-        pendingOtpLogin.value;
+  // ---------------------------------------------------------------------------
+  // OTP methods — disabled. The API now issues the access token directly
+  // on login. Keep these for easy re-enable when OTP is needed again.
+  // ---------------------------------------------------------------------------
 
-    if (pending == null) {
-      throw const ApiException(
-        statusCode: 422,
-        message:
-        'Please log in again to request a new code.',
-      );
-    }
-
-    final LoginResponseModel response =
-    await authApiService.verifyLoginOtp(
-      otpToken: pending.otpToken,
-      otp: otp,
-    );
-
-    final LoginDataModel? user = response.data;
-
-    if (user == null) {
-      throw const ApiException(
-        statusCode: 500,
-        message:
-        'User information was not returned.',
-      );
-    }
-
-    currentUser.value = user;
-    pendingOtpLogin.value = null;
-  }
-
-  /// Re-sends the login OTP by re-running step 1 with the credentials
-  /// still sitting in the login form (they aren't cleared until step 2
-  /// succeeds). Also throws instead of catching — VerifyOtpForm shows
-  /// its own "unable_to_resend" / "code_sent" toasts around this call.
-  Future<void> resendLoginOtp() async {
-    final LoginOtpResponseModel response =
-    await authApiService.login(
-      login: loginEmailController.text
-          .trim()
-          .toLowerCase(),
-      password:
-      loginPasswordController.text,
-    );
-
-    pendingOtpLogin.value = response;
-  }
-
-
-  /// Fired by VerifyOtpForm's onVerified after a successful verify.
-  /// Fire-and-forget on purpose: onVerified is a VoidCallback (sync),
-  /// but the prefetch + navigation work is async.
-  void _handleLoginOtpVerified() {
-    unawaited(_finishPostLoginFlow());
-  }
+  // Future<void> verifyLoginOtp(String otp) async { ... }
+  // Future<void> resendLoginOtp() async { ... }
+  // void _handleLoginOtpVerified() { unawaited(_finishPostLoginFlow()); }
 
   Future<void> _finishPostLoginFlow() async {
     TextInput.finishAutofillContext();
@@ -461,7 +392,6 @@ class AuthController extends GetxController {
 
     currentUser.value = null;
     loginPasswordController.clear();
-    pendingOtpLogin.value = null;
 
     Get.offAllNamed(
       AppRoutes.login,

@@ -10,6 +10,7 @@ import '../../../controllers/user/user_controller.dart';
 import '../../../data/mock_chat_data.dart';
 import '../../../models/chat_model.dart';
 import '../../../services/search_service/search_history_service.dart';
+import '../../../services/user_service/user_service.dart';
 import '../../chat_detail/chat_detail_screen.dart';
 import '../../profile/details_profile/profile_detail_screen.dart';
 import 'search_scope_selector.dart';
@@ -80,7 +81,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
     final UserController userController = Get.isRegistered<UserController>()
         ? Get.find<UserController>()
-        : Get.put(UserController());
+        : Get.put(UserController(
+            userApiService: Get.find<UserApiService>(),
+          ));
 
     userController.name.value = chat.name;
     userController.profileImageUrl.value = chat.image;
@@ -102,7 +105,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
     final UserController userController = Get.isRegistered<UserController>()
         ? Get.find<UserController>()
-        : Get.put(UserController());
+        : Get.put(UserController(
+            userApiService: Get.find<UserApiService>(),
+          ));
 
     userController.name.value = user.name;
     userController.profileImageUrl.value = user.image;

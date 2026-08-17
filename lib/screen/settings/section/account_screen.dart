@@ -132,6 +132,15 @@ class AccountSettingsSection extends StatelessWidget {
                   _AccountDivider(
                     color: dividerColor,
                   ),
+                  _AccountTile(
+                    icon: CupertinoIcons.doc_text,
+                    label: 'bio'.tr,
+                    value: controller.userBio.value,
+                    onTap: _openProfileDetails,
+                  ),
+                  _AccountDivider(
+                    color: dividerColor,
+                  ),
                   _DeleteAccountTile(
                     onTap: _openDeleteAccount,
                   ),

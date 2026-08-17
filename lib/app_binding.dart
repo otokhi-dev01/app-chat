@@ -1,5 +1,7 @@
-import 'package:appchat/services/auth_service%20/auth_api_service.dart';
-import 'package:appchat/services/auth_service%20/auth_service.dart';
+import 'package:appchat/services/auth_service /auth_api_service.dart';
+import 'package:appchat/services/auth_service /auth_service.dart';
+import 'package:appchat/services/contact_service/contact_api_service.dart';
+import 'package:appchat/services/folder_service/chat_folder_api_service.dart';
 import 'package:appchat/services/user_service/user_service.dart';
 import 'package:get/get.dart';
 
@@ -27,7 +29,25 @@ class AppBinding extends Bindings {
       permanent: true,
     );
 
-    // 4. Register ProfileController
+    // 4. Register ChatFolderApiService
+    Get.put<ChatFolderApiService>(
+      ChatFolderApiService(
+        apiService: Get.find<ApiService>(),
+        authApiService: Get.find<AuthApiService>(),
+      ),
+      permanent: true,
+    );
+
+    // 5. Register ContactApiService
+    Get.put<ContactApiService>(
+      ContactApiService(
+        apiService: Get.find<ApiService>(),
+        authApiService: Get.find<AuthApiService>(),
+      ),
+      permanent: true,
+    );
+
+    // 6. Register ProfileController
     Get.lazyPut<ProfileController>(
           () => ProfileController(authApiService: Get.find<UserApiService>()),
     );

@@ -1,157 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 import '../../models/chat_model.dart';
 import '../../models/contact_model.dart';
+import '../../route/app_route.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
-import '../../screen/widgets/app_feedback.dart';
-import '../../services/contact_service/contact_service.dart';
-import 'package:permission_handler/permission_handler.dart';
+import '../../services/contact_service/contact_api_service.dart';
 
 class ContactController extends GetxController {
-  final ContactService contactService;
+  final ContactApiService contactApiService;
 
   ContactController({
-    required this.contactService,
+    required this.contactApiService,
   });
-
-
-  final TextEditingController searchController =
-  TextEditingController();
-
-  final ScrollController scrollController =
-  ScrollController();
-
-  final RxBool isSyncingContacts = false.obs;
-  final RxBool isDeletingSyncedContacts = false.obs;
 
   final RxList<ContactModel> contacts =
       <ContactModel>[].obs;
 
-  final RxString searchQuery = ''.obs;
-  final RxString errorMessage = ''.obs;
+  final RxList<ContactModel> userOptions =
+      <ContactModel>[].obs;
 
-  final RxBool showAddButton = true.obs;
-  final RxBool isNameAscending = true.obs;
+  final RxString contactSearch = ''.obs;
+  final RxString userSearch = ''.obs;
+  final RxString errorMessage = ''.obs;
+  final RxString successMessage = ''.obs;
+
   final RxBool isLoading = false.obs;
-  final RxBool isAddingContact = false.obs;
+  final RxBool isSearchingUsers = false.obs;
+  final RxBool isSaving = false.obs;
+  final RxBool isDeleting = false.obs;
+
+  // Added for UI compatibility
+  final TextEditingController searchController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  final RxBool showAddButton = true.obs;
+  final RxBool isSyncingContacts = false.obs;
+  final RxBool isDeletingSyncedContacts = false.obs;
+  
+  // Maps to contactSearch
+  RxString get searchQuery => contactSearch;
+
+  // Grouped contacts mapped to the flat list
+  Map<String, List<ContactModel>> get groupedContacts {
+    final map = <String, List<ContactModel>>{};
+    for (var contact in contacts) {
+      // Basic grouping: first letter of name (fallback to #)
+      final String firstLetter = (contact.name.isNotEmpty ? contact.name : (contact.username.isNotEmpty ? contact.username : '#'))[0].toUpperCase();
+      final key = RegExp(r'[A-Z]').hasMatch(firstLetter) ? firstLetter : '#';
+      map.putIfAbsent(key, () => []).add(contact);
+    }
+    return map;
+  }
+
+  Worker? _contactSearchWorker;
+  Worker? _userSearchWorker;
 
   @override
   void onInit() {
     super.onInit();
 
-    scrollController.addListener(
-      _handleScroll,
+    _contactSearchWorker = debounce<String>(
+      contactSearch,
+          (search) {
+        loadContacts(search: search);
+      },
+      time: const Duration(milliseconds: 400),
+    );
+
+    _userSearchWorker = debounce<String>(
+      userSearch,
+          (search) {
+        searchUsers(search);
+      },
+      time: const Duration(milliseconds: 500),
     );
 
     loadContacts();
   }
 
-  Future<void> deleteSyncedContacts() async {
-    if (isDeletingSyncedContacts.value) return;
-
-    isDeletingSyncedContacts.value = true;
-
-    try {
-      await contactService.deleteSyncedContacts();
-      await loadContacts();
-
-      AppFeedback.showMessage(
-        title: 'contacts_deleted'.tr,
-        message: 'contacts_deleted_message'.tr,
-        icon: Icons.check_circle_outline,
-      );
-    } catch (error) {
-      debugPrint('Delete synced contacts error: $error');
-
-      AppFeedback.showMessage(
-        title: 'unable_to_delete_contacts'.tr,
-        message: 'contacts_delete_failed_message'.tr,
-        icon: Icons.error_outline,
-      );
-    } finally {
-      isDeletingSyncedContacts.value = false;
-    }
+  @override
+  void onClose() {
+    searchController.dispose();
+    scrollController.dispose();
+    _contactSearchWorker?.dispose();
+    _userSearchWorker?.dispose();
+    super.onClose();
   }
 
-  Future<void> syncPhoneContacts() async {
-    if (isSyncingContacts.value) {
-      return;
-    }
-
-    try {
-      PermissionStatus status =
-      await Permission.contacts.status;
-
-      if (status.isDenied) {
-        status =
-        await Permission.contacts.request();
-      }
-
-      bool hasPermission =
-          status.isGranted || status.isLimited;
-
-      if (!hasPermission) {
-        if (status.isPermanentlyDenied ||
-            status.isRestricted) {
-          AppFeedback.showMessage(
-            title: 'permission_required'.tr,
-            message:
-            'contacts_permission_settings_message'.tr,
-            icon: Icons.settings_outlined,
-          );
-
-          await openAppSettings();
-          return;
-        }
-
-        AppFeedback.showMessage(
-          title: 'permission_denied'.tr,
-          message:
-          'contacts_permission_denied_message'.tr,
-          icon: Icons.contacts_outlined,
-        );
-
-        return;
-      }
-
-      isSyncingContacts.value = true;
-
-      // Replace this delay with your real contact-sync function.
-      await Future<void>.delayed(
-        Duration(seconds: 2),
-      );
-
-      // Example:
-      // List<ContactModel> syncedContacts =
-      //     await contactService.syncPhoneContacts();
-      //
-      // contacts.assignAll(syncedContacts);
-
-      AppFeedback.showMessage(
-        title: 'contacts_synced'.tr,
-        message:
-        'contacts_synced_message'.tr,
-        icon: Icons.check_circle_outline,
-      );
-    } catch (error) {
-      debugPrint(
-        'Sync contacts error: $error',
-      );
-
-      AppFeedback.showMessage(
-        title: 'unable_to_sync'.tr,
-        message:
-        'contacts_sync_failed_message'.tr,
-        icon: Icons.error_outline,
-      );
-    } finally {
-      isSyncingContacts.value = false;
-    }
-  }
-
-  Future<void> loadContacts() async {
+  Future<void> loadContacts({
+    String search = '',
+  }) async {
     if (isLoading.value) {
       return;
     }
@@ -160,538 +98,266 @@ class ContactController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      List<ContactModel> result =
-      await contactService.getContacts();
+      final result =
+      await contactApiService.getContacts(
+        search: search,
+      );
 
       contacts.assignAll(result);
-
-      _sortContacts();
     } catch (error) {
-      errorMessage.value =
-      'Failed to load contacts: $error';
+      errorMessage.value = _errorText(error);
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> refreshContacts() async {
-    await loadContacts();
+    await loadContacts(
+      search: contactSearch.value,
+    );
   }
 
-  Future<void> retry() async {
-    await loadContacts();
+  void onContactSearchChanged(String value) {
+    contactSearch.value = value.trim();
   }
 
   void updateSearch(String value) {
-    searchQuery.value = value.trim();
+    onContactSearchChanged(value);
   }
 
   void clearSearch() {
-    searchQuery.value = '';
+    searchController.clear();
+    onContactSearchChanged('');
+  }
 
-    if (searchController.text.isNotEmpty) {
-      searchController.clear();
+  void onUserSearchChanged(String value) {
+    userSearch.value = value.trim();
+  }
+
+  Future<void> searchUsers(
+      String search,
+      ) async {
+    final normalizedSearch = search.trim();
+
+    if (normalizedSearch.length < 2) {
+      userOptions.clear();
+      return;
+    }
+
+    try {
+      isSearchingUsers.value = true;
+      errorMessage.value = '';
+
+      final result =
+      await contactApiService.getUserOptions(
+        search: normalizedSearch,
+      );
+
+      userOptions.assignAll(result);
+    } catch (error) {
+      userOptions.clear();
+      errorMessage.value = _errorText(error);
+    } finally {
+      isSearchingUsers.value = false;
     }
   }
 
-  bool contactPhoneExists(
-      String phoneNumber,
-      ) {
-    String normalizedPhone =
-    _normalizePhoneNumber(phoneNumber);
-
-    return contacts.any(
-          (ContactModel contact) {
-        return _normalizePhoneNumber(
-          contact.phoneNumber,
-        ) ==
-            normalizedPhone;
-      },
-    );
-  }
-
-  Future<void> addContact({
-    required String name,
-    required String phoneNumber,
+  Future<bool> addContact({
+    required ContactModel user,
+    String? customName,
   }) async {
-    String cleanName = name.trim();
-    String cleanPhoneNumber =
-    phoneNumber.trim();
-
-    if (cleanName.isEmpty ||
-        cleanPhoneNumber.isEmpty) {
-      Get.snackbar(
-        'Invalid contact',
-        'Name and phone number are required.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      return;
-    }
-
-    if (contactPhoneExists(
-      cleanPhoneNumber,
-    )) {
-      Get.snackbar(
-        'Contact already exists',
-        'This phone number is already in your contacts.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      return;
-    }
-
-    if (isAddingContact.value) {
-      return;
+    if (isSaving.value) {
+      return false;
     }
 
     try {
-      isAddingContact.value = true;
+      isSaving.value = true;
       errorMessage.value = '';
+      successMessage.value = '';
 
-      ContactModel contact =
-      await contactService.addManualContact(
-        name: cleanName,
-        phoneNumber: cleanPhoneNumber,
+      final contact =
+      await contactApiService.createContact(
+        contactUserId: user.contactUserId,
+        name: customName,
       );
 
-      contacts.add(contact);
+      contacts.insert(0, contact);
 
-      _sortContacts();
-
-      debugPrint(
-        'Contact added: ${contact.id}',
+      userOptions.removeWhere(
+            (item) =>
+        item.contactUserId == contact.contactUserId,
       );
+
+      successMessage.value =
+      'Contact added successfully.';
+
+      return true;
     } catch (error) {
-      errorMessage.value =
-      'Failed to add contact: $error';
-
-      Get.snackbar(
-        'Unable to add contact',
-        error.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      errorMessage.value = _errorText(error);
+      return false;
     } finally {
-      isAddingContact.value = false;
+      isSaving.value = false;
     }
   }
 
-  Future<void> addContactByUserId(
-      String userId,
-      ) async {
-    String cleanUserId = userId.trim();
-
-    if (cleanUserId.isEmpty) {
-      return;
-    }
-
-    bool exists = contacts.any(
-          (ContactModel contact) {
-        return contact.id == cleanUserId;
-      },
-    );
-
-    if (exists) {
-      Get.snackbar(
-        'Contact already exists',
-        'This user is already in your contacts.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      return;
-    }
-
-    try {
-      isAddingContact.value = true;
-      errorMessage.value = '';
-
-      ContactModel? contact =
-      await contactService
-          .addContactByUserId(
-        cleanUserId,
-      );
-
-      if (contact == null) {
-        Get.snackbar(
-          'User not found',
-          'Unable to find this user.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-
-        return;
-      }
-
-      contacts.add(contact);
-
-      _sortContacts();
-    } catch (error) {
-      errorMessage.value =
-      'Failed to add contact: $error';
-    } finally {
-      isAddingContact.value = false;
-    }
-  }
-
-  Future<void> addContactModel(
-      ContactModel contact,
-      ) async {
-    bool contactExists = contacts.any(
-          (ContactModel item) {
-        return item.id == contact.id ||
-            _normalizePhoneNumber(
-              item.phoneNumber,
-            ) ==
-                _normalizePhoneNumber(
-                  contact.phoneNumber,
-                );
-      },
-    );
-
-    if (contactExists) {
-      return;
-    }
-
-    try {
-      ContactModel? addedContact =
-      await contactService
-          .addContactByUserId(
-        contact.id,
-      );
-
-      contacts.add(
-        addedContact ?? contact,
-      );
-
-      _sortContacts();
-    } catch (error) {
-      errorMessage.value =
-      'Failed to add contact: $error';
-    }
-  }
-
-  void _sortContacts() {
-    contacts.sort(
-          (
-          ContactModel first,
-          ContactModel second,
-          ) {
-        int comparison = first.name
-            .toLowerCase()
-            .compareTo(
-          second.name.toLowerCase(),
-        );
-
-        return isNameAscending.value
-            ? comparison
-            : -comparison;
-      },
-    );
-
-    contacts.refresh();
-  }
-
-  void toggleNameSort() {
-    isNameAscending.toggle();
-
-    _sortContacts();
-  }
-
-  List<ContactModel> get filteredContacts {
-    String query =
-    searchQuery.value.trim().toLowerCase();
-
-    List<ContactModel> result =
-    contacts.where(
-          (ContactModel contact) {
-        return !contact.isBlocked;
-      },
-    ).toList();
-
-    if (query.isEmpty) {
-      return result;
-    }
-
-    return result.where(
-          (ContactModel contact) {
-        bool matchesName = contact.name
-            .toLowerCase()
-            .contains(query);
-
-        bool matchesUsername =
-        contact.username
-            .toLowerCase()
-            .contains(query);
-
-        bool matchesPhone =
-        contact.phoneNumber
-            .toLowerCase()
-            .contains(query);
-
-        return matchesName ||
-            matchesUsername ||
-            matchesPhone;
-      },
-    ).toList();
-  }
-
-  Map<String, List<ContactModel>>
-  get groupedContacts {
-    Map<String, List<ContactModel>> grouped =
-    <String, List<ContactModel>>{};
-
-    for (ContactModel contact
-    in filteredContacts) {
-      String cleanName = contact.name.trim();
-
-      if (cleanName.isEmpty) {
-        continue;
-      }
-
-      String firstLetter =
-      cleanName[0].toUpperCase();
-
-      grouped.putIfAbsent(
-        firstLetter,
-            () {
-          return <ContactModel>[];
-        },
-      );
-
-      grouped[firstLetter]!.add(contact);
-    }
-
-    for (List<ContactModel> contactList
-    in grouped.values) {
-      contactList.sort(
-            (
-            ContactModel first,
-            ContactModel second,
-            ) {
-          int comparison = first.name
-              .toLowerCase()
-              .compareTo(
-            second.name.toLowerCase(),
-          );
-
-          return isNameAscending.value
-              ? comparison
-              : -comparison;
-        },
-      );
-    }
-
-    return grouped;
-  }
-
-  List<String> get contactLetters {
-    List<String> letters =
-    groupedContacts.keys.toList();
-
-    letters.sort();
-
-    if (!isNameAscending.value) {
-      letters = letters.reversed.toList();
-    }
-
-    return letters;
-  }
-
-  int get onlineContactCount {
-    return contacts.where(
-          (ContactModel contact) {
-        return contact.status ==
-            ContactStatus.online &&
-            !contact.isBlocked;
-      },
-    ).length;
-  }
-
-  int get favoriteContactCount {
-    return contacts.where(
-          (ContactModel contact) {
-        return contact.isFavorite &&
-            !contact.isBlocked;
-      },
-    ).length;
-  }
-
-  Future<void> toggleFavorite(
-      ContactModel contact,
-      ) async {
-    try {
-      ContactModel? updated =
-      await contactService.toggleFavorite(
-        contact.id,
-      );
-
-      if (updated == null) {
-        return;
-      }
-
-      _replaceContact(updated);
-    } catch (error) {
-      errorMessage.value =
-      'Failed to update favorite: $error';
-    }
-  }
-
-  Future<void> blockContact(
-      ContactModel contact,
-      ) async {
-    await _updateBlocked(
-      contactId: contact.id,
-      isBlocked: true,
-    );
-  }
-
-  Future<void> unblockContact(
-      ContactModel contact,
-      ) async {
-    await _updateBlocked(
-      contactId: contact.id,
-      isBlocked: false,
-    );
-  }
-
-  Future<void> _updateBlocked({
+  Future<bool> updateContact({
     required String contactId,
-    required bool isBlocked,
+    String? name,
+    bool? isFavorite,
+    bool? isBlocked,
   }) async {
+    if (isSaving.value) {
+      return false;
+    }
+
     try {
-      ContactModel? updated =
-      await contactService.updateBlocked(
+      isSaving.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final updatedContact =
+      await contactApiService.updateContact(
         contactId: contactId,
+        name: name,
+        isFavorite: isFavorite,
         isBlocked: isBlocked,
       );
 
-      if (updated == null) {
-        return;
-      }
+      _replaceContact(updatedContact);
 
-      _replaceContact(updated);
+      successMessage.value =
+      'Contact updated successfully.';
+
+      return true;
     } catch (error) {
-      errorMessage.value =
-      'Failed to update contact: $error';
+      errorMessage.value = _errorText(error);
+      return false;
+    } finally {
+      isSaving.value = false;
     }
+  }
+
+  Future<bool> toggleFavorite(
+      ContactModel contact,
+      ) async {
+    return updateContact(
+      contactId: contact.id,
+      isFavorite: !contact.isFavorite,
+    );
+  }
+
+  Future<bool> toggleBlocked(
+      ContactModel contact,
+      ) async {
+    return updateContact(
+      contactId: contact.id,
+      isBlocked: !contact.isBlocked,
+    );
+  }
+
+  Future<bool> deleteContact(
+      ContactModel contact,
+      ) async {
+    if (isDeleting.value) {
+      return false;
+    }
+
+    try {
+      isDeleting.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final message =
+      await contactApiService.deleteContact(
+        contact.id,
+      );
+
+      contacts.removeWhere(
+            (item) => item.id == contact.id,
+      );
+
+      successMessage.value = message;
+
+      return true;
+    } catch (error) {
+      errorMessage.value = _errorText(error);
+      return false;
+    } finally {
+      isDeleting.value = false;
+    }
+  }
+
+  // Alias for backward compatibility
+  Future<bool> removeContact(ContactModel contact) => deleteContact(contact);
+
+  void clearUserSearch() {
+    userSearch.value = '';
+    userOptions.clear();
+  }
+
+  void clearMessages() {
+    errorMessage.value = '';
+    successMessage.value = '';
+  }
+
+  // Dummy methods for phone contacts sync
+  Future<void> syncPhoneContacts() async {
+    isSyncingContacts.value = true;
+    await Future.delayed(const Duration(seconds: 1));
+    isSyncingContacts.value = false;
+  }
+
+  Future<void> deleteSyncedContacts() async {
+    isDeletingSyncedContacts.value = true;
+    await Future.delayed(const Duration(seconds: 1));
+    isDeletingSyncedContacts.value = false;
+  }
+
+  // Navigate to chat detail screen for a contact
+  void openContact(ContactModel contact) {
+    final ChatModel chat = ChatModel(
+      id: contact.contactUserId,
+      peerUserId: contact.contactUserId,
+      name: contact.name.isNotEmpty ? contact.name : contact.username,
+      message: '',
+      dateTime: DateTime.now(),
+      type: 'personal',
+      image: contact.avatarUrl,
+      isOnline: false,
+    );
+
+    Get.to(
+      () => ChatDetailScreen(chat: chat),
+      transition: Transition.cupertino,
+      duration: const Duration(milliseconds: 280),
+    );
   }
 
   void _replaceContact(
       ContactModel updatedContact,
       ) {
-    int index = contacts.indexWhere(
-          (ContactModel contact) {
-        return contact.id ==
-            updatedContact.id;
-      },
+    final index = contacts.indexWhere(
+          (contact) => contact.id == updatedContact.id,
     );
 
-    if (index < 0) {
-      contacts.add(updatedContact);
-    } else {
+    if (index >= 0) {
       contacts[index] = updatedContact;
     }
 
-    _sortContacts();
-  }
-
-  void openContact(
-      ContactModel contact,
-      ) {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
-
-    ChatModel chat = ChatModel(
-      id: contact.id,
-      name: contact.name,
-      message: '',
-      dateTime: DateTime.now(),
-      image: contact.avatarUrl,
-      unread: 0,
-      type: 'personal',
-      isPinned: false,
-      isMuted: false,
-      isOnline:
-      contact.status == ContactStatus.online,
-      isTyping: false,
-      isMe: false,
-      isArchived: false,
-      status: MessageStatus.read,
-    );
-
-    Get.to(
-          () => ChatDetailScreen(
-        chat: chat,
-      ),
-      transition: Transition.cupertino,
-      duration: Duration(
-        milliseconds: 280,
-      ),
-    );
-  }
-
-  Future<void> removeContact(
-      ContactModel contact,
-      ) async {
-    try {
-      await contactService.removeContact(
-        contact.id,
-      );
-
-      contacts.removeWhere(
-            (ContactModel item) {
-          return item.id == contact.id;
-        },
-      );
-    } catch (error) {
-      errorMessage.value =
-      'Failed to remove contact: $error';
-    }
-  }
-
-  String _normalizePhoneNumber(
-      String phoneNumber,
-      ) {
-    return phoneNumber.replaceAll(
-      RegExp(r'[^0-9+]'),
-      '',
-    );
-  }
-
-  void _handleScroll() {
-    if (!scrollController.hasClients) {
-      return;
-    }
-
-    ScrollDirection direction =
-        scrollController
-            .position.userScrollDirection;
-
-    if (direction ==
-        ScrollDirection.reverse) {
-      if (showAddButton.value) {
-        showAddButton.value = false;
+    // Backend sorts favorite contacts first.
+    contacts.sort((first, second) {
+      if (first.isFavorite == second.isFavorite) {
+        return 0;
       }
 
-      return;
-    }
-
-    if (direction ==
-        ScrollDirection.forward) {
-      if (!showAddButton.value) {
-        showAddButton.value = true;
-      }
-    }
+      return first.isFavorite ? -1 : 1;
+    });
   }
 
-  @override
-  void onClose() {
-    scrollController.removeListener(
-      _handleScroll,
-    );
-
-    scrollController.dispose();
-    searchController.dispose();
-
-    super.onClose();
+  String _errorText(Object error) {
+    return error
+        .toString()
+        .replaceFirst('Exception: ', '')
+        .replaceFirst('FormatException: ', '');
   }
 }
