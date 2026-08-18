@@ -16,20 +16,29 @@ import 'profile_field.dart';
 import 'profile_photo_sheet.dart';
 import 'profile_section_title.dart';
 
-class ProfileEditScreen extends StatelessWidget {
-  ProfileEditScreen({
-    super.key,
-  });
+class ProfileEditScreen extends StatefulWidget {
+  const ProfileEditScreen({super.key});
 
-  final ProfileEditController controller = Get.put(
-    ProfileEditController(
-      authApiService: Get.find<UserApiService>(),
-    ),
-  );
+  @override
+  State<ProfileEditScreen> createState() => _ProfileEditScreenState();
+}
 
-  SettingsController get settingsController {
-    return Get.find<SettingsController>();
+class _ProfileEditScreenState extends State<ProfileEditScreen> {
+  late final ProfileEditController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delete any stale instance from a previous user, then create fresh one.
+    if (Get.isRegistered<ProfileEditController>()) {
+      Get.delete<ProfileEditController>(force: true);
+    }
+    controller = Get.put(
+      ProfileEditController(authApiService: Get.find<UserApiService>()),
+    );
   }
+
+  SettingsController get settingsController => Get.find<SettingsController>();
 
   final ChatCameraService _cameraService = ChatCameraService();
 

@@ -37,7 +37,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
     controller = Get.isRegistered<ChatSearchController>()
         ? Get.find<ChatSearchController>()
-        : Get.put(ChatSearchController());
+        : Get.put(ChatSearchController(
+            contactApiService: Get.find(),
+            chatListApiService: Get.find(),
+          ));
 
     mockChats = MockChatData.build();
   }
@@ -67,12 +70,23 @@ class _SearchScreenState extends State<SearchScreen> {
 
     await controller.addVisitedUser(VisitedUser.fromChat(chat));
 
+    // Wait, the chat object might be a user mapping. Let's create direct chat if it's a contact search.
+    ChatModel targetChat = chat;
+    if (chat.peerUserId != null) {
+      try {
+        targetChat = await controller.chatListApiService.createDirectChat(chat.peerUserId!);
+      } catch (e) {
+        // Fallback to original chat if creation fails
+      }
+    }
+
     await Get.to(
-      () => ChatDetailScreen(chat: chat),
+      () => ChatDetailScreen(chat: targetChat),
       transition: Transition.cupertino,
       duration: const Duration(milliseconds: 280),
     );
   }
+
 
   void _openUserProfile(ChatModel chat) {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -137,6 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
         id: visited.id.isNotEmpty
             ? visited.id
             : DateTime.now().millisecondsSinceEpoch.toString(),
+        peerUserId: visited.id.isNotEmpty ? visited.id : null,
         name: visited.name,
         message: visited.message,
         dateTime: DateTime.now(),
@@ -215,32 +230,7 @@ class _SearchScreenState extends State<SearchScreen> {
       return <ChatModel>[];
     }
 
-    return mockChats.where((ChatModel chat) {
-      if (chat.isArchived) {
-        return false;
-      }
-
-      bool scopeMatches = true;
-
-      if (scope == SearchScope.contacts) {
-        scopeMatches = chat.type == 'personal';
-      }
-
-      if (scope == SearchScope.chats) {
-        scopeMatches = chat.type == 'personal' ||
-            chat.type == 'group' ||
-            chat.type == 'saved';
-      }
-
-      if (!scopeMatches) {
-        return false;
-      }
-
-      final String name = chat.name.toLowerCase();
-      final String message = chat.message.toLowerCase();
-
-      return name.contains(query) || message.contains(query);
-    }).toList();
+    return controller.searchResults.toList();
   }
 
   @override

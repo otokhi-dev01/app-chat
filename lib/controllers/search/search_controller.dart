@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../services/search_service/search_history_service.dart';
+import '../../services/contact_service/contact_api_service.dart';
+import '../../services/chat_service/chat_list_api_service.dart';
+import '../../models/chat_model.dart';
+import '../../models/contact_model.dart';
 
 enum SearchScope {
   chats,
@@ -10,6 +14,14 @@ enum SearchScope {
 }
 
 class ChatSearchController extends GetxController {
+  final ContactApiService contactApiService;
+  final ChatListApiService chatListApiService;
+
+  ChatSearchController({
+    required this.contactApiService,
+    required this.chatListApiService,
+  });
+
   final SearchHistoryService historyService =
   SearchHistoryService();
 
@@ -23,6 +35,9 @@ class ChatSearchController extends GetxController {
 
   final RxList<VisitedUser> visitedUsers =
       <VisitedUser>[].obs;
+
+  final RxList<ChatModel> searchResults =
+      <ChatModel>[].obs;
 
   final Rx<SearchScope> selectedScope =
       SearchScope.chats.obs;
@@ -87,16 +102,28 @@ class ChatSearchController extends GetxController {
     updateSearch(query);
 
     if (query.isEmpty) {
+      searchResults.clear();
       return;
     }
 
     await addHistory(query);
 
-    // Call your search API here.
-    // await chatService.searchMessages(
-    //   query: query,
-    //   scope: selectedScope.value,
-    // );
+    try {
+      final List<ContactModel> contacts = await contactApiService.getUserOptions(search: query);
+      
+      searchResults.assignAll(contacts.map((contact) => ChatModel(
+        id: contact.id, // Using user ID as ID temporarily
+        peerUserId: contact.id, // Set peerUserId for direct chat creation
+        name: contact.name,
+        message: contact.username, // Show username as message
+        dateTime: DateTime.now(),
+        type: 'personal',
+        image: contact.avatarUrl,
+        isOnline: contact.isOnline,
+      )).toList());
+    } catch (e) {
+      searchResults.clear();
+    }
   }
 
   Future<void> selectHistory(String value) async {

@@ -100,6 +100,57 @@ class ApiService {
     }
   }
 
+  // --- POST MULTIPART ---
+  Future<Map<String, dynamic>> postMultipart(
+      String endpoint, {
+        Map<String, String> fields = const <String, String>{},
+        Map<String, File> files = const <String, File>{},
+        String? token,
+      }) async {
+    final Uri uri = Uri.parse('${ApiConstants.baseUrl}$endpoint');
+
+    _printRequest(
+      method: 'POST MULTIPART',
+      uri: uri,
+      body: fields,
+      hasToken: token != null && token.trim().isNotEmpty,
+    );
+
+    try {
+      final request = http.MultipartRequest('POST', uri);
+      
+      request.headers.addAll({
+        'Accept': 'application/json',
+        if (token != null && token.trim().isNotEmpty)
+          'Authorization': 'Bearer ${token.trim()}',
+      });
+      
+      request.fields.addAll(fields);
+      
+      for (final entry in files.entries) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            entry.key,
+            entry.value.path,
+          ),
+        );
+      }
+
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+      final response = await http.Response.fromStream(streamedResponse);
+
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw _throwTimeout();
+    } on SocketException {
+      throw _throwSocket();
+    } on ApiException {
+      rethrow;
+    } catch (error, stackTrace) {
+      throw _handleUnexpected(error, stackTrace);
+    }
+  }
+
   // --- PUT ---
   Future<Map<String, dynamic>> put(
       String endpoint, {

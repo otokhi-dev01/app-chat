@@ -1,66 +1,83 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../models/device_session_model.dart';
-import '../../services/device_service/device_service.dart';
+import '../../services/device_service/device_session_api_service.dart';
 
-class DeviceController extends GetxController {
-  final DeviceService deviceService;
+class DeviceSessionController extends GetxController
+    with WidgetsBindingObserver {
+  final DeviceSessionApiService deviceSessionApiService;
 
-  DeviceController({
-    required this.deviceService,
+  DeviceSessionController({
+    required this.deviceSessionApiService,
   });
 
   final RxList<DeviceSessionModel> sessions =
       <DeviceSessionModel>[].obs;
 
+  final Rxn<DeviceSessionModel> currentSession =
+  Rxn<DeviceSessionModel>();
+
   final RxBool isLoading = false.obs;
-  final RxBool isTerminatingAll = false.obs;
+  final RxBool isRegistering = false.obs;
+  final RxBool isTerminating = false.obs;
 
   final RxString errorMessage = ''.obs;
+  final RxString successMessage = ''.obs;
+
+  Timer? _heartbeatTimer;
 
   @override
   void onInit() {
     super.onInit();
 
-    loadSessions();
+    WidgetsBinding.instance.addObserver(this);
+
+    initializeDeviceSession();
   }
 
-  DeviceSessionModel? get currentSession {
-    int index = sessions.indexWhere(
-          (DeviceSessionModel session) {
-        return session.isCurrent;
-      },
-    );
+  @override
+  void onClose() {
+    _heartbeatTimer?.cancel();
 
-    if (index < 0) {
-      return null;
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(
+      AppLifecycleState state,
+      ) {
+    if (state == AppLifecycleState.resumed) {
+      sendHeartbeat();
+      loadSessions();
     }
-
-    return sessions[index];
   }
 
-  List<DeviceSessionModel> get otherSessions {
-    return sessions.where(
-          (DeviceSessionModel session) {
-        return !session.isCurrent;
-      },
-    ).toList();
-  }
+  Future<void> initializeDeviceSession() async {
+    try {
+      isRegistering.value = true;
+      errorMessage.value = '';
 
-  int get otherSessionCount {
-    return otherSessions.length;
+      final session = await deviceSessionApiService
+          .registerCurrentDevice();
+
+      currentSession.value = session;
+
+      await loadSessions();
+
+      _startHeartbeat();
+    } catch (error) {
+      errorMessage.value = _errorText(error);
+    } finally {
+      isRegistering.value = false;
+    }
   }
 
   Future<void> loadSessions() async {
-    await _fetchSessions();
-  }
-
-  Future<void> refreshSessions() async {
-    await _fetchSessions();
-  }
-
-  Future<void> _fetchSessions() async {
     if (isLoading.value) {
       return;
     }
@@ -69,142 +86,132 @@ class DeviceController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      List<DeviceSessionModel> result =
-      await deviceService.getSessions();
+      final result = await deviceSessionApiService
+          .getDeviceSessions();
 
       sessions.assignAll(result);
+
+      final current = result.firstWhereOrNull(
+            (session) => session.isCurrent,
+      );
+
+      if (current != null) {
+        currentSession.value = current;
+      }
     } catch (error) {
-      errorMessage.value =
-          _cleanErrorMessage(error);
+      errorMessage.value = _errorText(error);
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> terminateSession(
+  Future<void> sendHeartbeat() async {
+    try {
+      final session =
+      await deviceSessionApiService.sendHeartbeat();
+
+      currentSession.value = session;
+
+      _replaceSession(session);
+    } catch (_) {
+      // Do not show a UI error for a temporary background
+      // heartbeat/network failure.
+    }
+  }
+
+  Future<bool> terminateSession(
       DeviceSessionModel session,
       ) async {
     if (session.isCurrent) {
-      return;
+      errorMessage.value =
+      'Use logout to terminate this device.';
+      return false;
     }
 
     try {
+      isTerminating.value = true;
       errorMessage.value = '';
+      successMessage.value = '';
 
-      List<DeviceSessionModel> result =
-      await deviceService.terminateSession(
-        session.id,
+      final message = await deviceSessionApiService
+          .terminateSession(session.id);
+
+      sessions.removeWhere(
+            (item) => item.id == session.id,
       );
 
-      sessions.assignAll(result);
+      successMessage.value = message;
 
-      Get.snackbar(
-        'session_terminated'.tr,
-        'device_logged_out'.trParams({
-          'device_service': session.deviceName,
-        }),
-        snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
-        borderRadius: 16,
-        icon: Icon(
-          Icons.logout_rounded,
-        ),
-      );
+      return true;
     } catch (error) {
-      errorMessage.value =
-          _cleanErrorMessage(error);
-
-      Get.snackbar(
-        'unable_to_terminate_session'.tr,
-        errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
-        borderRadius: 16,
-        icon: Icon(
-          Icons.error_outline_rounded,
-        ),
-      );
-    }
-  }
-
-  Future<void> terminateAllOtherSessions() async {
-    if (otherSessions.isEmpty ||
-        isTerminatingAll.value) {
-      return;
-    }
-
-    try {
-      isTerminatingAll.value = true;
-      errorMessage.value = '';
-
-      List<DeviceSessionModel> result =
-      await deviceService
-          .terminateAllOtherSessions();
-
-      sessions.assignAll(result);
-
-      Get.snackbar(
-        'sessions_terminated'.tr,
-        'all_other_devices_logged_out'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
-        borderRadius: 16,
-        icon: Icon(
-          Icons.verified_user_rounded,
-        ),
-      );
-    } catch (error) {
-      errorMessage.value =
-          _cleanErrorMessage(error);
-
-      Get.snackbar(
-        'unable_to_terminate_sessions'.tr,
-        errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
-        borderRadius: 16,
-        icon: Icon(
-          Icons.error_outline_rounded,
-        ),
-      );
+      errorMessage.value = _errorText(error);
+      return false;
     } finally {
-      isTerminatingAll.value = false;
+      isTerminating.value = false;
     }
   }
 
-  Future<void> resetMockSessions() async {
-    if (isLoading.value) {
-      return;
-    }
-
+  Future<bool> terminateOtherSessions() async {
     try {
-      isLoading.value = true;
+      isTerminating.value = true;
       errorMessage.value = '';
+      successMessage.value = '';
 
-      List<DeviceSessionModel> result =
-      await deviceService.resetSessions();
+      final count = await deviceSessionApiService
+          .terminateOtherSessions();
 
-      sessions.assignAll(result);
+      sessions.removeWhere(
+            (session) => !session.isCurrent,
+      );
+
+      successMessage.value =
+      '$count other device session(s) terminated.';
+
+      return true;
     } catch (error) {
-      errorMessage.value =
-          _cleanErrorMessage(error);
+      errorMessage.value = _errorText(error);
+      return false;
     } finally {
-      isLoading.value = false;
+      isTerminating.value = false;
     }
   }
 
-  String _cleanErrorMessage(
-      Object error,
+  Future<void> refreshSessions() {
+    return loadSessions();
+  }
+
+  void clearMessages() {
+    errorMessage.value = '';
+    successMessage.value = '';
+  }
+
+  void _startHeartbeat() {
+    _heartbeatTimer?.cancel();
+
+    _heartbeatTimer = Timer.periodic(
+      const Duration(minutes: 1),
+          (_) {
+        sendHeartbeat();
+      },
+    );
+  }
+
+  void _replaceSession(
+      DeviceSessionModel updatedSession,
       ) {
+    final index = sessions.indexWhere(
+          (session) => session.id == updatedSession.id,
+    );
+
+    if (index >= 0) {
+      sessions[index] = updatedSession;
+    }
+  }
+
+  String _errorText(Object error) {
     return error
         .toString()
-        .replaceFirst(
-      'Bad state: ',
-      '',
-    )
-        .replaceFirst(
-      'Exception: ',
-      '',
-    );
+        .replaceFirst('Exception: ', '')
+        .replaceFirst('FormatException: ', '');
   }
 }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/device/device_controller.dart';
-import '../../../services/device_service/device_service.dart';
-import '../../../services/device_service/real_device_service.dart';
+import '../../../services/api_service.dart';
+import '../../../services/auth_service /auth_api_service.dart';
+import '../../../services/device_service/device_identity_service.dart';
+import '../../../services/device_service/device_session_api_service.dart';
 import 'device_content.dart';
 import 'device_state_view.dart';
 import 'device_app_bar.dart';
@@ -13,24 +15,34 @@ class DevicesScreen extends StatelessWidget {
     super.key,
   });
 
-  DeviceController get controller {
-    if (!Get.isRegistered<DeviceService>()) {
-      Get.put<DeviceService>(
-        RealDeviceService(),
-        permanent: true,
+  DeviceSessionController get controller {
+    if (!Get.isRegistered<DeviceIdentityService>()) {
+      Get.lazyPut<DeviceIdentityService>(
+        () => DeviceIdentityService(),
       );
     }
 
-    if (Get.isRegistered<DeviceController>()) {
-      return Get.find<DeviceController>();
+    if (!Get.isRegistered<DeviceSessionApiService>()) {
+      Get.lazyPut<DeviceSessionApiService>(
+        () => DeviceSessionApiService(
+          apiService: Get.find<ApiService>(),
+          authApiService: Get.find<AuthApiService>(),
+          identityService: Get.find<DeviceIdentityService>(),
+        ),
+      );
     }
 
-    return Get.put<DeviceController>(
-      DeviceController(
-        deviceService: Get.find<DeviceService>(),
+    if (Get.isRegistered<DeviceSessionController>()) {
+      return Get.find<DeviceSessionController>();
+    }
+
+    return Get.put<DeviceSessionController>(
+      DeviceSessionController(
+        deviceSessionApiService: Get.find<DeviceSessionApiService>(),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +74,12 @@ class DevicesScreen extends StatelessWidget {
           }
 
           return DevicesContent(
-            currentSession: controller.currentSession,
-            otherSessions: controller.otherSessions,
-            isTerminatingAll: controller.isTerminatingAll.value,
+            currentSession: controller.currentSession.value,
+            otherSessions: controller.sessions.where((s) => !s.isCurrent).toList(),
+            isTerminatingAll: controller.isTerminating.value,
             onRefresh: controller.refreshSessions,
             onTerminate: controller.terminateSession,
-            onTerminateAll: controller.terminateAllOtherSessions,
+            onTerminateAll: controller.terminateOtherSessions,
           );
         },
       ),

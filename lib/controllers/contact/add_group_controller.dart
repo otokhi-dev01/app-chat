@@ -1,9 +1,18 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 
+import '../chat/chat_controller.dart';
 import '../../data/mock_add_group_contact_data.dart';
 import '../../models/contact_model.dart';
+import '../../services/chat_service/group_chat_api_service.dart';
 
 class AddGroupController extends GetxController {
+  final GroupChatApiService groupChatApiService;
+
+  AddGroupController({
+    required this.groupChatApiService,
+  });
   final RxList<ContactModel> contacts =
       <ContactModel>[].obs;
 
@@ -228,12 +237,29 @@ class AddGroupController extends GetxController {
     errorMessage.value = '';
 
     try {
-      // Replace this section with the API request.
+      final memberIds = selectedMembers.map((member) => member.id).toList();
+      File? imageFile;
+      
+      if (groupImagePath.value.isNotEmpty) {
+        imageFile = File(groupImagePath.value);
+      }
+
+      final chat = await groupChatApiService.createGroup(
+        name: groupName.value,
+        memberIds: memberIds,
+        groupImage: imageFile,
+      );
+
+      // Refresh home chat list if controller is active
+      if (Get.isRegistered<ChatController>()) {
+        await Get.find<ChatController>().loadChats();
+      }
+
+      Get.back(result: chat);
+
       return true;
     } catch (error) {
-      errorMessage.value =
-      'Unable to create group.';
-
+      errorMessage.value = error.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
       isCreating.value = false;

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/constants/api_constants.dart';
 import '../../data/model/login_response_model.dart';
@@ -22,7 +23,7 @@ class AuthApiService {
     );
     final response = LoginResponseModel.fromJson(json);
     if (response.accessToken.isNotEmpty) {
-      await _storage.write(key: _tokenKey, value: response.accessToken);
+      await _saveToken(response.accessToken);
     }
     return response;
   }
@@ -75,6 +76,24 @@ class AuthApiService {
       throw const ApiException(statusCode: 401, message: 'Session expired.');
     }
     return token.trim();
+  }
+
+  /// Saves token to keychain with fallback for iOS -25299 (already exists)
+  /// and silent recovery for -25291 (no keychain / simulator issue).
+  Future<void> _saveToken(String token) async {
+    try {
+      await _storage.write(key: _tokenKey, value: token);
+    } catch (_) {
+      // Might already exist (-25299) — delete then retry
+      try {
+        await _storage.delete(key: _tokenKey);
+        await _storage.write(key: _tokenKey, value: token);
+      } catch (e) {
+        // Keychain unavailable (-25291) on simulator — skip silently
+        // Token won't persist but the session works in-memory for now
+        debugPrint('[Keychain] Could not save token: $e');
+      }
+    }
   }
 
   Future<void> logout() async {

@@ -3,17 +3,16 @@ import 'package:get/get.dart';
 import '../../controllers/chat/chat_controller.dart';
 import '../../controllers/contact/contact_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
-import '../../services/massage_service /chat_data_service.dart';
+import '../../services/chat_service/chat_list_api_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
 import '../../services/contact_service/contact_api_service.dart';
-import '../../services/mock/mock_chat_service.dart';
 
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<ChatDataService>()) {
-      Get.lazyPut<ChatDataService>(
-            () => MockChatDataService(),
+    if (!Get.isRegistered<ChatListService>()) {
+      Get.lazyPut<ChatListService>(
+        () => Get.find<ChatListApiService>(),
         fenix: true,
       );
     }

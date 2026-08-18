@@ -17,12 +17,14 @@ import '../widgets/app_feedback.dart';
 import 'call/call_screen.dart';
 import 'chat_detail_app_bar.dart';
 import 'chat_search/chat_message_search_screen.dart';
+import '../../services/massage_service /message_api_service.dart';
 
 // ---------------------------------------------------------------------
 // 1. Controller handling all state and lifecycles
 // ---------------------------------------------------------------------
 class ChatDetailController extends GetxController with WidgetsBindingObserver {
   final ChatModel chat;
+  final MessageApiService messageApiService = Get.find<MessageApiService>();
 
   ChatDetailController({required this.chat});
 
@@ -56,11 +58,25 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
 
     messageFocusNode.addListener(_handleMessageFocusChange);
 
-    messages.addAll(buildChatSampleMessages(chat));
+    _fetchMessages();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToBottom(animated: false);
     });
+  }
+
+  Future<void> _fetchMessages() async {
+    try {
+      final fetchedMessages = await messageApiService.getMessages(chat.id);
+      messages.value = fetchedMessages.reversed.toList();
+      scrollToBottom(animated: false);
+    } catch (e) {
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not fetch messages',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
+    }
   }
 
   @override
@@ -108,7 +124,7 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
     );
   }
 
-  void sendMessage() {
+  Future<void> sendMessage() async {
     String text = messageController.text.trim();
 
     if (text.isEmpty) {
@@ -117,12 +133,14 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
 
     HapticFeedback.lightImpact();
 
+    String tempId = DateTime.now().microsecondsSinceEpoch.toString();
     ChatMessageModel newMessage = ChatMessageModel(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: tempId,
       text: text,
       sentAt: DateTime.now(),
       isMe: true,
       isRead: false,
+      status: ChatMessageStatus.sending,
     );
 
     messages.add(newMessage);
@@ -130,6 +148,27 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
 
     messageFocusNode.requestFocus();
     scrollToBottom();
+
+    try {
+      final actualMessage = await messageApiService.sendTextMessage(
+        chatId: chat.id,
+        text: text,
+      );
+      int index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = actualMessage;
+      }
+    } catch (e) {
+      int index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = newMessage.copyWith(status: ChatMessageStatus.failed);
+      }
+      AppFeedback.showMessage(
+        title: 'Error',
+        message: 'Could not send message',
+        icon: CupertinoIcons.exclamationmark_circle,
+      );
+    }
   }
 
   Future<void> openMessageSearch() async {

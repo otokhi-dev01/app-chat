@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../route/app_route.dart';
+import '../../services/auth_service /auth_api_service.dart';
+import '../../services/chat_service/chat_list_api_service.dart';
+import '../../services/folder_service/chat_folder_api_service.dart';
+import '../../services/user_service/user_service.dart';
 
 enum AppLanguage {
   english,
@@ -10,6 +13,8 @@ enum AppLanguage {
 }
 
 class SettingsController extends GetxController {
+  final AuthApiService authApiService = Get.find<AuthApiService>();
+
   final Rx<ThemeMode> themeMode =
       ThemeMode.system.obs;
 
@@ -118,11 +123,34 @@ class SettingsController extends GetxController {
   }
 
   Future<void> logout() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    try {
+      await authApiService.logout();
+    } catch (e) {
+      // Ignore API errors on logout to ensure local session clears
+    }
+
+    // Clear all cached per-user state from permanent services
+    _clearAllCachedState();
 
     await Get.offAllNamed(
       AppRoutes.login,
     );
+  }
+
+  void _clearAllCachedState() {
+    try {
+      Get.find<UserApiService>().clearCurrentUser();
+    } catch (_) {}
+
+    try {
+      Get.find<ChatFolderApiService>().folders.clear();
+    } catch (_) {}
+
+    try {
+      // ChatListApiService does not cache in a field; API fetches fresh.
+      Get.find<ChatListApiService>();
+    } catch (_) {}
   }
 }

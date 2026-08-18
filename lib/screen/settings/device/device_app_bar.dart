@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import '../../../controllers/device/device_controller.dart';
 
 class DevicesAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final DeviceController controller;
+  final DeviceSessionController controller;
 
   const DevicesAppBar({
     super.key,
@@ -138,7 +138,7 @@ class DevicesAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Obx(
             () {
           int sessionCount = controller.sessions.length;
-          int otherSessionCount = controller.otherSessionCount;
+          int otherSessionCount = controller.sessions.where((s) => !s.isCurrent).length;
 
           String subtitle;
 

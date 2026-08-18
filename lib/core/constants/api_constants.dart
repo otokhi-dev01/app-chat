@@ -26,6 +26,21 @@ class ApiConstants {
   static String contactList({String search = '',}) {return Uri(path: contacts, queryParameters: search.trim().isEmpty ? null : {'search': search.trim(),},).toString();}
   static String searchContactUsers({required String search,}) {return Uri(path: contactUserOptions, queryParameters: {'search': search.trim(),},).toString();}
 
+  // Device sessions
+  static const String deviceSessions ='/device-sessions';
+  static const String currentDeviceHeartbeat ='/device-sessions/current';
+  static const String otherDeviceSessions ='/device-sessions/others';
+  static String deviceSessionById(String sessionId,) {return '$deviceSessions/$sessionId';}
+  
+  // Chat
+  static const String groupChats = '/chats/groups';
+  static const String chats = '/chats';
+  static String chatById(String chatId) => '$chats/$chatId';
+  static String chatPreferences(String chatId) => '$chats/$chatId/preferences';
+  static String chatMarkRead(String chatId) => '$chats/$chatId/read';
+  static String chatMessages(String chatId) => '$chats/$chatId/messages';
+  static String chatMessageById(String chatId, String messageId) => '$chats/$chatId/messages/$messageId';
+
   static Uri uri(String endpoint) {
     return Uri.parse('$baseUrl$endpoint');
   }

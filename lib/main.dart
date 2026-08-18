@@ -13,8 +13,14 @@ import 'core/theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 1. Initialize local storage
   await GetStorage.init();
 
+  // 2. IMPORTANT: Manually initialize all services/bindings first
+  // This ensures AuthApiService is available before SettingsController starts
+  AppBinding().dependencies();
+
+  // 3. Register high-level controllers needed for the app shell
   Get.put<SettingsController>(
     SettingsController(),
     permanent: true,
@@ -25,46 +31,32 @@ Future<void> main() async {
     permanent: true,
   );
 
-
-
-  runApp(
-    MyApp(),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-  });
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    SettingsController settingsController =
-    Get.find<SettingsController>();
+    // Access the settings controller to react to theme/locale changes
+    final SettingsController settingsController = Get.find<SettingsController>();
 
     return Obx(
-          () {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'OTOKHI Chat',
-
-          translations: AppTranslations(),
-          locale:
-          settingsController.currentLocale,
-          fallbackLocale: Locale(
-            'en',
-            'US',
-          ),
-
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode:
-          settingsController.themeMode.value,
-          initialBinding: AppBinding(),
-          initialRoute: AppRoutes.splash,
-          getPages: AppPages.pages,
-        );
-      },
+          () => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'OTOKHI Chat',
+        translations: AppTranslations(),
+        locale: settingsController.currentLocale,
+        fallbackLocale: const Locale('en', 'US'),
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: settingsController.themeMode.value,
+        // Bindings are already loaded in main, but keeping this is fine for deep-linking
+        initialBinding: AppBinding(),
+        initialRoute: AppRoutes.splash,
+        getPages: AppPages.pages,
+      ),
     );
   }
 }

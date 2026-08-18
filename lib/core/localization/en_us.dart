@@ -215,6 +215,8 @@ final Map<String, String> enUS = {
 'chat_folders': 'Chat Folders',
 'manage_folders':
 'Organize and manage your chat folders',
+'no_custom_folders': 'No Custom Folders',
+'no_custom_folders_desc': 'Create and manage custom folders',
 
 'devices': 'Devices',
 'manage_devices':

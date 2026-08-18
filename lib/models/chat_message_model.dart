@@ -386,26 +386,26 @@ class ChatMessageModel {
       id: json['id']?.toString() ?? '',
       localId: json['localId']?.toString(),
       conversationId:
-      json['conversationId']?.toString() ?? '',
+      json['conversationId']?.toString() ?? json['chat_id']?.toString() ?? '',
       senderId:
-      json['senderId']?.toString() ?? '',
+      json['senderId']?.toString() ?? json['sender_id']?.toString() ?? '',
       senderName:
-      json['senderName']?.toString() ?? '',
+      json['senderName']?.toString() ?? (json['sender'] is Map ? json['sender']['name']?.toString() : null) ?? '',
       senderAvatar:
-      json['senderAvatar']?.toString() ?? '',
-      text: json['text']?.toString() ?? '',
+      json['senderAvatar']?.toString() ?? (json['sender'] is Map ? json['sender']['avatar_url']?.toString() : null) ?? '',
+      text: json['text']?.toString() ?? json['message']?.toString() ?? '',
       sentAt: DateTime.tryParse(
-        json['sentAt']?.toString() ?? '',
+        json['sentAt']?.toString() ?? json['created_at']?.toString() ?? '',
       ) ??
           DateTime.now(),
       updatedAt: _parseDateTime(
-        json['updatedAt'],
+        json['updatedAt'] ?? json['updated_at'],
       ),
       deliveredAt: _parseDateTime(
-        json['deliveredAt'],
+        json['deliveredAt'] ?? json['delivered_at'],
       ),
       readAt: _parseDateTime(
-        json['readAt'],
+        json['readAt'] ?? json['read_at'],
       ),
       isMe: json['isMe'] == true,
       isRead: json['isRead'] == true,
@@ -421,7 +421,7 @@ class ChatMessageModel {
         json['status']?.toString(),
       ),
       mediaPath:
-      json['mediaPath']?.toString(),
+      json['mediaPath']?.toString() ?? json['media_path']?.toString(),
       thumbnailPath:
       json['thumbnailPath']?.toString(),
       fileName: json['fileName']?.toString(),

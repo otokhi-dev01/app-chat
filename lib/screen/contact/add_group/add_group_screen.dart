@@ -3,75 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/contact/add_group_controller.dart';
-import '../../../models/contact_model.dart';
 import 'add_group_content.dart';
 import '../../widgets/app_feedback.dart';
 import 'add_group_app_bar.dart';
 
-class AddGroupScreen extends StatelessWidget {
-  final AddGroupController controller;
+class AddGroupScreen extends GetView<AddGroupController> {
+  const AddGroupScreen({super.key});
 
-  AddGroupScreen({
-    super.key,
-    AddGroupController? controller,
-  }) : controller = controller ??
-      (Get.isRegistered<AddGroupController>()
-          ? Get.find<AddGroupController>()
-          : Get.put(
-        AddGroupController(),
-      ));
-
-  Future<void> _createGroup(
-      BuildContext context,
-      ) async {
+  Future<void> _createGroup(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     bool created = await controller.createGroup();
 
-    if (!context.mounted) {
-      return;
-    }
+    if (!context.mounted) return;
 
     if (!created) {
-      _showMessage(
+      AppFeedback.showMessage(
+        title: 'unable_to_create_group'.tr,
         message: controller.errorMessage.value,
         icon: CupertinoIcons.exclamationmark_circle,
       );
-
-      return;
     }
-
-    String groupName = controller.groupName.value;
-    String imagePath = controller.groupImagePath.value;
-
-    List<String> memberIds = controller.selectedMembers
-        .map(
-          (ContactModel contact) {
-        return contact.id;
-      },
-    )
-        .toList(
-      growable: false,
-    );
-
-    Get.back(
-      result: <String, dynamic>{
-        'name': groupName,
-        'imagePath': imagePath,
-        'memberIds': memberIds,
-      },
-    );
-  }
-
-  void _showMessage({
-    required String message,
-    required IconData icon,
-  }) {
-    AppFeedback.showMessage(
-      title: 'unable_to_create_group'.tr,
-      message: message,
-      icon: icon,
-    );
   }
 
   @override
@@ -83,17 +35,11 @@ class AddGroupScreen extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: Obx(
-              () {
-            return AddGroupAppBar(
-              canCreate: controller.canCreateGroup,
-              isCreating: controller.isCreating.value,
-              onCreate: () {
-                _createGroup(
-                  context,
-                );
-              },
-            );
-          },
+          () => AddGroupAppBar(
+            canCreate: controller.canCreateGroup,
+            isCreating: controller.isCreating.value,
+            onCreate: () => _createGroup(context),
+          ),
         ),
       ),
       body: AddGroupContent(

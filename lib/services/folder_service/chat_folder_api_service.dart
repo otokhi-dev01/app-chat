@@ -5,14 +5,17 @@ import '../../data/model/chat_folder_member_model.dart';
 import '../../models/chat_folder_model.dart';
 import '../api_service.dart';
 import '../auth_service /auth_api_service.dart';
+import '../user_service/user_service.dart';
 
 class ChatFolderApiService extends GetxService {
   final ApiService apiService;
   final AuthApiService authApiService;
+  final UserApiService userApiService;
 
   ChatFolderApiService({
     required this.apiService,
     required this.authApiService,
+    required this.userApiService,
   });
 
   final RxList<ChatFolderModel> folders =
@@ -20,9 +23,13 @@ class ChatFolderApiService extends GetxService {
 
   Future<List<ChatFolderModel>> getFolders() async {
     final token = await authApiService.requireToken();
+    final userId = userApiService.currentUserValue?.id ?? '';
+    final String endpoint = userId.isNotEmpty 
+        ? '${ApiConstants.chatFolders}?user_id=$userId' 
+        : ApiConstants.chatFolders;
 
     final json = await apiService.get(
-      ApiConstants.chatFolders,
+      endpoint,
       token: token,
     );
 

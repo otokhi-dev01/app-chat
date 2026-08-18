@@ -8,10 +8,10 @@ import '../../data/model/login_response_model.dart';
 class ProfileEditController extends GetxController {
   final UserApiService authApiService;
 
-  // 1. Hold the initial user data to pre-fill fields and get the ID
-  final LoginDataModel? currentUser = Get.find<UserApiService>().currentUserValue;
-
   ProfileEditController({required this.authApiService});
+
+  // Resolved in onInit so it always reads the current logged-in user
+  LoginDataModel? currentUser;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -30,6 +30,9 @@ class ProfileEditController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // Always read the freshest user from the service (fixes stale user on re-login)
+    currentUser = authApiService.currentUserValue;
 
     // 2. Pre-fill controllers using the LoginDataModel
     // Logic for splitting name if necessary, or just using the fields
