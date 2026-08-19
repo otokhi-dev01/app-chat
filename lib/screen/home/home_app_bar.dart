@@ -16,6 +16,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<String> titles;
   final ChatController controller;
   final VoidCallback onOpenSettings;
+  final VoidCallback? onNavigateToContacts;
 
   const HomeAppBar({
     super.key,
@@ -23,6 +24,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.titles,
     required this.controller,
     required this.onOpenSettings,
+    this.onNavigateToContacts,
   });
 
   double get bottomHeight {
@@ -36,9 +38,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       case 1:
         return 'contacts'.tr;
       case 2:
-        return 'settings'.tr;
+        return 'calls'.tr;
       case 3:
-        return 'profile'.tr;
+        return 'search'.tr;
       default:
         if (index >= 0 && index < titles.length) {
           return titles[index];
@@ -112,9 +114,22 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.06);
 
-    final Color actionBackground = isDark
-        ? const Color(0xFF1B1D22)
-        : Colors.white;
+    final Color actionBackground =
+    isDark ? const Color(0xFF1B1D22) : Colors.white;
+
+    // Single Settings button on Chat tab (index 0) only
+    final Widget? leadingWidget = selectedIndex == 0
+        ? Padding(
+      padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+      child: HomeAppBarActionButton(
+        tooltip: 'settings'.tr,
+        icon: CupertinoIcons.gear_alt,
+        backgroundColor: actionBackground,
+        foregroundColor: colorScheme.onSurface,
+        onPressed: onOpenSettings,
+      ),
+    )
+        : null;
 
     return AppBar(
       elevation: 0,
@@ -124,26 +139,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       forceMaterialTransparency: true,
+      automaticallyImplyLeading: false,
       centerTitle: selectedIndex != 0,
-      // UPDATED: Set titleSpacing to 0 on Profile tab so center title is balanced with leading button
-      titleSpacing: selectedIndex == 3 ? 0 : 20,
-      // ADDED: Width configuration for the leading QR Scan button container
-      leadingWidth: selectedIndex == 3 ? 58 : null,
-      // ADDED: QR Scan button placed on the LEFT side (leading) when on Profile tab (selectedIndex == 3)
-      leading: selectedIndex == 3
-          ? Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
-        child: HomeAppBarActionButton(
-          tooltip: 'scan_qr'.tr,
-          icon: CupertinoIcons.qrcode_viewfinder,
-          backgroundColor: actionBackground,
-          foregroundColor: colorScheme.onSurface,
-          onPressed: () {
-            Get.toNamed(AppRoutes.qrScanner);
-          },
-        ),
-      )
-          : null,
+      titleSpacing: selectedIndex == 0 ? 8 : 16,
+      leadingWidth: selectedIndex == 0 ? 58 : 0,
+      leading: leadingWidget,
       systemOverlayStyle: _overlayStyle(
         theme,
         isDark,
@@ -211,13 +211,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      // UPDATED: Right side actions (contains Edit Profile button when selectedIndex == 3)
       actions: [
         HomeAppBarActions(
           selectedIndex: selectedIndex,
           controller: controller,
           backgroundColor: actionBackground,
           iconColor: colorScheme.onSurface,
+          onNavigateToContacts: onNavigateToContacts,
           onChatMenuSelected: (String value) {
             _handleChatMenu(
               context,

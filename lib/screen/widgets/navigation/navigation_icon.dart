@@ -7,7 +7,6 @@ class NavigationIcon extends StatelessWidget {
   final Color primary;
   final Color inactiveColor;
   final int badgeCount;
-  final ImageProvider? profileImage;
   final Color navigationBackground;
 
   const NavigationIcon({
@@ -19,42 +18,24 @@ class NavigationIcon extends StatelessWidget {
     required this.inactiveColor,
     required this.badgeCount,
     required this.navigationBackground,
-    this.profileImage,
   });
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    Widget iconWidget;
-
-    if (profileImage != null) {
-      iconWidget = AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        width: 29,
-        height: 29,
-        padding: const EdgeInsets.all(1.5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? primary : Colors.transparent,
-            width: 1.5,
-          ),
-        ),
-        child: CircleAvatar(
-          backgroundImage: profileImage,
-          backgroundColor: colorScheme.surfaceContainerHighest,
-        ),
-      );
-    } else {
-      iconWidget = SizedBox(
+    return AnimatedScale(
+      scale: selected ? 1.08 : 1.0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutBack,
+      child: SizedBox(
         width: 38,
         height: 29,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
+            // Smooth switcher between inactive and active icons
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               switchInCurve: Curves.easeOutBack,
@@ -72,18 +53,26 @@ class NavigationIcon extends StatelessWidget {
                 color: selected ? primary : inactiveColor,
               ),
             ),
+
+            // Badge count (for unread messages on chat, missed calls, etc.)
             if (badgeCount > 0)
               Positioned(
                 top: -5,
                 right: -3,
                 child: Container(
-                  constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: primary,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: navigationBackground, width: 1.5),
+                    border: Border.all(
+                      color: navigationBackground,
+                      width: 1.5,
+                    ),
                   ),
                   child: Text(
                     badgeCount > 99 ? '99+' : badgeCount.toString(),
@@ -98,14 +87,7 @@ class NavigationIcon extends StatelessWidget {
               ),
           ],
         ),
-      );
-    }
-
-    return AnimatedScale(
-      scale: selected ? 1.08 : 1.0,
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOutBack,
-      child: iconWidget,
+      ),
     );
   }
 }

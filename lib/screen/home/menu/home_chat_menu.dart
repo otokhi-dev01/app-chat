@@ -79,7 +79,7 @@ class HomeChatMenu extends StatelessWidget {
           ],
         ),
         child: Icon(
-          CupertinoIcons.ellipsis, // Native iOS 3-dots icon
+          CupertinoIcons.add, // Native iOS 3-dots icon
           color: icnColor,
           size: 20,
         ),

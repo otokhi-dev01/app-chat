@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:get/get.dart';
 
 import '../chat/chat_controller.dart';
-import '../../data/mock_add_group_contact_data.dart';
 import '../../models/contact_model.dart';
 import '../../services/chat_service/group_chat_api_service.dart';
+import 'contact_controller.dart';
 
 class AddGroupController extends GetxController {
   final GroupChatApiService groupChatApiService;
@@ -66,7 +66,7 @@ class AddGroupController extends GetxController {
 
     try {
       List<ContactModel> result =
-      MockAddGroupContactData.contacts
+      Get.find<ContactController>().contacts
           .where(
             (ContactModel contact) {
           return !contact.isBlocked;
@@ -237,7 +237,7 @@ class AddGroupController extends GetxController {
     errorMessage.value = '';
 
     try {
-      final memberIds = selectedMembers.map((member) => member.id).toList();
+      final memberIds = selectedMembers.map((member) => member.contactUserId).toList();
       File? imageFile;
       
       if (groupImagePath.value.isNotEmpty) {

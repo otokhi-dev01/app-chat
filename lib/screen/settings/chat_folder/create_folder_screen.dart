@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../data/mock_add_group_contact_data.dart';
+import '../../../controllers/contact/contact_controller.dart';
 import '../../../models/contact_model.dart';
 
 class ChatFolderFormResult {
@@ -38,7 +38,7 @@ class CreateFolderScreen extends StatefulWidget {
 
 class _CreateFolderScreenState extends State<CreateFolderScreen> {
   late TextEditingController textController;
-  final List<ContactModel> availableContacts = MockAddGroupContactData.contacts;
+  final ContactController contactController = Get.find<ContactController>();
   late Set<String> selectedMemberIds;
   bool canSubmit = false;
 
@@ -376,38 +376,41 @@ class _CreateFolderScreenState extends State<CreateFolderScreen> {
                   ),
                 ],
               ),
-              child: Column(
-                children: availableContacts.map((contact) {
-                  final bool isSelected =
-                  selectedMemberIds.contains(contact.id);
-                  return Material(
-                    color: Colors.transparent,
-                    child: CheckboxListTile(
-                      value: isSelected,
-                      activeColor: colorScheme.primary,
-                      onChanged: (_) => _toggleMember(contact.id),
-                      title: Text(contact.name),
-                      subtitle: Text(contact.username),
-                      secondary: CircleAvatar(
-                        backgroundColor:
-                        colorScheme.primary.withValues(alpha: 0.11),
-                        backgroundImage: contact.avatarUrl.trim().isNotEmpty
-                            ? NetworkImage(contact.avatarUrl)
-                            : null,
-                        child: contact.avatarUrl.trim().isEmpty
-                            ? Icon(
-                          CupertinoIcons.person_fill,
-                          color: colorScheme.primary,
-                          size: 18,
-                        )
-                            : null,
+              child: Obx(() {
+                final availableContacts = contactController.contacts;
+                return Column(
+                  children: availableContacts.map((contact) {
+                    final bool isSelected =
+                    selectedMemberIds.contains(contact.contactUserId);
+                    return Material(
+                      color: Colors.transparent,
+                      child: CheckboxListTile(
+                        value: isSelected,
+                        activeColor: colorScheme.primary,
+                        onChanged: (_) => _toggleMember(contact.contactUserId),
+                        title: Text(contact.name),
+                        subtitle: Text(contact.username),
+                        secondary: CircleAvatar(
+                          backgroundColor:
+                          colorScheme.primary.withValues(alpha: 0.11),
+                          backgroundImage: contact.avatarUrl.trim().isNotEmpty
+                              ? NetworkImage(contact.avatarUrl)
+                              : null,
+                          child: contact.avatarUrl.trim().isEmpty
+                              ? Icon(
+                            CupertinoIcons.person_fill,
+                            color: colorScheme.primary,
+                            size: 18,
+                          )
+                              : null,
+                        ),
+                        dense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
                       ),
-                      dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                  );
-                }).toList(),
-              ),
+                    );
+                  }).toList(),
+                );
+              }),
             ),
           ],
         ),

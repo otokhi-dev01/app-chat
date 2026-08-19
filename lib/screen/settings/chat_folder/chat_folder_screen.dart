@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../controllers/chat/chat_controller.dart';
 import '../../../controllers/settings/chat_folder_controller.dart';
 import '../../../models/chat_folder_model.dart';
 import 'chat_folder_content.dart';
@@ -37,7 +38,7 @@ class ChatFolderScreen extends StatelessWidget {
 
     bool created = await controller.createFolder(
       name: result.name,
-      chatIds: result.selectedMemberIds,
+      memberIds: result.selectedMemberIds,
     );
 
     if (!context.mounted) {
@@ -76,12 +77,22 @@ class ChatFolderScreen extends StatelessWidget {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
+    // Map folder.chatIds back to member user IDs using the loaded chats
+    final chatController = Get.find<ChatController>();
+    final List<String> memberIdsInFolder = [];
+    for (String chatId in folder.chatIds) {
+      final chat = chatController.chats.firstWhereOrNull((c) => c.id == chatId);
+      if (chat != null && chat.peerUserId != null) {
+        memberIdsInFolder.add(chat.peerUserId!);
+      }
+    }
+
     ChatFolderFormResult? result = await Get.to<ChatFolderFormResult>(
           () => CreateFolderScreen(
         title: 'edit_folder'.tr,
         confirmText: 'save'.tr,
         initialValue: folder.name,
-        initialSelectedMemberIds: folder.chatIds,
+        initialSelectedMemberIds: memberIdsInFolder,
       ),
       transition: Transition.rightToLeft,
       duration: Duration(milliseconds: 280),
@@ -93,13 +104,11 @@ class ChatFolderScreen extends StatelessWidget {
 
     String newName = result.name.trim();
 
-    if (newName == folder.name.trim()) {
-      return;
-    }
-
     bool updated = await controller.updateFolder(
       folderId: folder.id,
       name: newName,
+      chatIds: folder.chatIds, // Keep existing chats
+      memberIds: result.selectedMemberIds, // Add newly selected members
     );
 
     if (!context.mounted) {

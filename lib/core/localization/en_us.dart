@@ -203,7 +203,6 @@ final Map<String, String> enUS = {
 
 // General
 'general': 'General',
-
 'notifications': 'Notifications',
 'enable_notifications':
 'Receive notifications when you get a new message',
@@ -211,6 +210,7 @@ final Map<String, String> enUS = {
 'privacy_security': 'Privacy and Security',
 'manage_privacy':
 'Manage your privacy and keep your account secure',
+  'appearance': 'Appearance',
 
 'chat_folders': 'Chat Folders',
 'manage_folders':

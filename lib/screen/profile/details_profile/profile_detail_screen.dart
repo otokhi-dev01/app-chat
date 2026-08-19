@@ -19,14 +19,28 @@ class ProfileDetailScreen extends StatefulWidget {
   ProfileDetailScreen({
     super.key,
     UserController? controller,
-  }) : controller = controller ??
-      (Get.isRegistered<UserController>()
-          ? Get.find<UserController>()
-          : Get.put(
-        UserController(
-          userApiService: Get.find<UserApiService>(),
-        ),
-      ));
+  }) : controller = controller ?? _getController();
+
+  static UserController _getController() {
+    final args = Get.arguments;
+    String? userId;
+    if (args is Map && args.containsKey('userId')) {
+      userId = args['userId'].toString();
+    } else if (Get.parameters.containsKey('userId')) {
+      userId = Get.parameters['userId'];
+    }
+
+    if (userId != null && userId.isNotEmpty) {
+      return Get.put(
+        UserController(userApiService: Get.find<UserApiService>()),
+        tag: userId,
+      );
+    }
+
+    return Get.isRegistered<UserController>()
+        ? Get.find<UserController>()
+        : Get.put(UserController(userApiService: Get.find<UserApiService>()));
+  }
 
   @override
   State<ProfileDetailScreen> createState() {

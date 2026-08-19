@@ -63,9 +63,6 @@ class ContactScreen extends StatelessWidget {
             ],
           ),
 
-          ContactAddButton(
-            controller: contactController,
-          ),
         ],
       ),
     );

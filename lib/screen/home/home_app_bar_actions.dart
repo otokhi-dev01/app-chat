@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../controllers/chat/chat_controller.dart';
 import '../../route/app_route.dart';
 import 'home_app_bar_button.dart';
-import 'menu/home_chat_menu.dart';
+import 'add_contact_sheet.dart';
 
 class HomeAppBarActions extends StatelessWidget {
   final int selectedIndex;
@@ -13,6 +13,7 @@ class HomeAppBarActions extends StatelessWidget {
   final Color backgroundColor;
   final Color iconColor;
   final ValueChanged<String> onChatMenuSelected;
+  final VoidCallback? onNavigateToContacts;
 
   const HomeAppBarActions({
     super.key,
@@ -21,6 +22,7 @@ class HomeAppBarActions extends StatelessWidget {
     required this.backgroundColor,
     required this.iconColor,
     required this.onChatMenuSelected,
+    this.onNavigateToContacts,
   });
 
   @override
@@ -38,16 +40,39 @@ class HomeAppBarActions extends StatelessWidget {
               onPressed: controller.openSearchScreen,
             ),
             const SizedBox(width: 8),
-            HomeChatMenu(
-              backgroundColor: backgroundColor, // Pass active bg color
-              iconColor: iconColor,             // Pass active icon color
-              onSelected: onChatMenuSelected,
+            HomeAppBarActionButton(
+              tooltip: 'add_contact'.tr,
+              icon: CupertinoIcons.add,
+              backgroundColor: backgroundColor,
+              foregroundColor: iconColor,
+              onPressed: () {
+                AddContactSheet.show(
+                  context: context,
+                  onSave: (firstName, lastName, phone, countryCode) async {
+                    debugPrint('Adding contact: $firstName $lastName, $countryCode$phone');
+                  },
+                );
+              },
             ),
           ],
         );
 
       case 1:
-        return const SizedBox.shrink();
+        return HomeAppBarActionButton(
+          tooltip: 'add_contact'.tr,
+          icon: CupertinoIcons.person_add,
+          backgroundColor: backgroundColor,
+          foregroundColor: iconColor,
+          onPressed: () {
+            AddContactSheet.show(
+              context: context,
+              onSave: (firstName, lastName, phone, countryCode) async {
+                // The implementation for adding by phone number goes here
+                debugPrint('Adding contact: $firstName $lastName, $countryCode$phone');
+              },
+            );
+          },
+        );
 
       case 2:
       // UPDATED: Settings Search button (case 2: Settings Tab) navigating to AppRoutes.settingsSearch

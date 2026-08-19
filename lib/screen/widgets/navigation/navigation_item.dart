@@ -10,7 +10,6 @@ class NavigationItem extends StatelessWidget {
   final String label;
   final ValueChanged<int> onTap;
   final int badgeCount;
-  final ImageProvider? profileImage;
   final Color navigationBackground;
 
   const NavigationItem({
@@ -23,7 +22,6 @@ class NavigationItem extends StatelessWidget {
     required this.navigationBackground,
     required this.onTap,
     this.badgeCount = 0,
-    this.profileImage,
   });
 
   bool get isSelected => index == currentIndex;
@@ -63,7 +61,6 @@ class NavigationItem extends StatelessWidget {
                   primary: primary,
                   inactiveColor: inactiveColor,
                   badgeCount: badgeCount,
-                  profileImage: profileImage,
                   navigationBackground: navigationBackground,
                 ),
                 const SizedBox(height: 3),

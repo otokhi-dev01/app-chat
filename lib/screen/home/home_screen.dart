@@ -1,18 +1,17 @@
-import 'package:appchat/controllers/chat/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/chat/chat_controller.dart';
 import '../../controllers/settings/chat_folder_controller.dart';
 import '../../services/folder_service/chat_folder_api_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
-
 import '../../services/mock/mock_chat_list_service.dart';
 import '../contact/contact_screen.dart';
-import '../profile/profile_screen.dart';
-import '../settings/setting_screen.dart';
+import '../home/search/search_screen.dart';
 import '../widgets/navigation/main_bottom_navigation.dart';
 import 'chat_list/home_chat_list.dart';
 import 'home_app_bar.dart';
+import 'settings_side_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -26,6 +25,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // GlobalKey to control Scaffold and open the Drawer
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   late ChatController controller;
   late ChatFolderController folderController;
   late PageController pageController;
@@ -35,8 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<String> titles = [
     'Chats',
     'Contacts',
-    'Settings',
-    'Profile',
+    'Calls',
+    'Search',
   ];
 
   @override
@@ -116,34 +118,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     final List<Widget> screens = [
       HomeChatList(
         controller: controller,
       ),
       ContactScreen(),
-      SettingScreen(),
-      ProfileScreen(),
+      Center(child: Text('Calls Tab Placeholder')),
+      SearchScreen(),
     ];
 
     final HomeAppBar homeAppBar = HomeAppBar(
       selectedIndex: selectedIndex,
       titles: titles,
       controller: controller,
-      onOpenSettings: () {},
+      // Opens the left-to-right drawer
+      onOpenSettings: () {
+        _scaffoldKey.currentState?.openDrawer();
+      },
+      // Switches to the Contacts tab
+      onNavigateToContacts: () {
+        setState(() => selectedIndex = 1);
+      },
     );
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      key: _scaffoldKey,
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBody: true,
 
-      appBar: PreferredSize(
-        preferredSize: homeAppBar.preferredSize,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onHorizontalDragEnd: _onHeaderSwipe,
-          child: homeAppBar,
-        ),
-      ),
+      // Left-to-right sliding Drawer/Sheet
+      drawer: const SettingsSideDrawer(),
+
+      appBar: selectedIndex == 3
+          ? null
+          : PreferredSize(
+              preferredSize: homeAppBar.preferredSize,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onHorizontalDragEnd: _onHeaderSwipe,
+                child: homeAppBar,
+              ),
+            ),
 
       body: PageView(
         controller: pageController,

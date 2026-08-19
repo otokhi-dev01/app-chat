@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../data/model/chat_folder_member_model.dart';
 import '../../models/chat_folder_model.dart';
 import '../../services/folder_service/chat_folder_api_service.dart';
+import '../chat/chat_controller.dart';
 
 class ChatFolderController extends GetxController {
   final ChatFolderApiService chatFolderApiService;
@@ -141,6 +142,7 @@ class ChatFolderController extends GetxController {
   Future<bool> createFolder({
     required String name,
     List<String>? chatIds,
+    List<String>? memberIds,
   }) async {
     if (name.trim().isEmpty) {
       errorMessage.value =
@@ -157,7 +159,7 @@ class ChatFolderController extends GetxController {
       await chatFolderApiService.createFolder(
         name: name,
         chatIds: chatIds ?? selectedChatIds.toList(),
-        memberIds: selectedMemberIds.toList(),
+        memberIds: memberIds ?? selectedMemberIds.toList(),
       );
 
       folders.add(folder);
@@ -165,6 +167,10 @@ class ChatFolderController extends GetxController {
 
       successMessage.value =
       'Chat folder created successfully.';
+
+      if (Get.isRegistered<ChatController>()) {
+        Get.find<ChatController>().loadChats();
+      }
 
       debugPrint('✅ createFolder success: folder ${folder.id} created.');
       return true;
@@ -181,6 +187,8 @@ class ChatFolderController extends GetxController {
     required String folderId,
     String? name,
     bool updateSelection = true,
+    List<String>? chatIds,
+    List<String>? memberIds,
   }) async {
     try {
       isSaving.value = true;
@@ -192,10 +200,10 @@ class ChatFolderController extends GetxController {
         folderId: folderId,
         name: name,
         chatIds: updateSelection
-            ? selectedChatIds.toList()
+            ? (chatIds ?? selectedChatIds.toList())
             : null,
         memberIds: updateSelection
-            ? selectedMemberIds.toList()
+            ? (memberIds ?? selectedMemberIds.toList())
             : null,
       );
 
@@ -211,6 +219,10 @@ class ChatFolderController extends GetxController {
 
       successMessage.value =
       'Chat folder updated successfully.';
+
+      if (Get.isRegistered<ChatController>()) {
+        Get.find<ChatController>().loadChats();
+      }
 
       debugPrint('✅ updateFolder success: folder $folderId updated.');
       return true;

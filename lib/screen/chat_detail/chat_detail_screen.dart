@@ -220,7 +220,11 @@ class ChatDetailController extends GetxController with WidgetsBindingObserver {
 
   Future<void> openProfileDetail() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    await Get.toNamed(AppRoutes.profileDetail);
+    final String? targetUserId = chat.peerUserId ?? (chat.isPersonal ? chat.id : null);
+    await Get.toNamed(
+      AppRoutes.profileDetail,
+      arguments: targetUserId != null ? {'userId': targetUserId} : null,
+    );
   }
 
   Future<void> confirmClearConversation() async {

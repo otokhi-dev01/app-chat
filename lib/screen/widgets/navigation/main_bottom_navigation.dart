@@ -11,14 +11,12 @@ class MainBottomNavigation extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final int unreadCount;
-  final ImageProvider? profileImage;
 
   const MainBottomNavigation({
     super.key,
     required this.currentIndex,
     required this.onTap,
     this.unreadCount = 0,
-    this.profileImage,
   });
 
   @override
@@ -160,6 +158,7 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                     _buildIndicator(activeBackground),
                     Row(
                       children: [
+                        // 1. CHAT
                         _buildItem(
                           index: MainTab.chats.index,
                           displayIndex: displayIndex,
@@ -169,6 +168,7 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                           badgeCount: widget.unreadCount,
                           backgroundColor: backgroundColor,
                         ),
+                        // 2. CONTACT
                         _buildItem(
                           index: MainTab.contacts.index,
                           displayIndex: displayIndex,
@@ -177,21 +177,22 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                           label: 'contacts'.tr,
                           backgroundColor: backgroundColor,
                         ),
+                        // 3. CALL
                         _buildItem(
-                          index: MainTab.settings.index,
+                          index: MainTab.calls.index,
                           displayIndex: displayIndex,
-                          icon: CupertinoIcons.gear_alt,
-                          activeIcon: CupertinoIcons.gear_alt_fill,
-                          label: 'settings'.tr,
+                          icon: CupertinoIcons.phone,
+                          activeIcon: CupertinoIcons.phone_fill,
+                          label: 'calls'.tr,
                           backgroundColor: backgroundColor,
                         ),
+                        // 4. SEARCH
                         _buildItem(
-                          index: MainTab.profile.index,
+                          index: MainTab.search.index,
                           displayIndex: displayIndex,
-                          icon: CupertinoIcons.person,
-                          activeIcon: CupertinoIcons.person_fill,
-                          label: 'profile'.tr,
-                          profileImage: widget.profileImage,
+                          icon: CupertinoIcons.search,
+                          activeIcon: CupertinoIcons.search,
+                          label: 'search'.tr,
                           backgroundColor: backgroundColor,
                         ),
                       ],
@@ -210,7 +211,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
     if (_indicatorRect == null) return const SizedBox.shrink();
 
     if (_drag.isDragging && _drag.indicatorLeft != null) {
-      // No animation while dragging — tracks finger 1:1
       return Positioned(
         left: _drag.indicatorLeft!,
         top: _indicatorRect!.top,
@@ -249,7 +249,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
     required String label,
     required Color backgroundColor,
     int badgeCount = 0,
-    ImageProvider? profileImage,
   }) {
     return Expanded(
       child: NavigationItem(
@@ -260,7 +259,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
         activeIcon: activeIcon,
         label: label,
         badgeCount: badgeCount,
-        profileImage: profileImage,
         navigationBackground: backgroundColor,
         onTap: widget.onTap,
       ),

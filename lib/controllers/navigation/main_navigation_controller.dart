@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 enum MainTab {
   chats,
   contacts,
-  settings,
-  profile,
+  calls,
+  search,
 }
 
 class MainNavigationController extends GetxController {
@@ -30,11 +30,13 @@ class MainNavigationController extends GetxController {
     changeTab(MainTab.contacts.index);
   }
 
-  void goToSettings() {
-    changeTab(MainTab.settings.index);
+  void gotoCalls() {
+    changeTab(MainTab.calls.index);
   }
 
-  void goToProfile() {
-    changeTab(MainTab.profile.index);
+  void gotoSearch() {
+    changeTab(MainTab.search.index);
   }
+
+
 }
