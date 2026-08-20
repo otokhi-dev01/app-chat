@@ -194,27 +194,18 @@ class AppPages {
     GetPage(
       name: AppRoutes.profileQrCode,
       page: () {
-        Map<String, dynamic> arguments =
-        Get.arguments is Map
-            ? Map<String, dynamic>.from(
-          Get.arguments as Map,
-        )
+        final arguments = Get.arguments is Map
+            ? Map<String, dynamic>.from(Get.arguments as Map)
             : <String, dynamic>{};
 
         return ProfileQrCodeScreen(
-          name:
-          arguments['name']?.toString() ??
-              '',
-          username:
-          arguments['username']
-              ?.toString() ??
-              '',
+          userId: arguments['userId']?.toString() ?? '',
+          name: arguments['name']?.toString() ?? '',
+          username: arguments['username']?.toString() ?? '',
         );
       },
       transition: Transition.cupertino,
-      transitionDuration: Duration(
-        milliseconds: 200,
-      ),
+      transitionDuration: const Duration(milliseconds: 200),
     ),
 
     GetPage(

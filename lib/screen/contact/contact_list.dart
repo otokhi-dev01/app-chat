@@ -6,8 +6,8 @@ import '../../controllers/contact/contact_controller.dart';
 import 'contact_empty_state.dart';
 import 'contact_section_header.dart';
 import 'contact_title.dart';
+import 'edit_contact/edit_contact_sheet.dart';
 
-/// UPDATED: ContactList widget with long-press action sheet for deleting contacts
 class ContactList extends StatelessWidget {
   final ContactController controller;
 
@@ -19,21 +19,14 @@ class ContactList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-          () {
+      () {
         Map<String, List<ContactModel>> grouped = controller.groupedContacts;
 
         List<String> letters = grouped.keys.toList();
 
-        letters.sort(
-              (
-              String first,
-              String second,
-              ) {
-            return first.toLowerCase().compareTo(
-              second.toLowerCase(),
-            );
-          },
-        );
+        letters.sort((String first, String second) {
+          return first.toLowerCase().compareTo(second.toLowerCase());
+        });
 
         if (letters.isEmpty) {
           return ContactEmptyState(
@@ -52,10 +45,7 @@ class ContactList extends StatelessWidget {
             bottom: 120,
           ),
           itemCount: letters.length,
-          itemBuilder: (
-              BuildContext context,
-              int index,
-              ) {
+          itemBuilder: (BuildContext context, int index) {
             String letter = letters[index];
 
             List<ContactModel> contacts = grouped[letter] ?? <ContactModel>[];
@@ -63,16 +53,12 @@ class ContactList extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ContactSectionHeader(
-                  letter: letter,
-                ),
+                ContactSectionHeader(letter: letter),
                 ...contacts.map(
-                      (ContactModel contact) {
-                    // ADDED: GestureDetector wrapper to support long-press action sheet
+                  (ContactModel contact) {
                     return GestureDetector(
                       key: ValueKey<String>(contact.id),
                       behavior: HitTestBehavior.opaque,
-                      // ADDED: Long press opens contact action sheet with delete option
                       onLongPress: () {
                         _showContactActionSheet(context, contact);
                       },
@@ -93,11 +79,11 @@ class ContactList extends StatelessWidget {
     );
   }
 
-  /// ADDED: Displays native Cupertino Action Sheet with options to message or delete contact
+  /// Shows the action sheet with: Message · Edit · Delete
   Future<void> _showContactActionSheet(
-      BuildContext context,
-      ContactModel contact,
-      ) async {
+    BuildContext context,
+    ContactModel contact,
+  ) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     await showCupertinoModalPopup<void>(
@@ -115,12 +101,10 @@ class ContactList extends StatelessWidget {
             contact.phoneNumber.trim().isNotEmpty
                 ? contact.phoneNumber
                 : 'contact_options'.tr,
-            style: const TextStyle(
-              fontSize: 12,
-            ),
+            style: const TextStyle(fontSize: 12),
           ),
           actions: [
-            // Send Message Action
+            // Send Message
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.of(sheetContext).pop();
@@ -129,17 +113,31 @@ class ContactList extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    CupertinoIcons.chat_bubble,
-                    size: 20,
-                  ),
+                  const Icon(CupertinoIcons.chat_bubble, size: 20),
                   const SizedBox(width: 8),
                   Text('send_message'.tr),
                 ],
               ),
             ),
 
-            // ADDED: Delete Contact Action (Destructive Red)
+            // Edit Contact — only available for raw phone contacts
+            if (_isPhoneContact(contact))
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  _openEditSheet(context, contact);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(CupertinoIcons.pencil, size: 20),
+                    const SizedBox(width: 8),
+                    Text('edit_contact'.tr),
+                  ],
+                ),
+              ),
+
+            // Delete Contact
             CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
@@ -161,9 +159,7 @@ class ContactList extends StatelessWidget {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(sheetContext).pop();
-            },
+            onPressed: () => Navigator.of(sheetContext).pop(),
             child: Text('cancel'.tr),
           ),
         );
@@ -171,11 +167,35 @@ class ContactList extends StatelessWidget {
     );
   }
 
-  /// ADDED: Displays confirmation dialog before deleting the contact
+  /// Opens the Edit Contact bottom sheet
+  Future<void> _openEditSheet(
+    BuildContext context,
+    ContactModel contact,
+  ) async {
+    await showEditContactSheet(
+      context: context,
+      contact: contact,
+      onSave: (firstName, lastName, phoneNumber) async {
+        await controller.editPhoneContact(
+          contact: contact,
+          firstName: firstName,
+          lastName: lastName.isNotEmpty ? lastName : null,
+          phoneNumber: phoneNumber,
+        );
+      },
+    );
+  }
+
+  /// Returns true if this contact belongs to the phone-contacts API
+  bool _isPhoneContact(ContactModel contact) {
+    return contact.id.startsWith('phone_') || !contact.isRegisteredUser;
+  }
+
+  /// Confirmation dialog before deleting
   Future<void> _confirmDeleteContact(
-      BuildContext context,
-      ContactModel contact,
-      ) async {
+    BuildContext context,
+    ContactModel contact,
+  ) async {
     bool? shouldDelete = await Get.dialog<bool>(
       CupertinoAlertDialog(
         title: Text('delete_contact'.tr),

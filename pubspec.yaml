@@ -74,7 +74,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/otokhi_app_logo.jpg"
+  image_path: "assets/icon/pii_chat.jpg"
   min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
@@ -90,7 +90,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icon/otokhi_app_logo.jpg
+    - assets/icon/pii_chat.jpg
     - assets/images/languages/
 #    - assets/images/group/
 

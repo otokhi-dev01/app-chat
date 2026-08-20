@@ -19,10 +19,11 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
     required this.contactService,
   });
 
-  final MobileScannerController scannerController = MobileScannerController(
+  final MobileScannerController scannerController =
+  MobileScannerController(
     autoStart: true,
     facing: CameraFacing.back,
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    detectionSpeed: DetectionSpeed.normal,
     detectionTimeoutMs: 500,
     formats: const [
       BarcodeFormat.qrCode,
@@ -183,47 +184,54 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
     return value;
   }
 
-  Future<AppUserModel?> _findUser(
-      String value,
-      ) async {
-    String cleanValue = value.trim();
+  Future<AppUserModel?> _findUser(String value) async {
+    final cleanValue = value.trim();
 
-    AppUserModel? user = await appUserService.getUserById(
-      cleanValue,
-    );
-
-    if (user != null) {
-      return user;
-    }
-
-    List<AppUserModel> results = await appUserService.searchUsers(
-      query: cleanValue,
-    );
-
-    if (results.isEmpty) {
+    if (cleanValue.isEmpty) {
       return null;
     }
 
-    String normalizedValue = _normalizeValue(cleanValue);
-
-    for (AppUserModel item in results) {
-      bool matchesId = _normalizeValue(item.id) == normalizedValue;
-
-      bool matchesUsername = _normalizeValue(item.username) == normalizedValue;
-
-      bool matchesPhone = _normalizePhoneNumber(
-        item.phoneNumber,
-      ) ==
-          _normalizePhoneNumber(
-            cleanValue,
-          );
-
-      if (matchesId || matchesUsername || matchesPhone) {
-        return item;
-      }
+    // First, treat the QR value as a user ID.
+    try {
+      return await appUserService.getUserById(cleanValue);
+    } catch (error) {
+      debugPrint('User ID lookup failed: $error');
     }
 
-    return results.first;
+    // If it is not an ID, search by username or phone number.
+    try {
+      final results = await appUserService.searchUsers(
+        query: cleanValue,
+      );
+
+      if (results.isEmpty) {
+        return null;
+      }
+
+      final normalizedValue = _normalizeValue(cleanValue);
+      final normalizedPhone = _normalizePhoneNumber(cleanValue);
+
+      for (final item in results) {
+        final matchesId =
+            _normalizeValue(item.id) == normalizedValue;
+
+        final matchesUsername =
+            _normalizeValue(item.username) == normalizedValue;
+
+        final matchesPhone =
+            _normalizePhoneNumber(item.phoneNumber) ==
+                normalizedPhone;
+
+        if (matchesId || matchesUsername || matchesPhone) {
+          return item;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      debugPrint('User search failed: $error');
+      return null;
+    }
   }
 
   String _normalizeValue(
@@ -307,10 +315,22 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
     }
 
     try {
+      debugPrint('CAMERA: Starting scanner...');
+
       await scannerController.start();
-    } catch (error) {
+
+      debugPrint('CAMERA: Scanner started successfully');
+      debugPrint(
+        'CAMERA: Is running = '
+            '${scannerController.value.isRunning}',
+      );
+    } catch (error, stackTrace) {
+      debugPrint('CAMERA START ERROR: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
       if (!_isClosed) {
-        errorMessage.value = 'Unable to start the camera.';
+        errorMessage.value =
+        'Unable to start the camera.';
       }
     }
   }

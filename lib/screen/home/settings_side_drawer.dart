@@ -7,6 +7,8 @@ import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../../route/app_route.dart';
 import '../../services/contact_service/contact_api_service.dart';
+import '../../services/contact_service/phone_contact_api_service.dart';
+import '../../services/user_service/user_service.dart';
 import '../settings/display/display_settings_screen.dart';
 import '../settings/language/language_settings_screen.dart';
 
@@ -38,11 +40,11 @@ class SettingsSideDrawer extends StatelessWidget {
               final String name = profileController?.name.value.isNotEmpty == true
                   ? profileController!.name.value
                   : 'settings'.tr;
-              
+
               final String subtitle = profileController?.userPhone.value.isNotEmpty == true
                   ? profileController!.userPhone.value
-                  : (profileController?.userEmail.value.isNotEmpty == true 
-                      ? profileController!.userEmail.value 
+                  : (profileController?.userEmail.value.isNotEmpty == true
+                      ? profileController!.userEmail.value
                       : 'quick_actions'.tr);
 
               return InkWell(
@@ -108,6 +110,35 @@ class SettingsSideDrawer extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   ListTile(
+                    leading: const Icon(CupertinoIcons.qrcode),
+                    title: Text('my_qr_code'.tr),
+                    onTap: () async {
+                      Get.back();
+
+                      try {
+                        final userApiService = Get.find<UserApiService>();
+
+                        final user = userApiService.currentUserValue ??
+                            await userApiService.getProfile();
+
+                        Get.toNamed(
+                          AppRoutes.profileQrCode,
+                          arguments: {
+                            'userId': user.id,
+                            'name': user.name ?? '',
+                            'username': user.username ?? '',
+                          },
+                        );
+                      } catch (error) {
+                        Get.snackbar(
+                          'Error',
+                          'Unable to load your profile.',
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
                     leading: const Icon(CupertinoIcons.bell),
                     title: Text('notifications'.tr),
                     onTap: () {
@@ -154,7 +185,7 @@ class SettingsSideDrawer extends StatelessWidget {
                       Navigator.pop(context);
                       final ContactController contactController = Get.isRegistered<ContactController>()
                           ? Get.find<ContactController>()
-                          : Get.put(ContactController(contactApiService: Get.find<ContactApiService>()), permanent: true);
+                          : Get.put(ContactController(contactApiService: Get.find<ContactApiService>(), phoneContactApiService: Get.find<PhoneContactApiService>()), permanent: true);
                       contactController.syncPhoneContacts();
                     },
                   ),
@@ -173,6 +204,22 @@ class SettingsSideDrawer extends StatelessWidget {
                         transition: Transition.cupertino,
                         duration: const Duration(milliseconds: 280),
                       );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(CupertinoIcons.device_phone_portrait),
+                    title: Text('devices'.tr),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(AppRoutes.devices);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(CupertinoIcons.chart_pie),
+                    title: Text('data_storage'.tr),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(AppRoutes.dataStorage);
                     },
                   ),
                   ListTile(

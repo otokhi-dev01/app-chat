@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     return Obx(
           () => GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'OTOKHI Chat',
+        title: 'Pii Chat',
         translations: AppTranslations(),
         locale: settingsController.currentLocale,
         fallbackLocale: const Locale('en', 'US'),

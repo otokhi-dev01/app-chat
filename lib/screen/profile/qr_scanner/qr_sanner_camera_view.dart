@@ -65,7 +65,25 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
   void _handleCapture(
       BarcodeCapture capture,
       ) {
+    debugPrint('QR CAMERA: Detection event received');
+    debugPrint(
+      'QR CAMERA: Barcode count = '
+          '${capture.barcodes.length}',
+    );
+
+    for (final barcode in capture.barcodes) {
+      debugPrint(
+        'QR CAMERA: Raw value = ${barcode.rawValue}',
+      );
+      debugPrint(
+        'QR CAMERA: Format = ${barcode.format}',
+      );
+    }
+
     if (_isHandlingCapture) {
+      debugPrint(
+        'QR CAMERA: Ignored because another QR is processing',
+      );
       return;
     }
 
@@ -81,21 +99,26 @@ class _QrScannerCameraViewState extends State<QrScannerCameraView> {
       BarcodeCapture capture,
       ) async {
     try {
-      bool shouldProcess = await _autoZoomController.prepareCapture(
-        capture,
-      );
-
-      if (!mounted || !shouldProcess) {
+      if (!mounted) {
         return;
       }
 
-      widget.onDetect(
-        capture,
-      );
-    } catch (error) {
-      debugPrint(
-        'QR capture error: $error',
-      );
+      final values = capture.barcodes
+          .map((barcode) => barcode.rawValue)
+          .whereType<String>()
+          .where((value) => value.trim().isNotEmpty)
+          .toList();
+
+      debugPrint('Detected QR values: $values');
+
+      if (values.isEmpty) {
+        return;
+      }
+
+      widget.onDetect(capture);
+    } catch (error, stackTrace) {
+      debugPrint('QR capture error: $error');
+      debugPrintStack(stackTrace: stackTrace);
     } finally {
       _isHandlingCapture = false;
     }

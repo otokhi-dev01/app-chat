@@ -26,6 +26,10 @@ class ApiConstants {
   static String contactList({String search = '',}) {return Uri(path: contacts, queryParameters: search.trim().isEmpty ? null : {'search': search.trim(),},).toString();}
   static String searchContactUsers({required String search,}) {return Uri(path: contactUserOptions, queryParameters: {'search': search.trim(),},).toString();}
 
+  // Phone Contacts
+  static const String phoneContacts = '/phone-contacts';
+  static String phoneContactById(String contactId) {return '$phoneContacts/$contactId';}
+
   // Device sessions
   static const String deviceSessions ='/device-sessions';
   static const String currentDeviceHeartbeat ='/device-sessions/current';

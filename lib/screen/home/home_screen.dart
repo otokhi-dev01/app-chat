@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
+import '../../controllers/navigation/main_navigation_controller.dart';
 import '../../controllers/settings/chat_folder_controller.dart';
 import '../../services/folder_service/chat_folder_api_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late ChatController controller;
   late ChatFolderController folderController;
+  late MainNavigationController mainNavigationController;
   late PageController pageController;
 
   int selectedIndex = 0;
@@ -76,6 +78,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     controller = Get.find<ChatController>();
     folderController = Get.find<ChatFolderController>();
+    
+    mainNavigationController = Get.put<MainNavigationController>(
+      MainNavigationController(),
+      permanent: true,
+    );
+    
+    // Listen for programmatic tab changes
+    mainNavigationController.currentIndex.listen((index) {
+      if (index != selectedIndex && mounted) {
+        changePage(index);
+      }
+    });
   }
 
   @override
@@ -104,6 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       selectedIndex = index;
     });
+    if (mainNavigationController.currentIndex.value != index) {
+      mainNavigationController.currentIndex.value = index;
+    }
   }
 
   void _onHeaderSwipe(DragEndDetails details) {

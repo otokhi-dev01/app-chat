@@ -1,6 +1,7 @@
-import 'package:appchat/services/auth_service%20/auth_api_service.dart';
+import 'package:appchat/services/auth_service /auth_api_service.dart';
 import 'package:appchat/services/chat_service/chat_list_api_service.dart';
 import 'package:appchat/services/contact_service/contact_api_service.dart';
+import 'package:appchat/services/contact_service/phone_contact_api_service.dart';
 import 'package:appchat/services/folder_service/chat_folder_api_service.dart';
 import 'package:appchat/services/massage_service%20/message_api_service.dart';// Fixed 'massage' to 'message' if that was a typo
 import 'package:appchat/services/user_service/user_service.dart';
@@ -49,6 +50,14 @@ class AppBinding extends Bindings {
       permanent: true,
     );
 
+    // 5b. Register PhoneContactApiService
+    Get.put<PhoneContactApiService>(
+      PhoneContactApiService(
+        apiService: Get.find<ApiService>(),
+        authApiService: Get.find<AuthApiService>(),
+      ),
+      permanent: true,
+    );
     // 6. Register ChatListApiService
     Get.put<ChatListApiService>(
       ChatListApiService(

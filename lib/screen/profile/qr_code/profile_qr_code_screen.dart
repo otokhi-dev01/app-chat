@@ -11,16 +11,23 @@ import 'profile_qr_content.dart';
 import 'profile_qr_app_bar.dart';
 
 class ProfileQrCodeScreen extends StatelessWidget {
+  final String userId;
   final String name;
   final String username;
   final ProfileQrDownloadService downloadService;
 
   ProfileQrCodeScreen({
     super.key,
+    required this.userId,
     required this.name,
     required this.username,
     ProfileQrDownloadService? downloadService,
-  }) : downloadService = downloadService ?? ProfileQrDownloadService();
+  }) : downloadService =
+      downloadService ?? ProfileQrDownloadService();
+
+  String get cleanUserId {
+    return userId.trim();
+  }
 
   String get cleanName {
     String value = name.trim();
@@ -48,9 +55,19 @@ class ProfileQrCodeScreen extends StatelessWidget {
   }
 
   String get profileQrData {
-    String profileKey = cleanUsername.isNotEmpty ? cleanUsername : cleanName;
+    if (cleanUserId.isNotEmpty) {
+      return 'appchat://user/'
+          '${Uri.encodeComponent(cleanUserId)}';
+    }
 
-    return 'appchat://profile/${Uri.encodeComponent(profileKey)}';
+    if (cleanUsername.isNotEmpty) {
+      return 'appchat://user/'
+          '${Uri.encodeComponent(cleanUsername)}';
+    }
+
+    throw StateError(
+      'Unable to generate QR code because the user ID is missing.',
+    );
   }
 
   String get firstLetter {

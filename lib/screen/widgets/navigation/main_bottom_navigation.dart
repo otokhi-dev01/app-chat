@@ -7,6 +7,7 @@ import '../../../controllers/navigation/main_navigation_controller.dart';
 import 'nav_drag_state.dart';
 import 'navigation_item.dart';
 
+/// UPDATED: MainBottomNavigation featuring a 3 + 1 split layout (Chats, Contacts, Calls on left; Search on right)
 class MainBottomNavigation extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -42,6 +43,7 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
   }
 
+  /// UPDATED: Dynamically measures active item bounds to position indicator smoothly across split layout
   void _measure() {
     if (!mounted || _drag.isDragging) return;
 
@@ -156,9 +158,10 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                   key: _stackKey,
                   children: [
                     _buildIndicator(activeBackground),
+                    // UPDATED: Split Row layout placing 3 main tabs on left and 1 search tab on right
                     Row(
                       children: [
-                        // 1. CHAT
+                        // --- LEFT GROUP (3 Buttons: Chats, Contacts, Calls) ---
                         _buildItem(
                           index: MainTab.chats.index,
                           displayIndex: displayIndex,
@@ -168,7 +171,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                           badgeCount: widget.unreadCount,
                           backgroundColor: backgroundColor,
                         ),
-                        // 2. CONTACT
                         _buildItem(
                           index: MainTab.contacts.index,
                           displayIndex: displayIndex,
@@ -177,7 +179,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                           label: 'contacts'.tr,
                           backgroundColor: backgroundColor,
                         ),
-                        // 3. CALL
                         _buildItem(
                           index: MainTab.calls.index,
                           displayIndex: displayIndex,
@@ -186,7 +187,20 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                           label: 'calls'.tr,
                           backgroundColor: backgroundColor,
                         ),
-                        // 4. SEARCH
+
+                        // ADDED: Subtle 1px vertical divider separating 3 left tabs from 1 right search tab
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 2,
+                          ),
+                          child: Container(
+                            width: 1,
+                            color: borderColor,
+                          ),
+                        ),
+
+                        // --- RIGHT GROUP (1 Button: Search) ---
                         _buildItem(
                           index: MainTab.search.index,
                           displayIndex: displayIndex,

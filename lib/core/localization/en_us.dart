@@ -186,6 +186,8 @@ final Map<String, String> enUS = {
   'dont_have_account':
   "Don't have an account?",
   'create_account': 'Create Account',
+  'first_name': 'First Name',
+  'last_name': 'Last Name',
 
   'about': 'About',
   'app_version': 'App Version',
@@ -212,6 +214,15 @@ final Map<String, String> enUS = {
 'Manage your privacy and keep your account secure',
   'appearance': 'Appearance',
 
+  'new_message': 'Add new message',
+  'create_group_chat': 'Create a group chat',
+  'new_channel': 'New Channel',
+  'broadcast_messages': 'Broadcast Message',
+  'search_results': 'Search Results',
+
+  'no_contacts_available': 'No Contacts Available',
+  'save_contact': 'Save Contacts',
+
 'chat_folders': 'Chat Folders',
 'manage_folders':
 'Organize and manage your chat folders',
@@ -225,6 +236,7 @@ final Map<String, String> enUS = {
 'data_storage': 'Data and Storage',
 'manage_storage':
 'Manage the cache and data stored on this device',
+  'only_this_device': 'Only this device',
 
 'backup_sync': 'Backup and Sync',
 'manage_backup_sync':
@@ -236,6 +248,10 @@ final Map<String, String> enUS = {
 'about_app': 'About',
 'version_information':
 'View the app version and other information',
+  'was_archive': 'Was Archived',
+  'was_unarchive': 'Was Unarchived',
+  'was_pinned': 'Was Pinned',
+  'was_unpinned': 'Was Unpinned',
 
 // Account
 'account': 'Account',

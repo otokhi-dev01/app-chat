@@ -371,38 +371,33 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     try {
       await authApiService.logout();
-    } catch (error) {
-      debugPrint(
-        'API logout error: $error',
+    } catch (error, stackTrace) {
+      debugPrint('Logout error: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      // Clear cached user if the service is registered.
+      if (Get.isRegistered<UserApiService>()) {
+        Get.find<UserApiService>()
+            .clearCurrentUser();
+      }
+
+      currentUser.value = null;
+      loginPasswordController.clear();
+
+      Get.offAllNamed(
+        AppRoutes.login,
+      );
+
+      AppFeedback.showMessage(
+        title: 'Logged Out',
+        message: 'You have logged out successfully.',
+        icon: Icons.logout_rounded,
       );
     }
-
-    try {
-      await authService.logout();
-    } catch (error) {
-      debugPrint(
-        'Mock logout error: $error',
-      );
-    }
-
-    currentUser.value = null;
-    loginPasswordController.clear();
-
-    Get.offAllNamed(
-      AppRoutes.login,
-    );
-
-    AppFeedback.showMessage(
-      title: 'Logged Out',
-      message:
-      'You have logged out successfully.',
-      icon: Icons.logout_rounded,
-    );
   }
 
   void clearRegisterForm() {

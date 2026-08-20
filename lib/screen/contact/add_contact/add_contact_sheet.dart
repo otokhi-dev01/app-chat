@@ -1,35 +1,15 @@
+import 'dart:ui';
+
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../auth/phone_input/country_picker_sheet.dart';
+import '../../auth/telegram_login_controller.dart';
+
 export 'add_contact_sheet.dart' show AddContactData;
-
-Future<void> showAddContactSheet({
-  required BuildContext context,
-  required ValueChanged<AddContactData> onAdd,
-  required VoidCallback onAddViaQrCode,
-  String initialPhoneNumber = '',
-}) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-
-  await showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(
-      alpha: 0.42,
-    ),
-    builder: (BuildContext sheetContext) {
-      return AddContactSheet(
-        initialPhoneNumber: initialPhoneNumber,
-        onAdd: onAdd,
-        onAddViaQrCode: onAddViaQrCode,
-      );
-    },
-  );
-}
 
 class AddContactData {
   final String firstName;
@@ -47,341 +27,575 @@ class AddContactData {
   }
 }
 
-class AddContactSheet extends StatefulWidget {
-  final String initialPhoneNumber;
-  final ValueChanged<AddContactData> onAdd;
-  final VoidCallback? onAddViaQrCode;
+/// Displays the modal bottom sheet for creating a new contact
+Future<void> showAddContactSheet({
+  required BuildContext context,
+  required ValueChanged<AddContactData> onAdd,
+  required VoidCallback onAddViaQrCode,
+  String initialPhoneNumber = '',
+}) async {
+  FocusManager.instance.primaryFocus?.unfocus();
 
-  const AddContactSheet({
-    super.key,
-    this.initialPhoneNumber = '',
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: false,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withValues(alpha: 0.45),
+    builder: (BuildContext sheetContext) {
+      return _AddContactSheetContent(
+        onAdd: onAdd,
+        onAddViaQrCode: onAddViaQrCode,
+        initialPhoneNumber: initialPhoneNumber,
+      );
+    },
+  );
+}
+
+class _AddContactSheetContent extends StatefulWidget {
+  final ValueChanged<AddContactData> onAdd;
+  final VoidCallback onAddViaQrCode;
+  final String initialPhoneNumber;
+
+  const _AddContactSheetContent({
     required this.onAdd,
-    this.onAddViaQrCode,
+    required this.onAddViaQrCode,
+    this.initialPhoneNumber = '',
   });
 
   @override
-  State<AddContactSheet> createState() {
-    return _AddContactSheetState();
-  }
+  State<_AddContactSheetContent> createState() =>
+      __AddContactSheetContentState();
 }
 
-class _AddContactSheetState extends State<AddContactSheet> {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+class __AddContactSheetContentState extends State<_AddContactSheetContent> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  late TextEditingController firstNameController;
-  late TextEditingController lastNameController;
-  late TextEditingController phoneController;
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _phoneController;
+
+  final FocusNode _firstNameFocusNode = FocusNode();
+  final FocusNode _lastNameFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+
+  bool _isSaving = false;
+
+  TelegramLoginController get _phoneCtrl =>
+      Get.isRegistered<TelegramLoginController>()
+          ? Get.find<TelegramLoginController>()
+          : Get.put(TelegramLoginController());
 
   @override
   void initState() {
     super.initState();
-
-    firstNameController = TextEditingController();
-    lastNameController = TextEditingController();
-
-    phoneController = TextEditingController(
-      text: widget.initialPhoneNumber,
-    );
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _phoneController = TextEditingController(text: widget.initialPhoneNumber);
   }
 
   @override
   void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    phoneController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
 
+    _firstNameFocusNode.dispose();
+    _lastNameFocusNode.dispose();
+    _phoneFocusNode.dispose();
     super.dispose();
   }
 
-  void _closeSheet() {
+  /// Opens country picker sheet with smooth soft-keyboard dismissal
+  Future<void> _openCountryPicker() async {
     FocusManager.instance.primaryFocus?.unfocus();
+    await SystemChannels.textInput.invokeMethod('TextInput.hide');
+    if (!mounted) return;
 
-    Navigator.of(context).pop();
+    if (MediaQuery.of(context).viewInsets.bottom > 0) {
+      await Future<void>.delayed(const Duration(milliseconds: 180));
+    }
+    if (!mounted) return;
+
+    await CountryPickerSheet.show(
+      context: context,
+      controller: _phoneCtrl,
+      favoriteIsoCodes: const ['KH', 'US', 'CN', 'GB'],
+    );
+
+    setState(() {});
   }
 
-  void _submitContact() {
+  /// Dynamically resolves flag emoji for selected country dialing code
+  String _resolveFlagEmoji() {
+    try {
+      final cleanCode =
+          _phoneCtrl.selectedCountryCode.value.replaceAll('+', '').trim();
+      if (cleanCode.isNotEmpty) {
+        final country = CountryService().findByPhoneCode(cleanCode);
+        if (country != null) return country.flagEmoji;
+      }
+    } catch (_) {}
+    return '🌐';
+  }
+
+  /// Form validation and save handler
+  void _handleSave() {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    bool isValid = formKey.currentState?.validate() ?? false;
-
-    if (!isValid) {
+    if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
 
+    setState(() => _isSaving = true);
+
+    String fullPhone = _phoneCtrl.selectedCountryCode.value +
+        _phoneController.text.trim();
+
     AddContactData contact = AddContactData(
-      firstName: firstNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      phoneNumber: phoneController.text.trim(),
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      phoneNumber: fullPhone,
     );
 
     widget.onAdd(contact);
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _openQrCodeScanner() {
     FocusManager.instance.primaryFocus?.unfocus();
-
     Navigator.of(context).pop();
-
-    widget.onAddViaQrCode?.call();
+    widget.onAddViaQrCode();
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     ColorScheme colorScheme = theme.colorScheme;
-
     bool isDark = theme.brightness == Brightness.dark;
 
-    Color cardColor = isDark ? Color(0xFF1B1D22) : Colors.white;
+    Color sheetColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
+    Color fieldColor = isDark ? const Color(0xFF26282E) : Colors.white;
 
     Color borderColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Colors.black.withValues(
-      alpha: 0.06,
-    );
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
 
-    Color fieldColor = isDark
-        ? Colors.white.withValues(
-      alpha: 0.04,
-    )
-        : Colors.black.withValues(
-      alpha: 0.025,
-    );
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final double sheetHeight = screenHeight * 0.85;
 
-    Color actionBackground = isDark
-        ? Colors.white.withValues(
-      alpha: 0.08,
-    )
-        : Color(0xFFF2F4F7);
-
-    double keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
-    double topSafeArea = MediaQuery.paddingOf(context).top;
-    double maximumHeight = MediaQuery.sizeOf(context).height - topSafeArea - kToolbarHeight - 12;
-
-    return Material(
-      color: cardColor,
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(28),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: keyboardHeight,
-        ),
-        child: Container(
-          width: double.infinity,
-          constraints: BoxConstraints(
-            maxHeight: maximumHeight,
-          ),
-          padding: EdgeInsets.fromLTRB(
-            18,
-            10,
-            18,
-            22,
-          ),
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildDragHandle(
-                    colorScheme,
-                  ),
-                  SizedBox(height: 18),
-                  _buildHeader(
-                    theme: theme,
-                    colorScheme: colorScheme,
-                    actionBackground: actionBackground,
-                    borderColor: borderColor,
-                  ),
-                  SizedBox(height: 18),
-                  Divider(
-                    height: 1,
-                    color: borderColor,
-                  ),
-                  if (widget.onAddViaQrCode != null) ...[
-                    SizedBox(height: 18),
-                    _AddViaQrCodeButton(
-                      onTap: _openQrCodeScanner,
-                    ),
-                    SizedBox(height: 18),
-                    _buildSectionDivider(
-                      theme: theme,
-                      colorScheme: colorScheme,
-                      borderColor: borderColor,
-                    ),
-                    SizedBox(height: 18),
-                  ] else
-                    SizedBox(height: 18),
-                  _AddContactTextField(
-                    controller: firstNameController,
-                    label: 'first_name'.tr,
-                    hint: 'enter_first_name'.tr,
-                    icon: CupertinoIcons.person,
-                    textInputAction: TextInputAction.next,
-                    fieldColor: fieldColor,
-                    borderColor: borderColor,
-                    validator: (String? value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'first_name_required'.tr;
-                      }
-
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 14),
-                  _AddContactTextField(
-                    controller: lastNameController,
-                    label: 'last_name'.tr,
-                    hint: 'enter_last_name'.tr,
-                    icon: CupertinoIcons.person,
-                    textInputAction: TextInputAction.next,
-                    fieldColor: fieldColor,
-                    borderColor: borderColor,
-                  ),
-                  SizedBox(height: 14),
-                  _AddContactTextField(
-                    controller: phoneController,
-                    label: 'phone_number'.tr,
-                    hint: '+855 12 345 678',
-                    icon: CupertinoIcons.phone,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.done,
-                    fieldColor: fieldColor,
-                    borderColor: borderColor,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(
-                          r'[0-9+\-\s()]',
-                        ),
-                      ),
-                    ],
-                    onSubmitted: (_) {
-                      _submitContact();
-                    },
-                    validator: (String? value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'phone_number_required'.tr;
-                      }
-
-                      int digitCount = value
-                          .replaceAll(
-                        RegExp(r'[^0-9]'),
-                        '',
-                      )
-                          .length;
-
-                      if (digitCount < 7) {
-                        return 'valid_phone_number'.tr;
-                      }
-
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 22),
-                  _buildSubmitButton(
-                    colorScheme,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDragHandle(
-      ColorScheme colorScheme,
-      ) {
     return Container(
-      width: 42,
-      height: 4,
+      height: sheetHeight,
       decoration: BoxDecoration(
-        color: colorScheme.onSurfaceVariant.withValues(
-          alpha: 0.28,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: sheetColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-    );
-  }
-
-  Widget _buildHeader({
-    required ThemeData theme,
-    required ColorScheme colorScheme,
-    required Color actionBackground,
-    required Color borderColor,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(
-              alpha: 0.11,
-            ),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(
-            CupertinoIcons.person_badge_plus,
-            color: colorScheme.primary,
-            size: 22,
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.only(bottom: keyboardHeight),
+        child: SafeArea(
+          top: false,
+          bottom: keyboardHeight == 0,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'add_contact'.tr,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(height: 10),
+
+              // Top Drag Handle
+              Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(99),
                 ),
               ),
-              SizedBox(height: 3),
-              Text(
-                'create_new_contact'.tr,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
+
+              // Sheet Header (Title + Close 'X' Button)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 14, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'add_contact'.tr,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    // Circular 'X' close button
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: fieldColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          Navigator.of(context).pop();
+                        },
+                        child: Icon(
+                          CupertinoIcons.xmark,
+                          color: colorScheme.onSurface,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Divider(height: 1, color: borderColor),
+
+              // Form Body
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // --- QR Code Button ---
+                        _AddViaQrCodeButton(
+                          onTap: _openQrCodeScanner,
+                        ),
+                        
+                        const SizedBox(height: 18),
+                        
+                        _buildSectionDivider(
+                          theme: theme,
+                          colorScheme: colorScheme,
+                          borderColor: borderColor,
+                        ),
+                        
+                        const SizedBox(height: 18),
+
+                        // --- First Name Field ---
+                        _buildInputField(
+                          controller: _firstNameController,
+                          focusNode: _firstNameFocusNode,
+                          label: 'first_name'.tr,
+                          hintText: 'enter_first_name'.tr,
+                          icon: CupertinoIcons.person,
+                          textInputAction: TextInputAction.next,
+                          fieldColor: fieldColor,
+                          borderColor: borderColor,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return 'first_name_required'.tr;
+                            }
+                            return null;
+                          },
+                          onSubmitted: (_) {
+                            _lastNameFocusNode.requestFocus();
+                          },
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        // --- Last Name Field ---
+                        _buildInputField(
+                          controller: _lastNameController,
+                          focusNode: _lastNameFocusNode,
+                          label: 'last_name'.tr,
+                          hintText: 'enter_last_name'.tr,
+                          icon: CupertinoIcons.person,
+                          textInputAction: TextInputAction.next,
+                          fieldColor: fieldColor,
+                          borderColor: borderColor,
+                          onSubmitted: (_) {
+                            _phoneFocusNode.requestFocus();
+                          },
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        // --- Phone Number Field ---
+                        Text(
+                          'phone_number'.tr,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Country Code Flag Button
+                            GestureDetector(
+                              onTap: _openCountryPicker,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: fieldColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: borderColor),
+                                ),
+                                alignment: Alignment.center,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _resolveFlagEmoji(),
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      _phoneCtrl.selectedCountryCode.value,
+                                      style:
+                                          theme.textTheme.bodyLarge?.copyWith(
+                                        color: colorScheme.onSurface,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      CupertinoIcons.chevron_down,
+                                      color: colorScheme.onSurfaceVariant,
+                                      size: 14,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            // Phone Number Input
+                            Expanded(
+                              child: TextFormField(
+                                controller: _phoneController,
+                                focusNode: _phoneFocusNode,
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(15),
+                                ],
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface,
+                                ),
+                                cursorColor: colorScheme.primary,
+                                validator: (val) {
+                                  if (val == null || val.trim().isEmpty) {
+                                    return 'phone_number_required'.tr;
+                                  }
+                                  if (val.trim().length < 8) {
+                                    return 'valid_phone_number'.tr;
+                                  }
+                                  return null;
+                                },
+                                onFieldSubmitted: (_) => _handleSave(),
+                                decoration: InputDecoration(
+                                  hintText: 'enter_phone_number'.tr,
+                                  hintStyle:
+                                      theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                  prefixIcon: Icon(
+                                    CupertinoIcons.phone,
+                                    color: colorScheme.onSurfaceVariant,
+                                    size: 20,
+                                  ),
+                                  filled: true,
+                                  fillColor: fieldColor,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 15,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(color: borderColor),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(
+                                      color: colorScheme.primary,
+                                      width: 1.8,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide:
+                                        BorderSide(color: colorScheme.error),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(
+                                      color: colorScheme.error,
+                                      width: 1.8,
+                                    ),
+                                  ),
+                                  errorStyle:
+                                      theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.error,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // --- Save Contact Button ---
+                        SizedBox(
+                          height: 52,
+                          child: FilledButton(
+                            onPressed: _isSaving ? null : _handleSave,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              disabledBackgroundColor: colorScheme.primary
+                                  .withValues(alpha: 0.48),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: _isSaving
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.2,
+                                            color: colorScheme.onPrimary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          'saving_contact'.tr,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      'save_contact'.tr,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
-        // Unit Close Button UI
-        Container(
-          width: 36,
-          height: 36,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: actionBackground,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: 1.0,
-            ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String label,
+    required String hintText,
+    required IconData icon,
+    required TextInputAction textInputAction,
+    required Color fieldColor,
+    required Color borderColor,
+    String? Function(String?)? validator,
+    void Function(String)? onSubmitted,
+  }) {
+    ThemeData theme = Theme.of(context);
+    ColorScheme colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
           ),
-          child: CupertinoButton(
-            padding: EdgeInsets.zero,
-            minimumSize: Size(36, 36),
-            onPressed: _closeSheet,
-            child: Icon(
-              CupertinoIcons.xmark,
-              size: 18,
-              color: colorScheme.onSurface,
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          focusNode: focusNode,
+          textInputAction: textInputAction,
+          textCapitalization: TextCapitalization.words,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+          cursorColor: colorScheme.primary,
+          validator: validator,
+          onFieldSubmitted: onSubmitted,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
+            prefixIcon: Icon(
+              icon,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            filled: true,
+            fillColor: fieldColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 15,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: borderColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+                width: 1.8,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: colorScheme.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: colorScheme.error,
+                width: 1.8,
+              ),
+            ),
+            errorStyle: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.error,
             ),
           ),
         ),
@@ -403,7 +617,7 @@ class _AddContactSheetState extends State<AddContactSheet> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 12,
           ),
           child: Text(
@@ -424,35 +638,6 @@ class _AddContactSheetState extends State<AddContactSheet> {
       ],
     );
   }
-
-  Widget _buildSubmitButton(
-      ColorScheme colorScheme,
-      ) {
-    return FilledButton.icon(
-      onPressed: _submitContact,
-      icon: Icon(
-        CupertinoIcons.person_badge_plus,
-        color: colorScheme.onPrimary,
-        size: 20,
-      ),
-      label: Text(
-        'add_contact'.tr,
-        style: TextStyle(
-          color: colorScheme.onPrimary,
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      style: FilledButton.styleFrom(
-        minimumSize: Size(double.infinity, 52),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
-    );
-  }
 }
 
 class _AddViaQrCodeButton extends StatelessWidget {
@@ -470,17 +655,17 @@ class _AddViaQrCodeButton extends StatelessWidget {
 
     Color backgroundColor = isDark
         ? Colors.white.withValues(
-      alpha: 0.06,
-    )
-        : Color(0xFFF6F7F9);
+            alpha: 0.06,
+          )
+        : const Color(0xFFF6F7F9);
 
     Color borderColor = isDark
         ? Colors.white.withValues(
-      alpha: 0.08,
-    )
+            alpha: 0.08,
+          )
         : Colors.black.withValues(
-      alpha: 0.06,
-    );
+            alpha: 0.06,
+          );
 
     return Material(
       color: backgroundColor,
@@ -490,7 +675,7 @@ class _AddViaQrCodeButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.all(14),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
@@ -515,7 +700,7 @@ class _AddViaQrCodeButton extends StatelessWidget {
                   size: 22,
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,7 +713,7 @@ class _AddViaQrCodeButton extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       'scan_contact_qr_code'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -548,119 +733,6 @@ class _AddViaQrCodeButton extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AddContactTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final String hint;
-  final IconData icon;
-  final Color fieldColor;
-  final Color borderColor;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final List<TextInputFormatter>? inputFormatters;
-  final String? Function(String?)? validator;
-  final ValueChanged<String>? onSubmitted;
-
-  const _AddContactTextField({
-    required this.controller,
-    required this.label,
-    required this.hint,
-    required this.icon,
-    required this.fieldColor,
-    required this.borderColor,
-    this.keyboardType,
-    this.textInputAction,
-    this.inputFormatters,
-    this.validator,
-    this.onSubmitted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    ColorScheme colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: 4,
-            bottom: 7,
-          ),
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          inputFormatters: inputFormatters,
-          validator: validator,
-          onFieldSubmitted: onSubmitted,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(
-                alpha: 0.70,
-              ),
-              fontSize: 14,
-            ),
-            prefixIcon: Icon(
-              icon,
-              color: colorScheme.primary,
-              size: 20,
-            ),
-            filled: true,
-            fillColor: fieldColor,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 16,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: borderColor,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 1.4,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.error,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.error,
-                width: 1.4,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

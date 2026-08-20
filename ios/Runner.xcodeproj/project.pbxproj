@@ -510,7 +510,7 @@
 				DEVELOPMENT_TEAM = 76575X555K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "OTOKHI Chat";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pii Chat";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -701,7 +701,7 @@
 				DEVELOPMENT_TEAM = 76575X555K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "OTOKHI Chat";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pii Chat";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -726,7 +726,7 @@
 				DEVELOPMENT_TEAM = 76575X555K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "OTOKHI Chat";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pii Chat";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

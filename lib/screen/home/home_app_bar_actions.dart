@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat/chat_controller.dart';
+import '../../controllers/contact/contact_controller.dart';
 import '../../route/app_route.dart';
 import 'home_app_bar_button.dart';
-import 'add_contact_sheet.dart';
+import '../contact/add_contact/add_contact_sheet.dart';
+import 'new_message_sheet.dart';
 
 class HomeAppBarActions extends StatelessWidget {
   final int selectedIndex;
@@ -41,16 +43,13 @@ class HomeAppBarActions extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             HomeAppBarActionButton(
-              tooltip: 'add_contact'.tr,
-              icon: CupertinoIcons.add,
+              tooltip: 'new_message'.tr,
+              icon: CupertinoIcons.square_pencil,
               backgroundColor: backgroundColor,
               foregroundColor: iconColor,
               onPressed: () {
-                AddContactSheet.show(
+                NewMessageSheet.show(
                   context: context,
-                  onSave: (firstName, lastName, phone, countryCode) async {
-                    debugPrint('Adding contact: $firstName $lastName, $countryCode$phone');
-                  },
                 );
               },
             ),
@@ -64,12 +63,23 @@ class HomeAppBarActions extends StatelessWidget {
           backgroundColor: backgroundColor,
           foregroundColor: iconColor,
           onPressed: () {
-            AddContactSheet.show(
+            showAddContactSheet(
               context: context,
-              onSave: (firstName, lastName, phone, countryCode) async {
-                // The implementation for adding by phone number goes here
-                debugPrint('Adding contact: $firstName $lastName, $countryCode$phone');
+              onAdd: (data) async {
+                // Use ContactController if registered, else just log
+                if (Get.isRegistered<ContactController>()) {
+                  final ctrl = Get.find<ContactController>();
+                  final parts = data.phoneNumber.split(' ');
+                  await ctrl.addPhoneContact(
+                    firstName: data.firstName,
+                    lastName: data.lastName.isNotEmpty ? data.lastName : null,
+                    phoneNumber: data.phoneNumber,
+                  );
+                } else {
+                  debugPrint('Adding contact: ${data.firstName} ${data.lastName}, ${data.phoneNumber}');
+                }
               },
+              onAddViaQrCode: () {},
             );
           },
         );

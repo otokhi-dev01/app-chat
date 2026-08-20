@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+
+import '../../route/app_route.dart';
 
 enum MainTab {
   chats,
@@ -34,8 +37,12 @@ class MainNavigationController extends GetxController {
     changeTab(MainTab.calls.index);
   }
 
-  void gotoSearch() {
-    changeTab(MainTab.search.index);
+  // UPDATED: Navigates to SearchScreen cleanly using AppRoutes.searchChats
+  void openSearchScreen() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    // FIXED: Opens SearchScreen via GetX route definition with 280ms Cupertino transition
+    Get.toNamed(AppRoutes.searchChats);
   }
 
 

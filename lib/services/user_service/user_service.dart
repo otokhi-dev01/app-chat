@@ -18,33 +18,49 @@ class UserApiService extends GetxService {
   final Rxn<LoginDataModel> _currentUser =
   Rxn<LoginDataModel>();
 
-  LoginDataModel? get currentUserValue =>
-      _currentUser.value;
+  LoginDataModel? get currentUserValue {
+    return _currentUser.value;
+  }
 
-  Stream<LoginDataModel?> get currentUserStream =>
-      _currentUser.stream;
+  Stream<LoginDataModel?> get currentUserStream {
+    return _currentUser.stream;
+  }
+
+  bool get hasCurrentUser {
+    return _currentUser.value != null;
+  }
 
   /// GET /auth/me
-  Future<LoginDataModel> getProfile() async {
-    final token = await authApiService.requireToken();
+  Future<LoginDataModel> getProfile({
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh && _currentUser.value != null) {
+      return _currentUser.value!;
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.get(
       ApiConstants.profile,
       token: token,
     );
 
-    final rawData = _extractData(json);
-
-    final user = LoginDataModel.fromJson(rawData);
+    final user = LoginDataModel.fromJson(
+      _extractData(json),
+    );
 
     _currentUser.value = user;
 
     return user;
   }
 
-  /// Converts authenticated profile into AppUserModel.
-  Future<AppUserModel> getCurrentUser() async {
-    final profile = await getProfile();
+  Future<AppUserModel> getCurrentUser({
+    bool forceRefresh = false,
+  }) async {
+    final profile = await getProfile(
+      forceRefresh: forceRefresh,
+    );
 
     return _loginDataToAppUser(profile);
   }
@@ -53,10 +69,19 @@ class UserApiService extends GetxService {
   Future<AppUserModel> getUserById(
       String userId,
       ) async {
-    final token = await authApiService.requireToken();
+    final cleanUserId = userId.trim();
+
+    if (cleanUserId.isEmpty) {
+      throw const FormatException(
+        'User ID is required.',
+      );
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.get(
-      ApiConstants.userById(userId),
+      ApiConstants.userById(cleanUserId),
       token: token,
     );
 
@@ -71,11 +96,18 @@ class UserApiService extends GetxService {
     int page = 1,
     int perPage = 20,
   }) async {
-    final token = await authApiService.requireToken();
+    final cleanQuery = query.trim();
+
+    if (cleanQuery.isEmpty) {
+      return [];
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.get(
       ApiConstants.searchUsers(
-        search: query.trim(),
+        search: cleanQuery,
         page: page,
         perPage: perPage,
       ),
@@ -103,10 +135,19 @@ class UserApiService extends GetxService {
     required String userId,
     required Map<String, dynamic> data,
   }) async {
-    final token = await authApiService.requireToken();
+    final cleanUserId = userId.trim();
+
+    if (cleanUserId.isEmpty) {
+      throw const FormatException(
+        'User ID is required.',
+      );
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.patch(
-      ApiConstants.userById(userId),
+      ApiConstants.userById(cleanUserId),
       body: data,
       token: token,
     );
@@ -125,10 +166,19 @@ class UserApiService extends GetxService {
     required String userId,
     required bool isOnline,
   }) async {
-    final token = await authApiService.requireToken();
+    final cleanUserId = userId.trim();
+
+    if (cleanUserId.isEmpty) {
+      throw const FormatException(
+        'User ID is required.',
+      );
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.patch(
-      ApiConstants.userPresence(userId),
+      ApiConstants.userPresence(cleanUserId),
       body: {
         'isOnline': isOnline,
       },
@@ -145,17 +195,34 @@ class UserApiService extends GetxService {
     required String userId,
     required String password,
   }) async {
-    final token = await authApiService.requireToken();
+    final cleanUserId = userId.trim();
+
+    if (cleanUserId.isEmpty) {
+      throw const FormatException(
+        'User ID is required.',
+      );
+    }
+
+    if (password.isEmpty) {
+      throw const FormatException(
+        'Password is required.',
+      );
+    }
+
+    final token =
+    await authApiService.requireToken();
 
     final json = await apiService.delete(
-      ApiConstants.userById(userId),
+      ApiConstants.userById(cleanUserId),
       body: {
         'password': password,
       },
       token: token,
     );
 
-    _currentUser.value = null;
+    // Clear user data and token after account deletion.
+    clearCurrentUser();
+    await authApiService.clearToken();
 
     return json['message']?.toString() ??
         'Account deleted successfully.';
@@ -192,5 +259,11 @@ class UserApiService extends GetxService {
 
   void clearCurrentUser() {
     _currentUser.value = null;
+  }
+
+  @override
+  void onClose() {
+    clearCurrentUser();
+    super.onClose();
   }
 }

@@ -14,6 +14,7 @@ import '../../data/mock_profile_story_post_data.dart';
 import '../../models/add_post_capture_result.dart';
 import '../../models/profile_story_post_model.dart';
 import '../../route/app_route.dart';
+import '../../services/user_service/user_service.dart';
 import '../settings/section/account_screen.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
@@ -84,18 +85,19 @@ class ProfileScreen extends GetView<ProfileController> {
   }
 
   void _openQrCode({
+    required String userId,
     required String name,
     required String username,
   }) {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    Get.to(
-          () => ProfileQrCodeScreen(
-        name: name,
-        username: username,
-      ),
-      transition: Transition.rightToLeft,
-      duration: Duration(milliseconds: 280),
+    Get.toNamed(
+      AppRoutes.profileQrCode,
+      arguments: {
+        'userId': userId,
+        'name': name,
+        'username': username,
+      },
     );
   }
 
@@ -173,11 +175,25 @@ class ProfileScreen extends GetView<ProfileController> {
                       borderColor: borderColor,
                       onEdit: _openEditProfile,
                       onCopyUsername: () => _copyUsername(username),
-                      onQrCode: () {
-                        _openQrCode(
-                          name: name,
-                          username: username,
-                        );
+                      onQrCode: () async {
+                        try {
+                          final userApiService = Get.find<UserApiService>();
+
+                          final user = userApiService.currentUserValue ??
+                              await userApiService.getProfile();
+
+                          _openQrCode(
+                            userId: user.id,
+                            name: user.name ?? '',
+                            username: user.username ?? '',
+                          );
+                        } catch (error) {
+                          _showMessage(
+                            title: 'Error',
+                            message: 'Unable to load your profile.',
+                            icon: CupertinoIcons.exclamationmark_circle,
+                          );
+                        }
                       },
                     ),
                     SizedBox(height: 22),

@@ -3,22 +3,22 @@ import 'package:get/get.dart';
 
 import '../../models/chat_model.dart';
 import '../../models/contact_model.dart';
-import '../../route/app_route.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
 import '../../services/contact_service/contact_api_service.dart';
+import '../../services/contact_service/phone_contact_api_service.dart';
 
 class ContactController extends GetxController {
   final ContactApiService contactApiService;
+  final PhoneContactApiService phoneContactApiService;
 
   ContactController({
     required this.contactApiService,
+    required this.phoneContactApiService,
   });
 
-  final RxList<ContactModel> contacts =
-      <ContactModel>[].obs;
+  final RxList<ContactModel> contacts = <ContactModel>[].obs;
 
-  final RxList<ContactModel> userOptions =
-      <ContactModel>[].obs;
+  final RxList<ContactModel> userOptions = <ContactModel>[].obs;
 
   final RxString contactSearch = ''.obs;
   final RxString userSearch = ''.obs;
@@ -36,16 +36,28 @@ class ContactController extends GetxController {
   final RxBool showAddButton = true.obs;
   final RxBool isSyncingContacts = false.obs;
   final RxBool isDeletingSyncedContacts = false.obs;
-  
+
   // Maps to contactSearch
   RxString get searchQuery => contactSearch;
 
   // Grouped contacts mapped to the flat list
   Map<String, List<ContactModel>> get groupedContacts {
     final map = <String, List<ContactModel>>{};
-    for (var contact in contacts) {
-      // Basic grouping: first letter of name (fallback to #)
-      final String firstLetter = (contact.name.isNotEmpty ? contact.name : (contact.username.isNotEmpty ? contact.username : '#'))[0].toUpperCase();
+    final query = contactSearch.value.trim().toLowerCase();
+
+    final filtered = query.isEmpty
+        ? contacts
+        : contacts.where((c) {
+            return c.name.toLowerCase().contains(query) ||
+                c.phoneNumber.contains(query) ||
+                c.username.toLowerCase().contains(query);
+          }).toList();
+
+    for (var contact in filtered) {
+      final String firstLetter = (contact.name.isNotEmpty
+          ? contact.name
+          : (contact.username.isNotEmpty ? contact.username : '#'))[0]
+          .toUpperCase();
       final key = RegExp(r'[A-Z]').hasMatch(firstLetter) ? firstLetter : '#';
       map.putIfAbsent(key, () => []).add(contact);
     }
@@ -61,15 +73,16 @@ class ContactController extends GetxController {
 
     _contactSearchWorker = debounce<String>(
       contactSearch,
-          (search) {
-        loadContacts(search: search);
+      (search) {
+        // Refresh grouped view on search change (filtering is local)
+        contacts.refresh();
       },
-      time: const Duration(milliseconds: 400),
+      time: const Duration(milliseconds: 300),
     );
 
     _userSearchWorker = debounce<String>(
       userSearch,
-          (search) {
+      (search) {
         searchUsers(search);
       },
       time: const Duration(milliseconds: 500),
@@ -87,6 +100,7 @@ class ContactController extends GetxController {
     super.onClose();
   }
 
+  /// Fetches both app contacts AND phone contacts, merges them into one list.
   Future<void> loadContacts({
     String search = '',
   }) async {
@@ -98,12 +112,30 @@ class ContactController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final result =
-      await contactApiService.getContacts(
-        search: search,
-      );
+      final results = await Future.wait([
+        contactApiService.getContacts(search: search),
+        phoneContactApiService.getPhoneContacts(),
+      ]);
 
-      contacts.assignAll(result);
+      final appContacts = results[0];
+      final phoneContacts = results[1];
+
+      // Merge: app contacts first, then phone-only contacts (avoid duplicates by phone number)
+      final existingPhones = appContacts
+          .map((c) => c.phoneNumber.trim())
+          .where((p) => p.isNotEmpty)
+          .toSet();
+
+      final uniquePhoneContacts = phoneContacts
+          .where((c) => !existingPhones.contains(c.phoneNumber.trim()))
+          .toList();
+
+      final merged = [...appContacts, ...uniquePhoneContacts];
+
+      // Sort alphabetically by name
+      merged.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+      contacts.assignAll(merged);
     } catch (error) {
       errorMessage.value = _errorText(error);
     } finally {
@@ -112,9 +144,7 @@ class ContactController extends GetxController {
   }
 
   Future<void> refreshContacts() async {
-    await loadContacts(
-      search: contactSearch.value,
-    );
+    await loadContacts(search: contactSearch.value);
   }
 
   void onContactSearchChanged(String value) {
@@ -135,8 +165,8 @@ class ContactController extends GetxController {
   }
 
   Future<void> searchUsers(
-      String search,
-      ) async {
+    String search,
+  ) async {
     final normalizedSearch = search.trim();
 
     if (normalizedSearch.length < 2) {
@@ -148,8 +178,7 @@ class ContactController extends GetxController {
       isSearchingUsers.value = true;
       errorMessage.value = '';
 
-      final result =
-      await contactApiService.getUserOptions(
+      final result = await contactApiService.getUserOptions(
         search: normalizedSearch,
       );
 
@@ -162,6 +191,7 @@ class ContactController extends GetxController {
     }
   }
 
+  /// Add a registered app user as a contact.
   Future<bool> addContact({
     required ContactModel user,
     String? customName,
@@ -175,8 +205,7 @@ class ContactController extends GetxController {
       errorMessage.value = '';
       successMessage.value = '';
 
-      final contact =
-      await contactApiService.createContact(
+      final contact = await contactApiService.createContact(
         contactUserId: user.contactUserId,
         name: customName,
       );
@@ -184,12 +213,89 @@ class ContactController extends GetxController {
       contacts.insert(0, contact);
 
       userOptions.removeWhere(
-            (item) =>
-        item.contactUserId == contact.contactUserId,
+        (item) => item.contactUserId == contact.contactUserId,
       );
 
-      successMessage.value =
-      'Contact added successfully.';
+      successMessage.value = 'Contact added successfully.';
+
+      return true;
+    } catch (error) {
+      errorMessage.value = _errorText(error);
+      return false;
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  /// Add a phone-number-based contact via POST /api/phone-contacts.
+  Future<bool> addPhoneContact({
+    required String firstName,
+    String? lastName,
+    required String phoneNumber,
+  }) async {
+    if (isSaving.value) {
+      return false;
+    }
+
+    try {
+      isSaving.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final contact = await phoneContactApiService.createPhoneContact(
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+      );
+
+      // Insert and keep sorted
+      contacts.add(contact);
+      contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+      successMessage.value = 'Contact saved.';
+
+      return true;
+    } catch (error) {
+      errorMessage.value = _errorText(error);
+      return false;
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  /// Edit a raw phone contact via PATCH /api/phone-contacts/{id}.
+  Future<bool> editPhoneContact({
+    required ContactModel contact,
+    required String firstName,
+    String? lastName,
+    required String phoneNumber,
+  }) async {
+    if (isSaving.value) {
+      return false;
+    }
+
+    try {
+      isSaving.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      final realId = contact.id.replaceFirst('phone_', '');
+
+      final updated = await phoneContactApiService.updatePhoneContact(
+        contactId: realId,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+      );
+
+      // Replace in list and re-sort
+      final index = contacts.indexWhere((c) => c.id == contact.id);
+      if (index >= 0) {
+        contacts[index] = updated;
+      }
+      contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+      successMessage.value = 'Contact updated.';
 
       return true;
     } catch (error) {
@@ -215,8 +321,7 @@ class ContactController extends GetxController {
       errorMessage.value = '';
       successMessage.value = '';
 
-      final updatedContact =
-      await contactApiService.updateContact(
+      final updatedContact = await contactApiService.updateContact(
         contactId: contactId,
         name: name,
         isFavorite: isFavorite,
@@ -225,8 +330,7 @@ class ContactController extends GetxController {
 
       _replaceContact(updatedContact);
 
-      successMessage.value =
-      'Contact updated successfully.';
+      successMessage.value = 'Contact updated successfully.';
 
       return true;
     } catch (error) {
@@ -238,8 +342,8 @@ class ContactController extends GetxController {
   }
 
   Future<bool> toggleFavorite(
-      ContactModel contact,
-      ) async {
+    ContactModel contact,
+  ) async {
     return updateContact(
       contactId: contact.id,
       isFavorite: !contact.isFavorite,
@@ -247,17 +351,19 @@ class ContactController extends GetxController {
   }
 
   Future<bool> toggleBlocked(
-      ContactModel contact,
-      ) async {
+    ContactModel contact,
+  ) async {
     return updateContact(
       contactId: contact.id,
       isBlocked: !contact.isBlocked,
     );
   }
 
+  /// Deletes a contact — routes to the correct backend depending on whether
+  /// it's a raw phone contact (id starts with 'phone_') or an app contact.
   Future<bool> deleteContact(
-      ContactModel contact,
-      ) async {
+    ContactModel contact,
+  ) async {
     if (isDeleting.value) {
       return false;
     }
@@ -267,16 +373,17 @@ class ContactController extends GetxController {
       errorMessage.value = '';
       successMessage.value = '';
 
-      final message =
-      await contactApiService.deleteContact(
-        contact.id,
-      );
+      if (_isPhoneContact(contact)) {
+        // Strip the 'phone_' prefix to get the real backend ID
+        final realId = contact.id.replaceFirst('phone_', '');
+        await phoneContactApiService.deletePhoneContact(realId);
+      } else {
+        await contactApiService.deleteContact(contact.id);
+      }
 
-      contacts.removeWhere(
-            (item) => item.id == contact.id,
-      );
+      contacts.removeWhere((item) => item.id == contact.id);
 
-      successMessage.value = message;
+      successMessage.value = 'Contact deleted successfully.';
 
       return true;
     } catch (error) {
@@ -300,10 +407,10 @@ class ContactController extends GetxController {
     successMessage.value = '';
   }
 
-  // Dummy methods for phone contacts sync
+  // Sync phone contacts (stub — previously unused)
   Future<void> syncPhoneContacts() async {
     isSyncingContacts.value = true;
-    await Future.delayed(const Duration(seconds: 1));
+    await refreshContacts();
     isSyncingContacts.value = false;
   }
 
@@ -333,11 +440,16 @@ class ContactController extends GetxController {
     );
   }
 
+  /// Returns true if the contact is a raw phone contact (not a registered app user).
+  bool _isPhoneContact(ContactModel contact) {
+    return contact.id.startsWith('phone_') || !contact.isRegisteredUser;
+  }
+
   void _replaceContact(
-      ContactModel updatedContact,
-      ) {
+    ContactModel updatedContact,
+  ) {
     final index = contacts.indexWhere(
-          (contact) => contact.id == updatedContact.id,
+      (contact) => contact.id == updatedContact.id,
     );
 
     if (index >= 0) {
@@ -347,9 +459,8 @@ class ContactController extends GetxController {
     // Backend sorts favorite contacts first.
     contacts.sort((first, second) {
       if (first.isFavorite == second.isFavorite) {
-        return 0;
+        return first.name.toLowerCase().compareTo(second.name.toLowerCase());
       }
-
       return first.isFavorite ? -1 : 1;
     });
   }

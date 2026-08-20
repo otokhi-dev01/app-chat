@@ -9,6 +9,7 @@ import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../../route/app_route.dart';
 import '../../services/contact_service/contact_api_service.dart';
+import '../../services/contact_service/phone_contact_api_service.dart';
 import 'section/about_settings_section.dart';
 import 'section/contact_settings_section.dart';
 import 'section/display_langauge_settings_section.dart';
@@ -39,6 +40,7 @@ class SettingsSideDrawer extends StatelessWidget {
             : Get.put(
                 ContactController(
                   contactApiService: Get.find<ContactApiService>(),
+                  phoneContactApiService: Get.find<PhoneContactApiService>(),
                 ),
                 permanent: true,
               );

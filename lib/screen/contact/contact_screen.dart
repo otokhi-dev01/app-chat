@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../controllers/contact/contact_controller.dart';
 import '../../route/app_route.dart';
 import '../../services/contact_service/contact_api_service.dart';
-import 'add_contact/contact_add_button.dart';
+import '../../services/contact_service/phone_contact_api_service.dart';
 import 'add_group/contact_add_group_button.dart';
 import 'contact_search_field.dart';
 import 'contact_list.dart';
@@ -22,6 +22,7 @@ class ContactScreen extends StatelessWidget {
     return Get.put<ContactController>(
       ContactController(
         contactApiService: Get.find<ContactApiService>(),
+        phoneContactApiService: Get.find<PhoneContactApiService>(),
       ),
       permanent: true,
     );
