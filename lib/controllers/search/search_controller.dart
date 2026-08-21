@@ -52,6 +52,15 @@ class ChatSearchController extends GetxController {
     super.onInit();
     loadHistory();
     loadVisitedUsers();
+
+    debounce(searchQuery, (String query) {
+      final trimmedQuery = query.trim();
+      if (trimmedQuery.isNotEmpty) {
+        search(trimmedQuery, saveHistory: false);
+      } else {
+        searchResults.clear();
+      }
+    }, time: const Duration(milliseconds: 400));
   }
 
   Future<void> loadHistory() async {
@@ -96,7 +105,7 @@ class ChatSearchController extends GetxController {
     await loadHistory();
   }
 
-  Future<void> search(String value) async {
+  Future<void> search(String value, {bool saveHistory = true}) async {
     final String query = value.trim();
 
     updateSearch(query);
@@ -106,7 +115,9 @@ class ChatSearchController extends GetxController {
       return;
     }
 
-    await addHistory(query);
+    if (saveHistory) {
+      await addHistory(query);
+    }
 
     try {
       final List<ContactModel> contacts = await contactApiService.getUserOptions(search: query);

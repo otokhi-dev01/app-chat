@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 
 import '../../../controllers/search/search_controller.dart';
 import '../../../controllers/user/user_controller.dart';
-import '../../../data/mock_chat_data.dart';
 import '../../../models/chat_model.dart';
 import '../../../services/search_service/search_history_service.dart';
 import '../../../services/user_service/user_service.dart';
@@ -29,7 +28,6 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late final ChatSearchController controller;
-  late final List<ChatModel> mockChats;
 
   @override
   void initState() {
@@ -41,8 +39,6 @@ class _SearchScreenState extends State<SearchScreen> {
             contactApiService: Get.find(),
             chatListApiService: Get.find(),
           ));
-
-    mockChats = MockChatData.build();
   }
 
   void _closeSearch(BuildContext context) {
@@ -139,27 +135,18 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _openVisitedUserChat(VisitedUser visited) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    ChatModel? matchingChat;
-    try {
-      matchingChat = mockChats.firstWhere(
-        (ChatModel c) =>
-            c.id == visited.id ||
-            c.name.trim().toLowerCase() == visited.name.trim().toLowerCase(),
-      );
-    } catch (_) {
-      matchingChat = ChatModel(
-        id: visited.id.isNotEmpty
-            ? visited.id
-            : DateTime.now().millisecondsSinceEpoch.toString(),
-        peerUserId: visited.id.isNotEmpty ? visited.id : null,
-        name: visited.name,
-        message: visited.message,
-        dateTime: DateTime.now(),
-        type: visited.type,
-        image: visited.image,
-        isOnline: visited.isOnline,
-      );
-    }
+    final ChatModel matchingChat = ChatModel(
+      id: visited.id.isNotEmpty
+          ? visited.id
+          : DateTime.now().millisecondsSinceEpoch.toString(),
+      peerUserId: visited.id.isNotEmpty ? visited.id : null,
+      name: visited.name,
+      message: visited.message,
+      dateTime: DateTime.now(),
+      type: visited.type,
+      image: visited.image,
+      isOnline: visited.isOnline,
+    );
 
     await _openChat(matchingChat);
   }

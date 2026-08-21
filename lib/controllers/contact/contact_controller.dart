@@ -6,6 +6,8 @@ import '../../models/contact_model.dart';
 import '../../screen/chat_detail/chat_detail_screen.dart';
 import '../../services/contact_service/contact_api_service.dart';
 import '../../services/contact_service/phone_contact_api_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../../screen/widgets/app_feedback.dart'; // adjust path to match your project
 
 class ContactController extends GetxController {
   final ContactApiService contactApiService;
@@ -15,6 +17,9 @@ class ContactController extends GetxController {
     required this.contactApiService,
     required this.phoneContactApiService,
   });
+
+  final Rx<PermissionStatus> contactsPermissionStatus =
+      PermissionStatus.denied.obs;
 
   final RxList<ContactModel> contacts = <ContactModel>[].obs;
 
@@ -407,11 +412,69 @@ class ContactController extends GetxController {
     successMessage.value = '';
   }
 
-  // Sync phone contacts (stub — previously unused)
+// Sync phone contacts — checks/requests permission first.
   Future<void> syncPhoneContacts() async {
-    isSyncingContacts.value = true;
-    await refreshContacts();
-    isSyncingContacts.value = false;
+    if (isSyncingContacts.value) {
+      return;
+    }
+
+    try {
+      isSyncingContacts.value = true;
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      PermissionStatus status = await Permission.contacts.status;
+      contactsPermissionStatus.value = status;
+
+      if (status.isDenied) {
+        status = await Permission.contacts.request();
+        contactsPermissionStatus.value = status;
+      }
+
+      if (status.isPermanentlyDenied || status.isRestricted) {
+        _showPermissionSettingsDialog();
+        return;
+      }
+
+      // Accept both full access AND limited access
+      if (!status.isGranted && !status.isLimited) {
+        errorMessage.value = 'Contacts permission was not granted.';
+        return;
+      }
+
+      await refreshContacts();
+
+      successMessage.value = 'Contacts synced successfully.';
+    } catch (error) {
+      errorMessage.value = _errorText(error);
+    } finally {
+      isSyncingContacts.value = false;
+    }
+  }
+
+  void _showPermissionSettingsDialog() {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text('permission_required'.tr),
+        content: Text('enable_contacts_in_settings'.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              openAppSettings();
+            },
+            child: Text('open_settings'.tr),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> deleteSyncedContacts() async {

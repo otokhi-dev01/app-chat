@@ -99,6 +99,11 @@ final Map<String, String> enUS = {
   'Are you sure you want to unblock @name?',
 
   'follow_device_appearance': 'Follow Device Appearance',
+  // Call
+  'delete_call_log': 'Delete Call Log',
+  'missed_call': 'Missed Call',
+  'outgoing_call': 'Outgoing Call',
+  'incoming_call': 'Incoming Call',
 
   'control_privacy_security': 'Control Privacy and Security',
   'privacy_header_description': 'Manage your privacy and security',

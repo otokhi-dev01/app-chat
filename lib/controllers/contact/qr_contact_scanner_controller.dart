@@ -7,6 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../models/contact_model.dart';
 import '../../models/user_model.dart';
+import '../../route/app_route.dart';
 import '../../services/contact_service/contact_api_service.dart';
 import '../../services/user_service/user_service.dart';
 
@@ -21,7 +22,7 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
 
   final MobileScannerController scannerController =
   MobileScannerController(
-    autoStart: true,
+    autoStart: false, // <-- was true
     facing: CameraFacing.back,
     detectionSpeed: DetectionSpeed.normal,
     detectionTimeoutMs: 500,
@@ -38,11 +39,14 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
   final RxString scannedValue = ''.obs;
 
   bool _isClosed = false;
+  bool _isStarting = false;
+
 
   @override
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(_startScanner()); // single, explicit start
   }
 
   @override
@@ -61,21 +65,28 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
       return;
     }
 
-    if (state == AppLifecycleState.resumed && !isProcessing.value) {
+    if (state == AppLifecycleState.resumed &&
+        !isProcessing.value &&
+        !_isStarting &&
+        !scannerController.value.isRunning) {
       unawaited(_startScanner());
     }
   }
+
 
   Future<void> handleDetect(
       BarcodeCapture capture,
       ) async {
     if (isProcessing.value || _isClosed) {
+      debugPrint('QR: skipped detect (isProcessing=${isProcessing.value}, isClosed=$_isClosed)');
       return;
     }
 
     String rawValue = _getBarcodeValue(capture);
+    debugPrint('QR: raw barcode value = "$rawValue"');
 
     if (rawValue.isEmpty) {
+      debugPrint('QR: empty barcode value, ignoring');
       return;
     }
 
@@ -86,8 +97,11 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
     await HapticFeedback.mediumImpact();
     await _stopScanner();
 
+    AppUserModel? user; // hoisted so it's visible in catch
+
     try {
       String userValue = _extractUserValue(rawValue);
+      debugPrint('QR: extracted user value = "$userValue"');
 
       if (userValue.isEmpty) {
         throw StateError(
@@ -95,7 +109,9 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
         );
       }
 
-      AppUserModel? user = await _findUser(userValue);
+      debugPrint('QR: looking up user...');
+      user = await _findUser(userValue);
+      debugPrint('QR: _findUser result -> id=${user?.id}, username=${user?.username}');
 
       if (user == null) {
         throw StateError(
@@ -103,7 +119,9 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
         );
       }
 
+      debugPrint('QR: fetching current user...');
       AppUserModel? currentUser = await appUserService.getCurrentUser();
+      debugPrint('QR: currentUser -> id=${currentUser?.id}');
 
       if (currentUser?.id == user.id) {
         throw StateError(
@@ -111,9 +129,11 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
         );
       }
 
+      debugPrint('QR: creating contact for userId=${user.id}...');
       ContactModel? contact = await contactService.createContact(
         contactUserId: user.id,
       );
+      debugPrint('QR: createContact result -> id=${contact?.id}');
 
       if (contact == null) {
         throw StateError(
@@ -122,14 +142,28 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
       }
 
       if (_isClosed) {
+        debugPrint('QR: controller already closed, skipping navigation');
         return;
       }
 
-      Get.back<ContactModel>(
-        result: contact,
-      );
-    } catch (error) {
+      debugPrint('QR: SUCCESS — closing scanner and opening profile');
+      Get.back<ContactModel>(result: contact);
+      Get.toNamed(AppRoutes.profileDetail, arguments: {'userId': user.id});
+    } catch (error, stackTrace) {
       isProcessing.value = false;
+
+      if (_isDuplicateContactError(error) && user != null) {
+        debugPrint('QR: contact already exists, opening profile for userId=${user.id}');
+        if (!_isClosed) {
+          Get.back();
+          Get.toNamed(AppRoutes.profileDetail, arguments: {'userId': user.id});
+        }
+        return;
+      }
+
+      debugPrint('QR: ERROR in handleDetect -> $error');
+      debugPrintStack(stackTrace: stackTrace);
+
       errorMessage.value = _cleanErrorMessage(error);
 
       await _startScanner();
@@ -193,16 +227,21 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
 
     // First, treat the QR value as a user ID.
     try {
-      return await appUserService.getUserById(cleanValue);
+      debugPrint('QR: _findUser -> trying getUserById("$cleanValue")');
+      final result = await appUserService.getUserById(cleanValue);
+      debugPrint('QR: _findUser -> getUserById SUCCESS: id=${result?.id}');
+      return result;
     } catch (error) {
-      debugPrint('User ID lookup failed: $error');
+      debugPrint('QR: _findUser -> getUserById FAILED: $error');
     }
 
     // If it is not an ID, search by username or phone number.
     try {
+      debugPrint('QR: _findUser -> falling back to searchUsers("$cleanValue")');
       final results = await appUserService.searchUsers(
         query: cleanValue,
       );
+      debugPrint('QR: _findUser -> searchUsers returned ${results.length} result(s)');
 
       if (results.isEmpty) {
         return null;
@@ -222,14 +261,20 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
             _normalizePhoneNumber(item.phoneNumber) ==
                 normalizedPhone;
 
+        debugPrint(
+          'QR: _findUser -> candidate id=${item.id} username=${item.username} '
+              '-> matchesId=$matchesId matchesUsername=$matchesUsername matchesPhone=$matchesPhone',
+        );
+
         if (matchesId || matchesUsername || matchesPhone) {
           return item;
         }
       }
 
+      debugPrint('QR: _findUser -> no candidate matched');
       return null;
     } catch (error) {
-      debugPrint('User search failed: $error');
+      debugPrint('QR: _findUser -> searchUsers FAILED: $error');
       return null;
     }
   }
@@ -261,6 +306,12 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
         .replaceFirst('Bad state: ', '')
         .replaceFirst('Invalid argument(s): ', '')
         .trim();
+  }
+
+  // ADD THIS NEW METHOD HERE
+  bool _isDuplicateContactError(Object error) {
+    final message = error.toString().toLowerCase();
+    return message.contains('409') || message.contains('already exist');
   }
 
   Future<void> toggleTorch() async {
@@ -310,9 +361,15 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
   }
 
   Future<void> _startScanner() async {
-    if (_isClosed) {
+    if (_isClosed || _isStarting) {
       return;
     }
+
+    if (scannerController.value.isRunning) {
+      return;
+    }
+
+    _isStarting = true;
 
     try {
       debugPrint('CAMERA: Starting scanner...');
@@ -329,9 +386,10 @@ class QrContactScannerController extends GetxController with WidgetsBindingObser
       debugPrintStack(stackTrace: stackTrace);
 
       if (!_isClosed) {
-        errorMessage.value =
-        'Unable to start the camera.';
+        errorMessage.value = 'Unable to start the camera.';
       }
+    } finally {
+      _isStarting = false;
     }
   }
 

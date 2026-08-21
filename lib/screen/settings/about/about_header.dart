@@ -86,7 +86,7 @@ class AboutHeader extends StatelessWidget {
           SizedBox(height: 16),
 
           Text(
-            'OTOKHI Chat',
+            'Pii Chat',
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               color: colorScheme.onSurface,

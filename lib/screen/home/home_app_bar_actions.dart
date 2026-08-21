@@ -85,28 +85,7 @@ class HomeAppBarActions extends StatelessWidget {
         );
 
       case 2:
-      // UPDATED: Settings Search button (case 2: Settings Tab) navigating to AppRoutes.settingsSearch
-        return HomeAppBarActionButton(
-          tooltip: 'search_settings'.tr,
-          icon: CupertinoIcons.search,
-          backgroundColor: backgroundColor,
-          foregroundColor: iconColor,
-          onPressed: () async {
-            // UPDATED: Dismisses keyboard cleanly before initiating page transition
-            FocusManager.instance.primaryFocus?.unfocus();
-
-            // UPDATED: Opens SettingsSearchScreen via GetX route and awaits selected setting result
-            dynamic result = await Get.toNamed(
-              AppRoutes.settingsSearch,
-            );
-
-            String? selectedSetting = result is String ? result : null;
-
-            if (selectedSetting == null) return;
-
-            debugPrint('Selected setting: $selectedSetting');
-          },
-        );
+        return const SizedBox.shrink();
 
       case 3:
         return HomeAppBarActionButton(

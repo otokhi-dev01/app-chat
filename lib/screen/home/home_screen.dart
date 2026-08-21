@@ -7,12 +7,14 @@ import '../../controllers/settings/chat_folder_controller.dart';
 import '../../services/folder_service/chat_folder_api_service.dart';
 import '../../services/massage_service /chat_list_service.dart';
 import '../../services/mock/mock_chat_list_service.dart';
+import '../call_screen/call_list_screen.dart';
+import '../call_screen/call_screen.dart';
 import '../contact/contact_screen.dart';
-import '../home/search/search_screen.dart';
 import '../widgets/navigation/main_bottom_navigation.dart';
 import 'chat_list/home_chat_list.dart';
 import 'home_app_bar.dart';
-import 'settings_side_drawer.dart';
+import 'search/search_screen.dart';
+import 'settings_drawer/settings_side_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -40,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Chats',
     'Contacts',
     'Calls',
-    'Search',
   ];
 
   @override
@@ -99,6 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void changePage(int index) {
+    if (index == 3) {
+      Get.to(
+        () => const SearchScreen(),
+        transition: Transition.fadeIn,
+      );
+      return;
+    }
+
     if (index == selectedIndex) {
       return;
     }
@@ -142,8 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: controller,
       ),
       ContactScreen(),
-      Center(child: Text('Calls Tab Placeholder')),
-      SearchScreen(),
+      const CallListScreen(),
     ];
 
     final HomeAppBar homeAppBar = HomeAppBar(

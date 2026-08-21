@@ -1,58 +1,50 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../../../controllers/search/search_controller.dart';
+/// REPLACED: Custom interactive CallFilterSegment with sliding indicator pill, drag gestures, and unit UI styling
+class CallFilterSegment extends StatefulWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onIndexChanged;
 
-/// ADDED: Interactive category filter bar with sliding indicator pill and drag gesture support
-class SearchScopeSelector extends StatefulWidget {
-  final SearchScope selectedScope;
-  final ValueChanged<SearchScope> onScopeChanged;
-
-  const SearchScopeSelector({
+  const CallFilterSegment({
     super.key,
-    required this.selectedScope,
-    required this.onScopeChanged,
+    required this.selectedIndex,
+    required this.onIndexChanged,
   });
 
   @override
-  State<SearchScopeSelector> createState() {
-    return _SearchScopeSelectorState();
+  State<CallFilterSegment> createState() {
+    return _CallFilterSegmentState();
   }
 }
 
-class _SearchScopeSelectorState extends State<SearchScopeSelector> {
-  // ADDED: Drag position state for interactive sliding indicator
+class _CallFilterSegmentState extends State<CallFilterSegment> {
+  // UPDATED: Indicator position tracking for interactive long-press dragging
   double? _dragIndicatorLeft;
   bool _isDragging = false;
 
   double get itemGap => 3.0;
   double get itemHeight => 38.0;
 
-  // ADDED: Search scopes paired with Cupertino icons
-  List<_SearchScopeItem> get filterItems {
-    return <_SearchScopeItem>[
-      _SearchScopeItem(
-        type: SearchScope.chats,
-        title: 'chats'.tr,
-        icon: CupertinoIcons.chat_bubble_2,
+  // ADDED: Call filter items ("All Calls" & "Missed") paired with Cupertino icons
+  List<CallFilterItem> get filterItems {
+    return <CallFilterItem>[
+      CallFilterItem(
+        index: 0,
+        title: 'All Calls',
+        icon: CupertinoIcons.phone,
       ),
-      _SearchScopeItem(
-        type: SearchScope.contacts,
-        title: 'contacts'.tr,
-        icon: CupertinoIcons.person_2,
-      ),
-      _SearchScopeItem(
-        type: SearchScope.all,
-        title: 'all'.tr,
-        icon: CupertinoIcons.square_grid_2x2,
+      CallFilterItem(
+        index: 1,
+        title: 'Missed',
+        icon: CupertinoIcons.phone_down_fill,
       ),
     ];
   }
 
   int get selectedIndex {
     int index = filterItems.indexWhere(
-          (_SearchScopeItem item) => item.type == widget.selectedScope,
+          (CallFilterItem item) => item.index == widget.selectedIndex,
     );
     return index < 0 ? 0 : index;
   }
@@ -62,9 +54,17 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
     required double itemWidth,
   }) {
     double selectedLeft = selectedIndex * (itemWidth + itemGap);
-    Rect activeArea = Rect.fromLTWH(selectedLeft, 0, itemWidth, itemHeight);
 
-    if (!activeArea.contains(details.localPosition)) return;
+    Rect activeArea = Rect.fromLTWH(
+      selectedLeft,
+      0,
+      itemWidth,
+      itemHeight,
+    );
+
+    if (!activeArea.contains(details.localPosition)) {
+      return;
+    }
 
     setState(() {
       _isDragging = true;
@@ -77,7 +77,9 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
     required double itemWidth,
     required double maximumLeft,
   }) {
-    if (!_isDragging) return;
+    if (!_isDragging) {
+      return;
+    }
 
     double nextLeft = details.localPosition.dx - itemWidth / 2;
     nextLeft = nextLeft.clamp(0.0, maximumLeft).toDouble();
@@ -90,13 +92,21 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
       _dragIndicatorLeft = nextLeft;
     });
 
-    SearchScope nextScope = filterItems[nextIndex].type;
-    if (widget.selectedScope != nextScope) {
-      widget.onScopeChanged(nextScope);
+    int nextFilterIndex = filterItems[nextIndex].index;
+    if (widget.selectedIndex != nextFilterIndex) {
+      widget.onIndexChanged(nextFilterIndex);
     }
   }
 
   void _stopDragging() {
+    if (!_isDragging) return;
+    setState(() {
+      _isDragging = false;
+      _dragIndicatorLeft = null;
+    });
+  }
+
+  void _cancelDragging() {
     if (!_isDragging) return;
     setState(() {
       _isDragging = false;
@@ -110,7 +120,7 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
     ColorScheme colorScheme = theme.colorScheme;
     bool isDark = theme.brightness == Brightness.dark;
 
-    // UPDATED: Unit UI colors for filter container and active sliding pill
+    // UPDATED: Theme-aware colors matching unit UI glass container and active indicator borders
     Color backgroundColor = isDark ? const Color(0xFF1B1D22) : Colors.white;
 
     Color borderColor = isDark
@@ -121,6 +131,10 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
 
     Color activeBorderColor = colorScheme.primary.withValues(
       alpha: isDark ? 0.28 : 0.18,
+    );
+
+    Color shadowColor = Colors.black.withValues(
+      alpha: isDark ? 0.15 : 0.04,
     );
 
     return Padding(
@@ -136,9 +150,7 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
           border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(
-                alpha: isDark ? 0.15 : 0.04,
-              ),
+              color: shadowColor,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -151,6 +163,7 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
                 (constraints.maxWidth - totalGap) / filterItems.length;
 
             double normalIndicatorLeft = selectedIndex * (itemWidth + itemGap);
+
             double indicatorLeft = _isDragging && _dragIndicatorLeft != null
                 ? _dragIndicatorLeft!
                 : normalIndicatorLeft;
@@ -159,20 +172,26 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
 
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onLongPressStart: (details) => _startDragging(
-                details: details,
-                itemWidth: itemWidth,
-              ),
-              onLongPressMoveUpdate: (details) => _updateDragging(
-                details: details,
-                itemWidth: itemWidth,
-                maximumLeft: maximumLeft,
-              ),
-              onLongPressEnd: (_) => _stopDragging(),
-              onLongPressCancel: _stopDragging,
+              onLongPressStart: (LongPressStartDetails details) {
+                _startDragging(
+                  details: details,
+                  itemWidth: itemWidth,
+                );
+              },
+              onLongPressMoveUpdate: (LongPressMoveUpdateDetails details) {
+                _updateDragging(
+                  details: details,
+                  itemWidth: itemWidth,
+                  maximumLeft: maximumLeft,
+                );
+              },
+              onLongPressEnd: (LongPressEndDetails details) {
+                _stopDragging();
+              },
+              onLongPressCancel: _cancelDragging,
               child: Stack(
                 children: [
-                  // ADDED: Animated sliding active pill indicator
+                  // UPDATED: Sliding active indicator pill with animated positioning and 18px radius
                   AnimatedPositioned(
                     duration: _isDragging
                         ? Duration.zero
@@ -189,12 +208,23 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
                           color: activeColor,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: activeBorderColor),
+                          boxShadow: _isDragging
+                              ? [
+                            BoxShadow(
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.12,
+                              ),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                              : [],
                         ),
                       ),
                     ),
                   ),
 
-                  // Filter Buttons Row
+                  // UPDATED: Filter item buttons row
                   Row(
                     children: _buildButtons(itemWidth: itemWidth),
                   ),
@@ -211,19 +241,19 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
     List<Widget> widgets = <Widget>[];
 
     for (int index = 0; index < filterItems.length; index++) {
-      _SearchScopeItem item = filterItems[index];
+      CallFilterItem item = filterItems[index];
 
       widgets.add(
         SizedBox(
           width: itemWidth,
           height: itemHeight,
-          child: _FilterButton(
+          child: _CallFilterButton(
             title: item.title,
             icon: item.icon,
-            selected: widget.selectedScope == item.type,
+            selected: widget.selectedIndex == item.index,
             onTap: () {
-              if (_isDragging || widget.selectedScope == item.type) return;
-              widget.onScopeChanged(item.type);
+              if (_isDragging || widget.selectedIndex == item.index) return;
+              widget.onIndexChanged(item.index);
             },
           ),
         ),
@@ -238,25 +268,25 @@ class _SearchScopeSelectorState extends State<SearchScopeSelector> {
   }
 }
 
-class _SearchScopeItem {
-  final SearchScope type;
+class CallFilterItem {
+  final int index;
   final String title;
   final IconData icon;
 
-  _SearchScopeItem({
-    required this.type,
+  CallFilterItem({
+    required this.index,
     required this.title,
     required this.icon,
   });
 }
 
-class _FilterButton extends StatelessWidget {
+class _CallFilterButton extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
-  const _FilterButton({
+  const _CallFilterButton({
     required this.title,
     required this.icon,
     required this.selected,
@@ -283,6 +313,8 @@ class _FilterButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -297,7 +329,11 @@ class _FilterButton extends StatelessWidget {
                 curve: Curves.easeOut,
                 tween: ColorTween(end: contentColor),
                 builder: (context, Color? color, child) {
-                  return Icon(icon, color: color, size: 15);
+                  return Icon(
+                    icon,
+                    color: color,
+                    size: 15,
+                  );
                 },
               ),
               const SizedBox(width: 4),
